@@ -64,7 +64,7 @@
                     Cómo funciona
                 </a>
 
-                <a href="#" class="enlace-publicar">
+                <a href="publicar-plan.html" class="enlace-publicar">
                     <i class="fa-solid fa-plus"></i>
                     Publicar un plan
                 </a>
@@ -227,7 +227,7 @@
                                 </span>
 
                                 <div>
-                                    <strong>1</strong>
+                                    <strong id="contador-reservas-perfil">0</strong>
                                     <span>Reservas activas</span>
                                 </div>
                             </article>
@@ -238,7 +238,7 @@
                                 </span>
 
                                 <div>
-                                    <strong>3</strong>
+                                    <strong id="contador-favoritos-perfil">0</strong>
                                     <span>Planes favoritos</span>
                                 </div>
                             </article>
@@ -274,48 +274,7 @@
                                 </button>
                             </div>
 
-                            <article class="reserva-resumen">
-
-                                <div class="reserva-resumen__imagen">
-                                    <img
-                                        src="https://images.unsplash.com/photo-1602002418082-a4443e081dd1?auto=format&fit=crop&w=700&q=80"
-                                        alt="Visita guiada por Itálica"
-                                    >
-                                </div>
-
-                                <div class="reserva-resumen__contenido">
-
-                                    <span class="reserva-estado">
-                                        Confirmada
-                                    </span>
-
-                                    <h3>Visita guiada por Itálica</h3>
-
-                                    <p>
-                                        <i class="fa-regular fa-calendar"></i>
-                                        Sábado, 25 de julio
-                                    </p>
-
-                                    <p>
-                                        <i class="fa-regular fa-clock"></i>
-                                        10:30
-                                    </p>
-
-                                    <p>
-                                        <i class="fa-solid fa-location-dot"></i>
-                                        Santiponce, Sevilla
-                                    </p>
-
-                                    <a
-                                        href="detalle-plan.html"
-                                        class="boton-ver-reserva"
-                                    >
-                                        Ver actividad
-                                    </a>
-
-                                </div>
-
-                            </article>
+                            <div id="proxima-reserva-perfil"></div>
 
                         </div>
 
@@ -325,8 +284,7 @@
 
                     <section
                         class="perfil-seccion"
-                        id="seccion-reservas"
-                    >
+                        id="seccion-reservas">
 
                         <div class="perfil-seccion__cabecera">
 
@@ -344,283 +302,87 @@
 
                         </div>
 
-                        <div class="lista-reservas">
-
-                            <article class="reserva-item">
-
-                                <div class="reserva-item__imagen">
-                                    <img
-                                        src="https://images.unsplash.com/photo-1602002418082-a4443e081dd1?auto=format&fit=crop&w=700&q=80"
-                                        alt="Visita guiada por Itálica"
-                                    >
-                                </div>
-
-                                <div class="reserva-item__contenido">
-
-                                    <div class="reserva-item__superior">
-
-                                        <div>
-                                            <span class="reserva-estado">
-                                                Confirmada
-                                            </span>
-
-                                            <h3>
-                                                Visita guiada por Itálica
-                                            </h3>
-                                        </div>
-
-                                        <button
-                                            type="button"
-                                            class="boton-opciones"
-                                            aria-label="Opciones de reserva"
-                                        >
-                                            <i class="fa-solid fa-ellipsis"></i>
-                                        </button>
-
-                                    </div>
-
-                                    <div class="reserva-item__datos">
-
-                                        <span>
-                                            <i class="fa-regular fa-calendar"></i>
-                                            25 de julio de 2026
-                                        </span>
-
-                                        <span>
-                                            <i class="fa-regular fa-clock"></i>
-                                            10:30
-                                        </span>
-
-                                        <span>
-                                            <i class="fa-solid fa-user-group"></i>
-                                            2 personas
-                                        </span>
-
-                                    </div>
-
-                                    <div class="reserva-item__acciones">
-
-                                        <a
-                                            href="detalle-plan.html"
-                                            class="boton-principal-pequeno"
-                                        >
-                                            Ver actividad
-                                        </a>
-
-                                        <button
-                                            type="button"
-                                            class="boton-cancelar-reserva"
-                                        >
-                                            Cancelar reserva
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-                            </article>
-
+                        <div 
+                            class="lista-reservas"
+                            id="lista-reservas-perfil">
                         </div>
+
+                            <div
+                                class="estado-vacio"
+                                id="estado-vacio-reservas">
+
+                                <span class="estado-vacio__icono">
+                                    <i class="fa-regular fa-calendar-xmark"></i>
+                                </span>
+
+                                <h3>No tienes reservas activas</h3>
+
+                                <p>
+                                    Explora las actividades disponibles y reserva tu próximo plan.
+                                </p>
+
+                                <a href="planes.html" class="boton-auth">
+                                    Explorar planes
+                                </a>
+
+                            </div>
 
                     </section>
 
                     <!-- FAVORITOS -->
 
-                    <section
-                        class="perfil-seccion"
-                        id="seccion-favoritos"
-                    >
+                    <section 
+                            class="perfil-seccion"
+                            id="seccion-favoritos"
+                             >
 
-                        <div class="perfil-seccion__cabecera">
+                            <div class="perfil-seccion__cabecera">
 
-                            <div>
-                                <span class="subtitulo">
-                                    Guardados
-                                </span>
+                                <div>
+                                    <span class="subtitulo">
+                                        Guardados
+                                    </span>
 
-                                <h2>Planes favoritos</h2>
+                                    <h2>Planes favoritos</h2>
 
-                                <p>
-                                    Actividades que has guardado para más adelante.
-                                </p>
+                                    <p>
+                                        Actividades que has guardado para más adelante.
+                                    </p>
+                                </div>
+
                             </div>
 
-                        </div>
+                            <div
+                                class="planes__grid perfil-favoritos"
+                                id="lista-favoritos-perfil">
+                            </div>
 
-                        <div class="planes__grid perfil-favoritos">
-
-                            <article class="tarjeta-plan">
-
-                                <a
-                                    href="detalle-plan.html"
-                                    class="tarjeta-plan__enlace"
+                            <div
+                                class="estado-vacio"
+                                id="estado-vacio-favoritos"
                                 >
 
-                                    <div class="tarjeta-plan__imagen imagen-plan--italica">
+                                <span class="estado-vacio__icono">
+                                    <i class="fa-regular fa-heart"></i>
+                                </span>
 
-                                        <span class="tarjeta-plan__precio">
-                                            Gratis
-                                        </span>
+                                <h3>No tienes planes favoritos</h3>
 
-                                        <button
-                                            type="button"
-                                            class="tarjeta-plan__favorito favorito-activo"
-                                            aria-label="Eliminar de favoritos"
-                                        >
-                                            <i class="fa-solid fa-heart"></i>
-                                        </button>
+                                <p>
+                                    Guarda las actividades que más te interesen para
+                                    encontrarlas fácilmente.
+                                </p>
 
-                                    </div>
-
-                                    <div class="tarjeta-plan__contenido">
-
-                                        <div class="tarjeta-plan__meta">
-                                            <span>
-                                                <i class="fa-regular fa-calendar"></i>
-                                                25 de julio
-                                            </span>
-                                        </div>
-
-                                        <h3>Visita guiada por Itálica</h3>
-
-                                        <p class="tarjeta-plan__ubicacion">
-                                            <i class="fa-solid fa-location-dot"></i>
-                                            Santiponce, Sevilla
-                                        </p>
-
-                                        <div class="tarjeta-plan__pie">
-                                            <span>Cultura</span>
-
-                                            <strong>
-                                                4,8
-                                                <i class="fa-solid fa-star"></i>
-                                            </strong>
-                                        </div>
-
-                                    </div>
-
+                                <a href="planes.html" class="boton-auth">
+                                    Explorar planes
                                 </a>
 
-                            </article>
-
-                            <article class="tarjeta-plan">
-
-                                <a
-                                    href="detalle-plan.html"
-                                    class="tarjeta-plan__enlace"
-                                >
-
-                                    <div class="tarjeta-plan__imagen imagen-plan--kayak">
-
-                                        <span class="tarjeta-plan__precio">
-                                            18 €
-                                        </span>
-
-                                        <button
-                                            type="button"
-                                            class="tarjeta-plan__favorito favorito-activo"
-                                            aria-label="Eliminar de favoritos"
-                                        >
-                                            <i class="fa-solid fa-heart"></i>
-                                        </button>
-
-                                    </div>
-
-                                    <div class="tarjeta-plan__contenido">
-
-                                        <div class="tarjeta-plan__meta">
-                                            <span>
-                                                <i class="fa-regular fa-calendar"></i>
-                                                27 de julio
-                                            </span>
-                                        </div>
-
-                                        <h3>Kayak al atardecer</h3>
-
-                                        <p class="tarjeta-plan__ubicacion">
-                                            <i class="fa-solid fa-location-dot"></i>
-                                            Río Guadalquivir
-                                        </p>
-
-                                        <div class="tarjeta-plan__pie">
-                                            <span>Aventura</span>
-
-                                            <strong>
-                                                4,9
-                                                <i class="fa-solid fa-star"></i>
-                                            </strong>
-                                        </div>
-
-                                    </div>
-
-                                </a>
-
-                            </article>
-
-                            <article class="tarjeta-plan">
-
-                                <a
-                                    href="detalle-plan.html"
-                                    class="tarjeta-plan__enlace"
-                                >
-
-                                    <div class="tarjeta-plan__imagen imagen-plan--concierto">
-
-                                        <span class="tarjeta-plan__precio">
-                                            12 €
-                                        </span>
-
-                                        <button
-                                            type="button"
-                                            class="tarjeta-plan__favorito favorito-activo"
-                                            aria-label="Eliminar de favoritos"
-                                        >
-                                            <i class="fa-solid fa-heart"></i>
-                                        </button>
-
-                                    </div>
-
-                                    <div class="tarjeta-plan__contenido">
-
-                                        <div class="tarjeta-plan__meta">
-                                            <span>
-                                                <i class="fa-regular fa-calendar"></i>
-                                                30 de julio
-                                            </span>
-                                        </div>
-
-                                        <h3>Concierto en la Alameda</h3>
-
-                                        <p class="tarjeta-plan__ubicacion">
-                                            <i class="fa-solid fa-location-dot"></i>
-                                            Alameda de Hércules
-                                        </p>
-
-                                        <div class="tarjeta-plan__pie">
-                                            <span>Música</span>
-
-                                            <strong>
-                                                4,7
-                                                <i class="fa-solid fa-star"></i>
-                                            </strong>
-                                        </div>
-
-                                    </div>
-
-                                </a>
-
-                            </article>
-
-                        </div>
+                            </div>
 
                     </section>
-
                     <!-- PLANES PUBLICADOS -->
 
-                    <section
-                        class="perfil-seccion"
-                        id="seccion-publicados"
-                    >
+                    <section class="perfil-seccion" id="seccion-publicados">
 
                         <div class="perfil-seccion__cabecera">
 
@@ -632,12 +394,13 @@
                                 <h2>Planes publicados</h2>
 
                                 <p>
-                                    Gestiona las actividades creadas por ti.
+                                    Gestiona tus actividades, publicaciones pendientes
+                                    y borradores.
                                 </p>
                             </div>
 
                             <a
-                                href="#"
+                                href="publicar-plan.html"
                                 class="boton-principal-pequeno"
                             >
                                 <i class="fa-solid fa-plus"></i>
@@ -646,7 +409,46 @@
 
                         </div>
 
-                        <div class="estado-vacio">
+                        <div class="filtros-publicaciones">
+
+                            <button
+                                type="button"
+                                class="filtro-publicacion activo"
+                                data-filtro-publicacion="todos"
+                            >
+                                Todos
+                                <span id="contador-publicaciones">0</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                class="filtro-publicacion"
+                                data-filtro-publicacion="pendiente"
+                            >
+                                Pendientes
+                                <span id="contador-pendientes">0</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                class="filtro-publicacion"
+                                data-filtro-publicacion="borrador"
+                            >
+                                Borradores
+                                <span id="contador-borradores">0</span>
+                            </button>
+
+                        </div>
+
+                        <div
+                            class="lista-publicaciones"
+                            id="lista-publicaciones"
+                        ></div>
+
+                        <div
+                            class="estado-vacio"
+                            id="estado-vacio-publicaciones"
+                        >
 
                             <span class="estado-vacio__icono">
                                 <i class="fa-regular fa-calendar-plus"></i>
@@ -659,7 +461,7 @@
                                 interesadas en nuevas experiencias.
                             </p>
 
-                            <a href="#" class="boton-auth">
+                            <a href="publicar-plan.html" class="boton-auth">
                                 Publicar mi primer plan
                             </a>
 
@@ -866,6 +668,45 @@
             </div>
 
         </div>
+
+    </div>
+
+
+    <div class="modal-confirmacion" id="modal-eliminar-plan">
+
+                    <div class="modal-confirmacion__contenido">
+
+                        <span class="modal-confirmacion__icono">
+                            <i class="fa-solid fa-trash"></i>
+                        </span>
+
+                        <h2>¿Eliminar este plan?</h2>
+
+                        <p>
+                            Esta acción eliminará el plan de tu perfil.
+                        </p>
+
+                        <div class="modal-confirmacion__acciones">
+
+                            <button
+                                type="button"
+                                class="boton-secundario"
+                                id="cancelar-eliminar-plan"
+                            >
+                                Volver
+                            </button>
+
+                            <button
+                                type="button"
+                                class="boton-confirmar-cancelacion"
+                                id="confirmar-eliminar-plan"
+                            >
+                                Eliminar plan
+                            </button>
+
+                        </div>
+
+                    </div>
 
     </div>
 

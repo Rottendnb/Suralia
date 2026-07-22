@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Publica una actividad o experiencia en Sevilla a través de Suralia."
+    >
+
+    <title>Publicar un plan | Suralia</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="contenedor header__contenido">
+
+            <a
+                href="index.html"
+                class="logo"
+                aria-label="Página de inicio de Suralia"
+            >
+                <span class="logo__icono">
+                    <i class="fa-solid fa-location-dot"></i>
+                </span>
+
+                <span class="logo__texto">
+                    Suralia
+                </span>
+            </a>
+
+            <nav class="navegacion" id="navegacion">
+
+                <a href="planes.html">
+                    Explorar planes
+                </a>
+
+                <a href="index.html#categorias">
+                    Categorías
+                </a>
+
+                <a href="index.html#como-funciona">
+                    Cómo funciona
+                </a>
+
+                <a
+                    href="publicar-plan.html"
+                    class="enlace-publicar enlace-activo"
+                >
+                    <i class="fa-solid fa-plus"></i>
+                    Publicar un plan
+                </a>
+
+                <a href="perfil.html" class="login-movil">
+                    <i class="fa-regular fa-user"></i>
+                    Mi perfil
+                </a>
+
+            </nav>
+
+            <div class="header__acciones">
+
+                <a href="perfil.html" class="boton-login">
+                    <i class="fa-regular fa-user"></i>
+                    Mi perfil
+                </a>
+
+                <button
+                    class="boton-menu"
+                    id="boton-menu"
+                    type="button"
+                    aria-label="Abrir menú"
+                    aria-expanded="false"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+            </div>
+
+        </div>
+    </header>
+
+    <main>
+
+        <section class="cabecera-publicar">
+
+            <div class="contenedor cabecera-publicar__contenido">
+
+                <div>
+
+                    <span class="subtitulo">
+                        Comparte una experiencia
+                    </span>
+
+                    <h1>Publica un nuevo plan</h1>
+
+                    <p>
+                        Completa la información de la actividad para que otras
+                        personas puedan descubrirla y reservar su plaza.
+                    </p>
+
+                </div>
+
+                <div class="cabecera-publicar__icono">
+                    <i class="fa-regular fa-calendar-plus"></i>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="publicar-plan">
+
+            <div class="contenedor publicar-plan__grid">
+
+                <form
+                    class="formulario-publicar"
+                    id="formulario-publicar"
+                    novalidate
+                >
+
+                    <section class="bloque-formulario-publicar">
+
+                        <div class="bloque-formulario-publicar__cabecera">
+
+                            <span class="bloque-formulario-publicar__numero">
+                                01
+                            </span>
+
+                            <div>
+                                <h2>Información principal</h2>
+
+                                <p>
+                                    Introduce el nombre y la categoría de la
+                                    actividad.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="campo-formulario">
+
+                            <label for="plan-titulo">
+                                Título del plan
+                            </label>
+
+                            <div class="campo-formulario__control">
+                                <i class="fa-solid fa-heading"></i>
+
+                                <input
+                                    type="text"
+                                    id="plan-titulo"
+                                    name="titulo"
+                                    maxlength="70"
+                                    placeholder="Ejemplo: Ruta nocturna por Sevilla"
+                                >
+                            </div>
+
+                            <div class="campo-formulario__pie">
+
+                                <small
+                                    class="mensaje-error"
+                                    id="error-plan-titulo"
+                                ></small>
+
+                                <small id="contador-titulo">
+                                    0/70
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <div class="formulario-doble">
+
+                            <div class="campo-formulario">
+
+                                <label for="plan-categoria">
+                                    Categoría
+                                </label>
+
+                                <div class="campo-formulario__control">
+                                    <i class="fa-solid fa-layer-group"></i>
+
+                                    <select
+                                        id="plan-categoria"
+                                        name="categoria"
+                                    >
+                                        <option value="">
+                                            Selecciona una categoría
+                                        </option>
+
+                                        <option value="cultura">
+                                            Cultura
+                                        </option>
+
+                                        <option value="musica">
+                                            Música
+                                        </option>
+
+                                        <option value="naturaleza">
+                                            Naturaleza
+                                        </option>
+
+                                        <option value="gastronomia">
+                                            Gastronomía
+                                        </option>
+
+                                        <option value="aventura">
+                                            Aventura
+                                        </option>
+
+                                        <option value="talleres">
+                                            Talleres
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <small
+                                    class="mensaje-error"
+                                    id="error-plan-categoria"
+                                ></small>
+
+                            </div>
+
+                            <div class="campo-formulario">
+
+                                <label for="plan-provincia">
+                                    Provincia
+                                </label>
+
+                                <div class="campo-formulario__control">
+                                    <i class="fa-solid fa-map"></i>
+
+                                    <select
+                                        id="plan-provincia"
+                                        name="provincia"
+                                    >
+                                        <option value="sevilla">
+                                            Sevilla
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <small class="campo-ayuda">
+                                    Próximamente añadiremos más provincias.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <div class="campo-formulario">
+
+                            <label for="plan-descripcion">
+                                Descripción
+                            </label>
+
+                            <div class="campo-formulario__control campo-formulario__control--textarea">
+
+                                <textarea
+                                    id="plan-descripcion"
+                                    name="descripcion"
+                                    rows="7"
+                                    maxlength="600"
+                                    placeholder="Explica en qué consiste la actividad, qué se hará y a quién está dirigida."
+                                ></textarea>
+
+                            </div>
+
+                            <div class="campo-formulario__pie">
+
+                                <small
+                                    class="mensaje-error"
+                                    id="error-plan-descripcion"
+                                ></small>
+
+                                <small id="contador-descripcion">
+                                    0/600
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section class="bloque-formulario-publicar">
+
+                        <div class="bloque-formulario-publicar__cabecera">
+
+                            <span class="bloque-formulario-publicar__numero">
+                                02
+                            </span>
+
+                            <div>
+                                <h2>Fecha y disponibilidad</h2>
+
+                                <p>
+                                    Indica cuándo se realizará y cuántas plazas
+                                    estarán disponibles.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="formulario-doble">
+
+                            <div class="campo-formulario">
+
+                                <label for="plan-fecha">
+                                    Fecha
+                                </label>
+
+                                <div class="campo-formulario__control">
+                                    <i class="fa-regular fa-calendar"></i>
+
+                                    <input
+                                        type="date"
+                                        id="plan-fecha"
+                                        name="fecha"
+                                    >
+                                </div>
+
+                                <small
+                                    class="mensaje-error"
+                                    id="error-plan-fecha"
+                                ></small>
+
+                            </div>
+
+                            <div class="campo-formulario">
+
+                                <label for="plan-hora">
+                                    Hora de inicio
+                                </label>
+
+                                <div class="campo-formulario__control">
+                                    <i class="fa-regular fa-clock"></i>
+
+                                    <input
+                                        type="time"
+                                        id="plan-hora"
+                                        name="hora"
+                                    >
+                                </div>
+
+                                <small
+                                    class="mensaje-error"
+                                    id="error-plan-hora"
+                                ></small>
+
+                            </div>
+
+                        </div>
+
+                        <div class="formulario-doble">
+
+                            <div class="campo-formulario">
+
+                                <label for="plan-duracion">
+                                    Duración aproximada
+                                </label>
+
+                                <div class="campo-formulario__control">
+                                    <i class="fa-solid fa-hourglass-half"></i>
+
+                                    <select
+                                        id="plan-duracion"
+                                        name="duracion"
+                                    >
+                                        <option value="">
+                                            Selecciona una duración
+                                        </option>
+
+                                        <option value="1 hora">
+                                            1 hora
+                                        </option>
+
+                                        <option value="2 horas">
+                                            2 horas
+                                        </option>
+
+                                        <option value="3 horas">
+                                            3 horas
+                                        </option>
+
+                                        <option value="Medio día">
+                                            Medio día
+                                        </option>
+
+                                        <option value="Día completo">
+                                            Día completo
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <small
+                                    class="mensaje-error"
+                                    id="error-plan-duracion"
+                                ></small>
+
+                            </div>
+
+                            <div class="campo-formulario">
+
+                                <label for="plan-plazas">
+                                    Número de plazas
+                                </label>
+
+                                <div class="campo-formulario__control">
+                                    <i class="fa-solid fa-user-group"></i>
+
+                                    <input
+                                        type="number"
+                                        id="plan-plazas"
+                                        name="plazas"
+                                        min="1"
+                                        max="500"
+                                        placeholder="Ejemplo: 20"
+                                    >
+                                </div>
+
+                                <small
+                                    class="mensaje-error"
+                                    id="error-plan-plazas"
+                                ></small>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section class="bloque-formulario-publicar">
+
+                        <div class="bloque-formulario-publicar__cabecera">
+
+                            <span class="bloque-formulario-publicar__numero">
+                                03
+                            </span>
+
+                            <div>
+                                <h2>Ubicación y precio</h2>
+
+                                <p>
+                                    Añade el lugar de encuentro y el precio por
+                                    persona.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="campo-formulario">
+
+                            <label for="plan-ubicacion">
+                                Dirección o lugar de encuentro
+                            </label>
+
+                            <div class="campo-formulario__control">
+                                <i class="fa-solid fa-location-dot"></i>
+
+                                <input
+                                    type="text"
+                                    id="plan-ubicacion"
+                                    name="ubicacion"
+                                    placeholder="Ejemplo: Alameda de Hércules, Sevilla"
+                                >
+                            </div>
+
+                            <small
+                                class="mensaje-error"
+                                id="error-plan-ubicacion"
+                            ></small>
+
+                        </div>
+
+                        <div class="formulario-doble">
+
+                            <div class="campo-formulario">
+
+                                <label for="plan-precio">
+                                    Precio por persona
+                                </label>
+
+                                <div class="campo-formulario__control">
+                                    <i class="fa-solid fa-euro-sign"></i>
+
+                                    <input
+                                        type="number"
+                                        id="plan-precio"
+                                        name="precio"
+                                        min="0"
+                                        max="9999"
+                                        step="0.01"
+                                        placeholder="0"
+                                    >
+                                </div>
+
+                                <small
+                                    class="mensaje-error"
+                                    id="error-plan-precio"
+                                ></small>
+
+                            </div>
+
+                            <div class="campo-formulario">
+
+                                <label for="plan-dificultad">
+                                    Nivel o dificultad
+                                </label>
+
+                                <div class="campo-formulario__control">
+                                    <i class="fa-solid fa-signal"></i>
+
+                                    <select
+                                        id="plan-dificultad"
+                                        name="dificultad"
+                                    >
+                                        <option value="Todos los públicos">
+                                            Todos los públicos
+                                        </option>
+
+                                        <option value="Fácil">
+                                            Fácil
+                                        </option>
+
+                                        <option value="Media">
+                                            Media
+                                        </option>
+
+                                        <option value="Alta">
+                                            Alta
+                                        </option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section class="bloque-formulario-publicar">
+
+                        <div class="bloque-formulario-publicar__cabecera">
+
+                            <span class="bloque-formulario-publicar__numero">
+                                04
+                            </span>
+
+                            <div>
+                                <h2>Imagen del plan</h2>
+
+                                <p>
+                                    Añade una imagen atractiva que represente la
+                                    actividad.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="subida-imagen">
+
+                            <input
+                                type="file"
+                                id="plan-imagen"
+                                name="imagen"
+                                accept="image/png, image/jpeg, image/webp"
+                                hidden
+                            >
+
+                            <label
+                                for="plan-imagen"
+                                class="subida-imagen__zona"
+                                id="zona-subida-imagen"
+                            >
+
+                                <span class="subida-imagen__icono">
+                                    <i class="fa-regular fa-image"></i>
+                                </span>
+
+                                <strong>
+                                    Selecciona una imagen
+                                </strong>
+
+                                <p>
+                                    Formatos JPG, PNG o WEBP. Máximo 4 MB.
+                                </p>
+
+                                <span class="subida-imagen__boton">
+                                    Buscar archivo
+                                </span>
+
+                            </label>
+
+                            <div
+                                class="subida-imagen__resultado"
+                                id="resultado-imagen"
+                            >
+
+                                <img
+                                    src=""
+                                    alt="Vista previa de la imagen seleccionada"
+                                    id="imagen-seleccionada"
+                                >
+
+                                <div>
+                                    <strong id="nombre-imagen"></strong>
+
+                                    <button
+                                        type="button"
+                                        id="eliminar-imagen"
+                                    >
+                                        <i class="fa-solid fa-trash"></i>
+                                        Eliminar
+                                    </button>
+                                </div>
+
+                            </div>
+
+                            <small
+                                class="mensaje-error"
+                                id="error-plan-imagen"
+                            ></small>
+
+                        </div>
+
+                    </section>
+
+                    <section class="bloque-formulario-publicar">
+
+                        <label class="campo-check campo-check--terminos">
+
+                            <input
+                                type="checkbox"
+                                id="confirmar-plan"
+                            >
+
+                            <span>
+                                Confirmo que la información introducida es
+                                correcta y que tengo permiso para publicar esta
+                                actividad.
+                            </span>
+
+                        </label>
+
+                        <small
+                            class="mensaje-error"
+                            id="error-confirmar-plan"
+                        ></small>
+
+                        <div class="acciones-publicar">
+
+                            <button
+                                type="button"
+                                class="boton-guardar-borrador"
+                                id="guardar-borrador"
+                            >
+                                <i class="fa-regular fa-floppy-disk"></i>
+                                Guardar borrador
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="boton-publicar-plan"
+                            >
+                                Publicar actividad
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+
+                        </div>
+
+                    </section>
+
+                </form>
+
+                <aside class="vista-previa-plan">
+
+                    <div class="vista-previa-plan__encabezado">
+
+                        <span>Vista previa</span>
+
+                        <p>
+                            Así se mostrará tu actividad.
+                        </p>
+
+                    </div>
+
+                    <article class="tarjeta-plan tarjeta-plan--vista-previa">
+
+                        <div
+                            class="tarjeta-plan__imagen vista-previa-imagen"
+                            id="vista-previa-imagen"
+                        >
+
+                            <span
+                                class="tarjeta-plan__precio"
+                                id="vista-previa-precio"
+                            >
+                                Gratis
+                            </span>
+
+                            <button
+                                type="button"
+                                class="tarjeta-plan__favorito"
+                                aria-label="Favorito de demostración"
+                            >
+                                <i class="fa-regular fa-heart"></i>
+                            </button>
+
+                            <div class="vista-previa-imagen__vacia">
+                                <i class="fa-regular fa-image"></i>
+                                <span>Añade una imagen</span>
+                            </div>
+
+                        </div>
+
+                        <div class="tarjeta-plan__contenido">
+
+                            <div class="tarjeta-plan__meta">
+
+                                <span id="vista-previa-fecha">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    Fecha pendiente
+                                </span>
+
+                                <span id="vista-previa-hora">
+                                    <i class="fa-regular fa-clock"></i>
+                                    Hora pendiente
+                                </span>
+
+                            </div>
+
+                            <h3 id="vista-previa-titulo">
+                                Título de la actividad
+                            </h3>
+
+                            <p
+                                class="tarjeta-plan__descripcion"
+                                id="vista-previa-descripcion"
+                            >
+                                La descripción del plan aparecerá aquí.
+                            </p>
+
+                            <p
+                                class="tarjeta-plan__ubicacion"
+                                id="vista-previa-ubicacion"
+                            >
+                                <i class="fa-solid fa-location-dot"></i>
+                                Ubicación pendiente
+                            </p>
+
+                            <div class="tarjeta-plan__pie">
+
+                                <span id="vista-previa-categoria">
+                                    Categoría
+                                </span>
+
+                                <strong>
+                                    Nuevo
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <div class="consejos-publicacion">
+
+                        <h3>
+                            <i class="fa-regular fa-lightbulb"></i>
+                            Consejos para destacar
+                        </h3>
+
+                        <ul>
+                            <li>Utiliza un título claro y atractivo.</li>
+                            <li>Explica exactamente qué incluye el plan.</li>
+                            <li>Selecciona una imagen luminosa y horizontal.</li>
+                            <li>Indica con precisión el punto de encuentro.</li>
+                        </ul>
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="footer">
+
+        <div class="contenedor footer__inferior">
+
+            <p>
+                © 2026 Suralia. Proyecto desarrollado por Fernando.
+            </p>
+
+            <div>
+                <a href="#">Privacidad</a>
+                <a href="#">Cookies</a>
+                <a href="#">Aviso legal</a>
+            </div>
+
+        </div>
+
+    </footer>
+
+    <div
+        class="notificacion"
+        id="notificacion-publicar"
+        role="status"
+        aria-live="polite"
+    >
+        <i class="fa-solid fa-circle-check"></i>
+        <span></span>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/publicar-plan.js"></script>
+
+</body>
+</html>
