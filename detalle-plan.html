@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Descubre todos los detalles de esta experiencia en Sevilla con Suralia."
+    >
+
+    <title>Visita guiada por Itálica | Suralia</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="contenedor header__contenido">
+
+            <a
+                href="index.html"
+                class="logo"
+                aria-label="Página de inicio de Suralia"
+            >
+                <span class="logo__icono">
+                    <i class="fa-solid fa-location-dot"></i>
+                </span>
+
+                <span class="logo__texto">
+                    Suralia
+                </span>
+            </a>
+
+            <nav class="navegacion" id="navegacion">
+
+                <a href="planes.html">
+                    Explorar planes
+                </a>
+
+                <a href="index.html#categorias">
+                    Categorías
+                </a>
+
+                <a href="index.html#como-funciona">
+                    Cómo funciona
+                </a>
+
+                <a href="#" class="enlace-publicar">
+                    <i class="fa-solid fa-plus"></i>
+                    Publicar un plan
+                </a>
+
+            </nav>
+
+            <div class="header__acciones">
+
+                <a href="login.html" class="boton-login">
+                    Iniciar sesión
+                </a>
+
+                <button
+                    class="boton-menu"
+                    id="boton-menu"
+                    type="button"
+                    aria-label="Abrir menú"
+                    aria-expanded="false"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+            </div>
+
+        </div>
+    </header>
+
+    <main>
+
+        <section class="detalle-cabecera">
+
+            <div class="contenedor">
+
+                <nav class="migas-pan" aria-label="Ruta de navegación">
+
+                    <a href="index.html">
+                        Inicio
+                    </a>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                    <a href="planes.html">
+                        Planes
+                    </a>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                    <span>
+                        Visita guiada por Itálica
+                    </span>
+
+                </nav>
+
+                <div class="detalle-cabecera__contenido">
+
+                    <div>
+
+                        <span class="detalle-categoria">
+                            <i class="fa-solid fa-landmark"></i>
+                            Cultura
+                        </span>
+
+                        <h1>
+                            Visita guiada por Itálica
+                        </h1>
+
+                        <div class="detalle-cabecera__meta">
+
+                            <span>
+                                <i class="fa-solid fa-star"></i>
+                                <strong>4,8</strong>
+                                37 opiniones
+                            </span>
+
+                            <span>
+                                <i class="fa-solid fa-location-dot"></i>
+                                Santiponce, Sevilla
+                            </span>
+
+                            <span>
+                                <i class="fa-solid fa-user-group"></i>
+                                24 personas apuntadas
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="detalle-cabecera__acciones">
+
+                        <button
+                            type="button"
+                            class="boton-accion"
+                            id="boton-compartir"
+                        >
+                            <i class="fa-solid fa-share-nodes"></i>
+                            Compartir
+                        </button>
+
+                        <button
+                            type="button"
+                            class="boton-accion"
+                            id="boton-favorito-detalle"
+                        >
+                            <i class="fa-regular fa-heart"></i>
+                            Guardar
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="galeria-plan">
+
+            <div class="contenedor galeria-plan__grid">
+
+                <button
+                    class="galeria-plan__principal"
+                    type="button"
+                    data-imagen="https://images.unsplash.com/photo-1602002418082-a4443e081dd1?auto=format&fit=crop&w=1400&q=85"
+                    aria-label="Ampliar imagen principal"
+                >
+                    <img
+                        src="https://images.unsplash.com/photo-1602002418082-a4443e081dd1?auto=format&fit=crop&w=1400&q=85"
+                        alt="Ruinas del conjunto arqueológico de Itálica"
+                    >
+                </button>
+
+                <button
+                    class="galeria-plan__secundaria"
+                    type="button"
+                    data-imagen="https://images.unsplash.com/photo-1590424757263-e4de5b3b7cf3?auto=format&fit=crop&w=1000&q=85"
+                    aria-label="Ampliar segunda imagen"
+                >
+                    <img
+                        src="https://images.unsplash.com/photo-1590424757263-e4de5b3b7cf3?auto=format&fit=crop&w=1000&q=85"
+                        alt="Restos arqueológicos romanos"
+                    >
+                </button>
+
+                <button
+                    class="galeria-plan__secundaria galeria-plan__ultima"
+                    type="button"
+                    data-imagen="https://images.unsplash.com/photo-1591824438708-ce405f36ba3d?auto=format&fit=crop&w=1000&q=85"
+                    aria-label="Ampliar tercera imagen"
+                >
+                    <img
+                        src="https://images.unsplash.com/photo-1591824438708-ce405f36ba3d?auto=format&fit=crop&w=1000&q=85"
+                        alt="Arquitectura histórica"
+                    >
+
+                    <span class="galeria-plan__contador">
+                        <i class="fa-regular fa-images"></i>
+                        Ver todas
+                    </span>
+                </button>
+
+            </div>
+
+        </section>
+
+        <section class="detalle-contenido">
+
+            <div class="contenedor detalle-contenido__grid">
+
+                <div class="detalle-principal">
+
+                    <section class="bloque-detalle resumen-plan">
+
+                        <div class="resumen-plan__organizador">
+
+                            <div class="organizador-avatar">
+                                RS
+                            </div>
+
+                            <div>
+                                <span>Actividad organizada por</span>
+                                <h2>Rutas Sevilla</h2>
+
+                                <p>
+                                    Organizador verificado
+                                    <i class="fa-solid fa-circle-check"></i>
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="resumen-plan__datos">
+
+                            <article>
+                                <span class="resumen-plan__icono">
+                                    <i class="fa-regular fa-calendar"></i>
+                                </span>
+
+                                <div>
+                                    <strong>Sábado, 25 de julio</strong>
+                                    <span>De 10:30 a 13:00</span>
+                                </div>
+                            </article>
+
+                            <article>
+                                <span class="resumen-plan__icono">
+                                    <i class="fa-solid fa-users"></i>
+                                </span>
+
+                                <div>
+                                    <strong>Grupo reducido</strong>
+                                    <span>Máximo 30 personas</span>
+                                </div>
+                            </article>
+
+                            <article>
+                                <span class="resumen-plan__icono">
+                                    <i class="fa-solid fa-language"></i>
+                                </span>
+
+                                <div>
+                                    <strong>Idioma</strong>
+                                    <span>Actividad en español</span>
+                                </div>
+                            </article>
+
+                        </div>
+
+                    </section>
+
+                    <section class="bloque-detalle">
+
+                        <h2>Sobre esta experiencia</h2>
+
+                        <p>
+                            Descubre uno de los conjuntos arqueológicos más
+                            importantes de la antigua Hispania romana en una
+                            visita guiada por Itálica.
+                        </p>
+
+                        <p>
+                            Durante el recorrido conocerás la historia de la
+                            ciudad, sus principales edificios, el anfiteatro y
+                            las antiguas viviendas decoradas con mosaicos.
+                        </p>
+
+                        <p>
+                            La actividad está pensada para personas interesadas
+                            en la historia, la arquitectura y el patrimonio de
+                            Sevilla. No es necesario tener conocimientos previos.
+                        </p>
+
+                        <button
+                            type="button"
+                            class="boton-leer-mas"
+                            id="boton-leer-mas"
+                        >
+                            Leer descripción completa
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+
+                        <div
+                            class="descripcion-ampliada"
+                            id="descripcion-ampliada"
+                        >
+                            <p>
+                                El recorrido incluye explicaciones sobre la
+                                fundación de Itálica, su evolución durante el
+                                Imperio romano y la importancia de personajes
+                                como Trajano y Adriano.
+                            </p>
+
+                            <p>
+                                Se recomienda llevar calzado cómodo, agua y
+                                protección solar, especialmente durante los
+                                meses de verano.
+                            </p>
+                        </div>
+
+                    </section>
+
+                    <section class="bloque-detalle">
+
+                        <h2>Qué incluye</h2>
+
+                        <div class="lista-incluye">
+
+                            <div>
+                                <i class="fa-solid fa-check"></i>
+                                Guía especializado
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-check"></i>
+                                Entrada al recinto
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-check"></i>
+                                Recorrido de aproximadamente 2 horas y media
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-check"></i>
+                                Explicaciones históricas
+                            </div>
+
+                            <div class="no-incluido">
+                                <i class="fa-solid fa-xmark"></i>
+                                Transporte hasta Santiponce
+                            </div>
+
+                            <div class="no-incluido">
+                                <i class="fa-solid fa-xmark"></i>
+                                Comida o bebida
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section class="bloque-detalle">
+
+                        <h2>Ubicación</h2>
+
+                        <p class="texto-suave">
+                            Conjunto Arqueológico de Itálica, avenida de
+                            Extremadura, Santiponce.
+                        </p>
+
+                        <div id="mapa-plan" class="mapa-plan"></div>
+
+                        <a
+                            href="https://www.google.com/maps/search/?api=1&query=Itálica+Santiponce"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="enlace-mapa"
+                        >
+                            <i class="fa-solid fa-diamond-turn-right"></i>
+                            Cómo llegar
+                        </a>
+
+                    </section>
+
+                    <section class="bloque-detalle">
+
+                        <div class="cabecera-opiniones">
+
+                            <div>
+                                <h2>Opiniones</h2>
+
+                                <p>
+                                    <i class="fa-solid fa-star"></i>
+                                    <strong>4,8</strong>
+                                    · 37 valoraciones
+                                </p>
+                            </div>
+
+                            <button type="button" class="boton-secundario">
+                                Ver todas
+                            </button>
+
+                        </div>
+
+                        <div class="opiniones-grid">
+
+                            <article class="opinion">
+
+                                <div class="opinion__usuario">
+
+                                    <div class="opinion__avatar">
+                                        LM
+                                    </div>
+
+                                    <div>
+                                        <strong>Laura M.</strong>
+                                        <span>Julio de 2026</span>
+                                    </div>
+
+                                </div>
+
+                                <div class="opinion__estrellas">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+
+                                <p>
+                                    Una visita muy interesante. El guía explicó
+                                    todo de forma cercana y el recorrido se hizo
+                                    muy ameno.
+                                </p>
+
+                            </article>
+
+                            <article class="opinion">
+
+                                <div class="opinion__usuario">
+
+                                    <div class="opinion__avatar">
+                                        JC
+                                    </div>
+
+                                    <div>
+                                        <strong>Javier C.</strong>
+                                        <span>Junio de 2026</span>
+                                    </div>
+
+                                </div>
+
+                                <div class="opinion__estrellas">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-regular fa-star"></i>
+                                </div>
+
+                                <p>
+                                    Merece la pena para conocer mejor la historia
+                                    romana de Sevilla. Recomiendo llevar agua.
+                                </p>
+
+                            </article>
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+                <aside class="reserva-plan">
+
+                    <div class="reserva-plan__tarjeta">
+
+                        <div class="reserva-plan__precio">
+
+                            <div>
+                                <strong>Gratis</strong>
+                                <span>por persona</span>
+                            </div>
+
+                            <span>
+                                <i class="fa-solid fa-star"></i>
+                                4,8
+                            </span>
+
+                        </div>
+
+                        <form id="formulario-reserva">
+
+                            <div class="campo-reserva">
+
+                                <label for="fecha-reserva">
+                                    Fecha
+                                </label>
+
+                                <div>
+                                    <i class="fa-regular fa-calendar"></i>
+
+                                    <select id="fecha-reserva">
+                                        <option value="25-julio">
+                                            Sábado, 25 de julio
+                                        </option>
+
+                                        <option value="1-agosto">
+                                            Sábado, 1 de agosto
+                                        </option>
+
+                                        <option value="8-agosto">
+                                            Sábado, 8 de agosto
+                                        </option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <div class="campo-reserva">
+
+                                <label for="personas-reserva">
+                                    Personas
+                                </label>
+
+                                <div>
+                                    <i class="fa-solid fa-user-group"></i>
+
+                                    <select id="personas-reserva">
+                                        <option value="1">
+                                            1 persona
+                                        </option>
+
+                                        <option value="2">
+                                            2 personas
+                                        </option>
+
+                                        <option value="3">
+                                            3 personas
+                                        </option>
+
+                                        <option value="4">
+                                            4 personas
+                                        </option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="boton-reservar"
+                            >
+                                Reservar plaza
+                            </button>
+
+                        </form>
+
+                        <p class="reserva-plan__aviso">
+                            No se realizará ningún cobro.
+                        </p>
+
+                        <div class="reserva-plan__desglose">
+
+                            <div>
+                                <span>Precio de la actividad</span>
+                                <strong>0 €</strong>
+                            </div>
+
+                            <div>
+                                <span>Gastos de gestión</span>
+                                <strong>0 €</strong>
+                            </div>
+
+                            <div class="reserva-plan__total">
+                                <span>Total</span>
+                                <strong>0 €</strong>
+                            </div>
+
+                        </div>
+
+                        <div class="reserva-plan__plazas">
+
+                            <i class="fa-solid fa-bolt"></i>
+
+                            <span>
+                                Quedan pocas plazas para esta fecha
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="seguridad-reserva">
+
+                        <i class="fa-solid fa-shield-heart"></i>
+
+                        <div>
+                            <strong>Reserva segura</strong>
+
+                            <p>
+                                Tus datos estarán protegidos durante todo
+                                el proceso.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </section>
+
+        <section class="planes-relacionados">
+
+            <div class="contenedor">
+
+                <div class="encabezado-seccion">
+
+                    <div>
+                        <span class="subtitulo">
+                            También puede interesarte
+                        </span>
+
+                        <h2>Otros planes cercanos</h2>
+                    </div>
+
+                    <a
+                        href="planes.html"
+                        class="enlace-ver-todos"
+                    >
+                        Ver más planes
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                </div>
+
+                <div class="planes__grid">
+
+                    <article class="tarjeta-plan">
+
+                        <a href="#" class="tarjeta-plan__enlace">
+
+                            <div class="tarjeta-plan__imagen imagen-plan--exposicion">
+
+                                <span class="tarjeta-plan__precio">
+                                    Gratis
+                                </span>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        28 de julio
+                                    </span>
+
+                                </div>
+
+                                <h3>
+                                    Exposición de arte contemporáneo
+                                </h3>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Centro de Sevilla
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+
+                                    <span>Cultura</span>
+
+                                    <strong>
+                                        4,5
+                                        <i class="fa-solid fa-star"></i>
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </article>
+
+                    <article class="tarjeta-plan">
+
+                        <a href="#" class="tarjeta-plan__enlace">
+
+                            <div class="tarjeta-plan__imagen imagen-plan--concierto">
+
+                                <span class="tarjeta-plan__precio">
+                                    12 €
+                                </span>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        30 de julio
+                                    </span>
+
+                                </div>
+
+                                <h3>
+                                    Concierto en la Alameda
+                                </h3>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Alameda de Hércules
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+
+                                    <span>Música</span>
+
+                                    <strong>
+                                        4,7
+                                        <i class="fa-solid fa-star"></i>
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </article>
+
+                    <article class="tarjeta-plan">
+
+                        <a href="#" class="tarjeta-plan__enlace">
+
+                            <div class="tarjeta-plan__imagen imagen-plan--tapas">
+
+                                <span class="tarjeta-plan__precio">
+                                    25 €
+                                </span>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        3 de agosto
+                                    </span>
+
+                                </div>
+
+                                <h3>
+                                    Ruta de tapas por Triana
+                                </h3>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Triana, Sevilla
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+
+                                    <span>Gastronomía</span>
+
+                                    <strong>
+                                        4,6
+                                        <i class="fa-solid fa-star"></i>
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </article>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="footer">
+
+        <div class="contenedor footer__grid">
+
+            <div class="footer__marca">
+
+                <a href="index.html" class="logo logo--footer">
+
+                    <span class="logo__icono">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </span>
+
+                    <span class="logo__texto">
+                        Suralia
+                    </span>
+
+                </a>
+
+                <p>
+                    Descubre planes, lugares y experiencias diferentes
+                    para disfrutar Sevilla y sus alrededores.
+                </p>
+
+                <span class="footer__eslogan">
+                    Descubre el sur a tu manera.
+                </span>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>Descubre</h3>
+
+                <a href="planes.html">Todos los planes</a>
+                <a href="#">Este fin de semana</a>
+                <a href="#">Planes gratuitos</a>
+                <a href="#">Nuevas actividades</a>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>Información</h3>
+
+                <a href="#">Sobre Suralia</a>
+                <a href="index.html#como-funciona">Cómo funciona</a>
+                <a href="#">Preguntas frecuentes</a>
+                <a href="#">Contacto</a>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>Síguenos</h3>
+
+                <div class="redes">
+
+                    <a href="#" aria-label="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+
+                    <a href="#" aria-label="TikTok">
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+
+                    <a href="#" aria-label="Facebook">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="contenedor footer__inferior">
+
+            <p>
+                © 2026 Suralia. Proyecto desarrollado por Fernando.
+            </p>
+
+            <div>
+                <a href="#">Privacidad</a>
+                <a href="#">Cookies</a>
+                <a href="#">Aviso legal</a>
+            </div>
+
+        </div>
+
+    </footer>
+
+    <div class="modal-imagen" id="modal-imagen">
+
+        <button
+            type="button"
+            class="modal-imagen__cerrar"
+            id="cerrar-modal-imagen"
+            aria-label="Cerrar imagen"
+        >
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <img
+            src=""
+            alt="Imagen ampliada del plan"
+            id="imagen-modal"
+        >
+
+    </div>
+
+    <div
+        class="notificacion"
+        id="notificacion"
+        role="status"
+        aria-live="polite"
+    >
+        <i class="fa-solid fa-circle-check"></i>
+        <span></span>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script src="js/main.js"></script>
+    <script src="js/detalle-plan.js"></script>
+
+</body>
+</html>

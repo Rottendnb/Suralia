@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Descubre rutas, conciertos, talleres, gastronomía y experiencias en Sevilla con Suralia."
+    >
+
+    <title>Suralia | Planes y experiencias en Sevilla</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="contenedor header__contenido">
+
+            <a href="#" class="logo" aria-label="Página de inicio de Suralia">
+                <span class="logo__icono">
+                    <i class="fa-solid fa-location-dot"></i>
+                </span>
+
+                <span class="logo__texto">
+                    Suralia
+                </span>
+            </a>
+
+            <nav class="navegacion" id="navegacion">
+                <a href="planes.html">Explorar planes</a>
+                <a href="#categorias">Categorías</a>
+                <a href="#como-funciona">Cómo funciona</a>
+
+                <a href="login.html" class="enlace-publicar">
+                    <i class="fa-solid fa-plus"></i>
+                    Publicar un plan
+                </a>
+            </nav>
+
+            <div class="header__acciones">
+                <a href="login.html" class="boton-login">
+                    Iniciar sesión
+                </a>
+
+                <button
+                    class="boton-menu"
+                    id="boton-menu"
+                    aria-label="Abrir menú"
+                    aria-expanded="false"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+        </div>
+    </header>
+
+    <main>
+
+        <section class="hero">
+
+            <div class="hero__decoracion hero__decoracion--uno"></div>
+            <div class="hero__decoracion hero__decoracion--dos"></div>
+
+            <div class="contenedor hero__contenido">
+
+                <div class="hero__texto">
+
+                    <span class="etiqueta">
+                        <i class="fa-solid fa-sun"></i>
+                        Planes para disfrutar Sevilla
+                    </span>
+
+                    <h1>
+                        Descubre Sevilla
+                        <span>a tu manera</span>
+                    </h1>
+
+                    <p>
+                        Encuentra rutas, conciertos, talleres, gastronomía
+                        y experiencias diferentes en Sevilla y sus alrededores.
+                    </p>
+
+                    <form class="buscador" id="formulario-buscador">
+
+                        <div class="buscador__campo">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+
+                            <div>
+                                <label for="busqueda">
+                                    ¿Qué te apetece?
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="busqueda"
+                                    name="busqueda"
+                                    placeholder="Conciertos, rutas, talleres..."
+                                >
+                            </div>
+                        </div>
+
+                        <div class="buscador__separador"></div>
+
+                        <div class="buscador__campo">
+                            <i class="fa-regular fa-calendar"></i>
+
+                            <div>
+                                <label for="fecha">
+                                    ¿Cuándo?
+                                </label>
+
+                                <input
+                                    type="date"
+                                    id="fecha"
+                                    name="fecha"
+                                >
+                            </div>
+                        </div>
+
+                        <button type="submit" class="boton-buscar">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span>Buscar planes</span>
+                        </button>
+
+                    </form>
+
+                    <div class="hero__datos">
+
+                        <div class="dato">
+                            <strong>120+</strong>
+                            <span>Planes disponibles</span>
+                        </div>
+
+                        <div class="dato">
+                            <strong>35</strong>
+                            <span>Nuevos esta semana</span>
+                        </div>
+
+                        <div class="dato">
+                            <strong>4,8</strong>
+                            <span>Valoración media</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="hero__visual">
+
+                    <div class="tarjeta-principal">
+
+                        <div class="tarjeta-principal__imagen">
+
+                            <div class="tarjeta-principal__gradiente"></div>
+
+                            <span class="tarjeta-principal__categoria">
+                                <i class="fa-solid fa-person-hiking"></i>
+                                Naturaleza
+                            </span>
+
+                            <button
+                                class="boton-favorito"
+                                type="button"
+                                aria-label="Guardar como favorito"
+                            >
+                                <i class="fa-regular fa-heart"></i>
+                            </button>
+
+                            <div class="tarjeta-principal__info">
+                                <span>Este sábado</span>
+
+                                <h2>Ruta por la Sierra Norte</h2>
+
+                                <p>
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Constantina, Sevilla
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="tarjeta-flotante tarjeta-flotante--usuarios">
+
+                        <div class="avatares">
+                            <span>LM</span>
+                            <span>JR</span>
+                            <span>AC</span>
+                        </div>
+
+                        <div>
+                            <strong>24 personas</strong>
+                            <span>ya se han apuntado</span>
+                        </div>
+
+                    </div>
+
+                    <div class="tarjeta-flotante tarjeta-flotante--valoracion">
+
+                        <i class="fa-solid fa-star"></i>
+
+                        <div>
+                            <strong>4,9</strong>
+                            <span>Actividad recomendada</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <section class="seccion categorias" id="categorias">
+
+            <div class="contenedor">
+
+                <div class="encabezado-seccion">
+
+                    <div>
+                        <span class="subtitulo">
+                            Explora a tu manera
+                        </span>
+
+                        <h2>¿Qué te apetece hacer?</h2>
+                    </div>
+
+                    <a href="#" class="enlace-ver-todos">
+                        Ver todas
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                </div>
+
+                <div class="categorias__grid">
+
+                    <a href="#" class="categoria">
+
+                        <span class="categoria__icono">
+                            <i class="fa-solid fa-music"></i>
+                        </span>
+
+                        <div>
+                            <h3>Música</h3>
+                            <p>Conciertos y festivales</p>
+                        </div>
+
+                        <i class="fa-solid fa-arrow-right categoria__flecha"></i>
+                    </a>
+
+                    <a href="#" class="categoria">
+
+                        <span class="categoria__icono">
+                            <i class="fa-solid fa-person-hiking"></i>
+                        </span>
+
+                        <div>
+                            <h3>Naturaleza</h3>
+                            <p>Rutas y escapadas</p>
+                        </div>
+
+                        <i class="fa-solid fa-arrow-right categoria__flecha"></i>
+                    </a>
+
+                    <a href="#" class="categoria">
+
+                        <span class="categoria__icono">
+                            <i class="fa-solid fa-utensils"></i>
+                        </span>
+
+                        <div>
+                            <h3>Gastronomía</h3>
+                            <p>Sabores y experiencias</p>
+                        </div>
+
+                        <i class="fa-solid fa-arrow-right categoria__flecha"></i>
+                    </a>
+
+                    <a href="#" class="categoria">
+
+                        <span class="categoria__icono">
+                            <i class="fa-solid fa-palette"></i>
+                        </span>
+
+                        <div>
+                            <h3>Cultura</h3>
+                            <p>Arte, teatro y museos</p>
+                        </div>
+
+                        <i class="fa-solid fa-arrow-right categoria__flecha"></i>
+                    </a>
+
+                </div>
+
+            </div>
+        </section>
+
+        <section class="seccion planes" id="planes">
+
+            <div class="contenedor">
+
+                <div class="encabezado-seccion">
+
+                    <div>
+                        <span class="subtitulo">
+                            Planes destacados
+                        </span>
+
+                        <h2>Ideas para los próximos días</h2>
+                    </div>
+
+                    <a href="planes.html" class="enlace-ver-todos">
+                        Explorar planes
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                </div>
+
+                <div class="planes__grid">
+
+                   <article class="tarjeta-plan">
+
+    <a href="detalle-plan.html" class="tarjeta-plan__enlace">
+
+        <div class="tarjeta-plan__imagen imagen-plan--italica">
+
+            <span class="tarjeta-plan__precio">
+                Gratis
+            </span>
+
+            <button
+                class="tarjeta-plan__favorito"
+                type="button"
+                aria-label="Añadir visita a Itálica a favoritos"
+            >
+                <i class="fa-regular fa-heart"></i>
+            </button>
+
+        </div>
+
+        <div class="tarjeta-plan__contenido">
+
+            <div class="tarjeta-plan__meta">
+
+                <span>
+                    <i class="fa-regular fa-calendar"></i>
+                    25 de julio
+                </span>
+
+                <span>
+                    <i class="fa-regular fa-clock"></i>
+                    10:30
+                </span>
+
+            </div>
+
+            <h3>Visita guiada por Itálica</h3>
+
+            <p class="tarjeta-plan__ubicacion">
+                <i class="fa-solid fa-location-dot"></i>
+                Santiponce, Sevilla
+            </p>
+
+            <div class="tarjeta-plan__pie">
+
+                <span>Cultura</span>
+
+                <strong>
+                    4,8
+                    <i class="fa-solid fa-star"></i>
+                </strong>
+
+            </div>
+
+        </div>
+
+    </a>
+
+</article>
+
+                    <article class="tarjeta-plan">
+
+                        <div class="tarjeta-plan__imagen imagen-plan--kayak">
+
+                            <span class="tarjeta-plan__precio">
+                                18 €
+                            </span>
+
+                            <button
+                                class="tarjeta-plan__favorito"
+                                type="button"
+                                aria-label="Añadir kayak a favoritos"
+                            >
+                                <i class="fa-regular fa-heart"></i>
+                            </button>
+
+                        </div>
+
+                        <div class="tarjeta-plan__contenido">
+
+                            <div class="tarjeta-plan__meta">
+
+                                <span>
+                                    <i class="fa-regular fa-calendar"></i>
+                                    27 de julio
+                                </span>
+
+                                <span>
+                                    <i class="fa-regular fa-clock"></i>
+                                    19:00
+                                </span>
+
+                            </div>
+
+                            <h3>Kayak al atardecer</h3>
+
+                            <p class="tarjeta-plan__ubicacion">
+                                <i class="fa-solid fa-location-dot"></i>
+                                Río Guadalquivir
+                            </p>
+
+                            <div class="tarjeta-plan__pie">
+
+                                <span>Aventura</span>
+
+                                <strong>
+                                    4,9
+                                    <i class="fa-solid fa-star"></i>
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <article class="tarjeta-plan">
+
+                        <div class="tarjeta-plan__imagen imagen-plan--concierto">
+
+                            <span class="tarjeta-plan__precio">
+                                12 €
+                            </span>
+
+                            <button
+                                class="tarjeta-plan__favorito"
+                                type="button"
+                                aria-label="Añadir concierto a favoritos"
+                            >
+                                <i class="fa-regular fa-heart"></i>
+                            </button>
+
+                        </div>
+
+                        <div class="tarjeta-plan__contenido">
+
+                            <div class="tarjeta-plan__meta">
+
+                                <span>
+                                    <i class="fa-regular fa-calendar"></i>
+                                    30 de julio
+                                </span>
+
+                                <span>
+                                    <i class="fa-regular fa-clock"></i>
+                                    22:00
+                                </span>
+
+                            </div>
+
+                            <h3>Concierto en la Alameda</h3>
+
+                            <p class="tarjeta-plan__ubicacion">
+                                <i class="fa-solid fa-location-dot"></i>
+                                Alameda de Hércules
+                            </p>
+
+                            <div class="tarjeta-plan__pie">
+
+                                <span>Música</span>
+
+                                <strong>
+                                    4,7
+                                    <i class="fa-solid fa-star"></i>
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+            </div>
+        </section>
+
+        <section class="seccion como-funciona" id="como-funciona">
+
+            <div class="contenedor">
+
+                <div class="encabezado-centrado">
+
+                    <span class="subtitulo">
+                        Así de sencillo
+                    </span>
+
+                    <h2>Encuentra un plan en pocos minutos</h2>
+
+                    <p>
+                        Explora nuevas experiencias y organiza tu tiempo libre
+                        sin complicaciones.
+                    </p>
+
+                </div>
+
+                <div class="pasos">
+
+                    <article class="paso">
+
+                        <span class="paso__numero">
+                            01
+                        </span>
+
+                        <div class="paso__icono">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+
+                        <h3>Busca</h3>
+
+                        <p>
+                            Encuentra actividades según tus gustos, ubicación
+                            y disponibilidad.
+                        </p>
+
+                    </article>
+
+                    <article class="paso">
+
+                        <span class="paso__numero">
+                            02
+                        </span>
+
+                        <div class="paso__icono">
+                            <i class="fa-regular fa-heart"></i>
+                        </div>
+
+                        <h3>Guarda</h3>
+
+                        <p>
+                            Añade tus planes favoritos y compáralos cuando
+                            quieras.
+                        </p>
+
+                    </article>
+
+                    <article class="paso">
+
+                        <span class="paso__numero">
+                            03
+                        </span>
+
+                        <div class="paso__icono">
+                            <i class="fa-solid fa-ticket"></i>
+                        </div>
+
+                        <h3>Reserva</h3>
+
+                        <p>
+                            Apúntate a la actividad y consulta todos los
+                            detalles desde tu perfil.
+                        </p>
+
+                    </article>
+
+                </div>
+
+            </div>
+        </section>
+
+        <section class="cta">
+
+            <div class="contenedor">
+
+                <div class="cta__contenido">
+
+                    <div>
+
+                        <span class="subtitulo subtitulo--claro">
+                            Comparte experiencias
+                        </span>
+
+                        <h2>¿Organizas una actividad?</h2>
+
+                        <p>
+                            Publica tu propuesta y conecta con personas que
+                            buscan algo diferente en Sevilla.
+                        </p>
+
+                    </div>
+
+                    <a href="#" class="boton-claro">
+                        Publicar un plan
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+
+        <div class="contenedor footer__grid">
+
+            <div class="footer__marca">
+
+                <a href="#" class="logo logo--footer">
+
+                    <span class="logo__icono">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </span>
+
+                    <span class="logo__texto">
+                        Suralia
+                    </span>
+
+                </a>
+
+                <p>
+                    Descubre planes, lugares y experiencias diferentes
+                    para disfrutar Sevilla y sus alrededores.
+                </p>
+
+                <span class="footer__eslogan">
+                    Descubre el sur a tu manera.
+                </span>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>Descubre</h3>
+
+                <a href="planes.html">Todos los planes</a>
+                <a href="#">Este fin de semana</a>
+                <a href="#">Planes gratuitos</a>
+                <a href="#">Nuevas actividades</a>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>Información</h3>
+
+                <a href="#">Sobre Suralia</a>
+                <a href="#">Cómo funciona</a>
+                <a href="#">Preguntas frecuentes</a>
+                <a href="#">Contacto</a>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>Síguenos</h3>
+
+                <div class="redes">
+
+                    <a href="#" aria-label="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+
+                    <a href="#" aria-label="TikTok">
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+
+                    <a href="#" aria-label="Facebook">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="contenedor footer__inferior">
+
+            <p>
+                © 2026 Suralia. Proyecto desarrollado por Fernando.
+            </p>
+
+            <div>
+                <a href="#">Privacidad</a>
+                <a href="#">Cookies</a>
+                <a href="#">Aviso legal</a>
+            </div>
+
+        </div>
+
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

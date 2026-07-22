@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Crea tu cuenta en Suralia y empieza a guardar y reservar planes en Sevilla."
+    >
+
+    <title>Crear cuenta | Suralia</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="pagina-auth">
+
+    <header class="header">
+        <div class="contenedor header__contenido">
+
+            <a
+                href="index.html"
+                class="logo"
+                aria-label="Página de inicio de Suralia"
+            >
+                <span class="logo__icono">
+                    <i class="fa-solid fa-location-dot"></i>
+                </span>
+
+                <span class="logo__texto">
+                    Suralia
+                </span>
+            </a>
+
+            <a href="index.html" class="volver-inicio">
+                <i class="fa-solid fa-arrow-left"></i>
+                Volver al inicio
+            </a>
+
+        </div>
+    </header>
+
+    <main class="auth auth--registro">
+
+        <section class="auth__presentacion">
+
+            <div class="auth__presentacion-contenido">
+
+                <span class="etiqueta etiqueta--auth">
+                    <i class="fa-solid fa-location-dot"></i>
+                    Únete a Suralia
+                </span>
+
+                <h1>
+                    Sevilla está llena
+                    <span>de cosas por descubrir</span>
+                </h1>
+
+                <p>
+                    Crea tu cuenta gratuita y empieza a construir tu propia
+                    lista de experiencias.
+                </p>
+
+                <div class="auth__estadisticas">
+
+                    <div>
+                        <strong>120+</strong>
+                        <span>Planes disponibles</span>
+                    </div>
+
+                    <div>
+                        <strong>35</strong>
+                        <span>Nuevos esta semana</span>
+                    </div>
+
+                    <div>
+                        <strong>4,8</strong>
+                        <span>Valoración media</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="auth__formulario">
+
+            <div class="auth__tarjeta auth__tarjeta--registro">
+
+                <div class="auth__cabecera">
+                    <span class="subtitulo">Empieza ahora</span>
+
+                    <h2>Crea tu cuenta</h2>
+
+                    <p>
+                        Completa tus datos para empezar a utilizar Suralia.
+                    </p>
+                </div>
+
+                <form id="formulario-registro" novalidate>
+
+                    <div class="formulario-doble">
+
+                        <div class="campo-formulario">
+
+                            <label for="registro-nombre">
+                                Nombre
+                            </label>
+
+                            <div class="campo-formulario__control">
+                                <i class="fa-regular fa-user"></i>
+
+                                <input
+                                    type="text"
+                                    id="registro-nombre"
+                                    name="nombre"
+                                    placeholder="Tu nombre"
+                                    autocomplete="given-name"
+                                >
+                            </div>
+
+                            <small
+                                class="mensaje-error"
+                                id="error-registro-nombre"
+                            ></small>
+
+                        </div>
+
+                        <div class="campo-formulario">
+
+                            <label for="registro-apellidos">
+                                Apellidos
+                            </label>
+
+                            <div class="campo-formulario__control">
+                                <i class="fa-regular fa-user"></i>
+
+                                <input
+                                    type="text"
+                                    id="registro-apellidos"
+                                    name="apellidos"
+                                    placeholder="Tus apellidos"
+                                    autocomplete="family-name"
+                                >
+                            </div>
+
+                            <small
+                                class="mensaje-error"
+                                id="error-registro-apellidos"
+                            ></small>
+
+                        </div>
+
+                    </div>
+
+                    <div class="campo-formulario">
+
+                        <label for="registro-email">
+                            Correo electrónico
+                        </label>
+
+                        <div class="campo-formulario__control">
+                            <i class="fa-regular fa-envelope"></i>
+
+                            <input
+                                type="email"
+                                id="registro-email"
+                                name="email"
+                                placeholder="nombre@correo.com"
+                                autocomplete="email"
+                            >
+                        </div>
+
+                        <small
+                            class="mensaje-error"
+                            id="error-registro-email"
+                        ></small>
+
+                    </div>
+
+                    <div class="campo-formulario">
+
+                        <label for="registro-password">
+                            Contraseña
+                        </label>
+
+                        <div class="campo-formulario__control">
+                            <i class="fa-solid fa-lock"></i>
+
+                            <input
+                                type="password"
+                                id="registro-password"
+                                name="password"
+                                placeholder="Crea una contraseña segura"
+                                autocomplete="new-password"
+                            >
+
+                            <button
+                                type="button"
+                                class="boton-ver-password"
+                                data-password="registro-password"
+                                aria-label="Mostrar contraseña"
+                            >
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+
+                        <div class="seguridad-password">
+                            <div class="seguridad-password__barra">
+                                <span id="barra-password"></span>
+                            </div>
+
+                            <small id="texto-seguridad-password">
+                                Usa al menos 8 caracteres.
+                            </small>
+                        </div>
+
+                        <small
+                            class="mensaje-error"
+                            id="error-registro-password"
+                        ></small>
+
+                    </div>
+
+                    <div class="campo-formulario">
+
+                        <label for="registro-confirmar">
+                            Confirmar contraseña
+                        </label>
+
+                        <div class="campo-formulario__control">
+                            <i class="fa-solid fa-lock"></i>
+
+                            <input
+                                type="password"
+                                id="registro-confirmar"
+                                name="confirmarPassword"
+                                placeholder="Repite tu contraseña"
+                                autocomplete="new-password"
+                            >
+
+                            <button
+                                type="button"
+                                class="boton-ver-password"
+                                data-password="registro-confirmar"
+                                aria-label="Mostrar contraseña"
+                            >
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+
+                        <small
+                            class="mensaje-error"
+                            id="error-registro-confirmar"
+                        ></small>
+
+                    </div>
+
+                    <label class="campo-check campo-check--terminos">
+
+                        <input
+                            type="checkbox"
+                            id="aceptar-condiciones"
+                            name="condiciones"
+                        >
+
+                        <span>
+                            He leído y acepto la
+                            <a href="#">política de privacidad</a>
+                            y las
+                            <a href="#">condiciones de uso</a>.
+                        </span>
+
+                    </label>
+
+                    <small
+                        class="mensaje-error"
+                        id="error-condiciones"
+                    ></small>
+
+                    <button
+                        type="submit"
+                        class="boton-auth"
+                    >
+                        Crear mi cuenta
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </form>
+
+                <p class="auth__cambio">
+                    ¿Ya tienes una cuenta?
+
+                    <a href="login.html">
+                        Iniciar sesión
+                    </a>
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <div
+        class="notificacion"
+        id="notificacion-auth"
+        role="status"
+        aria-live="polite"
+    >
+        <i class="fa-solid fa-circle-check"></i>
+        <span></span>
+    </div>
+
+    <script src="js/auth.js"></script>
+
+</body>
+</html>

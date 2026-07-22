@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Explora conciertos, rutas, actividades culturales y experiencias en Sevilla con Suralia."
+    >
+
+    <title>Explorar planes | Suralia</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="contenedor header__contenido">
+
+            <a
+                href="index.html"
+                class="logo"
+                aria-label="Página de inicio de Suralia"
+            >
+                <span class="logo__icono">
+                    <i class="fa-solid fa-location-dot"></i>
+                </span>
+
+                <span class="logo__texto">
+                    Suralia
+                </span>
+            </a>
+
+            <nav class="navegacion" id="navegacion">
+                <a href="planes.html" class="enlace-activo">
+                    Explorar planes
+                </a>
+
+                <a href="index.html#categorias">
+                    Categorías
+                </a>
+
+                <a href="index.html#como-funciona">
+                    Cómo funciona
+                </a>
+
+                <a href="#" class="enlace-publicar">
+                    <i class="fa-solid fa-plus"></i>
+                    Publicar un plan
+                </a>
+            </nav>
+
+            <div class="header__acciones">
+                <a href="login.html" class="boton-login">
+                    Iniciar sesión
+                </a>
+
+                <button
+                    class="boton-menu"
+                    id="boton-menu"
+                    type="button"
+                    aria-label="Abrir menú"
+                    aria-expanded="false"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+        </div>
+    </header>
+
+    <main>
+
+        <section class="cabecera-pagina">
+            <div class="contenedor cabecera-pagina__contenido">
+
+                <div>
+                    <span class="subtitulo">
+                        Descubre Sevilla
+                    </span>
+
+                    <h1>Encuentra tu próximo plan</h1>
+
+                    <p>
+                        Explora actividades, experiencias y lugares diferentes
+                        para disfrutar en Sevilla y su provincia.
+                    </p>
+                </div>
+
+                <div class="cabecera-pagina__icono">
+                    <i class="fa-solid fa-compass"></i>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="seccion-explorar">
+
+            <div class="contenedor">
+
+                <form class="panel-filtros" id="formulario-filtros">
+
+                    <div class="filtro-buscador">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                        <input
+                            type="search"
+                            id="filtro-texto"
+                            placeholder="Busca conciertos, rutas, cultura..."
+                            aria-label="Buscar planes"
+                        >
+                    </div>
+
+                    <div class="filtro-select">
+                        <label for="filtro-categoria">
+                            Categoría
+                        </label>
+
+                        <select id="filtro-categoria">
+                            <option value="todas">
+                                Todas
+                            </option>
+
+                            <option value="cultura">
+                                Cultura
+                            </option>
+
+                            <option value="naturaleza">
+                                Naturaleza
+                            </option>
+
+                            <option value="musica">
+                                Música
+                            </option>
+
+                            <option value="gastronomia">
+                                Gastronomía
+                            </option>
+
+                            <option value="aventura">
+                                Aventura
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="filtro-select">
+                        <label for="filtro-precio">
+                            Precio
+                        </label>
+
+                        <select id="filtro-precio">
+                            <option value="todos">
+                                Todos
+                            </option>
+
+                            <option value="gratis">
+                                Gratis
+                            </option>
+
+                            <option value="menos-20">
+                                Menos de 20 €
+                            </option>
+
+                            <option value="mas-20">
+                                Más de 20 €
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="filtro-select">
+                        <label for="filtro-orden">
+                            Ordenar
+                        </label>
+
+                        <select id="filtro-orden">
+                            <option value="recomendados">
+                                Recomendados
+                            </option>
+
+                            <option value="precio-menor">
+                                Precio: menor
+                            </option>
+
+                            <option value="precio-mayor">
+                                Precio: mayor
+                            </option>
+
+                            <option value="valoracion">
+                                Mejor valorados
+                            </option>
+                        </select>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="boton-limpiar"
+                        id="boton-limpiar"
+                    >
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Limpiar
+                    </button>
+
+                </form>
+
+                <div class="barra-resultados">
+
+                    <div>
+                        <h2>Planes disponibles</h2>
+
+                        <p>
+                            Mostrando
+                            <strong id="numero-resultados">6</strong>
+                            resultados
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="boton-vista"
+                        aria-label="Cambiar vista"
+                    >
+                        <i class="fa-solid fa-grip"></i>
+                    </button>
+
+                </div>
+
+                <div class="planes__grid planes__grid--explorar" id="lista-planes">
+
+                    <article
+                        class="tarjeta-plan"
+                        data-nombre="Visita guiada por Itálica"
+                        data-categoria="cultura"
+                        data-precio="0"
+                        data-valoracion="4.8"
+                    >
+                        <a href="detalle-plan.html" class="tarjeta-plan__enlace">
+
+                            <div class="tarjeta-plan__imagen imagen-plan--italica">
+
+                                <span class="tarjeta-plan__precio">
+                                    Gratis
+                                </span>
+
+                                <button
+                                    class="tarjeta-plan__favorito"
+                                    type="button"
+                                    aria-label="Añadir a favoritos"
+                                >
+                                    <i class="fa-regular fa-heart"></i>
+                                </button>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        25 de julio
+                                    </span>
+
+                                    <span>
+                                        <i class="fa-regular fa-clock"></i>
+                                        10:30
+                                    </span>
+
+                                </div>
+
+                                <h3>Visita guiada por Itálica</h3>
+
+                                <p class="tarjeta-plan__descripcion">
+                                    Descubre la historia y los rincones del
+                                    conjunto arqueológico de Itálica.
+                                </p>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Santiponce, Sevilla
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+                                    <span>Cultura</span>
+
+                                    <strong>
+                                        4,8
+                                        <i class="fa-solid fa-star"></i>
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                        </a>
+                    </article>
+
+                    <article
+                        class="tarjeta-plan"
+                        data-nombre="Kayak al atardecer"
+                        data-categoria="aventura"
+                        data-precio="18"
+                        data-valoracion="4.9"
+                    >
+                        <a href="detalle-plan.html" class="tarjeta-plan__enlace">
+
+                            <div class="tarjeta-plan__imagen imagen-plan--kayak">
+
+                                <span class="tarjeta-plan__precio">
+                                    18 €
+                                </span>
+
+                                <button
+                                    class="tarjeta-plan__favorito"
+                                    type="button"
+                                    aria-label="Añadir a favoritos"
+                                >
+                                    <i class="fa-regular fa-heart"></i>
+                                </button>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        27 de julio
+                                    </span>
+
+                                    <span>
+                                        <i class="fa-regular fa-clock"></i>
+                                        19:00
+                                    </span>
+                                </div>
+
+                                <h3>Kayak al atardecer</h3>
+
+                                <p class="tarjeta-plan__descripcion">
+                                    Navega por el Guadalquivir mientras
+                                    contemplas el atardecer sevillano.
+                                </p>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Río Guadalquivir
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+                                    <span>Aventura</span>
+
+                                    <strong>
+                                        4,9
+                                        <i class="fa-solid fa-star"></i>
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                        </a>
+                    </article>
+
+                    <article
+                        class="tarjeta-plan"
+                        data-nombre="Concierto en la Alameda"
+                        data-categoria="musica"
+                        data-precio="12"
+                        data-valoracion="4.7"
+                    >
+                        <a href="detalle-plan.html" class="tarjeta-plan__enlace">
+
+                            <div class="tarjeta-plan__imagen imagen-plan--concierto">
+
+                                <span class="tarjeta-plan__precio">
+                                    12 €
+                                </span>
+
+                                <button
+                                    class="tarjeta-plan__favorito"
+                                    type="button"
+                                    aria-label="Añadir a favoritos"
+                                >
+                                    <i class="fa-regular fa-heart"></i>
+                                </button>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        30 de julio
+                                    </span>
+
+                                    <span>
+                                        <i class="fa-regular fa-clock"></i>
+                                        22:00
+                                    </span>
+                                </div>
+
+                                <h3>Concierto en la Alameda</h3>
+
+                                <p class="tarjeta-plan__descripcion">
+                                    Una noche de música en directo en uno de los
+                                    espacios más animados de Sevilla.
+                                </p>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Alameda de Hércules
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+                                    <span>Música</span>
+
+                                    <strong>
+                                        4,7
+                                        <i class="fa-solid fa-star"></i>
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                        </a>
+                    </article>
+
+                    <article
+                        class="tarjeta-plan"
+                        data-nombre="Ruta por el Cerro del Hierro"
+                        data-categoria="naturaleza"
+                        data-precio="8"
+                        data-valoracion="4.9"
+                    >
+                        <a href="detalle-plan.html" class="tarjeta-plan__enlace">
+
+                            <div class="tarjeta-plan__imagen imagen-plan--cerro">
+
+                                <span class="tarjeta-plan__precio">
+                                    8 €
+                                </span>
+
+                                <button
+                                    class="tarjeta-plan__favorito"
+                                    type="button"
+                                    aria-label="Añadir a favoritos"
+                                >
+                                    <i class="fa-regular fa-heart"></i>
+                                </button>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        2 de agosto
+                                    </span>
+
+                                    <span>
+                                        <i class="fa-regular fa-clock"></i>
+                                        09:00
+                                    </span>
+                                </div>
+
+                                <h3>Ruta por el Cerro del Hierro</h3>
+
+                                <p class="tarjeta-plan__descripcion">
+                                    Recorre uno de los paisajes naturales más
+                                    sorprendentes de la Sierra Norte.
+                                </p>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    San Nicolás del Puerto
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+                                    <span>Naturaleza</span>
+
+                                    <strong>
+                                        4,9
+                                        <i class="fa-solid fa-star"></i>
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                        </a>
+                    </article>
+
+                    <article
+                        class="tarjeta-plan"
+                        data-nombre="Ruta de tapas por Triana"
+                        data-categoria="gastronomia"
+                        data-precio="25"
+                        data-valoracion="4.6"
+                    >
+                        <a href="detalle-plan.html" class="tarjeta-plan__enlace">
+
+                            <div class="tarjeta-plan__imagen imagen-plan--tapas">
+
+                                <span class="tarjeta-plan__precio">
+                                    25 €
+                                </span>
+
+                                <button
+                                    class="tarjeta-plan__favorito"
+                                    type="button"
+                                    aria-label="Añadir a favoritos"
+                                >
+                                    <i class="fa-regular fa-heart"></i>
+                                </button>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        3 de agosto
+                                    </span>
+
+                                    <span>
+                                        <i class="fa-regular fa-clock"></i>
+                                        13:00
+                                    </span>
+                                </div>
+
+                                <h3>Ruta de tapas por Triana</h3>
+
+                                <p class="tarjeta-plan__descripcion">
+                                    Disfruta una selección de tapas tradicionales
+                                    en varios establecimientos de Triana.
+                                </p>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Triana, Sevilla
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+                                    <span>Gastronomía</span>
+
+                                    <strong>
+                                        4,6
+                                        <i class="fa-solid fa-star"></i>
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                        </a>
+                    </article>
+
+                    <article
+                        class="tarjeta-plan"
+                        data-nombre="Exposición de arte contemporáneo"
+                        data-categoria="cultura"
+                        data-precio="0"
+                        data-valoracion="4.5"
+                    >
+                        <a href="detalle-plan.html" class="tarjeta-plan__enlace">
+
+                            <div class="tarjeta-plan__imagen imagen-plan--exposicion">
+
+                                <span class="tarjeta-plan__precio">
+                                    Gratis
+                                </span>
+
+                                <button
+                                    class="tarjeta-plan__favorito"
+                                    type="button"
+                                    aria-label="Añadir a favoritos"
+                                >
+                                    <i class="fa-regular fa-heart"></i>
+                                </button>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        Hasta el 10 de agosto
+                                    </span>
+
+                                    <span>
+                                        <i class="fa-regular fa-clock"></i>
+                                        11:00
+                                    </span>
+                                </div>
+
+                                <h3>Exposición de arte contemporáneo</h3>
+
+                                <p class="tarjeta-plan__descripcion">
+                                    Una selección de obras de artistas emergentes
+                                    en un espacio cultural sevillano.
+                                </p>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Centro de Sevilla
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+                                    <span>Cultura</span>
+
+                                    <strong>
+                                        4,5
+                                        <i class="fa-solid fa-star"></i>
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                        </a>
+                    </article>
+
+                </div>
+
+                <div class="sin-resultados" id="sin-resultados">
+
+                    <i class="fa-regular fa-face-frown-open"></i>
+
+                    <h3>No hemos encontrado planes</h3>
+
+                    <p>
+                        Prueba con otra búsqueda o elimina algunos filtros.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="boton-principal"
+                        id="boton-restablecer"
+                    >
+                        Restablecer filtros
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="footer">
+
+        <div class="contenedor footer__grid">
+
+            <div class="footer__marca">
+
+                <a href="index.html" class="logo logo--footer">
+
+                    <span class="logo__icono">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </span>
+
+                    <span class="logo__texto">
+                        Suralia
+                    </span>
+
+                </a>
+
+                <p>
+                    Descubre planes, lugares y experiencias diferentes
+                    para disfrutar Sevilla y sus alrededores.
+                </p>
+
+                <span class="footer__eslogan">
+                    Descubre el sur a tu manera.
+                </span>
+
+            </div>
+
+            <div class="footer__columna">
+                <h3>Descubre</h3>
+                <a href="planes.html">Todos los planes</a>
+                <a href="#">Este fin de semana</a>
+                <a href="#">Planes gratuitos</a>
+                <a href="#">Nuevas actividades</a>
+            </div>
+
+            <div class="footer__columna">
+                <h3>Información</h3>
+                <a href="#">Sobre Suralia</a>
+                <a href="index.html#como-funciona">Cómo funciona</a>
+                <a href="#">Preguntas frecuentes</a>
+                <a href="#">Contacto</a>
+            </div>
+
+            <div class="footer__columna">
+                <h3>Síguenos</h3>
+
+                <div class="redes">
+                    <a href="#" aria-label="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+
+                    <a href="#" aria-label="TikTok">
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+
+                    <a href="#" aria-label="Facebook">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="contenedor footer__inferior">
+
+            <p>
+                © 2026 Suralia. Proyecto desarrollado por Fernando.
+            </p>
+
+            <div>
+                <a href="#">Privacidad</a>
+                <a href="#">Cookies</a>
+                <a href="#">Aviso legal</a>
+            </div>
+
+        </div>
+
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/planes.js"></script>
+
+</body>
+</html>

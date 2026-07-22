@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Inicia sesión en Suralia y gestiona tus planes, favoritos y reservas."
+    >
+
+    <title>Iniciar sesión | Suralia</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="pagina-auth">
+
+    <header class="header">
+        <div class="contenedor header__contenido">
+
+            <a
+                href="index.html"
+                class="logo"
+                aria-label="Página de inicio de Suralia"
+            >
+                <span class="logo__icono">
+                    <i class="fa-solid fa-location-dot"></i>
+                </span>
+
+                <span class="logo__texto">
+                    Suralia
+                </span>
+            </a>
+
+            <a href="index.html" class="volver-inicio">
+                <i class="fa-solid fa-arrow-left"></i>
+                Volver al inicio
+            </a>
+
+        </div>
+    </header>
+
+    <main class="auth">
+
+        <section class="auth__presentacion">
+
+            <div class="auth__presentacion-contenido">
+
+                <span class="etiqueta etiqueta--auth">
+                    <i class="fa-solid fa-sun"></i>
+                    Descubre Sevilla
+                </span>
+
+                <h1>
+                    Tus próximos planes,
+                    <span>siempre contigo</span>
+                </h1>
+
+                <p>
+                    Guarda tus actividades favoritas, consulta tus reservas
+                    y descubre nuevas experiencias en Sevilla.
+                </p>
+
+                <div class="auth__ventajas">
+
+                    <article>
+                        <span>
+                            <i class="fa-regular fa-heart"></i>
+                        </span>
+
+                        <div>
+                            <strong>Guarda tus favoritos</strong>
+                            <p>Ten siempre localizados los planes que te interesan.</p>
+                        </div>
+                    </article>
+
+                    <article>
+                        <span>
+                            <i class="fa-solid fa-ticket"></i>
+                        </span>
+
+                        <div>
+                            <strong>Gestiona tus reservas</strong>
+                            <p>Consulta fechas, plazas y actividades desde tu perfil.</p>
+                        </div>
+                    </article>
+
+                    <article>
+                        <span>
+                            <i class="fa-solid fa-compass"></i>
+                        </span>
+
+                        <div>
+                            <strong>Descubre algo diferente</strong>
+                            <p>Encuentra experiencias adaptadas a tus intereses.</p>
+                        </div>
+                    </article>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="auth__formulario">
+
+            <div class="auth__tarjeta">
+
+                <div class="auth__cabecera">
+                    <span class="subtitulo">Bienvenido de nuevo</span>
+
+                    <h2>Inicia sesión en Suralia</h2>
+
+                    <p>
+                        Accede a tu cuenta para gestionar tus planes.
+                    </p>
+                </div>
+
+                <form id="formulario-login" novalidate>
+
+                    <div class="campo-formulario">
+
+                        <label for="login-email">
+                            Correo electrónico
+                        </label>
+
+                        <div class="campo-formulario__control">
+                            <i class="fa-regular fa-envelope"></i>
+
+                            <input
+                                type="email"
+                                id="login-email"
+                                name="email"
+                                placeholder="nombre@correo.com"
+                                autocomplete="email"
+                            >
+                        </div>
+
+                        <small
+                            class="mensaje-error"
+                            id="error-login-email"
+                        ></small>
+
+                    </div>
+
+                    <div class="campo-formulario">
+
+                        <div class="campo-formulario__encabezado">
+                            <label for="login-password">
+                                Contraseña
+                            </label>
+
+                            <a href="#" class="enlace-recuperar">
+                                ¿La has olvidado?
+                            </a>
+                        </div>
+
+                        <div class="campo-formulario__control">
+                            <i class="fa-solid fa-lock"></i>
+
+                            <input
+                                type="password"
+                                id="login-password"
+                                name="password"
+                                placeholder="Introduce tu contraseña"
+                                autocomplete="current-password"
+                            >
+
+                            <button
+                                type="button"
+                                class="boton-ver-password"
+                                data-password="login-password"
+                                aria-label="Mostrar contraseña"
+                            >
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+
+                        <small
+                            class="mensaje-error"
+                            id="error-login-password"
+                        ></small>
+
+                    </div>
+
+                    <label class="campo-check">
+                        <input
+                            type="checkbox"
+                            id="recordar-sesion"
+                            name="recordar"
+                        >
+
+                        <span>Recordar mi sesión</span>
+                    </label>
+
+                    <button
+                        type="submit"
+                        class="boton-auth"
+                    >
+                        Iniciar sesión
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </form>
+
+                <div class="separador-auth">
+                    <span>o continúa con</span>
+                </div>
+
+                <button
+                    type="button"
+                    class="boton-social"
+                    id="login-google"
+                >
+                    <i class="fa-brands fa-google"></i>
+                    Continuar con Google
+                </button>
+
+                <p class="auth__cambio">
+                    ¿Todavía no tienes cuenta?
+
+                    <a href="registro.html">
+                        Crear una cuenta
+                    </a>
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <div
+        class="notificacion"
+        id="notificacion-auth"
+        role="status"
+        aria-live="polite"
+    >
+        <i class="fa-solid fa-circle-check"></i>
+        <span></span>
+    </div>
+
+    <script src="js/auth.js"></script>
+
+</body>
+</html>
