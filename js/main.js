@@ -105,3 +105,33 @@ botonesFavorito.forEach((boton) => {
         );
     });
 });
+
+
+// mostrar el usuario conectado en la cabecera
+
+
+
+const sesionActual = JSON.parse(
+    localStorage.getItem("sesionSuralia")
+);
+
+const botonLogin = document.querySelector(".boton-login");
+const loginMovil = document.querySelector(".login-movil");
+
+if (sesionActual?.conectado) {
+    if (botonLogin) {
+        botonLogin.href = "perfil.html";
+        botonLogin.innerHTML = `
+            <i class="fa-regular fa-user"></i>
+            ${sesionActual.nombre}
+        `;
+    }
+
+    if (loginMovil) {
+        loginMovil.href = "perfil.html";
+        loginMovil.innerHTML = `
+            <i class="fa-regular fa-user"></i>
+            Mi perfil
+        `;
+    }
+}

@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Gestiona tu perfil, reservas y planes favoritos en Suralia."
+    >
+
+    <title>Mi perfil | Suralia</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="contenedor header__contenido">
+
+            <a
+                href="index.html"
+                class="logo"
+                aria-label="Página de inicio de Suralia"
+            >
+                <span class="logo__icono">
+                    <i class="fa-solid fa-location-dot"></i>
+                </span>
+
+                <span class="logo__texto">
+                    Suralia
+                </span>
+            </a>
+
+            <nav class="navegacion" id="navegacion">
+
+                <a href="planes.html">
+                    Explorar planes
+                </a>
+
+                <a href="index.html#categorias">
+                    Categorías
+                </a>
+
+                <a href="index.html#como-funciona">
+                    Cómo funciona
+                </a>
+
+                <a href="#" class="enlace-publicar">
+                    <i class="fa-solid fa-plus"></i>
+                    Publicar un plan
+                </a>
+
+            </nav>
+
+            <div class="header__acciones">
+
+                <a href="perfil.html" class="usuario-header">
+                    <span class="usuario-header__avatar" id="avatar-header">
+                        FG
+                    </span>
+
+                    <span id="nombre-header">
+                        Fernando
+                    </span>
+                </a>
+
+                <button
+                    class="boton-menu"
+                    id="boton-menu"
+                    type="button"
+                    aria-label="Abrir menú"
+                    aria-expanded="false"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+            </div>
+
+        </div>
+    </header>
+
+    <main>
+
+        <section class="cabecera-perfil">
+
+            <div class="contenedor cabecera-perfil__contenido">
+
+                <div class="perfil-identidad">
+
+                    <div class="perfil-identidad__avatar" id="avatar-perfil">
+                        FG
+                    </div>
+
+                    <div>
+                        <span class="subtitulo">
+                            Mi cuenta
+                        </span>
+
+                        <h1 id="nombre-perfil">
+                            Fernando Graciani
+                        </h1>
+
+                        <p id="email-perfil">
+                            fernando@correo.com
+                        </p>
+                    </div>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="boton-cerrar-sesion"
+                    id="boton-cerrar-sesion"
+                >
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    Cerrar sesión
+                </button>
+
+            </div>
+
+        </section>
+
+        <section class="perfil">
+
+            <div class="contenedor perfil__grid">
+
+                <aside class="perfil-menu">
+
+                    <button
+                        type="button"
+                        class="perfil-menu__enlace activo"
+                        data-seccion="resumen"
+                    >
+                        <i class="fa-solid fa-house"></i>
+                        Resumen
+                    </button>
+
+                    <button
+                        type="button"
+                        class="perfil-menu__enlace"
+                        data-seccion="reservas"
+                    >
+                        <i class="fa-solid fa-ticket"></i>
+                        Mis reservas
+                    </button>
+
+                    <button
+                        type="button"
+                        class="perfil-menu__enlace"
+                        data-seccion="favoritos"
+                    >
+                        <i class="fa-regular fa-heart"></i>
+                        Favoritos
+                    </button>
+
+                    <button
+                        type="button"
+                        class="perfil-menu__enlace"
+                        data-seccion="publicados"
+                    >
+                        <i class="fa-regular fa-calendar-plus"></i>
+                        Planes publicados
+                    </button>
+
+                    <button
+                        type="button"
+                        class="perfil-menu__enlace"
+                        data-seccion="datos"
+                    >
+                        <i class="fa-regular fa-user"></i>
+                        Datos personales
+                    </button>
+
+                </aside>
+
+                <div class="perfil-contenido">
+
+                    <!-- RESUMEN -->
+
+                    <section
+                        class="perfil-seccion activa"
+                        id="seccion-resumen"
+                    >
+
+                        <div class="perfil-seccion__cabecera">
+                            <div>
+                                <span class="subtitulo">
+                                    Panel personal
+                                </span>
+
+                                <h2>
+                                    Hola,
+                                    <span id="saludo-usuario">Fernando</span>
+                                </h2>
+
+                                <p>
+                                    Aquí puedes consultar tu actividad reciente
+                                    en Suralia.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="perfil-estadisticas">
+
+                            <article>
+                                <span class="perfil-estadisticas__icono">
+                                    <i class="fa-solid fa-ticket"></i>
+                                </span>
+
+                                <div>
+                                    <strong>1</strong>
+                                    <span>Reservas activas</span>
+                                </div>
+                            </article>
+
+                            <article>
+                                <span class="perfil-estadisticas__icono">
+                                    <i class="fa-solid fa-heart"></i>
+                                </span>
+
+                                <div>
+                                    <strong>3</strong>
+                                    <span>Planes favoritos</span>
+                                </div>
+                            </article>
+
+                            <article>
+                                <span class="perfil-estadisticas__icono">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                </span>
+
+                                <div>
+                                    <strong>2</strong>
+                                    <span>Planes realizados</span>
+                                </div>
+                            </article>
+
+                        </div>
+
+                        <div class="perfil-bloque">
+
+                            <div class="perfil-bloque__cabecera">
+                                <div>
+                                    <h3>Próxima reserva</h3>
+                                    <p>Tu siguiente experiencia en Suralia.</p>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="enlace-ver-seccion"
+                                    data-ir-seccion="reservas"
+                                >
+                                    Ver reservas
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
+
+                            <article class="reserva-resumen">
+
+                                <div class="reserva-resumen__imagen">
+                                    <img
+                                        src="https://images.unsplash.com/photo-1602002418082-a4443e081dd1?auto=format&fit=crop&w=700&q=80"
+                                        alt="Visita guiada por Itálica"
+                                    >
+                                </div>
+
+                                <div class="reserva-resumen__contenido">
+
+                                    <span class="reserva-estado">
+                                        Confirmada
+                                    </span>
+
+                                    <h3>Visita guiada por Itálica</h3>
+
+                                    <p>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        Sábado, 25 de julio
+                                    </p>
+
+                                    <p>
+                                        <i class="fa-regular fa-clock"></i>
+                                        10:30
+                                    </p>
+
+                                    <p>
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        Santiponce, Sevilla
+                                    </p>
+
+                                    <a
+                                        href="detalle-plan.html"
+                                        class="boton-ver-reserva"
+                                    >
+                                        Ver actividad
+                                    </a>
+
+                                </div>
+
+                            </article>
+
+                        </div>
+
+                    </section>
+
+                    <!-- RESERVAS -->
+
+                    <section
+                        class="perfil-seccion"
+                        id="seccion-reservas"
+                    >
+
+                        <div class="perfil-seccion__cabecera">
+
+                            <div>
+                                <span class="subtitulo">
+                                    Mis actividades
+                                </span>
+
+                                <h2>Mis reservas</h2>
+
+                                <p>
+                                    Consulta y gestiona tus próximas actividades.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="lista-reservas">
+
+                            <article class="reserva-item">
+
+                                <div class="reserva-item__imagen">
+                                    <img
+                                        src="https://images.unsplash.com/photo-1602002418082-a4443e081dd1?auto=format&fit=crop&w=700&q=80"
+                                        alt="Visita guiada por Itálica"
+                                    >
+                                </div>
+
+                                <div class="reserva-item__contenido">
+
+                                    <div class="reserva-item__superior">
+
+                                        <div>
+                                            <span class="reserva-estado">
+                                                Confirmada
+                                            </span>
+
+                                            <h3>
+                                                Visita guiada por Itálica
+                                            </h3>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            class="boton-opciones"
+                                            aria-label="Opciones de reserva"
+                                        >
+                                            <i class="fa-solid fa-ellipsis"></i>
+                                        </button>
+
+                                    </div>
+
+                                    <div class="reserva-item__datos">
+
+                                        <span>
+                                            <i class="fa-regular fa-calendar"></i>
+                                            25 de julio de 2026
+                                        </span>
+
+                                        <span>
+                                            <i class="fa-regular fa-clock"></i>
+                                            10:30
+                                        </span>
+
+                                        <span>
+                                            <i class="fa-solid fa-user-group"></i>
+                                            2 personas
+                                        </span>
+
+                                    </div>
+
+                                    <div class="reserva-item__acciones">
+
+                                        <a
+                                            href="detalle-plan.html"
+                                            class="boton-principal-pequeno"
+                                        >
+                                            Ver actividad
+                                        </a>
+
+                                        <button
+                                            type="button"
+                                            class="boton-cancelar-reserva"
+                                        >
+                                            Cancelar reserva
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                        </div>
+
+                    </section>
+
+                    <!-- FAVORITOS -->
+
+                    <section
+                        class="perfil-seccion"
+                        id="seccion-favoritos"
+                    >
+
+                        <div class="perfil-seccion__cabecera">
+
+                            <div>
+                                <span class="subtitulo">
+                                    Guardados
+                                </span>
+
+                                <h2>Planes favoritos</h2>
+
+                                <p>
+                                    Actividades que has guardado para más adelante.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <div class="planes__grid perfil-favoritos">
+
+                            <article class="tarjeta-plan">
+
+                                <a
+                                    href="detalle-plan.html"
+                                    class="tarjeta-plan__enlace"
+                                >
+
+                                    <div class="tarjeta-plan__imagen imagen-plan--italica">
+
+                                        <span class="tarjeta-plan__precio">
+                                            Gratis
+                                        </span>
+
+                                        <button
+                                            type="button"
+                                            class="tarjeta-plan__favorito favorito-activo"
+                                            aria-label="Eliminar de favoritos"
+                                        >
+                                            <i class="fa-solid fa-heart"></i>
+                                        </button>
+
+                                    </div>
+
+                                    <div class="tarjeta-plan__contenido">
+
+                                        <div class="tarjeta-plan__meta">
+                                            <span>
+                                                <i class="fa-regular fa-calendar"></i>
+                                                25 de julio
+                                            </span>
+                                        </div>
+
+                                        <h3>Visita guiada por Itálica</h3>
+
+                                        <p class="tarjeta-plan__ubicacion">
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            Santiponce, Sevilla
+                                        </p>
+
+                                        <div class="tarjeta-plan__pie">
+                                            <span>Cultura</span>
+
+                                            <strong>
+                                                4,8
+                                                <i class="fa-solid fa-star"></i>
+                                            </strong>
+                                        </div>
+
+                                    </div>
+
+                                </a>
+
+                            </article>
+
+                            <article class="tarjeta-plan">
+
+                                <a
+                                    href="detalle-plan.html"
+                                    class="tarjeta-plan__enlace"
+                                >
+
+                                    <div class="tarjeta-plan__imagen imagen-plan--kayak">
+
+                                        <span class="tarjeta-plan__precio">
+                                            18 €
+                                        </span>
+
+                                        <button
+                                            type="button"
+                                            class="tarjeta-plan__favorito favorito-activo"
+                                            aria-label="Eliminar de favoritos"
+                                        >
+                                            <i class="fa-solid fa-heart"></i>
+                                        </button>
+
+                                    </div>
+
+                                    <div class="tarjeta-plan__contenido">
+
+                                        <div class="tarjeta-plan__meta">
+                                            <span>
+                                                <i class="fa-regular fa-calendar"></i>
+                                                27 de julio
+                                            </span>
+                                        </div>
+
+                                        <h3>Kayak al atardecer</h3>
+
+                                        <p class="tarjeta-plan__ubicacion">
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            Río Guadalquivir
+                                        </p>
+
+                                        <div class="tarjeta-plan__pie">
+                                            <span>Aventura</span>
+
+                                            <strong>
+                                                4,9
+                                                <i class="fa-solid fa-star"></i>
+                                            </strong>
+                                        </div>
+
+                                    </div>
+
+                                </a>
+
+                            </article>
+
+                            <article class="tarjeta-plan">
+
+                                <a
+                                    href="detalle-plan.html"
+                                    class="tarjeta-plan__enlace"
+                                >
+
+                                    <div class="tarjeta-plan__imagen imagen-plan--concierto">
+
+                                        <span class="tarjeta-plan__precio">
+                                            12 €
+                                        </span>
+
+                                        <button
+                                            type="button"
+                                            class="tarjeta-plan__favorito favorito-activo"
+                                            aria-label="Eliminar de favoritos"
+                                        >
+                                            <i class="fa-solid fa-heart"></i>
+                                        </button>
+
+                                    </div>
+
+                                    <div class="tarjeta-plan__contenido">
+
+                                        <div class="tarjeta-plan__meta">
+                                            <span>
+                                                <i class="fa-regular fa-calendar"></i>
+                                                30 de julio
+                                            </span>
+                                        </div>
+
+                                        <h3>Concierto en la Alameda</h3>
+
+                                        <p class="tarjeta-plan__ubicacion">
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            Alameda de Hércules
+                                        </p>
+
+                                        <div class="tarjeta-plan__pie">
+                                            <span>Música</span>
+
+                                            <strong>
+                                                4,7
+                                                <i class="fa-solid fa-star"></i>
+                                            </strong>
+                                        </div>
+
+                                    </div>
+
+                                </a>
+
+                            </article>
+
+                        </div>
+
+                    </section>
+
+                    <!-- PLANES PUBLICADOS -->
+
+                    <section
+                        class="perfil-seccion"
+                        id="seccion-publicados"
+                    >
+
+                        <div class="perfil-seccion__cabecera">
+
+                            <div>
+                                <span class="subtitulo">
+                                    Organizador
+                                </span>
+
+                                <h2>Planes publicados</h2>
+
+                                <p>
+                                    Gestiona las actividades creadas por ti.
+                                </p>
+                            </div>
+
+                            <a
+                                href="#"
+                                class="boton-principal-pequeno"
+                            >
+                                <i class="fa-solid fa-plus"></i>
+                                Publicar un plan
+                            </a>
+
+                        </div>
+
+                        <div class="estado-vacio">
+
+                            <span class="estado-vacio__icono">
+                                <i class="fa-regular fa-calendar-plus"></i>
+                            </span>
+
+                            <h3>Todavía no has publicado ningún plan</h3>
+
+                            <p>
+                                Comparte una actividad y conecta con personas
+                                interesadas en nuevas experiencias.
+                            </p>
+
+                            <a href="#" class="boton-auth">
+                                Publicar mi primer plan
+                            </a>
+
+                        </div>
+
+                    </section>
+
+                    <!-- DATOS PERSONALES -->
+
+                    <section
+                        class="perfil-seccion"
+                        id="seccion-datos"
+                    >
+
+                        <div class="perfil-seccion__cabecera">
+
+                            <div>
+                                <span class="subtitulo">
+                                    Configuración
+                                </span>
+
+                                <h2>Datos personales</h2>
+
+                                <p>
+                                    Actualiza la información asociada a tu cuenta.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <form
+                            class="formulario-perfil"
+                            id="formulario-perfil"
+                        >
+
+                            <div class="formulario-doble">
+
+                                <div class="campo-formulario">
+
+                                    <label for="perfil-nombre">
+                                        Nombre
+                                    </label>
+
+                                    <div class="campo-formulario__control">
+                                        <i class="fa-regular fa-user"></i>
+
+                                        <input
+                                            type="text"
+                                            id="perfil-nombre"
+                                        >
+                                    </div>
+
+                                    <small
+                                        class="mensaje-error"
+                                        id="error-perfil-nombre"
+                                    ></small>
+
+                                </div>
+
+                                <div class="campo-formulario">
+
+                                    <label for="perfil-apellidos">
+                                        Apellidos
+                                    </label>
+
+                                    <div class="campo-formulario__control">
+                                        <i class="fa-regular fa-user"></i>
+
+                                        <input
+                                            type="text"
+                                            id="perfil-apellidos"
+                                        >
+                                    </div>
+
+                                    <small
+                                        class="mensaje-error"
+                                        id="error-perfil-apellidos"
+                                    ></small>
+
+                                </div>
+
+                            </div>
+
+                            <div class="campo-formulario">
+
+                                <label for="perfil-email">
+                                    Correo electrónico
+                                </label>
+
+                                <div class="campo-formulario__control">
+                                    <i class="fa-regular fa-envelope"></i>
+
+                                    <input
+                                        type="email"
+                                        id="perfil-email"
+                                    >
+                                </div>
+
+                                <small
+                                    class="mensaje-error"
+                                    id="error-perfil-email"
+                                ></small>
+
+                            </div>
+
+                            <div class="campo-formulario">
+
+                                <label for="perfil-telefono">
+                                    Teléfono
+                                </label>
+
+                                <div class="campo-formulario__control">
+                                    <i class="fa-solid fa-phone"></i>
+
+                                    <input
+                                        type="tel"
+                                        id="perfil-telefono"
+                                        placeholder="600 000 000"
+                                    >
+                                </div>
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="boton-auth boton-guardar-perfil"
+                            >
+                                Guardar cambios
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+
+                        </form>
+
+                    </section>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="footer">
+
+        <div class="contenedor footer__inferior">
+
+            <p>
+                © 2026 Suralia. Proyecto desarrollado por Fernando.
+            </p>
+
+            <div>
+                <a href="#">Privacidad</a>
+                <a href="#">Cookies</a>
+                <a href="#">Aviso legal</a>
+            </div>
+
+        </div>
+
+    </footer>
+
+    <div
+        class="notificacion"
+        id="notificacion-perfil"
+        role="status"
+        aria-live="polite"
+    >
+        <i class="fa-solid fa-circle-check"></i>
+        <span></span>
+    </div>
+
+    <div class="modal-confirmacion" id="modal-cancelacion">
+
+        <div class="modal-confirmacion__contenido">
+
+            <span class="modal-confirmacion__icono">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </span>
+
+            <h2>¿Cancelar la reserva?</h2>
+
+            <p>
+                Esta acción eliminará la reserva de tu perfil.
+            </p>
+
+            <div class="modal-confirmacion__acciones">
+
+                <button
+                    type="button"
+                    class="boton-secundario"
+                    id="mantener-reserva"
+                >
+                    Mantener reserva
+                </button>
+
+                <button
+                    type="button"
+                    class="boton-confirmar-cancelacion"
+                    id="confirmar-cancelacion"
+                >
+                    Cancelar reserva
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/perfil.js"></script>
+
+</body>
+</html>

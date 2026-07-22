@@ -154,7 +154,7 @@ if (formularioLogin) {
         );
 
         setTimeout(() => {
-            window.location.href = "index.html";
+            window.location.href = "perfil.html";
         }, 1200);
     });
 
