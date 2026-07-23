@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Disfruta de una experiencia en kayak al atardecer por el río Guadalquivir con Suralia."
+    >
+
+    <title>Kayak al atardecer | Suralia</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body
+    data-plan-id="kayak-atardecer"
+    data-plan-titulo="Kayak al atardecer"
+    data-plan-categoria="Aventura"
+    data-plan-imagen="img/kayak.jpg"
+    data-plan-precio="18"
+    data-plan-valoracion="4.9"
+    data-plan-fecha="27 de julio de 2026"
+    data-plan-ubicacion="Río Guadalquivir, Sevilla"
+    data-plan-enlace="detalle-kayak.html"
+>
+
+    <header class="header">
+
+        <div class="contenedor header__contenido">
+
+            <a
+                href="index.html"
+                class="logo"
+                aria-label="Página de inicio de Suralia"
+            >
+                <span class="logo__icono">
+                    <i class="fa-solid fa-location-dot"></i>
+                </span>
+
+                <span class="logo__texto">
+                    Suralia
+                </span>
+            </a>
+
+            <nav
+                class="navegacion"
+                id="navegacion"
+            >
+
+                <a href="planes.html">
+                    Explorar planes
+                </a>
+
+                <a href="index.html#categorias">
+                    Categorías
+                </a>
+
+                <a href="index.html#como-funciona">
+                    Cómo funciona
+                </a>
+
+                <a
+                    href="login.html"
+                    class="enlace-publicar"
+                >
+                    <i class="fa-solid fa-plus"></i>
+                    Publicar un plan
+                </a>
+
+                <a
+                    href="login.html"
+                    class="login-movil"
+                >
+                    <i class="fa-regular fa-user"></i>
+                    Iniciar sesión
+                </a>
+
+            </nav>
+
+            <div class="header__acciones">
+
+                <a
+                    href="login.html"
+                    class="boton-login"
+                >
+                    Iniciar sesión
+                </a>
+
+                <button
+                    class="boton-menu"
+                    id="boton-menu"
+                    type="button"
+                    aria-label="Abrir menú"
+                    aria-expanded="false"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <main>
+
+        <section class="detalle-cabecera">
+
+            <div class="contenedor">
+
+                <nav
+                    class="migas-pan"
+                    aria-label="Ruta de navegación"
+                >
+
+                    <a href="index.html">
+                        Inicio
+                    </a>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                    <a href="planes.html">
+                        Planes
+                    </a>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                    <span>
+                        Kayak al atardecer
+                    </span>
+
+                </nav>
+
+                <div class="detalle-cabecera__contenido">
+
+                    <div>
+
+                        <span class="detalle-categoria">
+                            <i class="fa-solid fa-water"></i>
+                            Aventura
+                        </span>
+
+                        <h1>
+                            Kayak al atardecer
+                        </h1>
+
+                        <div class="detalle-cabecera__meta">
+
+                            <span>
+                                <i class="fa-solid fa-star"></i>
+                                <strong>4,9</strong>
+                                42 opiniones
+                            </span>
+
+                            <span>
+                                <i class="fa-solid fa-location-dot"></i>
+                                Río Guadalquivir, Sevilla
+                            </span>
+
+                            <span>
+                                <i class="fa-solid fa-user-group"></i>
+                                18 personas apuntadas
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="detalle-cabecera__acciones">
+
+                        <button
+                            type="button"
+                            class="boton-accion"
+                            id="boton-compartir"
+                        >
+                            <i class="fa-solid fa-share-nodes"></i>
+                            Compartir
+                        </button>
+
+                        <button
+                            type="button"
+                            class="boton-favorito-detalle"
+                            id="boton-favorito-plan"
+                            aria-label="Añadir plan a favoritos"
+                        >
+                            <i class="fa-regular fa-heart"></i>
+                            <span>Guardar</span>
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="galeria-plan">
+
+            <div class="contenedor galeria-plan__grid">
+
+                <button
+                    class="galeria-plan__principal"
+                    type="button"
+                    data-imagen="img/kayak1.jpg"
+                    aria-label="Ampliar imagen principal"
+                >
+                    <img
+                        src="img/kayak1.jpg"
+                        alt="Personas practicando kayak en el río Guadalquivir"
+                    >
+                </button>
+
+                <button
+                    class="galeria-plan__secundaria"
+                    type="button"
+                    data-imagen="img/kayak2.jpg"
+                    aria-label="Ampliar segunda imagen"
+                >
+                    <img
+                        src="img/kayak2.jpg"
+                        alt="Kayaks navegando al atardecer por Sevilla"
+                    >
+                </button>
+
+                <button
+                    class="galeria-plan__secundaria galeria-plan__ultima"
+                    type="button"
+                    data-imagen="img/kayak3.jpg"
+                    aria-label="Ampliar tercera imagen"
+                >
+                    <img
+                        src="img/kayak3.jpg"
+                        alt="Vista del río Guadalquivir desde un kayak"
+                    >
+
+                    <span class="galeria-plan__contador">
+                        <i class="fa-regular fa-images"></i>
+                        Ver todas
+                    </span>
+                </button>
+
+            </div>
+
+        </section>
+
+        <section class="detalle-contenido">
+
+            <div class="contenedor detalle-contenido__grid">
+
+                <div class="detalle-principal">
+
+                    <section class="bloque-detalle resumen-plan">
+
+                        <div class="resumen-plan__organizador">
+
+                            <div class="organizador-avatar">
+                                SK
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Actividad organizada por
+                                </span>
+
+                                <h2>
+                                    Sevilla Kayak
+                                </h2>
+
+                                <p>
+                                    Organizador verificado
+                                    <i class="fa-solid fa-circle-check"></i>
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="resumen-plan__datos">
+
+                            <article>
+
+                                <span class="resumen-plan__icono">
+                                    <i class="fa-regular fa-calendar"></i>
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        Lunes, 27 de julio
+                                    </strong>
+
+                                    <span>
+                                        De 19:00 a 21:00
+                                    </span>
+                                </div>
+
+                            </article>
+
+                            <article>
+
+                                <span class="resumen-plan__icono">
+                                    <i class="fa-solid fa-users"></i>
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        Grupo reducido
+                                    </strong>
+
+                                    <span>
+                                        Máximo 20 personas
+                                    </span>
+                                </div>
+
+                            </article>
+
+                            <article>
+
+                                <span class="resumen-plan__icono">
+                                    <i class="fa-solid fa-signal"></i>
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        Nivel inicial
+                                    </strong>
+
+                                    <span>
+                                        No necesitas experiencia
+                                    </span>
+                                </div>
+
+                            </article>
+
+                        </div>
+
+                    </section>
+
+                    <section class="bloque-detalle">
+
+                        <h2>
+                            Sobre esta experiencia
+                        </h2>
+
+                        <p>
+                            Descubre Sevilla desde una perspectiva diferente
+                            con una ruta en kayak por el río Guadalquivir
+                            mientras cae el sol sobre la ciudad.
+                        </p>
+
+                        <p>
+                            Durante el recorrido podrás contemplar algunos de
+                            los lugares más conocidos de Sevilla, como la Torre
+                            del Oro, el puente de Triana y la calle Betis.
+                        </p>
+
+                        <p>
+                            La actividad está pensada tanto para personas que
+                            nunca han utilizado un kayak como para quienes ya
+                            tienen algo de experiencia.
+                        </p>
+
+                        <button
+                            type="button"
+                            class="boton-leer-mas"
+                            id="boton-leer-mas"
+                        >
+                            Leer descripción completa
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+
+                        <div
+                            class="descripcion-ampliada"
+                            id="descripcion-ampliada"
+                        >
+
+                            <p>
+                                Antes de comenzar, el equipo de monitores dará
+                                una explicación básica sobre el manejo del kayak,
+                                la posición correcta y las normas de seguridad.
+                            </p>
+
+                            <p>
+                                La ruta se realiza a un ritmo tranquilo y cuenta
+                                con varias paradas para descansar, hacer
+                                fotografías y disfrutar de las vistas.
+                            </p>
+
+                            <p>
+                                Se recomienda llevar ropa cómoda, protección
+                                solar, una botella de agua y una muda de ropa
+                                por si fuera necesaria.
+                            </p>
+
+                        </div>
+
+                    </section>
+
+                    <section class="bloque-detalle">
+
+                        <h2>
+                            Qué incluye
+                        </h2>
+
+                        <div class="lista-incluye">
+
+                            <div>
+                                <i class="fa-solid fa-check"></i>
+                                Kayak individual o doble
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-check"></i>
+                                Remo y chaleco salvavidas
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-check"></i>
+                                Monitor especializado
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-check"></i>
+                                Explicación inicial de seguridad
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-check"></i>
+                                Bolsa estanca para objetos personales
+                            </div>
+
+                            <div class="no-incluido">
+                                <i class="fa-solid fa-xmark"></i>
+                                Transporte hasta el punto de encuentro
+                            </div>
+
+                            <div class="no-incluido">
+                                <i class="fa-solid fa-xmark"></i>
+                                Comida o bebida
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section class="bloque-detalle">
+
+                        <h2>
+                            Ubicación
+                        </h2>
+
+                        <p class="texto-suave">
+                            Punto de encuentro junto al Centro de Actividades
+                            Náuticas, paseo de la O, Sevilla.
+                        </p>
+
+                        <div
+                            id="mapa-plan"
+                            class="mapa-plan"
+                        ></div>
+
+                        <a
+                            href="https://www.google.com/maps/search/?api=1&query=Paseo+de+la+O+Sevilla"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="enlace-mapa"
+                        >
+                            <i class="fa-solid fa-diamond-turn-right"></i>
+                            Cómo llegar
+                        </a>
+
+                    </section>
+
+                    <section class="bloque-detalle">
+
+                        <div class="cabecera-opiniones">
+
+                            <div>
+
+                                <h2>
+                                    Opiniones
+                                </h2>
+
+                                <p>
+                                    <i class="fa-solid fa-star"></i>
+                                    <strong>4,9</strong>
+                                    · 42 valoraciones
+                                </p>
+
+                            </div>
+
+                            <button
+                                type="button"
+                                class="boton-secundario"
+                            >
+                                Ver todas
+                            </button>
+
+                        </div>
+
+                        <div class="opiniones-grid">
+
+                            <article class="opinion">
+
+                                <div class="opinion__usuario">
+
+                                    <div class="opinion__avatar">
+                                        AM
+                                    </div>
+
+                                    <div>
+                                        <strong>
+                                            Ana M.
+                                        </strong>
+
+                                        <span>
+                                            Julio de 2026
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                <div class="opinion__estrellas">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+
+                                <p>
+                                    Una experiencia muy divertida y tranquila.
+                                    Ver el atardecer desde el río fue precioso
+                                    y los monitores estuvieron pendientes de
+                                    nosotros en todo momento.
+                                </p>
+
+                            </article>
+
+                            <article class="opinion">
+
+                                <div class="opinion__usuario">
+
+                                    <div class="opinion__avatar">
+                                        DR
+                                    </div>
+
+                                    <div>
+                                        <strong>
+                                            David R.
+                                        </strong>
+
+                                        <span>
+                                            Junio de 2026
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                <div class="opinion__estrellas">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+
+                                <p>
+                                    Era la primera vez que hacía kayak y fue
+                                    bastante sencillo. La ruta permite ver
+                                    Sevilla desde un lugar totalmente distinto.
+                                </p>
+
+                            </article>
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+                <aside class="reserva-plan">
+
+                    <div class="reserva-plan__tarjeta">
+
+                        <div class="reserva-plan__precio">
+
+                            <div>
+                                <strong>
+                                    18 €
+                                </strong>
+
+                                <span>
+                                    por persona
+                                </span>
+                            </div>
+
+                            <span>
+                                <i class="fa-solid fa-star"></i>
+                                4,9
+                            </span>
+
+                        </div>
+
+                        <form id="formulario-reserva">
+
+                            <div class="campo-reserva">
+
+                                <label for="fecha-reserva">
+                                    Fecha
+                                </label>
+
+                                <div>
+
+                                    <i class="fa-regular fa-calendar"></i>
+
+                                    <select
+                                        id="fecha-reserva"
+                                        name="fecha-reserva"
+                                    >
+                                        <option value="27-julio-2026">
+                                            Lunes, 27 de julio
+                                        </option>
+
+                                        <option value="29-julio-2026">
+                                            Miércoles, 29 de julio
+                                        </option>
+
+                                        <option value="1-agosto-2026">
+                                            Sábado, 1 de agosto
+                                        </option>
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                            <div class="campo-reserva">
+
+                                <label for="personas-reserva">
+                                    Personas
+                                </label>
+
+                                <div>
+
+                                    <i class="fa-solid fa-user-group"></i>
+
+                                    <select
+                                        id="personas-reserva"
+                                        name="personas-reserva"
+                                    >
+                                        <option value="1">
+                                            1 persona
+                                        </option>
+
+                                        <option value="2">
+                                            2 personas
+                                        </option>
+
+                                        <option value="3">
+                                            3 personas
+                                        </option>
+
+                                        <option value="4">
+                                            4 personas
+                                        </option>
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="boton-reservar"
+                            >
+                                Reservar plaza
+                            </button>
+
+                        </form>
+
+                        <p class="reserva-plan__aviso">
+                            No se realizará ningún cobro inmediato.
+                        </p>
+
+                        <div class="reserva-plan__desglose">
+
+                            <div>
+                                <span>
+                                    18 € ×
+                                    <span id="numero-personas-desglose">
+                                        1
+                                    </span>
+                                </span>
+
+                                <strong id="precio-actividad">
+                                    18 €
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span>
+                                    Gastos de gestión
+                                </span>
+
+                                <strong>
+                                    0 €
+                                </strong>
+                            </div>
+
+                            <div class="reserva-plan__total">
+                                <span>
+                                    Total
+                                </span>
+
+                                <strong id="precio-total">
+                                    18 €
+                                </strong>
+                            </div>
+
+                        </div>
+
+                        <div class="reserva-plan__plazas">
+
+                            <i class="fa-solid fa-bolt"></i>
+
+                            <span>
+                                Quedan pocas plazas para esta fecha
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="seguridad-reserva">
+
+                        <i class="fa-solid fa-shield-heart"></i>
+
+                        <div>
+
+                            <strong>
+                                Reserva segura
+                            </strong>
+
+                            <p>
+                                Tus datos estarán protegidos durante todo
+                                el proceso.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </section>
+
+        <section class="planes-relacionados">
+
+            <div class="contenedor">
+
+                <div class="encabezado-seccion">
+
+                    <div>
+
+                        <span class="subtitulo">
+                            También puede interesarte
+                        </span>
+
+                        <h2>
+                            Otros planes cercanos
+                        </h2>
+
+                    </div>
+
+                    <a
+                        href="planes.html"
+                        class="enlace-ver-todos"
+                    >
+                        Ver más planes
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                </div>
+
+                <div class="planes__grid">
+
+                    <article class="tarjeta-plan">
+
+                        <a
+                            href="detalle-plan.html"
+                            class="tarjeta-plan__enlace"
+                        >
+
+                            <div class="tarjeta-plan__imagen imagen-plan--italica">
+
+                                <span class="tarjeta-plan__precio">
+                                    Gratis
+                                </span>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        25 de julio
+                                    </span>
+
+                                </div>
+
+                                <h3>
+                                    Visita guiada por Itálica
+                                </h3>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Santiponce, Sevilla
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+
+                                    <span>
+                                        Cultura
+                                    </span>
+
+                                    <strong>
+                                        4,8
+                                        <i class="fa-solid fa-star"></i>
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </article>
+
+                    <article class="tarjeta-plan">
+
+                        <a
+                            href="detalle-poncho-k.html"
+                            class="tarjeta-plan__enlace"
+                        >
+
+                            <div class="tarjeta-plan__imagen imagen-plan--poncho-k">
+
+                                <span class="tarjeta-plan__precio">
+                                    25 €
+                                </span>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        21 de noviembre
+                                    </span>
+
+                                </div>
+
+                                <h3>
+                                    PONCHO K - Cartuja Center CITE
+                                </h3>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Cartuja Center CITE
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+
+                                    <span>
+                                        Música
+                                    </span>
+
+                                    <strong>
+                                        4,8
+                                        <i class="fa-solid fa-star"></i>
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </article>
+
+                    <article class="tarjeta-plan">
+
+                        <a
+                            href="#"
+                            class="tarjeta-plan__enlace"
+                        >
+
+                            <div class="tarjeta-plan__imagen imagen-plan--tapas">
+
+                                <span class="tarjeta-plan__precio">
+                                    25 €
+                                </span>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        3 de agosto
+                                    </span>
+
+                                </div>
+
+                                <h3>
+                                    Ruta de tapas por Triana
+                                </h3>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Triana, Sevilla
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+
+                                    <span>
+                                        Gastronomía
+                                    </span>
+
+                                    <strong>
+                                        4,6
+                                        <i class="fa-solid fa-star"></i>
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </article>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="footer">
+
+        <div class="contenedor footer__grid">
+
+            <div class="footer__marca">
+
+                <a
+                    href="index.html"
+                    class="logo logo--footer"
+                >
+
+                    <span class="logo__icono">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </span>
+
+                    <span class="logo__texto">
+                        Suralia
+                    </span>
+
+                </a>
+
+                <p>
+                    Descubre planes, lugares y experiencias diferentes
+                    para disfrutar Sevilla y sus alrededores.
+                </p>
+
+                <span class="footer__eslogan">
+                    Descubre el sur a tu manera.
+                </span>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>
+                    Descubre
+                </h3>
+
+                <a href="planes.html">
+                    Todos los planes
+                </a>
+
+                <a href="#">
+                    Este fin de semana
+                </a>
+
+                <a href="#">
+                    Planes gratuitos
+                </a>
+
+                <a href="#">
+                    Nuevas actividades
+                </a>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>
+                    Información
+                </h3>
+
+                <a href="#">
+                    Sobre Suralia
+                </a>
+
+                <a href="index.html#como-funciona">
+                    Cómo funciona
+                </a>
+
+                <a href="#">
+                    Preguntas frecuentes
+                </a>
+
+                <a href="#">
+                    Contacto
+                </a>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>
+                    Síguenos
+                </h3>
+
+                <div class="redes">
+
+                    <a
+                        href="#"
+                        aria-label="Instagram"
+                    >
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+
+                    <a
+                        href="#"
+                        aria-label="TikTok"
+                    >
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+
+                    <a
+                        href="#"
+                        aria-label="Facebook"
+                    >
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="contenedor footer__inferior">
+
+            <p>
+                © 2026 Suralia. Proyecto desarrollado por Fernando.
+            </p>
+
+            <div>
+                <a href="#">
+                    Privacidad
+                </a>
+
+                <a href="#">
+                    Cookies
+                </a>
+
+                <a href="#">
+                    Aviso legal
+                </a>
+            </div>
+
+        </div>
+
+    </footer>
+
+    <div
+        class="modal-imagen"
+        id="modal-imagen"
+    >
+
+        <button
+            type="button"
+            class="modal-imagen__cerrar"
+            id="cerrar-modal-imagen"
+            aria-label="Cerrar imagen"
+        >
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <img
+            src=""
+            alt="Imagen ampliada del plan"
+            id="imagen-modal"
+        >
+
+    </div>
+
+    <div
+        class="notificacion"
+        id="notificacion"
+        role="status"
+        aria-live="polite"
+    >
+        <i class="fa-solid fa-circle-check"></i>
+        <span></span>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script src="js/main.js"></script>
+    <script src="js/detalle-kayak.js"></script>
+
+</body>
+
+</html>

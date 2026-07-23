@@ -633,17 +633,18 @@ img {
 
 .imagen-plan--italica {
     background-image:
-        url("https://images.unsplash.com/photo-1602002418082-a4443e081dd1?auto=format&fit=crop&w=900&q=80");
+        url("../img/italica principal.jpg");
 }
 
 .imagen-plan--kayak {
     background-image:
-        url("https://images.unsplash.com/photo-1515023115689-589c33041d3c?auto=format&fit=crop&w=900&q=80");
+        url("../img/kayak\ principal.jpg");
 }
 
-.imagen-plan--concierto {
-    background-image:
-        url("https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=900&q=80");
+.imagen-plan--poncho-k {
+    background-image: url("../img/poncho-k.jpg");
+    background-position: center;
+    background-size: cover;
 }
 
 .tarjeta-plan__precio {
@@ -1319,17 +1320,17 @@ img {
 
 .imagen-plan--cerro {
     background-image:
-        url("https://images.unsplash.com/photo-1464278533981-50106e6176b1?auto=format&fit=crop&w=900&q=80");
+        url("../img/cerro1.jpg");
 }
 
 .imagen-plan--tapas {
     background-image:
-        url("https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=80");
+        url("../img/triana1.jpg");
 }
 
 .imagen-plan--exposicion {
     background-image:
-        url("https://images.unsplash.com/photo-1561214115-f2f134cc4912?auto=format&fit=crop&w=900&q=80");
+        url("../img/andaluz1.jpg");
 }
 
 .sin-resultados {
