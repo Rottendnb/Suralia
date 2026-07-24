@@ -1,14 +1,60 @@
 /* =====================================================
+   FUNCIONES SEGURAS PARA LOCALSTORAGE
+===================================================== */
+
+function leerLocalStorage(clave, valorAlternativo = null) {
+    try {
+        const contenido = localStorage.getItem(clave);
+
+        if (!contenido) {
+            return valorAlternativo;
+        }
+
+        return JSON.parse(contenido);
+    } catch (error) {
+        console.error(
+            `No se pudo leer ${clave}:`,
+            error
+        );
+
+        return valorAlternativo;
+    }
+}
+
+
+function guardarLocalStorage(clave, valor) {
+    try {
+        localStorage.setItem(
+            clave,
+            JSON.stringify(valor)
+        );
+
+        return true;
+    } catch (error) {
+        console.error(
+            `No se pudo guardar ${clave}:`,
+            error
+        );
+
+        return false;
+    }
+}
+
+
+/* =====================================================
    COMPROBAR USUARIO Y SESIÓN
 ===================================================== */
 
-const usuarioGuardado = JSON.parse(
-    localStorage.getItem("usuarioSuralia")
+const usuarioGuardado = leerLocalStorage(
+    "usuarioSuralia",
+    null
 );
 
-const sesionGuardada = JSON.parse(
-    localStorage.getItem("sesionSuralia")
+const sesionGuardada = leerLocalStorage(
+    "sesionSuralia",
+    null
 );
+
 
 if (
     !usuarioGuardado ||
@@ -23,48 +69,87 @@ if (
    ELEMENTOS GENERALES
 ===================================================== */
 
-const botonesMenuPerfil = document.querySelectorAll(
-    ".perfil-menu__enlace"
-);
+const botonesMenuPerfil =
+    document.querySelectorAll(
+        ".perfil-menu__enlace"
+    );
 
-const seccionesPerfil = document.querySelectorAll(
-    ".perfil-seccion"
-);
+const seccionesPerfil =
+    document.querySelectorAll(
+        ".perfil-seccion"
+    );
 
-const enlacesSeccion = document.querySelectorAll(
-    "[data-ir-seccion]"
-);
+const enlacesSeccion =
+    document.querySelectorAll(
+        "[data-ir-seccion]"
+    );
 
-const botonCerrarSesion = document.querySelector(
-    "#boton-cerrar-sesion"
-);
+const botonCerrarSesion =
+    document.querySelector(
+        "#boton-cerrar-sesion"
+    );
 
-const formularioPerfil = document.querySelector(
-    "#formulario-perfil"
-);
+const formularioPerfil =
+    document.querySelector(
+        "#formulario-perfil"
+    );
 
-const notificacionPerfil = document.querySelector(
-    "#notificacion-perfil"
-);
+const notificacionPerfil =
+    document.querySelector(
+        "#notificacion-perfil"
+    );
 
 let temporizadorNotificacion;
+
+
+/* =====================================================
+   ELEMENTOS DEL AVATAR
+===================================================== */
+
+const avatarPreview =
+    document.querySelector(
+        "#avatar-preview"
+    );
+
+const inputAvatar =
+    document.querySelector(
+        "#input-avatar"
+    );
+
+const botonEliminarAvatar =
+    document.querySelector(
+        "#boton-eliminar-avatar"
+    );
+
+const botonesAvatarPredeterminado =
+    document.querySelectorAll(
+        ".avatar-predeterminado"
+    );
+
+const errorAvatar =
+    document.querySelector(
+        "#error-avatar"
+    );
 
 
 /* =====================================================
    MODAL DE CANCELACIÓN DE RESERVA
 ===================================================== */
 
-const modalCancelacion = document.querySelector(
-    "#modal-cancelacion"
-);
+const modalCancelacion =
+    document.querySelector(
+        "#modal-cancelacion"
+    );
 
-const mantenerReserva = document.querySelector(
-    "#mantener-reserva"
-);
+const mantenerReserva =
+    document.querySelector(
+        "#mantener-reserva"
+    );
 
-const confirmarCancelacion = document.querySelector(
-    "#confirmar-cancelacion"
-);
+const confirmarCancelacion =
+    document.querySelector(
+        "#confirmar-cancelacion"
+    );
 
 let reservaPendienteCancelar = null;
 
@@ -73,7 +158,10 @@ let reservaPendienteCancelar = null;
    FUNCIONES GENERALES
 ===================================================== */
 
-function obtenerIniciales(nombre, apellidos) {
+function obtenerIniciales(
+    nombre,
+    apellidos
+) {
     const inicialNombre =
         nombre?.trim().charAt(0) || "";
 
@@ -81,7 +169,8 @@ function obtenerIniciales(nombre, apellidos) {
         apellidos?.trim().charAt(0) || "";
 
     return (
-        inicialNombre + inicialApellido
+        inicialNombre +
+        inicialApellido
     ).toUpperCase();
 }
 
@@ -92,21 +181,435 @@ function mostrarNotificacion(mensaje) {
         return;
     }
 
-    const texto = notificacionPerfil.querySelector("span");
+    const texto =
+        notificacionPerfil.querySelector(
+            "span"
+        );
 
     if (texto) {
         texto.textContent = mensaje;
     }
 
-    notificacionPerfil.classList.add("visible");
+    notificacionPerfil.classList.add(
+        "visible"
+    );
 
-    clearTimeout(temporizadorNotificacion);
+    clearTimeout(
+        temporizadorNotificacion
+    );
 
-    temporizadorNotificacion = setTimeout(() => {
-        notificacionPerfil.classList.remove("visible");
-    }, 3000);
+    temporizadorNotificacion = setTimeout(
+        () => {
+            notificacionPerfil.classList.remove(
+                "visible"
+            );
+        },
+        3000
+    );
 }
 
+
+function escaparHTML(valor = "") {
+    return String(valor)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* =====================================================
+   FOTO Y AVATAR DEL USUARIO
+===================================================== */
+
+function limpiarEstiloAvatar(elemento) {
+    if (!elemento) {
+        return;
+    }
+
+    elemento.style.backgroundImage = "";
+
+    elemento.classList.remove(
+        "avatar-con-imagen"
+    );
+}
+
+
+function aplicarAvatarEnElemento(
+    elemento,
+    iniciales
+) {
+    if (!elemento) {
+        return;
+    }
+
+    limpiarEstiloAvatar(elemento);
+
+    const tipoAvatar =
+        usuarioGuardado.avatarTipo;
+
+    const valorAvatar =
+        usuarioGuardado.avatarValor;
+
+    if (
+        tipoAvatar === "imagen" &&
+        valorAvatar
+    ) {
+        elemento.textContent = "";
+
+        elemento.style.backgroundImage =
+            `url("${valorAvatar}")`;
+
+        elemento.classList.add(
+            "avatar-con-imagen"
+        );
+
+        return;
+    }
+
+    if (
+        tipoAvatar === "emoji" &&
+        valorAvatar
+    ) {
+        elemento.textContent =
+            valorAvatar;
+
+        return;
+    }
+
+    elemento.textContent =
+        iniciales || "SU";
+}
+
+
+function actualizarAvataresUsuario() {
+    const iniciales = obtenerIniciales(
+        usuarioGuardado.nombre,
+        usuarioGuardado.apellidos
+    );
+
+    const avatarHeader =
+        document.querySelector(
+            "#avatar-header"
+        );
+
+    const avatarPerfil =
+        document.querySelector(
+            "#avatar-perfil"
+        );
+
+    aplicarAvatarEnElemento(
+        avatarHeader,
+        iniciales
+    );
+
+    aplicarAvatarEnElemento(
+        avatarPerfil,
+        iniciales
+    );
+
+    aplicarAvatarEnElemento(
+        avatarPreview,
+        iniciales
+    );
+
+    botonesAvatarPredeterminado.forEach(
+        (boton) => {
+            const estaSeleccionado =
+                usuarioGuardado.avatarTipo ===
+                    "emoji" &&
+                usuarioGuardado.avatarValor ===
+                    boton.dataset.avatar;
+
+            boton.classList.toggle(
+                "activo",
+                estaSeleccionado
+            );
+        }
+    );
+}
+
+
+function guardarAvatarUsuario(
+    tipo,
+    valor
+) {
+    usuarioGuardado.avatarTipo =
+        tipo;
+
+    usuarioGuardado.avatarValor =
+        valor;
+
+    const guardadoCorrecto =
+        guardarLocalStorage(
+            "usuarioSuralia",
+            usuarioGuardado
+        );
+
+    if (!guardadoCorrecto) {
+        mostrarNotificacion(
+            "No se ha podido guardar el avatar."
+        );
+
+        return false;
+    }
+
+    actualizarAvataresUsuario();
+
+    return true;
+}
+
+
+function reducirImagenAvatar(archivo) {
+    return new Promise(
+        (resolve, reject) => {
+            const lector =
+                new FileReader();
+
+            lector.onload = () => {
+                const imagen =
+                    new Image();
+
+                imagen.onload = () => {
+                    const canvas =
+                        document.createElement(
+                            "canvas"
+                        );
+
+                    const contexto =
+                        canvas.getContext("2d");
+
+                    if (!contexto) {
+                        reject(
+                            new Error(
+                                "No se ha podido crear el editor de imagen."
+                            )
+                        );
+
+                        return;
+                    }
+
+                    const medidaMaxima = 350;
+
+                    let ancho =
+                        imagen.width;
+
+                    let alto =
+                        imagen.height;
+
+                    if (ancho > alto) {
+                        alto =
+                            alto *
+                            (medidaMaxima / ancho);
+
+                        ancho =
+                            medidaMaxima;
+                    } else {
+                        ancho =
+                            ancho *
+                            (medidaMaxima / alto);
+
+                        alto =
+                            medidaMaxima;
+                    }
+
+                    canvas.width =
+                        Math.round(ancho);
+
+                    canvas.height =
+                        Math.round(alto);
+
+                    contexto.drawImage(
+                        imagen,
+                        0,
+                        0,
+                        canvas.width,
+                        canvas.height
+                    );
+
+                    const imagenReducida =
+                        canvas.toDataURL(
+                            "image/jpeg",
+                            0.78
+                        );
+
+                    resolve(
+                        imagenReducida
+                    );
+                };
+
+                imagen.onerror = () => {
+                    reject(
+                        new Error(
+                            "No se ha podido procesar la imagen."
+                        )
+                    );
+                };
+
+                imagen.src =
+                    lector.result;
+            };
+
+            lector.onerror = () => {
+                reject(
+                    new Error(
+                        "No se ha podido leer el archivo."
+                    )
+                );
+            };
+
+            lector.readAsDataURL(
+                archivo
+            );
+        }
+    );
+}
+
+
+if (inputAvatar) {
+    inputAvatar.addEventListener(
+        "change",
+        async () => {
+            const archivo =
+                inputAvatar.files?.[0];
+
+            if (!archivo) {
+                return;
+            }
+
+            const tiposPermitidos = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ];
+
+            if (
+                !tiposPermitidos.includes(
+                    archivo.type
+                )
+            ) {
+                if (errorAvatar) {
+                    errorAvatar.textContent =
+                        "Selecciona una imagen JPG, PNG o WEBP.";
+                }
+
+                inputAvatar.value = "";
+
+                return;
+            }
+
+            const tamañoMaximo =
+                5 * 1024 * 1024;
+
+            if (
+                archivo.size >
+                tamañoMaximo
+            ) {
+                if (errorAvatar) {
+                    errorAvatar.textContent =
+                        "La imagen no puede superar los 5 MB.";
+                }
+
+                inputAvatar.value = "";
+
+                return;
+            }
+
+            if (errorAvatar) {
+                errorAvatar.textContent = "";
+            }
+
+            try {
+                const imagenReducida =
+                    await reducirImagenAvatar(
+                        archivo
+                    );
+
+                const guardado =
+                    guardarAvatarUsuario(
+                        "imagen",
+                        imagenReducida
+                    );
+
+                if (guardado) {
+                    mostrarNotificacion(
+                        "La foto de perfil se ha actualizado."
+                    );
+                }
+            } catch (error) {
+                console.error(error);
+
+                if (errorAvatar) {
+                    errorAvatar.textContent =
+                        "No se ha podido guardar la imagen.";
+                }
+            }
+
+            inputAvatar.value = "";
+        }
+    );
+}
+
+
+botonesAvatarPredeterminado.forEach(
+    (boton) => {
+        boton.addEventListener(
+            "click",
+            () => {
+                const avatar =
+                    boton.dataset.avatar;
+
+                if (!avatar) {
+                    return;
+                }
+
+                const guardado =
+                    guardarAvatarUsuario(
+                        "emoji",
+                        avatar
+                    );
+
+                if (guardado) {
+                    mostrarNotificacion(
+                        "El avatar se ha actualizado."
+                    );
+                }
+            }
+        );
+    }
+);
+
+
+if (botonEliminarAvatar) {
+    botonEliminarAvatar.addEventListener(
+        "click",
+        () => {
+            delete usuarioGuardado.avatarTipo;
+            delete usuarioGuardado.avatarValor;
+
+            guardarLocalStorage(
+                "usuarioSuralia",
+                usuarioGuardado
+            );
+
+            actualizarAvataresUsuario();
+
+            if (errorAvatar) {
+                errorAvatar.textContent = "";
+            }
+
+            mostrarNotificacion(
+                "Se han restaurado tus iniciales."
+            );
+        }
+    );
+}
+
+
+/* =====================================================
+   CARGAR DATOS DEL USUARIO
+===================================================== */
 
 function cargarDatosUsuario() {
     const nombreCompleto = `
@@ -114,117 +617,122 @@ function cargarDatosUsuario() {
         ${usuarioGuardado.apellidos || ""}
     `.trim();
 
-    const iniciales = obtenerIniciales(
-        usuarioGuardado.nombre,
-        usuarioGuardado.apellidos
-    );
+    const nombreHeader =
+        document.querySelector(
+            "#nombre-header"
+        );
 
-    const nombreHeader = document.querySelector(
-        "#nombre-header"
-    );
+    const nombrePerfil =
+        document.querySelector(
+            "#nombre-perfil"
+        );
 
-    const nombrePerfil = document.querySelector(
-        "#nombre-perfil"
-    );
+    const emailPerfil =
+        document.querySelector(
+            "#email-perfil"
+        );
 
-    const emailPerfil = document.querySelector(
-        "#email-perfil"
-    );
+    const saludoUsuario =
+        document.querySelector(
+            "#saludo-usuario"
+        );
 
-    const saludoUsuario = document.querySelector(
-        "#saludo-usuario"
-    );
+    const perfilNombre =
+        document.querySelector(
+            "#perfil-nombre"
+        );
 
-    const avatarHeader = document.querySelector(
-        "#avatar-header"
-    );
+    const perfilApellidos =
+        document.querySelector(
+            "#perfil-apellidos"
+        );
 
-    const avatarPerfil = document.querySelector(
-        "#avatar-perfil"
-    );
+    const perfilEmail =
+        document.querySelector(
+            "#perfil-email"
+        );
 
-    const perfilNombre = document.querySelector(
-        "#perfil-nombre"
-    );
-
-    const perfilApellidos = document.querySelector(
-        "#perfil-apellidos"
-    );
-
-    const perfilEmail = document.querySelector(
-        "#perfil-email"
-    );
-
-    const perfilTelefono = document.querySelector(
-        "#perfil-telefono"
-    );
+    const perfilTelefono =
+        document.querySelector(
+            "#perfil-telefono"
+        );
 
     if (nombreHeader) {
         nombreHeader.textContent =
-            usuarioGuardado.nombre || "Usuario";
+            usuarioGuardado.nombre ||
+            "Usuario";
     }
 
     if (nombrePerfil) {
         nombrePerfil.textContent =
-            nombreCompleto || "Usuario";
+            nombreCompleto ||
+            "Usuario";
     }
 
     if (emailPerfil) {
         emailPerfil.textContent =
-            usuarioGuardado.email || "";
+            usuarioGuardado.email ||
+            "";
     }
 
     if (saludoUsuario) {
         saludoUsuario.textContent =
-            usuarioGuardado.nombre || "Usuario";
-    }
-
-    if (avatarHeader) {
-        avatarHeader.textContent =
-            iniciales || "SU";
-    }
-
-    if (avatarPerfil) {
-        avatarPerfil.textContent =
-            iniciales || "SU";
+            usuarioGuardado.nombre ||
+            "Usuario";
     }
 
     if (perfilNombre) {
         perfilNombre.value =
-            usuarioGuardado.nombre || "";
+            usuarioGuardado.nombre ||
+            "";
     }
 
     if (perfilApellidos) {
         perfilApellidos.value =
-            usuarioGuardado.apellidos || "";
+            usuarioGuardado.apellidos ||
+            "";
     }
 
     if (perfilEmail) {
         perfilEmail.value =
-            usuarioGuardado.email || "";
+            usuarioGuardado.email ||
+            "";
     }
 
     if (perfilTelefono) {
         perfilTelefono.value =
-            usuarioGuardado.telefono || "";
+            usuarioGuardado.telefono ||
+            "";
     }
+
+    actualizarAvataresUsuario();
 }
 
 
-function cambiarSeccion(nombreSeccion) {
-    botonesMenuPerfil.forEach((boton) => {
-        boton.classList.toggle(
-            "activo",
-            boton.dataset.seccion === nombreSeccion
-        );
-    });
+/* =====================================================
+   CAMBIAR SECCIONES DEL PERFIL
+===================================================== */
 
-    seccionesPerfil.forEach((seccion) => {
-        seccion.classList.toggle(
-            "activa",
-            seccion.id === `seccion-${nombreSeccion}`
-        );
-    });
+function cambiarSeccion(nombreSeccion) {
+    botonesMenuPerfil.forEach(
+        (boton) => {
+            boton.classList.toggle(
+                "activo",
+                boton.dataset.seccion ===
+                    nombreSeccion
+            );
+        }
+    );
+
+    seccionesPerfil.forEach(
+        (seccion) => {
+            seccion.classList.toggle(
+                "activa",
+                seccion.id ===
+                    `seccion-${nombreSeccion}`
+            );
+        }
+    );
 }
 
 
@@ -232,30 +740,46 @@ function cambiarSeccion(nombreSeccion) {
    NAVEGACIÓN DEL PERFIL
 ===================================================== */
 
-botonesMenuPerfil.forEach((boton) => {
-    boton.addEventListener("click", () => {
-        cambiarSeccion(
-            boton.dataset.seccion
+botonesMenuPerfil.forEach(
+    (boton) => {
+        boton.addEventListener(
+            "click",
+            () => {
+                cambiarSeccion(
+                    boton.dataset.seccion
+                );
+            }
         );
-    });
-});
+    }
+);
 
 
-enlacesSeccion.forEach((boton) => {
-    boton.addEventListener("click", () => {
-        cambiarSeccion(
-            boton.dataset.irSeccion
+enlacesSeccion.forEach(
+    (boton) => {
+        boton.addEventListener(
+            "click",
+            () => {
+                cambiarSeccion(
+                    boton.dataset.irSeccion
+                );
+            }
         );
-    });
-});
+    }
+);
 
 
 if (botonCerrarSesion) {
-    botonCerrarSesion.addEventListener("click", () => {
-        localStorage.removeItem("sesionSuralia");
+    botonCerrarSesion.addEventListener(
+        "click",
+        () => {
+            localStorage.removeItem(
+                "sesionSuralia"
+            );
 
-        window.location.href = "login.html";
-    });
+            window.location.href =
+                "login.html";
+        }
+    );
 }
 
 
@@ -270,28 +794,42 @@ if (formularioPerfil) {
             evento.preventDefault();
 
             const campoNombre =
-                document.querySelector("#perfil-nombre");
+                document.querySelector(
+                    "#perfil-nombre"
+                );
 
             const campoApellidos =
-                document.querySelector("#perfil-apellidos");
+                document.querySelector(
+                    "#perfil-apellidos"
+                );
 
             const campoEmail =
-                document.querySelector("#perfil-email");
+                document.querySelector(
+                    "#perfil-email"
+                );
 
             const campoTelefono =
-                document.querySelector("#perfil-telefono");
+                document.querySelector(
+                    "#perfil-telefono"
+                );
 
             const nombre =
-                campoNombre?.value.trim() || "";
+                campoNombre?.value.trim() ||
+                "";
 
             const apellidos =
-                campoApellidos?.value.trim() || "";
+                campoApellidos?.value.trim() ||
+                "";
 
             const email =
-                campoEmail?.value.trim() || "";
+                campoEmail?.value
+                    .trim()
+                    .toLowerCase() ||
+                "";
 
             const telefono =
-                campoTelefono?.value.trim() || "";
+                campoTelefono?.value.trim() ||
+                "";
 
             const errorNombre =
                 document.querySelector(
@@ -308,6 +846,11 @@ if (formularioPerfil) {
                     "#error-perfil-email"
                 );
 
+            const errorTelefono =
+                document.querySelector(
+                    "#error-perfil-telefono"
+                );
+
             if (errorNombre) {
                 errorNombre.textContent = "";
             }
@@ -318,6 +861,10 @@ if (formularioPerfil) {
 
             if (errorEmail) {
                 errorEmail.textContent = "";
+            }
+
+            if (errorTelefono) {
+                errorTelefono.textContent = "";
             }
 
             let formularioValido = true;
@@ -343,7 +890,11 @@ if (formularioPerfil) {
             const expresionEmail =
                 /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-            if (!expresionEmail.test(email)) {
+            if (
+                !expresionEmail.test(
+                    email
+                )
+            ) {
                 if (errorEmail) {
                     errorEmail.textContent =
                         "Introduce un correo electrónico válido.";
@@ -352,30 +903,61 @@ if (formularioPerfil) {
                 formularioValido = false;
             }
 
+            const telefonoLimpio =
+                telefono.replace(
+                    /[\s-]/g,
+                    ""
+                );
+
+            if (
+                telefonoLimpio &&
+                !/^[6789]\d{8}$/.test(
+                    telefonoLimpio
+                )
+            ) {
+                if (errorTelefono) {
+                    errorTelefono.textContent =
+                        "Introduce un teléfono español válido de 9 cifras.";
+                }
+
+                formularioValido = false;
+            }
+
             if (!formularioValido) {
+                mostrarNotificacion(
+                    "Revisa los campos del formulario."
+                );
+
                 return;
             }
 
             const emailAnterior =
                 usuarioGuardado.email;
 
-            usuarioGuardado.nombre = nombre;
-            usuarioGuardado.apellidos = apellidos;
-            usuarioGuardado.email = email;
-            usuarioGuardado.telefono = telefono;
+            usuarioGuardado.nombre =
+                nombre;
 
-            localStorage.setItem(
+            usuarioGuardado.apellidos =
+                apellidos;
+
+            usuarioGuardado.email =
+                email;
+
+            usuarioGuardado.telefono =
+                telefonoLimpio;
+
+            guardarLocalStorage(
                 "usuarioSuralia",
-                JSON.stringify(usuarioGuardado)
+                usuarioGuardado
             );
 
-            localStorage.setItem(
+            guardarLocalStorage(
                 "sesionSuralia",
-                JSON.stringify({
+                {
                     nombre,
                     email,
                     conectado: true
-                })
+                }
             );
 
             actualizarEmailGuardado(
@@ -401,48 +983,57 @@ function actualizarEmailGuardado(
     emailNuevo
 ) {
     const claves = [
-    "reservasSuralia",
-    "favoritosSuralia",
-    "planesPublicadosSuralia",
-    "borradoresSuralia"
+        "reservasSuralia",
+        "favoritosSuralia",
+        "planesPublicadosSuralia",
+        "borradoresSuralia"
     ];
 
-    claves.forEach((clave) => {
-        const datos = JSON.parse(
-            localStorage.getItem(clave)
-        ) || [];
+    claves.forEach(
+        (clave) => {
+            const datos =
+                leerLocalStorage(
+                    clave,
+                    []
+                );
 
-        const datosActualizados = datos.map(
-            (elemento) => {
-                if (
-                    elemento.usuarioEmail ===
-                    emailAnterior
-                ) {
-                    return {
-                        ...elemento,
-                        usuarioEmail: emailNuevo
-                    };
-                }
-
-                if (
-                    elemento.creadoPor ===
-                    emailAnterior
-                ) {
-                    return {
-                        ...elemento,
-                        creadoPor: emailNuevo
-                    };
-                }
-
-                return elemento;
+            if (!Array.isArray(datos)) {
+                return;
             }
-        );
 
-        localStorage.setItem(
-            clave,
-            JSON.stringify(datosActualizados)
-        );
-    });
+            const datosActualizados =
+                datos.map(
+                    (elemento) => {
+                        const elementoActualizado = {
+                            ...elemento
+                        };
+
+                        if (
+                            elemento.usuarioEmail ===
+                            emailAnterior
+                        ) {
+                            elementoActualizado.usuarioEmail =
+                                emailNuevo;
+                        }
+
+                        if (
+                            elemento.creadoPor ===
+                            emailAnterior
+                        ) {
+                            elementoActualizado.creadoPor =
+                                emailNuevo;
+                        }
+
+                        return elementoActualizado;
+                    }
+                );
+
+            guardarLocalStorage(
+                clave,
+                datosActualizados
+            );
+        }
+    );
 }
 
 
@@ -471,110 +1062,354 @@ const contadorReservasPerfil =
     );
 
 
-function obtenerReservasUsuario() {
-    const reservas = JSON.parse(
-        localStorage.getItem("reservasSuralia")
-    ) || [];
+function obtenerReservasGuardadas() {
+    const reservas =
+        leerLocalStorage(
+            "reservasSuralia",
+            []
+        );
 
-    return reservas
-        .filter((reserva) => {
-            return (
-                reserva.usuarioEmail ===
-                    usuarioGuardado.email &&
-                reserva.estado === "confirmada"
-            );
-        })
-        .sort((reservaA, reservaB) => {
-            const fechaA = reservaA.fecha
-                ? new Date(
-                    `${reservaA.fecha}T${
-                        reservaA.hora || "00:00"
-                    }`
-                )
-                : new Date(
-                    reservaA.fechaReserva
-                );
-
-            const fechaB = reservaB.fecha
-                ? new Date(
-                    `${reservaB.fecha}T${
-                        reservaB.hora || "00:00"
-                    }`
-                )
-                : new Date(
-                    reservaB.fechaReserva
-                );
-
-            return fechaA - fechaB;
-        });
+    return Array.isArray(reservas)
+        ? reservas
+        : [];
 }
 
 
-function crearProximaReservaHTML(reserva) {
+function obtenerFechaOrdenReserva(
+    reserva
+) {
+    const fechaIso =
+        reserva.fechaIso ||
+        reserva.fecha;
+
+    if (
+        fechaIso &&
+        /^\d{4}-\d{2}-\d{2}$/.test(
+            fechaIso
+        )
+    ) {
+        return new Date(
+            `${fechaIso}T${
+                reserva.hora ||
+                "00:00"
+            }`
+        );
+    }
+
+    const equivalenciasFecha = {
+        "25-julio-2026":
+            "2026-07-25",
+
+        "27-julio-2026":
+            "2026-07-27",
+
+        "29-julio-2026":
+            "2026-07-29",
+
+        "1-agosto-2026":
+            "2026-08-01",
+
+        "8-agosto-2026":
+            "2026-08-08",
+
+        "21-noviembre-2026":
+            "2026-11-21"
+    };
+
+    const fechaConvertida =
+        equivalenciasFecha[
+            reserva.fechaValor
+        ];
+
+    if (fechaConvertida) {
+        return new Date(
+            `${fechaConvertida}T${
+                reserva.hora ||
+                "00:00"
+            }`
+        );
+    }
+
+    if (reserva.fechaReserva) {
+        return new Date(
+            reserva.fechaReserva
+        );
+    }
+
+    return new Date(
+        8640000000000000
+    );
+}
+
+
+function obtenerReservasUsuario() {
+    return obtenerReservasGuardadas()
+        .filter(
+            (reserva) => {
+                return (
+                    reserva.usuarioEmail ===
+                        usuarioGuardado.email &&
+                    reserva.estado ===
+                        "confirmada"
+                );
+            }
+        )
+        .sort(
+            (reservaA, reservaB) => {
+                return (
+                    obtenerFechaOrdenReserva(
+                        reservaA
+                    ) -
+                    obtenerFechaOrdenReserva(
+                        reservaB
+                    )
+                );
+            }
+        );
+}
+
+
+function obtenerEnlaceReserva(reserva) {
+    if (reserva.enlace) {
+        return reserva.enlace;
+    }
+
+    const enlacesPorPlan = {
+        italica:
+            "detalle-plan.html",
+
+        "kayak-atardecer":
+            "detalle-kayak.html",
+
+        "poncho-k-cartuja":
+            "detalle-poncho-k.html"
+    };
+
+    return (
+        enlacesPorPlan[
+            reserva.planId
+        ] ||
+        "planes.html"
+    );
+}
+
+
+function obtenerImagenReserva(reserva) {
+    if (reserva.imagen) {
+        return reserva.imagen;
+    }
+
+    const imagenesPorPlan = {
+        italica:
+            "img/italica principal.jpg",
+
+        "kayak-atardecer":
+            "img/kayak principal.jpg",
+
+        "poncho-k-cartuja":
+            "img/poncho-k.jpg"
+    };
+
+    return (
+        imagenesPorPlan[
+            reserva.planId
+        ] ||
+        ""
+    );
+}
+
+
+function obtenerTextoCantidadReserva(
+    reserva
+) {
+    const cantidad = Number(
+        reserva.entradas ||
+        reserva.personas ||
+        1
+    );
+
+    const esConcierto =
+        reserva.planId ===
+            "poncho-k-cartuja" ||
+        reserva.entradas !==
+            undefined;
+
+    if (esConcierto) {
+        return `${cantidad} ${
+            cantidad === 1
+                ? "entrada"
+                : "entradas"
+        }`;
+    }
+
+    return `${cantidad} ${
+        cantidad === 1
+            ? "persona"
+            : "personas"
+    }`;
+}
+
+
+function obtenerIconoCantidadReserva(
+    reserva
+) {
+    const esConcierto =
+        reserva.planId ===
+            "poncho-k-cartuja" ||
+        reserva.entradas !==
+            undefined;
+
+    return esConcierto
+        ? "fa-solid fa-ticket"
+        : "fa-solid fa-user-group";
+}
+
+
+function obtenerPrecioReserva(reserva) {
+    const total = Number(
+        reserva.precioTotal
+    );
+
+    if (
+        Number.isNaN(total) ||
+        total === 0
+    ) {
+        return "Gratis";
+    }
+
+    return `${total
+        .toFixed(2)
+        .replace(".00", "")
+        .replace(".", ",")} €`;
+}
+
+
+function obtenerFechaTextoReserva(
+    reserva
+) {
+    return (
+        reserva.fechaTexto ||
+        reserva.fecha ||
+        "Fecha pendiente"
+    );
+}
+
+
+function obtenerHoraReserva(reserva) {
+    return (
+        reserva.hora ||
+        "Hora pendiente"
+    );
+}
+
+
+function crearProximaReservaHTML(
+    reserva
+) {
+    const enlace =
+        obtenerEnlaceReserva(
+            reserva
+        );
+
+    const imagen =
+        obtenerImagenReserva(
+            reserva
+        );
+
     return `
         <article class="reserva-resumen">
 
             <div class="reserva-resumen__imagen">
 
-                <img
-                    src="${reserva.imagen}"
-                    alt="${reserva.titulo}"
-                >
+                ${
+                    imagen
+                        ? `
+                            <img
+                                src="${escaparHTML(imagen)}"
+                                alt="${escaparHTML(reserva.titulo)}"
+                            >
+                        `
+                        : `
+                            <div class="publicacion-item__sin-imagen">
+                                <i class="fa-regular fa-image"></i>
+                            </div>
+                        `
+                }
 
             </div>
 
             <div class="reserva-resumen__contenido">
 
                 <span class="reserva-estado">
+                    <i class="fa-solid fa-circle-check"></i>
                     Confirmada
                 </span>
 
                 <h3>
-                    ${reserva.titulo}
+                    ${escaparHTML(reserva.titulo)}
                 </h3>
 
                 <p>
                     <i class="fa-regular fa-calendar"></i>
 
-                    ${
-                        reserva.fechaTexto ||
-                        reserva.fecha ||
-                        "Fecha pendiente"
-                    }
+                    ${escaparHTML(
+                        obtenerFechaTextoReserva(
+                            reserva
+                        )
+                    )}
                 </p>
 
                 <p>
                     <i class="fa-regular fa-clock"></i>
 
-                    ${
-                        reserva.hora ||
-                        "Hora pendiente"
-                    }
+                    ${escaparHTML(
+                        obtenerHoraReserva(
+                            reserva
+                        )
+                    )}
                 </p>
 
                 <p>
-                    <i class="fa-solid fa-user-group"></i>
+                    <i class="${
+                        obtenerIconoCantidadReserva(
+                            reserva
+                        )
+                    }"></i>
 
-                    ${reserva.personas}
-
-                    ${
-                        Number(reserva.personas) === 1
-                            ? "persona"
-                            : "personas"
-                    }
+                    ${escaparHTML(
+                        obtenerTextoCantidadReserva(
+                            reserva
+                        )
+                    )}
                 </p>
 
                 <p>
                     <i class="fa-solid fa-location-dot"></i>
 
-                    ${reserva.ubicacion}
+                    ${escaparHTML(
+                        reserva.ubicacion ||
+                        "Ubicación pendiente"
+                    )}
+                </p>
+
+                <p class="reserva-resumen__precio">
+                    <i class="fa-solid fa-receipt"></i>
+
+                    Total:
+
+                    <strong>
+                        ${obtenerPrecioReserva(
+                            reserva
+                        )}
+                    </strong>
                 </p>
 
                 <a
-                    href="detalle-plan.html"
+                    href="${escaparHTML(enlace)}"
                     class="boton-ver-reserva"
                 >
                     Ver actividad
+                    <i class="fa-solid fa-arrow-right"></i>
                 </a>
 
             </div>
@@ -585,18 +1420,38 @@ function crearProximaReservaHTML(reserva) {
 
 
 function crearReservaHTML(reserva) {
+    const enlace =
+        obtenerEnlaceReserva(
+            reserva
+        );
+
+    const imagen =
+        obtenerImagenReserva(
+            reserva
+        );
+
     return `
         <article
             class="reserva-item"
-            data-reserva-id="${reserva.id}"
+            data-reserva-id="${Number(reserva.id)}"
         >
 
             <div class="reserva-item__imagen">
 
-                <img
-                    src="${reserva.imagen}"
-                    alt="${reserva.titulo}"
-                >
+                ${
+                    imagen
+                        ? `
+                            <img
+                                src="${escaparHTML(imagen)}"
+                                alt="${escaparHTML(reserva.titulo)}"
+                            >
+                        `
+                        : `
+                            <div class="publicacion-item__sin-imagen">
+                                <i class="fa-regular fa-image"></i>
+                            </div>
+                        `
+                }
 
             </div>
 
@@ -607,14 +1462,28 @@ function crearReservaHTML(reserva) {
                     <div>
 
                         <span class="reserva-estado">
+                            <i class="fa-solid fa-circle-check"></i>
                             Confirmada
                         </span>
 
                         <h3>
-                            ${reserva.titulo}
+                            ${escaparHTML(reserva.titulo)}
                         </h3>
 
+                        <span class="reserva-item__categoria">
+                            ${escaparHTML(
+                                reserva.categoria ||
+                                "Actividad"
+                            )}
+                        </span>
+
                     </div>
+
+                    <strong class="reserva-item__precio">
+                        ${obtenerPrecioReserva(
+                            reserva
+                        )}
+                    </strong>
 
                 </div>
 
@@ -623,38 +1492,44 @@ function crearReservaHTML(reserva) {
                     <span>
                         <i class="fa-regular fa-calendar"></i>
 
-                        ${
-                            reserva.fechaTexto ||
-                            reserva.fecha ||
-                            "Fecha pendiente"
-                        }
+                        ${escaparHTML(
+                            obtenerFechaTextoReserva(
+                                reserva
+                            )
+                        )}
                     </span>
 
                     <span>
                         <i class="fa-regular fa-clock"></i>
 
-                        ${
-                            reserva.hora ||
-                            "Hora pendiente"
-                        }
+                        ${escaparHTML(
+                            obtenerHoraReserva(
+                                reserva
+                            )
+                        )}
                     </span>
 
                     <span>
-                        <i class="fa-solid fa-user-group"></i>
+                        <i class="${
+                            obtenerIconoCantidadReserva(
+                                reserva
+                            )
+                        }"></i>
 
-                        ${reserva.personas}
-
-                        ${
-                            Number(reserva.personas) === 1
-                                ? "persona"
-                                : "personas"
-                        }
+                        ${escaparHTML(
+                            obtenerTextoCantidadReserva(
+                                reserva
+                            )
+                        )}
                     </span>
 
                     <span>
                         <i class="fa-solid fa-location-dot"></i>
 
-                        ${reserva.ubicacion}
+                        ${escaparHTML(
+                            reserva.ubicacion ||
+                            "Ubicación pendiente"
+                        )}
                     </span>
 
                 </div>
@@ -662,17 +1537,19 @@ function crearReservaHTML(reserva) {
                 <div class="reserva-item__acciones">
 
                     <a
-                        href="detalle-plan.html"
+                        href="${escaparHTML(enlace)}"
                         class="boton-principal-pequeno"
                     >
+                        <i class="fa-regular fa-eye"></i>
                         Ver actividad
                     </a>
 
                     <button
                         type="button"
                         class="boton-cancelar-reserva"
-                        data-reserva-id="${reserva.id}"
+                        data-reserva-id="${Number(reserva.id)}"
                     >
+                        <i class="fa-regular fa-calendar-xmark"></i>
                         Cancelar reserva
                     </button>
 
@@ -702,7 +1579,12 @@ function mostrarReservasPerfil() {
     }
 
     if (reservas.length === 0) {
-        listaReservasPerfil.innerHTML = "";
+        listaReservasPerfil.innerHTML =
+            "";
+
+        listaReservasPerfil.classList.add(
+            "oculto"
+        );
 
         proximaReservaPerfil.innerHTML = `
             <div
@@ -743,6 +1625,10 @@ function mostrarReservasPerfil() {
         return;
     }
 
+    listaReservasPerfil.classList.remove(
+        "oculto"
+    );
+
     if (estadoVacioReservas) {
         estadoVacioReservas.classList.add(
             "oculto"
@@ -769,48 +1655,58 @@ function activarBotonesCancelarReserva() {
             ".boton-cancelar-reserva"
         );
 
-    botonesCancelar.forEach((boton) => {
-        boton.addEventListener("click", () => {
-            reservaPendienteCancelar =
-                Number(
-                    boton.dataset.reservaId
-                );
+    botonesCancelar.forEach(
+        (boton) => {
+            boton.addEventListener(
+                "click",
+                () => {
+                    reservaPendienteCancelar =
+                        Number(
+                            boton.dataset.reservaId
+                        );
 
-            if (modalCancelacion) {
-                modalCancelacion.classList.add(
-                    "visible"
-                );
-            }
-        });
-    });
+                    if (modalCancelacion) {
+                        modalCancelacion.classList.add(
+                            "visible"
+                        );
+                    }
+                }
+            );
+        }
+    );
 }
 
 
 function cancelarReservaGuardada() {
-    if (!reservaPendienteCancelar) {
+    if (
+        reservaPendienteCancelar ===
+        null
+    ) {
         return;
     }
 
-    const reservas = JSON.parse(
-        localStorage.getItem("reservasSuralia")
-    ) || [];
+    const reservas =
+        obtenerReservasGuardadas();
 
     const reservasActualizadas =
-        reservas.filter((reserva) => {
-            return (
-                Number(reserva.id) !==
-                reservaPendienteCancelar
-            );
-        });
+        reservas.filter(
+            (reserva) => {
+                return (
+                    Number(reserva.id) !==
+                    Number(
+                        reservaPendienteCancelar
+                    )
+                );
+            }
+        );
 
-    localStorage.setItem(
+    guardarLocalStorage(
         "reservasSuralia",
-        JSON.stringify(
-            reservasActualizadas
-        )
+        reservasActualizadas
     );
 
-    reservaPendienteCancelar = null;
+    reservaPendienteCancelar =
+        null;
 
     if (modalCancelacion) {
         modalCancelacion.classList.remove(
@@ -826,18 +1722,22 @@ function cancelarReservaGuardada() {
 }
 
 
+function cerrarModalCancelacion() {
+    reservaPendienteCancelar =
+        null;
+
+    if (modalCancelacion) {
+        modalCancelacion.classList.remove(
+            "visible"
+        );
+    }
+}
+
+
 if (mantenerReserva) {
     mantenerReserva.addEventListener(
         "click",
-        () => {
-            reservaPendienteCancelar = null;
-
-            if (modalCancelacion) {
-                modalCancelacion.classList.remove(
-                    "visible"
-                );
-            }
-        }
+        cerrarModalCancelacion
     );
 }
 
@@ -858,11 +1758,7 @@ if (modalCancelacion) {
                 evento.target ===
                 modalCancelacion
             ) {
-                modalCancelacion.classList.remove(
-                    "visible"
-                );
-
-                reservaPendienteCancelar = null;
+                cerrarModalCancelacion();
             }
         }
     );
@@ -873,40 +1769,60 @@ if (modalCancelacion) {
    FAVORITOS DINÁMICOS
 ===================================================== */
 
-const listaFavoritosPerfil = document.querySelector(
-    "#lista-favoritos-perfil"
-);
+const listaFavoritosPerfil =
+    document.querySelector(
+        "#lista-favoritos-perfil"
+    );
 
-const estadoVacioFavoritos = document.querySelector(
-    "#estado-vacio-favoritos"
-);
+const estadoVacioFavoritos =
+    document.querySelector(
+        "#estado-vacio-favoritos"
+    );
 
-const contadorFavoritosPerfil = document.querySelector(
-    "#contador-favoritos-perfil"
-);
+const contadorFavoritosPerfil =
+    document.querySelector(
+        "#contador-favoritos-perfil"
+    );
+
 
 function obtenerFavoritosUsuario() {
-    const favoritos = JSON.parse(
-        localStorage.getItem("favoritosSuralia")
-    ) || [];
+    const favoritos =
+        leerLocalStorage(
+            "favoritosSuralia",
+            []
+        );
+
+    if (!Array.isArray(favoritos)) {
+        return [];
+    }
 
     return favoritos
-        .filter((favorito) => {
-            return (
-                favorito.usuarioEmail ===
-                usuarioGuardado.email
-            );
-        })
-        .sort((favoritoA, favoritoB) => {
-            return (
-                new Date(favoritoB.fechaGuardado) -
-                new Date(favoritoA.fechaGuardado)
-            );
-        });
+        .filter(
+            (favorito) => {
+                return (
+                    favorito.usuarioEmail ===
+                    usuarioGuardado.email
+                );
+            }
+        )
+        .sort(
+            (favoritoA, favoritoB) => {
+                return (
+                    new Date(
+                        favoritoB.fechaGuardado
+                    ) -
+                    new Date(
+                        favoritoA.fechaGuardado
+                    )
+                );
+            }
+        );
 }
 
+
 function obtenerPrecioFavorito(precio) {
-    const precioNumerico = Number(precio);
+    const precioNumerico =
+        Number(precio);
 
     if (!precioNumerico) {
         return "Gratis";
@@ -914,25 +1830,35 @@ function obtenerPrecioFavorito(precio) {
 
     return `${precioNumerico
         .toFixed(2)
-        .replace(".00", "")} €`;
+        .replace(".00", "")
+        .replace(".", ",")} €`;
 }
+
 
 function crearFavoritoHTML(favorito) {
     return `
         <article
             class="tarjeta-plan"
-            data-favorito-plan-id="${favorito.planId}"
+            data-favorito-plan-id="${escaparHTML(
+                favorito.planId
+            )}"
         >
 
             <div class="tarjeta-plan__imagen">
 
                 <img
-                    src="${favorito.imagen}"
-                    alt="${favorito.titulo}"
+                    src="${escaparHTML(
+                        favorito.imagen
+                    )}"
+                    alt="${escaparHTML(
+                        favorito.titulo
+                    )}"
                 >
 
                 <span class="tarjeta-plan__precio">
-                    ${obtenerPrecioFavorito(favorito.precio)}
+                    ${obtenerPrecioFavorito(
+                        favorito.precio
+                    )}
                 </span>
 
                 <button
@@ -942,7 +1868,9 @@ function crearFavoritoHTML(favorito) {
                         favorito-activo
                         boton-eliminar-favorito
                     "
-                    data-plan-id="${favorito.planId}"
+                    data-plan-id="${escaparHTML(
+                        favorito.planId
+                    )}"
                     aria-label="Eliminar de favoritos"
                 >
                     <i class="fa-solid fa-heart"></i>
@@ -956,31 +1884,45 @@ function crearFavoritoHTML(favorito) {
 
                     <span>
                         <i class="fa-regular fa-calendar"></i>
-                        ${
+
+                        ${escaparHTML(
                             favorito.fechaTexto ||
                             "Fecha por confirmar"
-                        }
+                        )}
                     </span>
 
                 </div>
 
                 <h3>
-                    ${favorito.titulo}
+                    ${escaparHTML(
+                        favorito.titulo
+                    )}
                 </h3>
 
                 <p class="tarjeta-plan__ubicacion">
                     <i class="fa-solid fa-location-dot"></i>
-                    ${favorito.ubicacion}
+
+                    ${escaparHTML(
+                        favorito.ubicacion ||
+                        "Ubicación pendiente"
+                    )}
                 </p>
 
                 <div class="tarjeta-plan__pie">
 
                     <span>
-                        ${favorito.categoria}
+                        ${escaparHTML(
+                            favorito.categoria ||
+                            "Actividad"
+                        )}
                     </span>
 
                     <strong>
-                        ${favorito.valoracion || "Nuevo"}
+                        ${
+                            favorito.valoracion ||
+                            "Nuevo"
+                        }
+
                         ${
                             favorito.valoracion
                                 ? '<i class="fa-solid fa-star"></i>'
@@ -991,7 +1933,10 @@ function crearFavoritoHTML(favorito) {
                 </div>
 
                 <a
-                    href="${favorito.enlace || "detalle-plan.html"}"
+                    href="${escaparHTML(
+                        favorito.enlace ||
+                        "detalle-plan.html"
+                    )}"
                     class="boton-principal-pequeno"
                 >
                     Ver actividad
@@ -1003,8 +1948,10 @@ function crearFavoritoHTML(favorito) {
     `;
 }
 
+
 function mostrarFavoritosPerfil() {
-    const favoritos = obtenerFavoritosUsuario();
+    const favoritos =
+        obtenerFavoritosUsuario();
 
     if (contadorFavoritosPerfil) {
         contadorFavoritosPerfil.textContent =
@@ -1019,60 +1966,94 @@ function mostrarFavoritosPerfil() {
     }
 
     if (favoritos.length === 0) {
-        listaFavoritosPerfil.innerHTML = "";
+        listaFavoritosPerfil.innerHTML =
+            "";
 
-        listaFavoritosPerfil.classList.add("oculto");
-        estadoVacioFavoritos.classList.remove("oculto");
+        listaFavoritosPerfil.classList.add(
+            "oculto"
+        );
+
+        estadoVacioFavoritos.classList.remove(
+            "oculto"
+        );
 
         return;
     }
 
-    listaFavoritosPerfil.classList.remove("oculto");
-    estadoVacioFavoritos.classList.add("oculto");
+    listaFavoritosPerfil.classList.remove(
+        "oculto"
+    );
 
-    listaFavoritosPerfil.innerHTML = favoritos
-        .map(crearFavoritoHTML)
-        .join("");
+    estadoVacioFavoritos.classList.add(
+        "oculto"
+    );
+
+    listaFavoritosPerfil.innerHTML =
+        favoritos
+            .map(crearFavoritoHTML)
+            .join("");
 
     activarBotonesEliminarFavorito();
 }
 
+
 function activarBotonesEliminarFavorito() {
     document
-        .querySelectorAll(".boton-eliminar-favorito")
-        .forEach((boton) => {
-            boton.addEventListener("click", () => {
-                const planId = boton.dataset.planId;
+        .querySelectorAll(
+            ".boton-eliminar-favorito"
+        )
+        .forEach(
+            (boton) => {
+                boton.addEventListener(
+                    "click",
+                    () => {
+                        const planId =
+                            boton.dataset.planId;
 
-                eliminarFavoritoGuardado(planId);
-            });
-        });
+                        eliminarFavoritoGuardado(
+                            planId
+                        );
+                    }
+                );
+            }
+        );
 }
 
-function eliminarFavoritoGuardado(planId) {
-    const favoritos = JSON.parse(
-        localStorage.getItem("favoritosSuralia")
-    ) || [];
 
-    const favoritosActualizados = favoritos.filter(
-        (favorito) => {
-            const perteneceAlUsuario =
-                favorito.usuarioEmail ===
-                usuarioGuardado.email;
+function eliminarFavoritoGuardado(
+    planId
+) {
+    const favoritos =
+        leerLocalStorage(
+            "favoritosSuralia",
+            []
+        );
 
-            const esMismoPlan =
-                favorito.planId === planId;
+    if (!Array.isArray(favoritos)) {
+        return;
+    }
 
-            return !(
-                perteneceAlUsuario &&
-                esMismoPlan
-            );
-        }
-    );
+    const favoritosActualizados =
+        favoritos.filter(
+            (favorito) => {
+                const perteneceAlUsuario =
+                    favorito.usuarioEmail ===
+                    usuarioGuardado.email;
 
-    localStorage.setItem(
+                const esMismoPlan =
+                    favorito.planId ===
+                    planId;
+
+                return !(
+                    perteneceAlUsuario &&
+                    esMismoPlan
+                );
+            }
+        );
+
+    guardarLocalStorage(
         "favoritosSuralia",
-        JSON.stringify(favoritosActualizados)
+        favoritosActualizados
     );
 
     mostrarFavoritosPerfil();
@@ -1081,8 +2062,6 @@ function eliminarFavoritoGuardado(planId) {
         "El plan se ha eliminado de favoritos."
     );
 }
-
-
 
 
 /* =====================================================
@@ -1134,67 +2113,96 @@ const confirmarEliminarPlan =
         "#confirmar-eliminar-plan"
     );
 
-let planPendienteEliminar = null;
-let filtroPublicacionActual = "todos";
+let planPendienteEliminar =
+    null;
+
+let filtroPublicacionActual =
+    "todos";
 
 
 function obtenerPlanesUsuario() {
-    const publicados = JSON.parse(
-        localStorage.getItem(
-            "planesPublicadosSuralia"
-        )
-    ) || [];
+    const publicados =
+        leerLocalStorage(
+            "planesPublicadosSuralia",
+            []
+        );
 
-    const borradores = JSON.parse(
-        localStorage.getItem(
-            "borradoresSuralia"
-        )
-    ) || [];
+    const borradores =
+        leerLocalStorage(
+            "borradoresSuralia",
+            []
+        );
+
+    const listaPublicados =
+        Array.isArray(publicados)
+            ? publicados
+            : [];
+
+    const listaBorradores =
+        Array.isArray(borradores)
+            ? borradores
+            : [];
 
     const emailUsuario =
         usuarioGuardado.email;
 
     const planesPublicadosUsuario =
-        publicados
-            .filter((plan) => {
-                return (
-                    plan.creadoPor ===
-                    emailUsuario
-                );
-            })
-            .map((plan) => {
-                return {
-                    ...plan,
-                    almacenamiento:
-                        "planesPublicadosSuralia"
-                };
-            });
+        listaPublicados
+            .filter(
+                (plan) => {
+                    return (
+                        plan.creadoPor ===
+                        emailUsuario
+                    );
+                }
+            )
+            .map(
+                (plan) => {
+                    return {
+                        ...plan,
+                        almacenamiento:
+                            "planesPublicadosSuralia"
+                    };
+                }
+            );
 
     const borradoresUsuario =
-        borradores
-            .filter((plan) => {
-                return (
-                    plan.creadoPor ===
-                    emailUsuario
-                );
-            })
-            .map((plan) => {
-                return {
-                    ...plan,
-                    almacenamiento:
-                        "borradoresSuralia"
-                };
-            });
+        listaBorradores
+            .filter(
+                (plan) => {
+                    return (
+                        plan.creadoPor ===
+                        emailUsuario
+                    );
+                }
+            )
+            .map(
+                (plan) => {
+                    return {
+                        ...plan,
+                        almacenamiento:
+                            "borradoresSuralia"
+                    };
+                }
+            );
 
     return [
         ...planesPublicadosUsuario,
         ...borradoresUsuario
-    ].sort((planA, planB) => {
-        return (
-            new Date(planB.fechaCreacion) -
-            new Date(planA.fechaCreacion)
-        );
-    });
+    ].sort(
+        (planA, planB) => {
+            return (
+                new Date(
+                    planB.fechaCreacion ||
+                    0
+                ) -
+                new Date(
+                    planA.fechaCreacion ||
+                    0
+                )
+            );
+        }
+    );
 }
 
 
@@ -1203,16 +2211,30 @@ function formatearFechaPlan(fecha) {
         return "Fecha pendiente";
     }
 
-    const fechaPlan = new Date(
-        `${fecha}T00:00:00`
-    );
+    const fechaPlan =
+        new Date(
+            `${fecha}T00:00:00`
+        );
+
+    if (
+        Number.isNaN(
+            fechaPlan.getTime()
+        )
+    ) {
+        return "Fecha pendiente";
+    }
 
     return new Intl.DateTimeFormat(
         "es-ES",
         {
-            day: "numeric",
-            month: "long",
-            year: "numeric"
+            day:
+                "numeric",
+
+            month:
+                "long",
+
+            year:
+                "numeric"
         }
     ).format(fechaPlan);
 }
@@ -1230,7 +2252,11 @@ function obtenerTextoEstado(estado) {
             "Publicado"
     };
 
-    return estados[estado] || estado;
+    return (
+        estados[estado] ||
+        estado ||
+        "Sin estado"
+    );
 }
 
 
@@ -1238,15 +2264,22 @@ function crearPublicacionHTML(plan) {
     const precio =
         Number(plan.precio) === 0
             ? "Gratis"
-            : `${Number(plan.precio)
+            : `${Number(
+                plan.precio || 0
+            )
                 .toFixed(2)
-                .replace(".00", "")} €`;
+                .replace(".00", "")
+                .replace(".", ",")} €`;
 
     const imagenPlan = plan.imagen
         ? `
             <img
-                src="${plan.imagen}"
-                alt="${plan.titulo}"
+                src="${escaparHTML(
+                    plan.imagen
+                )}"
+                alt="${escaparHTML(
+                    plan.titulo
+                )}"
             >
         `
         : `
@@ -1264,7 +2297,9 @@ function crearPublicacionHTML(plan) {
                         boton-publicacion
                         boton-editar-plan
                     "
-                    data-plan-id="${plan.id}"
+                    data-plan-id="${Number(
+                        plan.id
+                    )}"
                 >
                     <i class="fa-regular fa-pen-to-square"></i>
                     Continuar
@@ -1277,7 +2312,9 @@ function crearPublicacionHTML(plan) {
                         boton-publicacion
                         boton-ver-plan
                     "
-                    data-plan-id="${plan.id}"
+                    data-plan-id="${Number(
+                        plan.id
+                    )}"
                 >
                     <i class="fa-regular fa-eye"></i>
                     Ver
@@ -1287,8 +2324,12 @@ function crearPublicacionHTML(plan) {
     return `
         <article
             class="publicacion-item"
-            data-plan-id="${plan.id}"
-            data-plan-estado="${plan.estado}"
+            data-plan-id="${Number(
+                plan.id
+            )}"
+            data-plan-estado="${escaparHTML(
+                plan.estado
+            )}"
         >
 
             <div class="publicacion-item__imagen">
@@ -1304,14 +2345,23 @@ function crearPublicacionHTML(plan) {
                         <span
                             class="
                                 estado-publicacion
-                                estado-publicacion--${plan.estado}
+                                estado-publicacion--${escaparHTML(
+                                    plan.estado
+                                )}
                             "
                         >
-                            ${obtenerTextoEstado(plan.estado)}
+                            ${escaparHTML(
+                                obtenerTextoEstado(
+                                    plan.estado
+                                )
+                            )}
                         </span>
 
                         <h3>
-                            ${plan.titulo}
+                            ${escaparHTML(
+                                plan.titulo ||
+                                "Plan sin título"
+                            )}
                         </h3>
 
                     </div>
@@ -1324,10 +2374,10 @@ function crearPublicacionHTML(plan) {
 
                 <p class="publicacion-item__descripcion">
 
-                    ${
+                    ${escaparHTML(
                         plan.descripcion ||
                         "Este borrador todavía no tiene descripción."
-                    }
+                    )}
 
                 </p>
 
@@ -1336,31 +2386,36 @@ function crearPublicacionHTML(plan) {
                     <span>
                         <i class="fa-regular fa-calendar"></i>
 
-                        ${formatearFechaPlan(plan.fecha)}
+                        ${formatearFechaPlan(
+                            plan.fecha
+                        )}
                     </span>
 
                     <span>
                         <i class="fa-regular fa-clock"></i>
 
-                        ${
+                        ${escaparHTML(
                             plan.hora ||
                             "Hora pendiente"
-                        }
+                        )}
                     </span>
 
                     <span>
                         <i class="fa-solid fa-location-dot"></i>
 
-                        ${
+                        ${escaparHTML(
                             plan.ubicacion ||
                             "Ubicación pendiente"
-                        }
+                        )}
                     </span>
 
                     <span>
                         <i class="fa-solid fa-user-group"></i>
 
-                        ${plan.plazas || 0} plazas
+                        ${Number(
+                            plan.plazas ||
+                            0
+                        )} plazas
                     </span>
 
                 </div>
@@ -1369,11 +2424,11 @@ function crearPublicacionHTML(plan) {
 
                     <span class="publicacion-item__categoria">
 
-                        ${
+                        ${escaparHTML(
                             plan.nombreCategoria ||
                             plan.categoria ||
                             "Sin categoría"
-                        }
+                        )}
 
                     </span>
 
@@ -1388,8 +2443,12 @@ function crearPublicacionHTML(plan) {
                                 boton-publicacion--eliminar
                                 boton-eliminar-plan
                             "
-                            data-plan-id="${plan.id}"
-                            data-almacenamiento="${plan.almacenamiento}"
+                            data-plan-id="${Number(
+                                plan.id
+                            )}"
+                            data-almacenamiento="${escaparHTML(
+                                plan.almacenamiento
+                            )}"
                         >
                             <i class="fa-regular fa-trash-can"></i>
                             Eliminar
@@ -1416,16 +2475,26 @@ function actualizarContadoresPublicaciones(
 
     if (contadorPendientes) {
         contadorPendientes.textContent =
-            planes.filter((plan) => {
-                return plan.estado === "pendiente";
-            }).length;
+            planes.filter(
+                (plan) => {
+                    return (
+                        plan.estado ===
+                        "pendiente"
+                    );
+                }
+            ).length;
     }
 
     if (contadorBorradores) {
         contadorBorradores.textContent =
-            planes.filter((plan) => {
-                return plan.estado === "borrador";
-            }).length;
+            planes.filter(
+                (plan) => {
+                    return (
+                        plan.estado ===
+                        "borrador"
+                    );
+                }
+            ).length;
     }
 }
 
@@ -1446,19 +2515,21 @@ function mostrarPublicaciones() {
     );
 
     const planesFiltrados =
-        todosLosPlanes.filter((plan) => {
-            if (
-                filtroPublicacionActual ===
-                "todos"
-            ) {
-                return true;
-            }
+        todosLosPlanes.filter(
+            (plan) => {
+                if (
+                    filtroPublicacionActual ===
+                    "todos"
+                ) {
+                    return true;
+                }
 
-            return (
-                plan.estado ===
-                filtroPublicacionActual
-            );
-        });
+                return (
+                    plan.estado ===
+                    filtroPublicacionActual
+                );
+            }
+        );
 
     listaPublicaciones.innerHTML =
         planesFiltrados
@@ -1477,7 +2548,7 @@ function mostrarPublicaciones() {
     );
 
     listaPublicaciones.classList.toggle(
-        "oculta",
+        "oculto",
         noHayPlanesTotales
     );
 
@@ -1514,60 +2585,75 @@ function activarEventosPublicaciones() {
             ".boton-eliminar-plan"
         );
 
-    botonesEliminar.forEach((boton) => {
-        boton.addEventListener("click", () => {
-            planPendienteEliminar = {
-                id: Number(
-                    boton.dataset.planId
-                ),
+    botonesEliminar.forEach(
+        (boton) => {
+            boton.addEventListener(
+                "click",
+                () => {
+                    planPendienteEliminar = {
+                        id:
+                            Number(
+                                boton.dataset.planId
+                            ),
 
-                almacenamiento:
-                    boton.dataset.almacenamiento
-            };
+                        almacenamiento:
+                            boton.dataset.almacenamiento
+                    };
 
-            if (modalEliminarPlan) {
-                modalEliminarPlan.classList.add(
-                    "visible"
-                );
-            }
-        });
-    });
-
+                    if (modalEliminarPlan) {
+                        modalEliminarPlan.classList.add(
+                            "visible"
+                        );
+                    }
+                }
+            );
+        }
+    );
 
     const botonesEditar =
         document.querySelectorAll(
             ".boton-editar-plan"
         );
 
-    botonesEditar.forEach((boton) => {
-        boton.addEventListener("click", () => {
-            const idPlan = Number(
-                boton.dataset.planId
+    botonesEditar.forEach(
+        (boton) => {
+            boton.addEventListener(
+                "click",
+                () => {
+                    const idPlan =
+                        Number(
+                            boton.dataset.planId
+                        );
+
+                    localStorage.setItem(
+                        "borradorEditarSuralia",
+                        String(idPlan)
+                    );
+
+                    window.location.href =
+                        "publicar-plan.html";
+                }
             );
-
-            localStorage.setItem(
-                "borradorEditarSuralia",
-                String(idPlan)
-            );
-
-            window.location.href =
-                "publicar-plan.html";
-        });
-    });
-
+        }
+    );
 
     const botonesVer =
         document.querySelectorAll(
             ".boton-ver-plan"
         );
 
-    botonesVer.forEach((boton) => {
-        boton.addEventListener("click", () => {
-            mostrarNotificacion(
-                "La vista individual de este plan se añadirá más adelante."
+    botonesVer.forEach(
+        (boton) => {
+            boton.addEventListener(
+                "click",
+                () => {
+                    mostrarNotificacion(
+                        "La vista individual de este plan se añadirá más adelante."
+                    );
+                }
             );
-        });
-    });
+        }
+    );
 }
 
 
@@ -1579,23 +2665,29 @@ function eliminarPlanGuardado() {
     const clave =
         planPendienteEliminar.almacenamiento;
 
-    const planes = JSON.parse(
-        localStorage.getItem(clave)
-    ) || [];
+    const planes =
+        leerLocalStorage(
+            clave,
+            []
+        );
+
+    if (!Array.isArray(planes)) {
+        return;
+    }
 
     const planesActualizados =
-        planes.filter((plan) => {
-            return (
-                Number(plan.id) !==
-                planPendienteEliminar.id
-            );
-        });
+        planes.filter(
+            (plan) => {
+                return (
+                    Number(plan.id) !==
+                    planPendienteEliminar.id
+                );
+            }
+        );
 
-    localStorage.setItem(
+    guardarLocalStorage(
         clave,
-        JSON.stringify(
-            planesActualizados
-        )
+        planesActualizados
     );
 
     if (modalEliminarPlan) {
@@ -1604,7 +2696,8 @@ function eliminarPlanGuardado() {
         );
     }
 
-    planPendienteEliminar = null;
+    planPendienteEliminar =
+        null;
 
     mostrarPublicaciones();
 
@@ -1615,26 +2708,32 @@ function eliminarPlanGuardado() {
 
 
 /* =====================================================
-   EVENTOS DE LOS FILTROS
+   EVENTOS DE LOS FILTROS DE PUBLICACIONES
 ===================================================== */
 
-filtrosPublicaciones.forEach((boton) => {
-    boton.addEventListener("click", () => {
-        filtroPublicacionActual =
-            boton.dataset.filtroPublicacion;
+filtrosPublicaciones.forEach(
+    (boton) => {
+        boton.addEventListener(
+            "click",
+            () => {
+                filtroPublicacionActual =
+                    boton.dataset.filtroPublicacion;
 
-        filtrosPublicaciones.forEach(
-            (filtro) => {
-                filtro.classList.toggle(
-                    "activo",
-                    filtro === boton
+                filtrosPublicaciones.forEach(
+                    (filtro) => {
+                        filtro.classList.toggle(
+                            "activo",
+                            filtro ===
+                                boton
+                        );
+                    }
                 );
+
+                mostrarPublicaciones();
             }
         );
-
-        mostrarPublicaciones();
-    });
-});
+    }
+);
 
 
 if (cancelarEliminarPlan) {
@@ -1647,7 +2746,8 @@ if (cancelarEliminarPlan) {
                 );
             }
 
-            planPendienteEliminar = null;
+            planPendienteEliminar =
+                null;
         }
     );
 }
@@ -1673,7 +2773,8 @@ if (modalEliminarPlan) {
                     "visible"
                 );
 
-                planPendienteEliminar = null;
+                planPendienteEliminar =
+                    null;
             }
         }
     );
@@ -1681,10 +2782,60 @@ if (modalEliminarPlan) {
 
 
 /* =====================================================
+   CERRAR MODALES CON ESCAPE
+===================================================== */
+
+document.addEventListener(
+    "keydown",
+    (evento) => {
+        if (evento.key !== "Escape") {
+            return;
+        }
+
+        if (
+            modalCancelacion?.classList.contains(
+                "visible"
+            )
+        ) {
+            cerrarModalCancelacion();
+        }
+
+        if (
+            modalEliminarPlan?.classList.contains(
+                "visible"
+            )
+        ) {
+            modalEliminarPlan.classList.remove(
+                "visible"
+            );
+
+            planPendienteEliminar =
+                null;
+        }
+    }
+);
+
+
+/* =====================================================
    CARGA INICIAL
 ===================================================== */
 
-cargarDatosUsuario();
-mostrarReservasPerfil();
-mostrarFavoritosPerfil();
-mostrarPublicaciones();
+function iniciarPerfil() {
+    cargarDatosUsuario();
+    mostrarReservasPerfil();
+    mostrarFavoritosPerfil();
+    mostrarPublicaciones();
+}
+
+
+if (
+    document.readyState ===
+    "loading"
+) {
+    document.addEventListener(
+        "DOMContentLoaded",
+        iniciarPerfil
+    );
+} else {
+    iniciarPerfil();
+}

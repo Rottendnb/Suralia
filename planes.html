@@ -17,7 +17,12 @@
     <title>Explorar planes | Suralia</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
 
     <link
         href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
@@ -52,7 +57,10 @@
                 </span>
             </a>
 
-            <nav class="navegacion" id="navegacion">
+            <nav
+                class="navegacion"
+                id="navegacion"
+            >
 
                 <a
                     href="planes.html"
@@ -258,6 +266,15 @@
                     </div>
 
                     <button
+                        type="submit"
+                        class="boton-buscar-filtros"
+                        id="boton-buscar-filtros"
+                        >
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        Buscar
+                    </button>
+
+                    <button
                         type="button"
                         class="boton-limpiar"
                         id="boton-limpiar"
@@ -311,6 +328,7 @@
                         data-precio="0"
                         data-valoracion="4.8"
                         data-fecha="25 de julio"
+                        data-fecha-iso="2026-07-25"
                         data-ubicacion="Santiponce, Sevilla"
                         data-imagen="img/italica principal.jpg"
                         data-enlace="detalle-plan.html"
@@ -321,9 +339,7 @@
                             class="tarjeta-plan__enlace"
                         >
 
-                            <div
-                                class="tarjeta-plan__imagen imagen-plan--italica"
-                            >
+                            <div class="tarjeta-plan__imagen imagen-plan--italica">
 
                                 <span class="tarjeta-plan__precio">
                                     Gratis
@@ -332,7 +348,7 @@
                                 <button
                                     class="tarjeta-plan__favorito"
                                     type="button"
-                                    aria-label="Añadir a favoritos"
+                                    aria-label="Añadir visita a Itálica a favoritos"
                                 >
                                     <i class="fa-regular fa-heart"></i>
                                 </button>
@@ -400,7 +416,8 @@
                         data-precio="18"
                         data-valoracion="4.9"
                         data-fecha="27 de julio"
-                        data-ubicacion="Río Guadalquivir"
+                        data-fecha-iso="2026-07-27"
+                        data-ubicacion="Río Guadalquivir, Sevilla"
                         data-imagen="img/kayak principal.jpg"
                         data-enlace="detalle-kayak.html"
                     >
@@ -410,9 +427,7 @@
                             class="tarjeta-plan__enlace"
                         >
 
-                            <div
-                                class="tarjeta-plan__imagen imagen-plan--kayak"
-                            >
+                            <div class="tarjeta-plan__imagen imagen-plan--kayak">
 
                                 <span class="tarjeta-plan__precio">
                                     18 €
@@ -421,7 +436,7 @@
                                 <button
                                     class="tarjeta-plan__favorito"
                                     type="button"
-                                    aria-label="Añadir a favoritos"
+                                    aria-label="Añadir kayak a favoritos"
                                 >
                                     <i class="fa-regular fa-heart"></i>
                                 </button>
@@ -455,7 +470,7 @@
 
                                 <p class="tarjeta-plan__ubicacion">
                                     <i class="fa-solid fa-location-dot"></i>
-                                    Río Guadalquivir
+                                    Río Guadalquivir, Sevilla
                                 </p>
 
                                 <div class="tarjeta-plan__pie">
@@ -477,7 +492,6 @@
 
                     </article>
 
-                    
                     <!-- PONCHO K -->
 
                     <article
@@ -490,13 +504,14 @@
                         data-precio="25"
                         data-valoracion="4.8"
                         data-fecha="21 de noviembre de 2026"
+                        data-fecha-iso="2026-11-21"
                         data-ubicacion="Cartuja Center CITE, Sevilla"
                         data-imagen="img/poncho-k.jpg"
-                        data-enlace="detalle-plan.html"
+                        data-enlace="detalle-poncho-k.html"
                     >
 
                         <a
-                            href="detalle-plan.html"
+                            href="detalle-poncho-k.html"
                             class="tarjeta-plan__enlace"
                         >
 
@@ -509,7 +524,7 @@
                                 <button
                                     class="tarjeta-plan__favorito"
                                     type="button"
-                                    aria-label="Añadir a favoritos"
+                                    aria-label="Añadir concierto de Poncho K a favoritos"
                                 >
                                     <i class="fa-regular fa-heart"></i>
                                 </button>
@@ -532,11 +547,14 @@
 
                                 </div>
 
-                                <h3>PONCHO K - Cartuja Center CITE</h3>
+                                <h3>
+                                    PONCHO K - Cartuja Center CITE
+                                </h3>
 
                                 <p class="tarjeta-plan__descripcion">
-                                    Poncho K presenta su directo en el Cartuja Center CITE
-                                    con una noche de rock, poesía y canciones cargadas de intensidad.
+                                    Poncho K presenta su directo en el Cartuja
+                                    Center CITE con una noche de rock, poesía
+                                    y canciones cargadas de intensidad.
                                 </p>
 
                                 <p class="tarjeta-plan__ubicacion">
@@ -546,7 +564,9 @@
 
                                 <div class="tarjeta-plan__pie">
 
-                                    <span>Música</span>
+                                    <span>
+                                        Música
+                                    </span>
 
                                     <strong>
                                         4,8
@@ -559,7 +579,7 @@
 
                         </a>
 
-</article>
+                    </article>
 
                     <!-- CERRO DEL HIERRO -->
 
@@ -573,6 +593,7 @@
                         data-precio="8"
                         data-valoracion="4.9"
                         data-fecha="2 de agosto"
+                        data-fecha-iso="2026-08-02"
                         data-ubicacion="San Nicolás del Puerto"
                         data-imagen="https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=900&q=80"
                         data-enlace="detalle-plan.html"
@@ -583,9 +604,7 @@
                             class="tarjeta-plan__enlace"
                         >
 
-                            <div
-                                class="tarjeta-plan__imagen imagen-plan--cerro"
-                            >
+                            <div class="tarjeta-plan__imagen imagen-plan--cerro">
 
                                 <span class="tarjeta-plan__precio">
                                     8 €
@@ -594,7 +613,7 @@
                                 <button
                                     class="tarjeta-plan__favorito"
                                     type="button"
-                                    aria-label="Añadir a favoritos"
+                                    aria-label="Añadir ruta del Cerro del Hierro a favoritos"
                                 >
                                     <i class="fa-regular fa-heart"></i>
                                 </button>
@@ -662,6 +681,7 @@
                         data-precio="25"
                         data-valoracion="4.6"
                         data-fecha="3 de agosto"
+                        data-fecha-iso="2026-08-03"
                         data-ubicacion="Triana, Sevilla"
                         data-imagen="https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=900&q=80"
                         data-enlace="detalle-plan.html"
@@ -672,9 +692,7 @@
                             class="tarjeta-plan__enlace"
                         >
 
-                            <div
-                                class="tarjeta-plan__imagen imagen-plan--tapas"
-                            >
+                            <div class="tarjeta-plan__imagen imagen-plan--tapas">
 
                                 <span class="tarjeta-plan__precio">
                                     25 €
@@ -683,7 +701,7 @@
                                 <button
                                     class="tarjeta-plan__favorito"
                                     type="button"
-                                    aria-label="Añadir a favoritos"
+                                    aria-label="Añadir ruta de tapas a favoritos"
                                 >
                                     <i class="fa-regular fa-heart"></i>
                                 </button>
@@ -751,6 +769,7 @@
                         data-precio="0"
                         data-valoracion="4.5"
                         data-fecha="Hasta el 10 de agosto"
+                        data-fecha-iso="2026-08-10"
                         data-ubicacion="Centro de Sevilla"
                         data-imagen="https://images.unsplash.com/photo-1561214115-f2f134cc4912?auto=format&fit=crop&w=900&q=80"
                         data-enlace="detalle-plan.html"
@@ -761,9 +780,7 @@
                             class="tarjeta-plan__enlace"
                         >
 
-                            <div
-                                class="tarjeta-plan__imagen imagen-plan--exposicion"
-                            >
+                            <div class="tarjeta-plan__imagen imagen-plan--exposicion">
 
                                 <span class="tarjeta-plan__precio">
                                     Gratis
@@ -772,7 +789,7 @@
                                 <button
                                     class="tarjeta-plan__favorito"
                                     type="button"
-                                    aria-label="Añadir a favoritos"
+                                    aria-label="Añadir exposición a favoritos"
                                 >
                                     <i class="fa-regular fa-heart"></i>
                                 </button>
@@ -895,23 +912,21 @@
 
             <div class="footer__columna">
 
-                <h3>
-                    Descubre
-                </h3>
+                <h3>Descubre</h3>
 
                 <a href="planes.html">
                     Todos los planes
                 </a>
 
-                <a href="#">
+                <a href="planes.html">
                     Este fin de semana
                 </a>
 
-                <a href="#">
+                <a href="planes.html">
                     Planes gratuitos
                 </a>
 
-                <a href="#">
+                <a href="planes.html">
                     Nuevas actividades
                 </a>
 
@@ -919,9 +934,7 @@
 
             <div class="footer__columna">
 
-                <h3>
-                    Información
-                </h3>
+                <h3>Información</h3>
 
                 <a href="#">
                     Sobre Suralia
@@ -943,21 +956,28 @@
 
             <div class="footer__columna">
 
-                <h3>
-                    Síguenos
-                </h3>
+                <h3>Síguenos</h3>
 
                 <div class="redes">
 
-                    <a href="#" aria-label="Instagram">
+                    <a
+                        href="#"
+                        aria-label="Instagram"
+                    >
                         <i class="fa-brands fa-instagram"></i>
                     </a>
 
-                    <a href="#" aria-label="TikTok">
+                    <a
+                        href="#"
+                        aria-label="TikTok"
+                    >
                         <i class="fa-brands fa-tiktok"></i>
                     </a>
 
-                    <a href="#" aria-label="Facebook">
+                    <a
+                        href="#"
+                        aria-label="Facebook"
+                    >
                         <i class="fa-brands fa-facebook-f"></i>
                     </a>
 

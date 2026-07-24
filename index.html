@@ -17,7 +17,12 @@
     <title>Suralia | Planes y experiencias en Sevilla</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
 
     <link
         href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
@@ -43,6 +48,7 @@
                 class="logo"
                 aria-label="Página de inicio de Suralia"
             >
+
                 <span class="logo__icono">
                     <i class="fa-solid fa-location-dot"></i>
                 </span>
@@ -50,6 +56,7 @@
                 <span class="logo__texto">
                     Suralia
                 </span>
+
             </a>
 
             <nav
@@ -113,6 +120,8 @@
     </header>
 
     <main>
+
+        <!-- HERO -->
 
         <section class="hero">
 
@@ -289,6 +298,8 @@
 
         </section>
 
+        <!-- CATEGORÍAS -->
+
         <section
             class="seccion categorias"
             id="categorias"
@@ -323,7 +334,7 @@
                 <div class="categorias__grid">
 
                     <a
-                        href="planes.html"
+                        href="planes.html?busqueda=Música"
                         class="categoria"
                     >
 
@@ -341,7 +352,7 @@
                     </a>
 
                     <a
-                        href="planes.html"
+                        href="planes.html?busqueda=Naturaleza"
                         class="categoria"
                     >
 
@@ -359,7 +370,7 @@
                     </a>
 
                     <a
-                        href="planes.html"
+                        href="planes.html?busqueda=Gastronomía"
                         class="categoria"
                     >
 
@@ -377,7 +388,7 @@
                     </a>
 
                     <a
-                        href="planes.html"
+                        href="planes.html?busqueda=Cultura"
                         class="categoria"
                     >
 
@@ -399,6 +410,8 @@
             </div>
 
         </section>
+
+        <!-- PLANES DESTACADOS -->
 
         <section
             class="seccion planes"
@@ -445,8 +458,9 @@
                         data-precio="0"
                         data-valoracion="4.8"
                         data-fecha="25 de julio"
+                        data-fecha-iso="2026-07-25"
                         data-ubicacion="Santiponce, Sevilla"
-                        data-imagen="img/italica.jpg"
+                        data-imagen="img/italica principal.jpg"
                         data-enlace="detalle-plan.html"
                     >
 
@@ -498,7 +512,9 @@
 
                                 <div class="tarjeta-plan__pie">
 
-                                    <span>Cultura</span>
+                                    <span>
+                                        Cultura
+                                    </span>
 
                                     <strong>
                                         4,8
@@ -515,83 +531,86 @@
 
                     <!-- KAYAK -->
 
-                        <article
-                            class="tarjeta-plan"
-                            data-plan-id="kayak-atardecer"
-                            data-nombre="Kayak al atardecer"
-                            data-titulo="Kayak al atardecer"
-                            data-categoria="aventura"
-                            data-categoria-texto="Aventura"
-                            data-precio="18"
-                            data-valoracion="4.9"
-                            data-fecha="27 de julio de 2026"
-                            data-ubicacion="Río Guadalquivir, Sevilla"
-                            data-imagen="img/kayak.jpg"
-                            data-enlace="detalle-kayak.html"
+                    <article
+                        class="tarjeta-plan"
+                        data-plan-id="kayak-atardecer"
+                        data-nombre="Kayak al atardecer"
+                        data-titulo="Kayak al atardecer"
+                        data-categoria="aventura"
+                        data-categoria-texto="Aventura"
+                        data-precio="18"
+                        data-valoracion="4.9"
+                        data-fecha="27 de julio"
+                        data-fecha-iso="2026-07-27"
+                        data-ubicacion="Río Guadalquivir, Sevilla"
+                        data-imagen="img/kayak principal.jpg"
+                        data-enlace="detalle-kayak.html"
+                    >
+
+                        <a
+                            href="detalle-kayak.html"
+                            class="tarjeta-plan__enlace"
                         >
 
-                            <a
-                                href="detalle-kayak.html"
-                                class="tarjeta-plan__enlace"
-                            >
+                            <div class="tarjeta-plan__imagen imagen-plan--kayak">
 
-                                <div class="tarjeta-plan__imagen imagen-plan--kayak">
+                                <span class="tarjeta-plan__precio">
+                                    18 €
+                                </span>
 
-                                    <span class="tarjeta-plan__precio">
-                                        18 €
+                                <button
+                                    class="tarjeta-plan__favorito"
+                                    type="button"
+                                    aria-label="Añadir kayak a favoritos"
+                                >
+                                    <i class="fa-regular fa-heart"></i>
+                                </button>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        27 de julio
                                     </span>
 
-                                    <button
-                                        class="tarjeta-plan__favorito"
-                                        type="button"
-                                        aria-label="Añadir kayak a favoritos"
-                                    >
-                                        <i class="fa-regular fa-heart"></i>
-                                    </button>
+                                    <span>
+                                        <i class="fa-regular fa-clock"></i>
+                                        19:00
+                                    </span>
 
                                 </div>
 
-                                <div class="tarjeta-plan__contenido">
+                                <h3>
+                                    Kayak al atardecer
+                                </h3>
 
-                                    <div class="tarjeta-plan__meta">
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Río Guadalquivir
+                                </p>
 
-                                        <span>
-                                            <i class="fa-regular fa-calendar"></i>
-                                            27 de julio
-                                        </span>
+                                <div class="tarjeta-plan__pie">
 
-                                        <span>
-                                            <i class="fa-regular fa-clock"></i>
-                                            19:00
-                                        </span>
+                                    <span>
+                                        Aventura
+                                    </span>
 
-                                    </div>
-
-                                    <h3>
-                                        Kayak al atardecer
-                                    </h3>
-
-                                    <p class="tarjeta-plan__ubicacion">
-                                        <i class="fa-solid fa-location-dot"></i>
-                                        Río Guadalquivir
-                                    </p>
-
-                                    <div class="tarjeta-plan__pie">
-
-                                        <span>Aventura</span>
-
-                                        <strong>
-                                            4,9
-                                            <i class="fa-solid fa-star"></i>
-                                        </strong>
-
-                                    </div>
+                                    <strong>
+                                        4,9
+                                        <i class="fa-solid fa-star"></i>
+                                    </strong>
 
                                 </div>
 
-                            </a>
+                            </div>
 
-                        </article>
+                        </a>
+
+                    </article>
 
                     <!-- PONCHO K -->
 
@@ -605,64 +624,74 @@
                         data-precio="25"
                         data-valoracion="4.8"
                         data-fecha="21 de noviembre de 2026"
+                        data-fecha-iso="2026-11-21"
                         data-ubicacion="Cartuja Center CITE, Sevilla"
                         data-imagen="img/poncho-k.jpg"
-                        data-enlace="detalle-plan.html"
+                        data-enlace="detalle-poncho-k.html"
                     >
 
-                        <div class="tarjeta-plan__imagen imagen-plan--poncho-k">
+                        <a
+                            href="detalle-poncho-k.html"
+                            class="tarjeta-plan__enlace"
+                        >
 
-                            <span class="tarjeta-plan__precio">
-                                25 €
-                            </span>
+                            <div class="tarjeta-plan__imagen imagen-plan--poncho-k">
 
-                            <button
-                                class="tarjeta-plan__favorito"
-                                type="button"
-                                aria-label="Añadir concierto de Poncho K a favoritos"
-                            >
-                                <i class="fa-regular fa-heart"></i>
-                            </button>
-
-                        </div>
-
-                        <div class="tarjeta-plan__contenido">
-
-                            <div class="tarjeta-plan__meta">
-
-                                <span>
-                                    <i class="fa-regular fa-calendar"></i>
-                                    21 de noviembre
+                                <span class="tarjeta-plan__precio">
+                                    25 €
                                 </span>
 
-                                <span>
-                                    <i class="fa-regular fa-clock"></i>
-                                    21:00
-                                </span>
+                                <button
+                                    class="tarjeta-plan__favorito"
+                                    type="button"
+                                    aria-label="Añadir concierto de Poncho K a favoritos"
+                                >
+                                    <i class="fa-regular fa-heart"></i>
+                                </button>
 
                             </div>
 
-                            <h3>
-                                PONCHO K - Cartuja Center CITE
-                            </h3>
+                            <div class="tarjeta-plan__contenido">
 
-                            <p class="tarjeta-plan__ubicacion">
-                                <i class="fa-solid fa-location-dot"></i>
-                                Cartuja Center CITE, Sevilla
-                            </p>
+                                <div class="tarjeta-plan__meta">
 
-                            <div class="tarjeta-plan__pie">
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        21 de noviembre
+                                    </span>
 
-                                <span>Música</span>
+                                    <span>
+                                        <i class="fa-regular fa-clock"></i>
+                                        21:00
+                                    </span>
 
-                                <strong>
-                                    4,8
-                                    <i class="fa-solid fa-star"></i>
-                                </strong>
+                                </div>
+
+                                <h3>
+                                    PONCHO K - Cartuja Center CITE
+                                </h3>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    Cartuja Center CITE, Sevilla
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+
+                                    <span>
+                                        Música
+                                    </span>
+
+                                    <strong>
+                                        4,8
+                                        <i class="fa-solid fa-star"></i>
+                                    </strong>
+
+                                </div>
 
                             </div>
 
-                        </div>
+                        </a>
 
                     </article>
 
@@ -671,6 +700,8 @@
             </div>
 
         </section>
+
+        <!-- CÓMO FUNCIONA -->
 
         <section
             class="seccion como-funciona"
@@ -761,6 +792,8 @@
 
         </section>
 
+        <!-- CTA -->
+
         <section class="cta">
 
             <div class="contenedor">
@@ -799,6 +832,8 @@
         </section>
 
     </main>
+
+    <!-- FOOTER -->
 
     <footer class="footer">
 
@@ -840,15 +875,15 @@
                     Todos los planes
                 </a>
 
-                <a href="#">
+                <a href="planes.html">
                     Este fin de semana
                 </a>
 
-                <a href="#">
+                <a href="planes.html">
                     Planes gratuitos
                 </a>
 
-                <a href="#">
+                <a href="planes.html">
                     Nuevas actividades
                 </a>
 
@@ -924,6 +959,8 @@
         </div>
 
     </footer>
+
+    <!-- NOTIFICACIÓN -->
 
     <div
         class="notificacion"

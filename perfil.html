@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
 
@@ -15,8 +16,16 @@
 
     <title>Mi perfil | Suralia</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
 
     <link
         href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
@@ -28,12 +37,16 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     >
 
-    <link rel="stylesheet" href="css/style.css">
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
 </head>
 
 <body>
 
     <header class="header">
+
         <div class="contenedor header__contenido">
 
             <a
@@ -41,6 +54,7 @@
                 class="logo"
                 aria-label="Página de inicio de Suralia"
             >
+
                 <span class="logo__icono">
                     <i class="fa-solid fa-location-dot"></i>
                 </span>
@@ -48,9 +62,13 @@
                 <span class="logo__texto">
                     Suralia
                 </span>
+
             </a>
 
-            <nav class="navegacion" id="navegacion">
+            <nav
+                class="navegacion"
+                id="navegacion"
+            >
 
                 <a href="planes.html">
                     Explorar planes
@@ -64,7 +82,10 @@
                     Cómo funciona
                 </a>
 
-                <a href="publicar-plan.html" class="enlace-publicar">
+                <a
+                    href="publicar-plan.html"
+                    class="enlace-publicar"
+                >
                     <i class="fa-solid fa-plus"></i>
                     Publicar un plan
                 </a>
@@ -73,14 +94,22 @@
 
             <div class="header__acciones">
 
-                <a href="perfil.html" class="usuario-header">
-                    <span class="usuario-header__avatar" id="avatar-header">
+                <a
+                    href="perfil.html"
+                    class="usuario-header"
+                >
+
+                    <span
+                        class="usuario-header__avatar"
+                        id="avatar-header"
+                    >
                         FG
                     </span>
 
                     <span id="nombre-header">
                         Fernando
                     </span>
+
                 </a>
 
                 <button
@@ -96,9 +125,14 @@
             </div>
 
         </div>
+
     </header>
 
     <main>
+
+        <!-- =================================================
+             CABECERA DEL PERFIL
+        ================================================== -->
 
         <section class="cabecera-perfil">
 
@@ -106,11 +140,15 @@
 
                 <div class="perfil-identidad">
 
-                    <div class="perfil-identidad__avatar" id="avatar-perfil">
+                    <div
+                        class="perfil-identidad__avatar"
+                        id="avatar-perfil"
+                    >
                         FG
                     </div>
 
                     <div>
+
                         <span class="subtitulo">
                             Mi cuenta
                         </span>
@@ -122,6 +160,7 @@
                         <p id="email-perfil">
                             fernando@correo.com
                         </p>
+
                     </div>
 
                 </div>
@@ -139,9 +178,15 @@
 
         </section>
 
+        <!-- =================================================
+             CONTENIDO DEL PERFIL
+        ================================================== -->
+
         <section class="perfil">
 
             <div class="contenedor perfil__grid">
+
+                <!-- MENÚ LATERAL -->
 
                 <aside class="perfil-menu">
 
@@ -192,9 +237,13 @@
 
                 </aside>
 
+                <!-- CONTENIDO CENTRAL -->
+
                 <div class="perfil-contenido">
 
-                    <!-- RESUMEN -->
+                    <!-- =================================================
+                         RESUMEN
+                    ================================================== -->
 
                     <section
                         class="perfil-seccion activa"
@@ -202,56 +251,83 @@
                     >
 
                         <div class="perfil-seccion__cabecera">
+
                             <div>
+
                                 <span class="subtitulo">
                                     Panel personal
                                 </span>
 
                                 <h2>
                                     Hola,
-                                    <span id="saludo-usuario">Fernando</span>
+                                    <span id="saludo-usuario">
+                                        Fernando
+                                    </span>
                                 </h2>
 
                                 <p>
                                     Aquí puedes consultar tu actividad reciente
                                     en Suralia.
                                 </p>
+
                             </div>
+
                         </div>
 
                         <div class="perfil-estadisticas">
 
                             <article>
+
                                 <span class="perfil-estadisticas__icono">
                                     <i class="fa-solid fa-ticket"></i>
                                 </span>
 
                                 <div>
-                                    <strong id="contador-reservas-perfil">0</strong>
-                                    <span>Reservas activas</span>
+                                    <strong id="contador-reservas-perfil">
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        Reservas activas
+                                    </span>
                                 </div>
+
                             </article>
 
                             <article>
+
                                 <span class="perfil-estadisticas__icono">
                                     <i class="fa-solid fa-heart"></i>
                                 </span>
 
                                 <div>
-                                    <strong id="contador-favoritos-perfil">0</strong>
-                                    <span>Planes favoritos</span>
+                                    <strong id="contador-favoritos-perfil">
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        Planes favoritos
+                                    </span>
                                 </div>
+
                             </article>
 
                             <article>
+
                                 <span class="perfil-estadisticas__icono">
                                     <i class="fa-solid fa-calendar-check"></i>
                                 </span>
 
                                 <div>
-                                    <strong>2</strong>
-                                    <span>Planes realizados</span>
+                                    <strong>
+                                        2
+                                    </strong>
+
+                                    <span>
+                                        Planes realizados
+                                    </span>
                                 </div>
+
                             </article>
 
                         </div>
@@ -259,9 +335,15 @@
                         <div class="perfil-bloque">
 
                             <div class="perfil-bloque__cabecera">
+
                                 <div>
-                                    <h3>Próxima reserva</h3>
-                                    <p>Tu siguiente experiencia en Suralia.</p>
+                                    <h3>
+                                        Próxima reserva
+                                    </h3>
+
+                                    <p>
+                                        Tu siguiente experiencia en Suralia.
+                                    </p>
                                 </div>
 
                                 <button
@@ -272,6 +354,7 @@
                                     Ver reservas
                                     <i class="fa-solid fa-arrow-right"></i>
                                 </button>
+
                             </div>
 
                             <div id="proxima-reserva-perfil"></div>
@@ -280,123 +363,158 @@
 
                     </section>
 
-                    <!-- RESERVAS -->
+                    <!-- =================================================
+                         RESERVAS
+                    ================================================== -->
 
                     <section
                         class="perfil-seccion"
-                        id="seccion-reservas">
+                        id="seccion-reservas"
+                    >
 
                         <div class="perfil-seccion__cabecera">
 
                             <div>
+
                                 <span class="subtitulo">
                                     Mis actividades
                                 </span>
 
-                                <h2>Mis reservas</h2>
+                                <h2>
+                                    Mis reservas
+                                </h2>
 
                                 <p>
                                     Consulta y gestiona tus próximas actividades.
                                 </p>
+
                             </div>
 
                         </div>
 
-                        <div 
+                        <div
                             class="lista-reservas"
-                            id="lista-reservas-perfil">
+                            id="lista-reservas-perfil"
+                        ></div>
+
+                        <div
+                            class="estado-vacio"
+                            id="estado-vacio-reservas"
+                        >
+
+                            <span class="estado-vacio__icono">
+                                <i class="fa-regular fa-calendar-xmark"></i>
+                            </span>
+
+                            <h3>
+                                No tienes reservas activas
+                            </h3>
+
+                            <p>
+                                Explora las actividades disponibles y reserva
+                                tu próximo plan.
+                            </p>
+
+                            <a
+                                href="planes.html"
+                                class="boton-auth"
+                            >
+                                Explorar planes
+                            </a>
+
                         </div>
 
-                            <div
-                                class="estado-vacio"
-                                id="estado-vacio-reservas">
-
-                                <span class="estado-vacio__icono">
-                                    <i class="fa-regular fa-calendar-xmark"></i>
-                                </span>
-
-                                <h3>No tienes reservas activas</h3>
-
-                                <p>
-                                    Explora las actividades disponibles y reserva tu próximo plan.
-                                </p>
-
-                                <a href="planes.html" class="boton-auth">
-                                    Explorar planes
-                                </a>
-
-                            </div>
-
                     </section>
 
-                    <!-- FAVORITOS -->
+                    <!-- =================================================
+                         FAVORITOS
+                    ================================================== -->
 
-                    <section 
-                            class="perfil-seccion"
-                            id="seccion-favoritos"
-                             >
-
-                            <div class="perfil-seccion__cabecera">
-
-                                <div>
-                                    <span class="subtitulo">
-                                        Guardados
-                                    </span>
-
-                                    <h2>Planes favoritos</h2>
-
-                                    <p>
-                                        Actividades que has guardado para más adelante.
-                                    </p>
-                                </div>
-
-                            </div>
-
-                            <div
-                                class="planes__grid perfil-favoritos"
-                                id="lista-favoritos-perfil">
-                            </div>
-
-                            <div
-                                class="estado-vacio"
-                                id="estado-vacio-favoritos"
-                                >
-
-                                <span class="estado-vacio__icono">
-                                    <i class="fa-regular fa-heart"></i>
-                                </span>
-
-                                <h3>No tienes planes favoritos</h3>
-
-                                <p>
-                                    Guarda las actividades que más te interesen para
-                                    encontrarlas fácilmente.
-                                </p>
-
-                                <a href="planes.html" class="boton-auth">
-                                    Explorar planes
-                                </a>
-
-                            </div>
-
-                    </section>
-                    <!-- PLANES PUBLICADOS -->
-
-                    <section class="perfil-seccion" id="seccion-publicados">
+                    <section
+                        class="perfil-seccion"
+                        id="seccion-favoritos"
+                    >
 
                         <div class="perfil-seccion__cabecera">
 
                             <div>
+
+                                <span class="subtitulo">
+                                    Guardados
+                                </span>
+
+                                <h2>
+                                    Planes favoritos
+                                </h2>
+
+                                <p>
+                                    Actividades que has guardado para más adelante.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="planes__grid perfil-favoritos"
+                            id="lista-favoritos-perfil"
+                        ></div>
+
+                        <div
+                            class="estado-vacio"
+                            id="estado-vacio-favoritos"
+                        >
+
+                            <span class="estado-vacio__icono">
+                                <i class="fa-regular fa-heart"></i>
+                            </span>
+
+                            <h3>
+                                No tienes planes favoritos
+                            </h3>
+
+                            <p>
+                                Guarda las actividades que más te interesen para
+                                encontrarlas fácilmente.
+                            </p>
+
+                            <a
+                                href="planes.html"
+                                class="boton-auth"
+                            >
+                                Explorar planes
+                            </a>
+
+                        </div>
+
+                    </section>
+
+                    <!-- =================================================
+                         PLANES PUBLICADOS
+                    ================================================== -->
+
+                    <section
+                        class="perfil-seccion"
+                        id="seccion-publicados"
+                    >
+
+                        <div class="perfil-seccion__cabecera">
+
+                            <div>
+
                                 <span class="subtitulo">
                                     Organizador
                                 </span>
 
-                                <h2>Planes publicados</h2>
+                                <h2>
+                                    Planes publicados
+                                </h2>
 
                                 <p>
-                                    Gestiona tus actividades, publicaciones pendientes
-                                    y borradores.
+                                    Gestiona tus actividades, publicaciones
+                                    pendientes y borradores.
                                 </p>
+
                             </div>
 
                             <a
@@ -417,7 +535,9 @@
                                 data-filtro-publicacion="todos"
                             >
                                 Todos
-                                <span id="contador-publicaciones">0</span>
+                                <span id="contador-publicaciones">
+                                    0
+                                </span>
                             </button>
 
                             <button
@@ -426,7 +546,9 @@
                                 data-filtro-publicacion="pendiente"
                             >
                                 Pendientes
-                                <span id="contador-pendientes">0</span>
+                                <span id="contador-pendientes">
+                                    0
+                                </span>
                             </button>
 
                             <button
@@ -435,7 +557,9 @@
                                 data-filtro-publicacion="borrador"
                             >
                                 Borradores
-                                <span id="contador-borradores">0</span>
+                                <span id="contador-borradores">
+                                    0
+                                </span>
                             </button>
 
                         </div>
@@ -454,14 +578,19 @@
                                 <i class="fa-regular fa-calendar-plus"></i>
                             </span>
 
-                            <h3>Todavía no has publicado ningún plan</h3>
+                            <h3>
+                                Todavía no has publicado ningún plan
+                            </h3>
 
                             <p>
                                 Comparte una actividad y conecta con personas
                                 interesadas en nuevas experiencias.
                             </p>
 
-                            <a href="publicar-plan.html" class="boton-auth">
+                            <a
+                                href="publicar-plan.html"
+                                class="boton-auth"
+                            >
                                 Publicar mi primer plan
                             </a>
 
@@ -469,7 +598,9 @@
 
                     </section>
 
-                    <!-- DATOS PERSONALES -->
+                    <!-- =================================================
+                         DATOS PERSONALES
+                    ================================================== -->
 
                     <section
                         class="perfil-seccion"
@@ -479,18 +610,145 @@
                         <div class="perfil-seccion__cabecera">
 
                             <div>
+
                                 <span class="subtitulo">
                                     Configuración
                                 </span>
 
-                                <h2>Datos personales</h2>
+                                <h2>
+                                    Datos personales
+                                </h2>
 
                                 <p>
                                     Actualiza la información asociada a tu cuenta.
                                 </p>
+
                             </div>
 
                         </div>
+
+                        <!-- SELECTOR DE FOTO Y AVATAR -->
+
+                        <div class="selector-avatar">
+
+                            <div
+                                class="selector-avatar__vista"
+                                id="avatar-preview"
+                            >
+                                FG
+                            </div>
+
+                            <div class="selector-avatar__contenido">
+
+                                <div>
+
+                                    <h3>
+                                        Imagen de perfil
+                                    </h3>
+
+                                    <p>
+                                        Sube una fotografía o elige uno de
+                                        los avatares disponibles.
+                                    </p>
+
+                                </div>
+
+                                <div class="selector-avatar__acciones">
+
+                                    <label
+                                        for="input-avatar"
+                                        class="boton-subir-avatar"
+                                    >
+                                        <i class="fa-solid fa-camera"></i>
+                                        Subir foto
+                                    </label>
+
+                                    <input
+                                        type="file"
+                                        id="input-avatar"
+                                        accept="image/jpeg,image/png,image/webp"
+                                        hidden
+                                    >
+
+                                    <button
+                                        type="button"
+                                        class="boton-eliminar-avatar"
+                                        id="boton-eliminar-avatar"
+                                    >
+                                        <i class="fa-regular fa-trash-can"></i>
+                                        Quitar foto
+                                    </button>
+
+                                </div>
+
+                                <div class="avatares-predeterminados">
+
+                                    <button
+                                        type="button"
+                                        class="avatar-predeterminado"
+                                        data-avatar="🧭"
+                                        aria-label="Seleccionar avatar de brújula"
+                                    >
+                                        🧭
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="avatar-predeterminado"
+                                        data-avatar="🌄"
+                                        aria-label="Seleccionar avatar de paisaje"
+                                    >
+                                        🌄
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="avatar-predeterminado"
+                                        data-avatar="🎸"
+                                        aria-label="Seleccionar avatar de guitarra"
+                                    >
+                                        🎸
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="avatar-predeterminado"
+                                        data-avatar="🚲"
+                                        aria-label="Seleccionar avatar de bicicleta"
+                                    >
+                                        🚲
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="avatar-predeterminado"
+                                        data-avatar="🌊"
+                                        aria-label="Seleccionar avatar del mar"
+                                    >
+                                        🌊
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="avatar-predeterminado"
+                                        data-avatar="🥾"
+                                        aria-label="Seleccionar avatar de senderismo"
+                                    >
+                                        🥾
+                                    </button>
+
+                                </div>
+
+                                <small
+                                    class="mensaje-error"
+                                    id="error-avatar"
+                                ></small>
+
+                            </div>
+
+                        </div>
+
+                        <!-- FORMULARIO DE DATOS -->
 
                         <form
                             class="formulario-perfil"
@@ -506,12 +764,15 @@
                                     </label>
 
                                     <div class="campo-formulario__control">
+
                                         <i class="fa-regular fa-user"></i>
 
                                         <input
                                             type="text"
                                             id="perfil-nombre"
+                                            autocomplete="given-name"
                                         >
+
                                     </div>
 
                                     <small
@@ -528,12 +789,15 @@
                                     </label>
 
                                     <div class="campo-formulario__control">
+
                                         <i class="fa-regular fa-user"></i>
 
                                         <input
                                             type="text"
                                             id="perfil-apellidos"
+                                            autocomplete="family-name"
                                         >
+
                                     </div>
 
                                     <small
@@ -552,12 +816,15 @@
                                 </label>
 
                                 <div class="campo-formulario__control">
+
                                     <i class="fa-regular fa-envelope"></i>
 
                                     <input
                                         type="email"
                                         id="perfil-email"
+                                        autocomplete="email"
                                     >
+
                                 </div>
 
                                 <small
@@ -574,14 +841,24 @@
                                 </label>
 
                                 <div class="campo-formulario__control">
+
                                     <i class="fa-solid fa-phone"></i>
 
                                     <input
                                         type="tel"
                                         id="perfil-telefono"
                                         placeholder="600 000 000"
+                                        autocomplete="tel"
+                                        inputmode="numeric"
+                                        maxlength="11"
                                     >
+
                                 </div>
+
+                                <small
+                                    class="mensaje-error"
+                                    id="error-perfil-telefono"
+                                ></small>
 
                             </div>
 
@@ -605,6 +882,10 @@
 
     </main>
 
+    <!-- =================================================
+         FOOTER
+    ================================================== -->
+
     <footer class="footer">
 
         <div class="contenedor footer__inferior">
@@ -614,14 +895,26 @@
             </p>
 
             <div>
-                <a href="#">Privacidad</a>
-                <a href="#">Cookies</a>
-                <a href="#">Aviso legal</a>
+                <a href="#">
+                    Privacidad
+                </a>
+
+                <a href="#">
+                    Cookies
+                </a>
+
+                <a href="#">
+                    Aviso legal
+                </a>
             </div>
 
         </div>
 
     </footer>
+
+    <!-- =================================================
+         NOTIFICACIÓN
+    ================================================== -->
 
     <div
         class="notificacion"
@@ -633,7 +926,14 @@
         <span></span>
     </div>
 
-    <div class="modal-confirmacion" id="modal-cancelacion">
+    <!-- =================================================
+         MODAL DE CANCELACIÓN DE RESERVA
+    ================================================== -->
+
+    <div
+        class="modal-confirmacion"
+        id="modal-cancelacion"
+    >
 
         <div class="modal-confirmacion__contenido">
 
@@ -641,7 +941,9 @@
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </span>
 
-            <h2>¿Cancelar la reserva?</h2>
+            <h2>
+                ¿Cancelar la reserva?
+            </h2>
 
             <p>
                 Esta acción eliminará la reserva de tu perfil.
@@ -671,42 +973,50 @@
 
     </div>
 
+    <!-- =================================================
+         MODAL DE ELIMINACIÓN DE PLAN
+    ================================================== -->
 
-    <div class="modal-confirmacion" id="modal-eliminar-plan">
+    <div
+        class="modal-confirmacion"
+        id="modal-eliminar-plan"
+    >
 
-                    <div class="modal-confirmacion__contenido">
+        <div class="modal-confirmacion__contenido">
 
-                        <span class="modal-confirmacion__icono">
-                            <i class="fa-solid fa-trash"></i>
-                        </span>
+            <span class="modal-confirmacion__icono">
+                <i class="fa-solid fa-trash"></i>
+            </span>
 
-                        <h2>¿Eliminar este plan?</h2>
+            <h2>
+                ¿Eliminar este plan?
+            </h2>
 
-                        <p>
-                            Esta acción eliminará el plan de tu perfil.
-                        </p>
+            <p>
+                Esta acción eliminará el plan de tu perfil.
+            </p>
 
-                        <div class="modal-confirmacion__acciones">
+            <div class="modal-confirmacion__acciones">
 
-                            <button
-                                type="button"
-                                class="boton-secundario"
-                                id="cancelar-eliminar-plan"
-                            >
-                                Volver
-                            </button>
+                <button
+                    type="button"
+                    class="boton-secundario"
+                    id="cancelar-eliminar-plan"
+                >
+                    Volver
+                </button>
 
-                            <button
-                                type="button"
-                                class="boton-confirmar-cancelacion"
-                                id="confirmar-eliminar-plan"
-                            >
-                                Eliminar plan
-                            </button>
+                <button
+                    type="button"
+                    class="boton-confirmar-cancelacion"
+                    id="confirmar-eliminar-plan"
+                >
+                    Eliminar plan
+                </button>
 
-                        </div>
+            </div>
 
-                    </div>
+        </div>
 
     </div>
 
@@ -714,4 +1024,5 @@
     <script src="js/perfil.js"></script>
 
 </body>
+
 </html>

@@ -2,6 +2,10 @@
    ELEMENTOS DE LOS FILTROS
 ===================================================== */
 
+const formularioFiltros = document.querySelector(
+    "#formulario-filtros"
+);
+
 const filtroTexto = document.querySelector(
     "#filtro-texto"
 );
@@ -44,6 +48,8 @@ const sinResultados = document.querySelector(
     "#sin-resultados"
 );
 
+let fechaBuscadaDesdePortada = "";
+
 
 /* =====================================================
    NOTIFICACIONES
@@ -68,7 +74,9 @@ function mostrarNotificacion(mensaje) {
         texto.textContent = mensaje;
     }
 
-    notificacionPlanes.classList.add("visible");
+    notificacionPlanes.classList.add(
+        "visible"
+    );
 
     clearTimeout(
         temporizadorNotificacionPlanes
@@ -86,6 +94,42 @@ function mostrarNotificacion(mensaje) {
 
 
 /* =====================================================
+   PARÁMETROS RECIBIDOS DESDE INDEX.HTML
+===================================================== */
+
+function obtenerParametrosBusqueda() {
+    const parametros = new URLSearchParams(
+        window.location.search
+    );
+
+    return {
+        busqueda:
+            parametros.get("busqueda") || "",
+
+        fecha:
+            parametros.get("fecha") || ""
+    };
+}
+
+
+function aplicarParametrosIniciales() {
+    const parametros =
+        obtenerParametrosBusqueda();
+
+    if (
+        parametros.busqueda &&
+        filtroTexto
+    ) {
+        filtroTexto.value =
+            parametros.busqueda;
+    }
+
+    fechaBuscadaDesdePortada =
+        parametros.fecha;
+}
+
+
+/* =====================================================
    FILTROS
 ===================================================== */
 
@@ -97,7 +141,10 @@ function normalizarTexto(texto = "") {
 }
 
 
-function cumpleFiltroPrecio(precio, filtro) {
+function cumpleFiltroPrecio(
+    precio,
+    filtro
+) {
     if (filtro === "gratis") {
         return precio === 0;
     }
@@ -114,44 +161,59 @@ function cumpleFiltroPrecio(precio, filtro) {
 }
 
 
-function ordenarPlanes(planesVisibles) {
-    const orden = filtroOrden.value;
+function ordenarPlanes(
+    planesVisibles
+) {
+    const orden =
+        filtroOrden?.value ||
+        "recomendados";
 
-    return planesVisibles.sort((planA, planB) => {
-        const precioA = Number(
-            planA.dataset.precio
-        );
+    return planesVisibles.sort(
+        (planA, planB) => {
+            const precioA = Number(
+                planA.dataset.precio || 0
+            );
 
-        const precioB = Number(
-            planB.dataset.precio
-        );
+            const precioB = Number(
+                planB.dataset.precio || 0
+            );
 
-        const valoracionA = Number(
-            planA.dataset.valoracion
-        );
+            const valoracionA = Number(
+                planA.dataset.valoracion || 0
+            );
 
-        const valoracionB = Number(
-            planB.dataset.valoracion
-        );
+            const valoracionB = Number(
+                planB.dataset.valoracion || 0
+            );
 
-        if (orden === "precio-menor") {
-            return precioA - precioB;
+            if (orden === "precio-menor") {
+                return precioA - precioB;
+            }
+
+            if (orden === "precio-mayor") {
+                return precioB - precioA;
+            }
+
+            if (orden === "valoracion") {
+                return valoracionB - valoracionA;
+            }
+
+            return 0;
         }
-
-        if (orden === "precio-mayor") {
-            return precioB - precioA;
-        }
-
-        if (orden === "valoracion") {
-            return valoracionB - valoracionA;
-        }
-
-        return 0;
-    });
+    );
 }
 
 
 function aplicarFiltros() {
+    if (
+        !filtroTexto ||
+        !filtroCategoria ||
+        !filtroPrecio ||
+        !listaPlanes
+    ) {
+        return;
+    }
+
     const textoBuscado = normalizarTexto(
         filtroTexto.value.trim()
     );
@@ -165,23 +227,46 @@ function aplicarFiltros() {
     let planesVisibles = planes.filter(
         (plan) => {
             const nombre = normalizarTexto(
-                plan.dataset.nombre
+                plan.dataset.nombre || ""
             );
+
+            const titulo = normalizarTexto(
+                plan.dataset.titulo || ""
+            );
+
+            const ubicacion = normalizarTexto(
+                plan.dataset.ubicacion || ""
+            );
+
+            const categoriaTexto =
+                normalizarTexto(
+                    plan.dataset.categoriaTexto || ""
+                );
 
             const categoria =
-                plan.dataset.categoria;
+                plan.dataset.categoria || "";
 
             const precio = Number(
-                plan.dataset.precio
+                plan.dataset.precio || 0
             );
+
+            const fechaIso =
+                plan.dataset.fechaIso || "";
 
             const coincideTexto =
                 !textoBuscado ||
-                nombre.includes(textoBuscado);
+                nombre.includes(textoBuscado) ||
+                titulo.includes(textoBuscado) ||
+                ubicacion.includes(textoBuscado) ||
+                categoriaTexto.includes(
+                    textoBuscado
+                );
 
             const coincideCategoria =
-                categoriaSeleccionada === "todas" ||
-                categoria === categoriaSeleccionada;
+                categoriaSeleccionada ===
+                    "todas" ||
+                categoria ===
+                    categoriaSeleccionada;
 
             const coincidePrecio =
                 cumpleFiltroPrecio(
@@ -189,10 +274,16 @@ function aplicarFiltros() {
                     precioSeleccionado
                 );
 
+            const coincideFecha =
+                !fechaBuscadaDesdePortada ||
+                fechaIso ===
+                    fechaBuscadaDesdePortada;
+
             return (
                 coincideTexto &&
                 coincideCategoria &&
-                coincidePrecio
+                coincidePrecio &&
+                coincideFecha
             );
         }
     );
@@ -201,30 +292,53 @@ function aplicarFiltros() {
         plan.style.display = "none";
     });
 
-    planesVisibles = ordenarPlanes(
-        planesVisibles
-    );
+    planesVisibles =
+        ordenarPlanes(planesVisibles);
 
     planesVisibles.forEach((plan) => {
         plan.style.display = "block";
         listaPlanes.appendChild(plan);
     });
 
-    numeroResultados.textContent =
-        planesVisibles.length;
+    if (numeroResultados) {
+        numeroResultados.textContent =
+            planesVisibles.length;
+    }
 
-    sinResultados.classList.toggle(
-        "visible",
-        planesVisibles.length === 0
-    );
+    if (sinResultados) {
+        sinResultados.classList.toggle(
+            "visible",
+            planesVisibles.length === 0
+        );
+    }
 }
 
 
 function limpiarFiltros() {
-    filtroTexto.value = "";
-    filtroCategoria.value = "todas";
-    filtroPrecio.value = "todos";
-    filtroOrden.value = "recomendados";
+    if (filtroTexto) {
+        filtroTexto.value = "";
+    }
+
+    if (filtroCategoria) {
+        filtroCategoria.value = "todas";
+    }
+
+    if (filtroPrecio) {
+        filtroPrecio.value = "todos";
+    }
+
+    if (filtroOrden) {
+        filtroOrden.value =
+            "recomendados";
+    }
+
+    fechaBuscadaDesdePortada = "";
+
+    window.history.replaceState(
+        {},
+        "",
+        window.location.pathname
+    );
 
     aplicarFiltros();
 }
@@ -234,35 +348,58 @@ function limpiarFiltros() {
    EVENTOS DE LOS FILTROS
 ===================================================== */
 
-filtroTexto.addEventListener(
-    "input",
-    aplicarFiltros
-);
+/*
+    El formulario se ejecuta al pulsar el botón Buscar
+    o al pulsar Enter dentro del campo de búsqueda.
+*/
 
-filtroCategoria.addEventListener(
-    "change",
-    aplicarFiltros
-);
+if (formularioFiltros) {
+    formularioFiltros.addEventListener(
+        "submit",
+        (evento) => {
+            evento.preventDefault();
 
-filtroPrecio.addEventListener(
-    "change",
-    aplicarFiltros
-);
+            fechaBuscadaDesdePortada = "";
 
-filtroOrden.addEventListener(
-    "change",
-    aplicarFiltros
-);
+            window.history.replaceState(
+                {},
+                "",
+                window.location.pathname
+            );
 
-botonLimpiar.addEventListener(
-    "click",
-    limpiarFiltros
-);
+            aplicarFiltros();
+        }
+    );
+}
 
-botonRestablecer.addEventListener(
-    "click",
-    limpiarFiltros
-);
+
+/*
+    La ordenación continúa reaccionando inmediatamente,
+    sin necesidad de pulsar Buscar.
+*/
+
+if (filtroOrden) {
+    filtroOrden.addEventListener(
+        "change",
+        aplicarFiltros
+    );
+}
+
+
+if (botonLimpiar) {
+    botonLimpiar.addEventListener(
+        "click",
+        limpiarFiltros
+    );
+}
+
+
+if (botonRestablecer) {
+    botonRestablecer.addEventListener(
+        "click",
+        limpiarFiltros
+    );
+}
 
 
 /* =====================================================
@@ -276,24 +413,48 @@ const botonesFavoritosPlanes =
 
 
 function obtenerSesionPlanes() {
-    return JSON.parse(
-        localStorage.getItem(
-            "sesionSuralia"
-        )
-    );
+    try {
+        return JSON.parse(
+            localStorage.getItem(
+                "sesionSuralia"
+            )
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo leer la sesión:",
+            error
+        );
+
+        return null;
+    }
 }
 
 
 function obtenerFavoritosPlanes() {
-    return JSON.parse(
-        localStorage.getItem(
-            "favoritosSuralia"
-        )
-    ) || [];
+    try {
+        const favoritos = JSON.parse(
+            localStorage.getItem(
+                "favoritosSuralia"
+            )
+        );
+
+        return Array.isArray(favoritos)
+            ? favoritos
+            : [];
+    } catch (error) {
+        console.error(
+            "No se pudieron leer los favoritos:",
+            error
+        );
+
+        return [];
+    }
 }
 
 
-function obtenerDatosTarjeta(tarjeta) {
+function obtenerDatosTarjeta(
+    tarjeta
+) {
     return {
         planId:
             tarjeta.dataset.planId,
@@ -311,6 +472,9 @@ function obtenerDatosTarjeta(tarjeta) {
 
         fechaTexto:
             tarjeta.dataset.fecha,
+
+        fechaIso:
+            tarjeta.dataset.fechaIso,
 
         ubicacion:
             tarjeta.dataset.ubicacion,
@@ -339,12 +503,14 @@ function tarjetaEstaEnFavoritos(
     const favoritos =
         obtenerFavoritosPlanes();
 
-    return favoritos.some((favorito) => {
-        return (
-            favorito.planId === planId &&
-            favorito.usuarioEmail === email
-        );
-    });
+    return favoritos.some(
+        (favorito) => {
+            return (
+                favorito.planId === planId &&
+                favorito.usuarioEmail === email
+            );
+        }
+    );
 }
 
 
@@ -392,14 +558,14 @@ function cargarEstadoFavoritosTarjetas() {
             const planId =
                 tarjeta.dataset.planId;
 
-            const esFavorito =
-                Boolean(
-                    sesion?.conectado &&
-                    tarjetaEstaEnFavoritos(
-                        planId,
-                        sesion.email
-                    )
-                );
+            const esFavorito = Boolean(
+                sesion?.conectado &&
+                planId &&
+                tarjetaEstaEnFavoritos(
+                    planId,
+                    sesion.email
+                )
+            );
 
             actualizarBotonFavoritoTarjeta(
                 boton,
@@ -410,7 +576,9 @@ function cargarEstadoFavoritosTarjetas() {
 }
 
 
-function alternarFavoritoTarjeta(boton) {
+function alternarFavoritoTarjeta(
+    boton
+) {
     const sesion =
         obtenerSesionPlanes();
 
@@ -453,21 +621,25 @@ function alternarFavoritoTarjeta(boton) {
     const favoritos =
         obtenerFavoritosPlanes();
 
-    const posicion = favoritos.findIndex(
-        (favorito) => {
-            return (
-                favorito.planId ===
-                    datosPlan.planId &&
-                favorito.usuarioEmail ===
-                    sesion.email
-            );
-        }
-    );
+    const posicion =
+        favoritos.findIndex(
+            (favorito) => {
+                return (
+                    favorito.planId ===
+                        datosPlan.planId &&
+                    favorito.usuarioEmail ===
+                        sesion.email
+                );
+            }
+        );
 
     let quedaGuardado;
 
     if (posicion !== -1) {
-        favoritos.splice(posicion, 1);
+        favoritos.splice(
+            posicion,
+            1
+        );
 
         quedaGuardado = false;
 
@@ -507,24 +679,27 @@ function alternarFavoritoTarjeta(boton) {
 }
 
 
-botonesFavoritosPlanes.forEach((boton) => {
-    boton.addEventListener(
-        "click",
-        (evento) => {
-            evento.preventDefault();
-            evento.stopPropagation();
+botonesFavoritosPlanes.forEach(
+    (boton) => {
+        boton.addEventListener(
+            "click",
+            (evento) => {
+                evento.preventDefault();
+                evento.stopPropagation();
 
-            alternarFavoritoTarjeta(
-                boton
-            );
-        }
-    );
-});
+                alternarFavoritoTarjeta(
+                    boton
+                );
+            }
+        );
+    }
+);
 
 
 /* =====================================================
    CARGA INICIAL
 ===================================================== */
 
+aplicarParametrosIniciales();
 aplicarFiltros();
 cargarEstadoFavoritosTarjetas();
