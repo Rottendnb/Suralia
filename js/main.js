@@ -1,39 +1,111 @@
 /* =====================================================
+   FUNCIONES SEGURAS DE LOCALSTORAGE
+===================================================== */
+
+function leerLocalStorage(
+    clave,
+    valorAlternativo = null
+) {
+    try {
+        const contenido =
+            localStorage.getItem(clave);
+
+        if (!contenido) {
+            return valorAlternativo;
+        }
+
+        return JSON.parse(contenido);
+    } catch (error) {
+        console.error(
+            `No se pudo leer ${clave}:`,
+            error
+        );
+
+        return valorAlternativo;
+    }
+}
+
+
+function guardarLocalStorage(
+    clave,
+    valor
+) {
+    try {
+        localStorage.setItem(
+            clave,
+            JSON.stringify(valor)
+        );
+
+        return true;
+    } catch (error) {
+        console.error(
+            `No se pudo guardar ${clave}:`,
+            error
+        );
+
+        return false;
+    }
+}
+
+
+/* =====================================================
    MENÚ MÓVIL
 ===================================================== */
 
-const botonMenu = document.querySelector("#boton-menu");
-const navegacion = document.querySelector("#navegacion");
+const botonMenu =
+    document.querySelector(
+        "#boton-menu"
+    );
 
-if (botonMenu && navegacion) {
-    botonMenu.addEventListener("click", () => {
-        const menuAbierto =
-            navegacion.classList.toggle("activa");
+const navegacion =
+    document.querySelector(
+        "#navegacion"
+    );
 
-        botonMenu.setAttribute(
-            "aria-expanded",
-            String(menuAbierto)
-        );
 
-        botonMenu.innerHTML = menuAbierto
-            ? '<i class="fa-solid fa-xmark"></i>'
-            : '<i class="fa-solid fa-bars"></i>';
-    });
+if (
+    botonMenu &&
+    navegacion
+) {
+    botonMenu.addEventListener(
+        "click",
+        () => {
+            const menuAbierto =
+                navegacion.classList.toggle(
+                    "activa"
+                );
+
+            botonMenu.setAttribute(
+                "aria-expanded",
+                String(menuAbierto)
+            );
+
+            botonMenu.innerHTML =
+                menuAbierto
+                    ? '<i class="fa-solid fa-xmark"></i>'
+                    : '<i class="fa-solid fa-bars"></i>';
+        }
+    );
 
     navegacion
         .querySelectorAll("a")
         .forEach((enlace) => {
-            enlace.addEventListener("click", () => {
-                navegacion.classList.remove("activa");
+            enlace.addEventListener(
+                "click",
+                () => {
+                    navegacion.classList.remove(
+                        "activa"
+                    );
 
-                botonMenu.setAttribute(
-                    "aria-expanded",
-                    "false"
-                );
+                    botonMenu.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
 
-                botonMenu.innerHTML =
-                    '<i class="fa-solid fa-bars"></i>';
-            });
+                    botonMenu.innerHTML =
+                        '<i class="fa-solid fa-bars"></i>';
+                }
+            );
         });
 }
 
@@ -42,48 +114,64 @@ if (botonMenu && navegacion) {
    SESIÓN DEL USUARIO
 ===================================================== */
 
-const sesionActual = JSON.parse(
-    localStorage.getItem("sesionSuralia")
-);
+const sesionActual =
+    leerLocalStorage(
+        "sesionSuralia",
+        null
+    );
 
-const botonLogin = document.querySelector(
-    ".boton-login"
-);
+const botonLogin =
+    document.querySelector(
+        ".boton-login"
+    );
 
-const loginMovil = document.querySelector(
-    ".login-movil"
-);
+const loginMovil =
+    document.querySelector(
+        ".login-movil"
+    );
 
-const enlacesPublicar = document.querySelectorAll(
-    ".enlace-publicar"
-);
+const enlacesPublicar =
+    document.querySelectorAll(
+        ".enlace-publicar"
+    );
 
-if (sesionActual?.conectado) {
-    if (botonLogin) {
-        botonLogin.href = "perfil.html";
 
-        botonLogin.innerHTML = `
-            <i class="fa-regular fa-user"></i>
-            ${sesionActual.nombre}
-        `;
+function actualizarCabeceraSesion() {
+    if (sesionActual?.conectado) {
+        if (botonLogin) {
+            botonLogin.href =
+                "perfil.html";
+
+            botonLogin.innerHTML = `
+                <i class="fa-regular fa-user"></i>
+                ${sesionActual.nombre || "Mi perfil"}
+            `;
+        }
+
+        if (loginMovil) {
+            loginMovil.href =
+                "perfil.html";
+
+            loginMovil.innerHTML = `
+                <i class="fa-regular fa-user"></i>
+                Mi perfil
+            `;
+        }
+
+        enlacesPublicar.forEach(
+            (enlace) => {
+                enlace.href =
+                    "publicar-plan.html";
+            }
+        );
+    } else {
+        enlacesPublicar.forEach(
+            (enlace) => {
+                enlace.href =
+                    "login.html";
+            }
+        );
     }
-
-    if (loginMovil) {
-        loginMovil.href = "perfil.html";
-
-        loginMovil.innerHTML = `
-            <i class="fa-regular fa-user"></i>
-            Mi perfil
-        `;
-    }
-
-    enlacesPublicar.forEach((enlace) => {
-        enlace.href = "publicar-plan.html";
-    });
-} else {
-    enlacesPublicar.forEach((enlace) => {
-        enlace.href = "login.html";
-    });
 }
 
 
@@ -91,9 +179,11 @@ if (sesionActual?.conectado) {
    BUSCADOR DE LA PORTADA
 ===================================================== */
 
-const formularioBuscador = document.querySelector(
-    "#formulario-buscador"
-);
+const formularioBuscador =
+    document.querySelector(
+        "#formulario-buscador"
+    );
+
 
 if (formularioBuscador) {
     formularioBuscador.addEventListener(
@@ -102,19 +192,28 @@ if (formularioBuscador) {
             evento.preventDefault();
 
             const campoBusqueda =
-                document.querySelector("#busqueda");
+                document.querySelector(
+                    "#busqueda"
+                );
 
             const campoFecha =
-                document.querySelector("#fecha");
+                document.querySelector(
+                    "#fecha"
+                );
 
             const busqueda =
-                campoBusqueda?.value.trim() || "";
+                campoBusqueda?.value.trim() ||
+                "";
 
             const fecha =
-                campoFecha?.value || "";
+                campoFecha?.value ||
+                "";
 
-            if (!busqueda && !fecha) {
-                alert(
+            if (
+                !busqueda &&
+                !fecha
+            ) {
+                mostrarNotificacionPrincipal(
                     "Escribe una búsqueda o selecciona una fecha."
                 );
 
@@ -146,7 +245,7 @@ if (formularioBuscador) {
 
 
 /* =====================================================
-   NOTIFICACIÓN DE LA PORTADA
+   NOTIFICACIÓN
 ===================================================== */
 
 const notificacionPrincipal =
@@ -156,7 +255,10 @@ const notificacionPrincipal =
 
 let temporizadorNotificacionPrincipal;
 
-function mostrarNotificacionPrincipal(mensaje) {
+
+function mostrarNotificacionPrincipal(
+    mensaje
+) {
     if (!notificacionPrincipal) {
         console.log(mensaje);
         return;
@@ -168,7 +270,8 @@ function mostrarNotificacionPrincipal(mensaje) {
         );
 
     if (texto) {
-        texto.textContent = mensaje;
+        texto.textContent =
+            mensaje;
     }
 
     notificacionPrincipal.classList.add(
@@ -194,19 +297,26 @@ function mostrarNotificacionPrincipal(mensaje) {
 
 const botonesFavoritosPortada =
     document.querySelectorAll(
-        ".tarjeta-plan__favorito"
+        "#planes .tarjeta-plan__favorito"
     );
 
+
 function obtenerFavoritosPortada() {
-    return JSON.parse(
-        localStorage.getItem(
-            "favoritosSuralia"
-        )
-    ) || [];
+    const favoritos =
+        leerLocalStorage(
+            "favoritosSuralia",
+            []
+        );
+
+    return Array.isArray(favoritos)
+        ? favoritos
+        : [];
 }
 
 
-function obtenerDatosPlanPortada(tarjeta) {
+function obtenerDatosPlanPortada(
+    tarjeta
+) {
     return {
         planId:
             tarjeta.dataset.planId,
@@ -225,17 +335,22 @@ function obtenerDatosPlanPortada(tarjeta) {
         fechaTexto:
             tarjeta.dataset.fecha,
 
+        fechaIso:
+            tarjeta.dataset.fechaIso,
+
         ubicacion:
             tarjeta.dataset.ubicacion,
 
         precio:
             Number(
-                tarjeta.dataset.precio || 0
+                tarjeta.dataset.precio ||
+                0
             ),
 
         valoracion:
             Number(
-                tarjeta.dataset.valoracion || 0
+                tarjeta.dataset.valoracion ||
+                0
             ),
 
         enlace:
@@ -252,12 +367,16 @@ function estaEnFavoritosPortada(
     const favoritos =
         obtenerFavoritosPortada();
 
-    return favoritos.some((favorito) => {
-        return (
-            favorito.planId === planId &&
-            favorito.usuarioEmail === email
-        );
-    });
+    return favoritos.some(
+        (favorito) => {
+            return (
+                favorito.planId ===
+                    planId &&
+                favorito.usuarioEmail ===
+                    email
+            );
+        }
+    );
 }
 
 
@@ -265,6 +384,10 @@ function actualizarCorazonPortada(
     boton,
     esFavorito
 ) {
+    if (!boton) {
+        return;
+    }
+
     const icono =
         boton.querySelector("i");
 
@@ -274,9 +397,10 @@ function actualizarCorazonPortada(
     );
 
     if (icono) {
-        icono.className = esFavorito
-            ? "fa-solid fa-heart"
-            : "fa-regular fa-heart";
+        icono.className =
+            esFavorito
+                ? "fa-solid fa-heart"
+                : "fa-regular fa-heart";
     }
 
     boton.setAttribute(
@@ -303,14 +427,15 @@ function cargarFavoritosPortada() {
             const planId =
                 tarjeta.dataset.planId;
 
-            const esFavorito = Boolean(
-                sesionActual?.conectado &&
-                planId &&
-                estaEnFavoritosPortada(
-                    planId,
-                    sesionActual.email
-                )
-            );
+            const esFavorito =
+                Boolean(
+                    sesionActual?.conectado &&
+                    planId &&
+                    estaEnFavoritosPortada(
+                        planId,
+                        sesionActual.email
+                    )
+                );
 
             actualizarCorazonPortada(
                 boton,
@@ -321,7 +446,9 @@ function cargarFavoritosPortada() {
 }
 
 
-function alternarFavoritoPortada(boton) {
+function alternarFavoritoPortada(
+    boton
+) {
     if (!sesionActual?.conectado) {
         mostrarNotificacionPrincipal(
             "Debes iniciar sesión para guardar favoritos."
@@ -336,7 +463,9 @@ function alternarFavoritoPortada(boton) {
     }
 
     const tarjeta =
-        boton.closest(".tarjeta-plan");
+        boton.closest(
+            ".tarjeta-plan"
+        );
 
     if (!tarjeta) {
         return;
@@ -408,9 +537,9 @@ function alternarFavoritoPortada(boton) {
         );
     }
 
-    localStorage.setItem(
+    guardarLocalStorage(
         "favoritosSuralia",
-        JSON.stringify(favoritos)
+        favoritos
     );
 
     actualizarCorazonPortada(
@@ -438,47 +567,320 @@ botonesFavoritosPortada.forEach(
 
 
 /* =====================================================
-   FAVORITO DE LA TARJETA PRINCIPAL
+   FAVORITO DEL HERO: SIERRA NORTE
 ===================================================== */
 
-const botonFavoritoPrincipal =
+const botonFavoritoSierraNorte =
     document.querySelector(
-        ".boton-favorito"
+        "#favorito-sierra-norte"
     );
 
-if (botonFavoritoPrincipal) {
-    botonFavoritoPrincipal.addEventListener(
+
+function obtenerDatosSierraNorte() {
+    const tarjeta =
+        botonFavoritoSierraNorte?.closest(
+            ".tarjeta-principal"
+        );
+
+    return {
+        id:
+            Date.now(),
+
+        planId:
+            tarjeta?.dataset.planId ||
+            "sierra-norte",
+
+        titulo:
+            tarjeta?.dataset.titulo ||
+            "Ruta por la Sierra Norte",
+
+        categoria:
+            tarjeta?.dataset.categoria ||
+            "Naturaleza",
+
+        imagen:
+            tarjeta?.dataset.imagen ||
+            "img/sierra-norte-nueva.png",
+
+        fechaTexto:
+            tarjeta?.dataset.fecha ||
+            "Este sábado",
+
+        ubicacion:
+            tarjeta?.dataset.ubicacion ||
+            "Constantina, Sevilla",
+
+        precio:
+            Number(
+                tarjeta?.dataset.precio ||
+                0
+            ),
+
+        valoracion:
+            Number(
+                tarjeta?.dataset.valoracion ||
+                4.9
+            ),
+
+        enlace:
+            tarjeta?.dataset.enlace ||
+            "planes.html?busqueda=Naturaleza"
+    };
+}
+
+
+function actualizarFavoritoSierraNorte() {
+    if (!botonFavoritoSierraNorte) {
+        return;
+    }
+
+    const datosPlan =
+        obtenerDatosSierraNorte();
+
+    const favoritos =
+        obtenerFavoritosPortada();
+
+    const estaGuardado =
+        Boolean(
+            sesionActual?.conectado &&
+            favoritos.some(
+                (favorito) => {
+                    return (
+                        favorito.planId ===
+                            datosPlan.planId &&
+                        favorito.usuarioEmail ===
+                            sesionActual.email
+                    );
+                }
+            )
+        );
+
+    actualizarCorazonPortada(
+        botonFavoritoSierraNorte,
+        estaGuardado
+    );
+}
+
+
+function alternarFavoritoSierraNorte() {
+    if (!sesionActual?.conectado) {
+        mostrarNotificacionPrincipal(
+            "Debes iniciar sesión para guardar favoritos."
+        );
+
+        setTimeout(() => {
+            window.location.href =
+                "login.html";
+        }, 1200);
+
+        return;
+    }
+
+    const datosPlan =
+        obtenerDatosSierraNorte();
+
+    const favoritos =
+        obtenerFavoritosPortada();
+
+    const posicion =
+        favoritos.findIndex(
+            (favorito) => {
+                return (
+                    favorito.planId ===
+                        datosPlan.planId &&
+                    favorito.usuarioEmail ===
+                        sesionActual.email
+                );
+            }
+        );
+
+    let quedaGuardado;
+
+    if (posicion !== -1) {
+        favoritos.splice(
+            posicion,
+            1
+        );
+
+        quedaGuardado = false;
+
+        mostrarNotificacionPrincipal(
+            "La ruta se ha eliminado de favoritos."
+        );
+    } else {
+        favoritos.push({
+            ...datosPlan,
+
+            usuarioEmail:
+                sesionActual.email,
+
+            fechaGuardado:
+                new Date().toISOString()
+        });
+
+        quedaGuardado = true;
+
+        mostrarNotificacionPrincipal(
+            "La ruta se ha guardado en favoritos."
+        );
+    }
+
+    guardarLocalStorage(
+        "favoritosSuralia",
+        favoritos
+    );
+
+    actualizarCorazonPortada(
+        botonFavoritoSierraNorte,
+        quedaGuardado
+    );
+}
+
+
+if (botonFavoritoSierraNorte) {
+    botonFavoritoSierraNorte.addEventListener(
         "click",
         (evento) => {
             evento.preventDefault();
+            evento.stopPropagation();
 
-            const icono =
-                botonFavoritoPrincipal.querySelector(
-                    "i"
-                );
-
-            const estaGuardado =
-                icono?.classList.contains(
-                    "fa-solid"
-                );
-
-            if (icono) {
-                icono.className = estaGuardado
-                    ? "fa-regular fa-heart"
-                    : "fa-solid fa-heart";
-            }
-
-            botonFavoritoPrincipal.classList.toggle(
-                "favorito-activo",
-                !estaGuardado
-            );
+            alternarFavoritoSierraNorte();
         }
     );
 }
 
 
 /* =====================================================
+   CONTADOR DE PERSONAS DE SIERRA NORTE
+===================================================== */
+
+const contadorPersonasSierraNorte =
+    document.querySelector(
+        "#contador-personas-sierra-norte"
+    );
+
+
+function obtenerReservasSierraNorte() {
+    const reservas =
+        leerLocalStorage(
+            "reservasSuralia",
+            []
+        );
+
+    if (!Array.isArray(reservas)) {
+        return [];
+    }
+
+    return reservas.filter(
+        (reserva) => {
+            return (
+                reserva.planId ===
+                    "sierra-norte" &&
+                reserva.estado ===
+                    "confirmada"
+            );
+        }
+    );
+}
+
+
+function obtenerNumeroPersonasSierraNorte() {
+    const personasIniciales = 24;
+
+    const reservas =
+        obtenerReservasSierraNorte();
+
+    const personasReservadas =
+        reservas.reduce(
+            (total, reserva) => {
+                const cantidad = Number(
+                    reserva.personas ||
+                    reserva.entradas ||
+                    1
+                );
+
+                return (
+                    total +
+                    (
+                        Number.isNaN(cantidad)
+                            ? 0
+                            : cantidad
+                    )
+                );
+            },
+            0
+        );
+
+    return (
+        personasIniciales +
+        personasReservadas
+    );
+}
+
+
+function actualizarContadorSierraNorte() {
+    if (!contadorPersonasSierraNorte) {
+        return;
+    }
+
+    const numeroPersonas =
+        obtenerNumeroPersonasSierraNorte();
+
+    contadorPersonasSierraNorte.textContent =
+        `${numeroPersonas} ${
+            numeroPersonas === 1
+                ? "persona"
+                : "personas"
+        }`;
+}
+
+
+/*
+    Si las reservas cambian desde otra pestaña,
+    el contador se actualiza automáticamente.
+*/
+
+window.addEventListener(
+    "storage",
+    (evento) => {
+        if (
+            evento.key ===
+            "reservasSuralia"
+        ) {
+            actualizarContadorSierraNorte();
+        }
+
+        if (
+            evento.key ===
+            "favoritosSuralia"
+        ) {
+            cargarFavoritosPortada();
+            actualizarFavoritoSierraNorte();
+        }
+    }
+);
+
+
+/* =====================================================
    CARGA INICIAL
 ===================================================== */
 
-cargarFavoritosPortada();
+function iniciarPaginaPrincipal() {
+    actualizarCabeceraSesion();
+    cargarFavoritosPortada();
+    actualizarFavoritoSierraNorte();
+    actualizarContadorSierraNorte();
+}
+
+
+if (
+    document.readyState ===
+    "loading"
+) {
+    document.addEventListener(
+        "DOMContentLoaded",
+        iniciarPaginaPrincipal
+    );
+} else {
+    iniciarPaginaPrincipal();
+}

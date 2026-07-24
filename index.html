@@ -16,7 +16,10 @@
 
     <title>Suralia | Planes y experiencias en Sevilla</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
 
     <link
         rel="preconnect"
@@ -34,10 +37,17 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     >
 
-    <link rel="stylesheet" href="css/style.css">
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
 </head>
 
 <body>
+
+    <!-- =================================================
+         HEADER
+    ================================================== -->
 
     <header class="header">
 
@@ -121,14 +131,23 @@
 
     <main>
 
-        <!-- HERO -->
+        <!-- =================================================
+             HERO
+        ================================================== -->
 
         <section class="hero">
 
-            <div class="hero__decoracion hero__decoracion--uno"></div>
-            <div class="hero__decoracion hero__decoracion--dos"></div>
+            <div
+                class="hero__decoracion hero__decoracion--uno"
+            ></div>
+
+            <div
+                class="hero__decoracion hero__decoracion--dos"
+            ></div>
 
             <div class="contenedor hero__contenido">
+
+                <!-- TEXTO DEL HERO -->
 
                 <div class="hero__texto">
 
@@ -146,6 +165,8 @@
                         Encuentra rutas, conciertos, talleres, gastronomía
                         y experiencias diferentes en Sevilla y sus alrededores.
                     </p>
+
+                    <!-- BUSCADOR -->
 
                     <form
                         class="buscador"
@@ -200,94 +221,179 @@
                             class="boton-buscar"
                         >
                             <i class="fa-solid fa-magnifying-glass"></i>
-                            <span>Buscar planes</span>
+
+                            <span>
+                                Buscar planes
+                            </span>
                         </button>
 
                     </form>
 
+                    <!-- DATOS -->
+
                     <div class="hero__datos">
 
                         <div class="dato">
-                            <strong>120+</strong>
-                            <span>Planes disponibles</span>
+
+                            <strong>
+                                120+
+                            </strong>
+
+                            <span>
+                                Planes disponibles
+                            </span>
+
                         </div>
 
                         <div class="dato">
-                            <strong>35</strong>
-                            <span>Nuevos esta semana</span>
+
+                            <strong>
+                                35
+                            </strong>
+
+                            <span>
+                                Nuevos esta semana
+                            </span>
+
                         </div>
 
                         <div class="dato">
-                            <strong>4,8</strong>
-                            <span>Valoración media</span>
+
+                            <strong>
+                                4,8
+                            </strong>
+
+                            <span>
+                                Valoración media
+                            </span>
+
                         </div>
 
                     </div>
 
                 </div>
 
+                <!-- HERO VISUAL -->
+
                 <div class="hero__visual">
 
-                    <div class="tarjeta-principal">
+                    <article
+                        class="tarjeta-principal"
+                        data-plan-id="sierra-norte"
+                        data-titulo="Ruta por la Sierra Norte"
+                        data-categoria="Naturaleza"
+                        data-imagen="img/sierra-norte-nueva.png"
+                        data-fecha="Este sábado"
+                        data-ubicacion="Constantina, Sevilla"
+                        data-precio="0"
+                        data-valoracion="4.9"
+                        data-enlace="detalle-sierra-norte.html"
+                    >
 
-                        <div class="tarjeta-principal__imagen">
+                        <a
+                            href="detalle-sierra-norte.html"
+                            class="tarjeta-principal__enlace"
+                            aria-label="Ver planes de naturaleza en Sierra Norte"
+                        >
 
-                            <div class="tarjeta-principal__gradiente"></div>
+                            <div class="tarjeta-principal__imagen">
 
-                            <span class="tarjeta-principal__categoria">
-                                <i class="fa-solid fa-person-hiking"></i>
-                                Naturaleza
-                            </span>
+                                <div class="tarjeta-principal__gradiente"></div>
 
-                            <button
-                                class="boton-favorito"
-                                type="button"
-                                aria-label="Guardar como favorito"
-                            >
-                                <i class="fa-regular fa-heart"></i>
-                            </button>
+                                <span class="tarjeta-principal__categoria">
 
-                            <div class="tarjeta-principal__info">
+                                    <i class="fa-solid fa-person-hiking"></i>
 
-                                <span>Este sábado</span>
+                                    Naturaleza
 
-                                <h2>
-                                    Ruta por la Sierra Norte
-                                </h2>
+                                </span>
 
-                                <p>
-                                    <i class="fa-solid fa-location-dot"></i>
-                                    Constantina, Sevilla
-                                </p>
+                                <div class="tarjeta-principal__info">
+
+                                    <span>
+                                        Este sábado
+                                    </span>
+
+                                    <h2>
+                                        Ruta por la Sierra Norte
+                                    </h2>
+
+                                    <p>
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        Constantina, Sevilla
+                                    </p>
+
+                                </div>
 
                             </div>
 
-                        </div>
+                        </a>
 
-                    </div>
+                        <button
+                            class="boton-favorito boton-favorito-hero"
+                            id="favorito-sierra-norte"
+                            type="button"
+                            aria-label="Añadir Ruta por la Sierra Norte a favoritos"
+                        >
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
 
-                    <div class="tarjeta-flotante tarjeta-flotante--usuarios">
+                    </article>
+
+                    <!-- PERSONAS APUNTADAS -->
+
+                    <div
+                        class="tarjeta-flotante tarjeta-flotante--usuarios"
+                    >
 
                         <div class="avatares">
-                            <span>LM</span>
-                            <span>JR</span>
-                            <span>AC</span>
+
+                            <span>
+                                LM
+                            </span>
+
+                            <span>
+                                JR
+                            </span>
+
+                            <span>
+                                AC
+                            </span>
+
                         </div>
 
                         <div>
-                            <strong>24 personas</strong>
-                            <span>ya se han apuntado</span>
+
+                            <strong id="contador-personas-sierra-norte">
+                                24 personas
+                            </strong>
+
+                            <span>
+                                ya se han apuntado
+                            </span>
+
                         </div>
 
                     </div>
 
-                    <div class="tarjeta-flotante tarjeta-flotante--valoracion">
+                    <!-- VALORACIÓN -->
+
+                    <div
+                        class="tarjeta-flotante tarjeta-flotante--valoracion"
+                    >
 
                         <i class="fa-solid fa-star"></i>
 
                         <div>
-                            <strong>4,9</strong>
-                            <span>Actividad recomendada</span>
+
+                            <strong>
+                                4,9
+                            </strong>
+
+                            <span>
+                                Actividad recomendada
+                            </span>
+
                         </div>
 
                     </div>
@@ -298,7 +404,9 @@
 
         </section>
 
-        <!-- CATEGORÍAS -->
+        <!-- =================================================
+             CATEGORÍAS
+        ================================================== -->
 
         <section
             class="seccion categorias"
@@ -333,6 +441,8 @@
 
                 <div class="categorias__grid">
 
+                    <!-- MÚSICA -->
+
                     <a
                         href="planes.html?busqueda=Música"
                         class="categoria"
@@ -343,13 +453,24 @@
                         </span>
 
                         <div>
-                            <h3>Música</h3>
-                            <p>Conciertos y festivales</p>
+
+                            <h3>
+                                Música
+                            </h3>
+
+                            <p>
+                                Conciertos y festivales
+                            </p>
+
                         </div>
 
-                        <i class="fa-solid fa-arrow-right categoria__flecha"></i>
+                        <i
+                            class="fa-solid fa-arrow-right categoria__flecha"
+                        ></i>
 
                     </a>
+
+                    <!-- NATURALEZA -->
 
                     <a
                         href="planes.html?busqueda=Naturaleza"
@@ -361,13 +482,24 @@
                         </span>
 
                         <div>
-                            <h3>Naturaleza</h3>
-                            <p>Rutas y escapadas</p>
+
+                            <h3>
+                                Naturaleza
+                            </h3>
+
+                            <p>
+                                Rutas y escapadas
+                            </p>
+
                         </div>
 
-                        <i class="fa-solid fa-arrow-right categoria__flecha"></i>
+                        <i
+                            class="fa-solid fa-arrow-right categoria__flecha"
+                        ></i>
 
                     </a>
+
+                    <!-- GASTRONOMÍA -->
 
                     <a
                         href="planes.html?busqueda=Gastronomía"
@@ -379,13 +511,24 @@
                         </span>
 
                         <div>
-                            <h3>Gastronomía</h3>
-                            <p>Sabores y experiencias</p>
+
+                            <h3>
+                                Gastronomía
+                            </h3>
+
+                            <p>
+                                Sabores y experiencias
+                            </p>
+
                         </div>
 
-                        <i class="fa-solid fa-arrow-right categoria__flecha"></i>
+                        <i
+                            class="fa-solid fa-arrow-right categoria__flecha"
+                        ></i>
 
                     </a>
+
+                    <!-- CULTURA -->
 
                     <a
                         href="planes.html?busqueda=Cultura"
@@ -397,11 +540,20 @@
                         </span>
 
                         <div>
-                            <h3>Cultura</h3>
-                            <p>Arte, teatro y museos</p>
+
+                            <h3>
+                                Cultura
+                            </h3>
+
+                            <p>
+                                Arte, teatro y museos
+                            </p>
+
                         </div>
 
-                        <i class="fa-solid fa-arrow-right categoria__flecha"></i>
+                        <i
+                            class="fa-solid fa-arrow-right categoria__flecha"
+                        ></i>
 
                     </a>
 
@@ -411,7 +563,9 @@
 
         </section>
 
-        <!-- PLANES DESTACADOS -->
+        <!-- =================================================
+             PLANES DESTACADOS
+        ================================================== -->
 
         <section
             class="seccion planes"
@@ -469,7 +623,9 @@
                             class="tarjeta-plan__enlace"
                         >
 
-                            <div class="tarjeta-plan__imagen imagen-plan--italica">
+                            <div
+                                class="tarjeta-plan__imagen imagen-plan--italica"
+                            >
 
                                 <span class="tarjeta-plan__precio">
                                     Gratis
@@ -506,8 +662,11 @@
                                 </h3>
 
                                 <p class="tarjeta-plan__ubicacion">
+
                                     <i class="fa-solid fa-location-dot"></i>
+
                                     Santiponce, Sevilla
+
                                 </p>
 
                                 <div class="tarjeta-plan__pie">
@@ -517,8 +676,11 @@
                                     </span>
 
                                     <strong>
+
                                         4,8
+
                                         <i class="fa-solid fa-star"></i>
+
                                     </strong>
 
                                 </div>
@@ -552,7 +714,9 @@
                             class="tarjeta-plan__enlace"
                         >
 
-                            <div class="tarjeta-plan__imagen imagen-plan--kayak">
+                            <div
+                                class="tarjeta-plan__imagen imagen-plan--kayak"
+                            >
 
                                 <span class="tarjeta-plan__precio">
                                     18 €
@@ -589,8 +753,11 @@
                                 </h3>
 
                                 <p class="tarjeta-plan__ubicacion">
+
                                     <i class="fa-solid fa-location-dot"></i>
+
                                     Río Guadalquivir
+
                                 </p>
 
                                 <div class="tarjeta-plan__pie">
@@ -600,8 +767,11 @@
                                     </span>
 
                                     <strong>
+
                                         4,9
+
                                         <i class="fa-solid fa-star"></i>
+
                                     </strong>
 
                                 </div>
@@ -635,7 +805,9 @@
                             class="tarjeta-plan__enlace"
                         >
 
-                            <div class="tarjeta-plan__imagen imagen-plan--poncho-k">
+                            <div
+                                class="tarjeta-plan__imagen imagen-plan--poncho-k"
+                            >
 
                                 <span class="tarjeta-plan__precio">
                                     25 €
@@ -672,8 +844,11 @@
                                 </h3>
 
                                 <p class="tarjeta-plan__ubicacion">
+
                                     <i class="fa-solid fa-location-dot"></i>
+
                                     Cartuja Center CITE, Sevilla
+
                                 </p>
 
                                 <div class="tarjeta-plan__pie">
@@ -683,8 +858,11 @@
                                     </span>
 
                                     <strong>
+
                                         4,8
+
                                         <i class="fa-solid fa-star"></i>
+
                                     </strong>
 
                                 </div>
@@ -701,7 +879,9 @@
 
         </section>
 
-        <!-- CÓMO FUNCIONA -->
+        <!-- =================================================
+             CÓMO FUNCIONA
+        ================================================== -->
 
         <section
             class="seccion como-funciona"
@@ -739,7 +919,9 @@
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </div>
 
-                        <h3>Busca</h3>
+                        <h3>
+                            Busca
+                        </h3>
 
                         <p>
                             Encuentra actividades según tus gustos, ubicación
@@ -758,7 +940,9 @@
                             <i class="fa-regular fa-heart"></i>
                         </div>
 
-                        <h3>Guarda</h3>
+                        <h3>
+                            Guarda
+                        </h3>
 
                         <p>
                             Añade tus planes favoritos y compáralos cuando
@@ -777,7 +961,9 @@
                             <i class="fa-solid fa-ticket"></i>
                         </div>
 
-                        <h3>Reserva</h3>
+                        <h3>
+                            Reserva
+                        </h3>
 
                         <p>
                             Apúntate a la actividad y consulta todos los
@@ -792,7 +978,9 @@
 
         </section>
 
-        <!-- CTA -->
+        <!-- =================================================
+             CTA
+        ================================================== -->
 
         <section class="cta">
 
@@ -833,7 +1021,9 @@
 
     </main>
 
-    <!-- FOOTER -->
+    <!-- =================================================
+         FOOTER
+    ================================================== -->
 
     <footer class="footer">
 
@@ -869,7 +1059,9 @@
 
             <div class="footer__columna">
 
-                <h3>Descubre</h3>
+                <h3>
+                    Descubre
+                </h3>
 
                 <a href="planes.html">
                     Todos los planes
@@ -891,9 +1083,11 @@
 
             <div class="footer__columna">
 
-                <h3>Información</h3>
+                <h3>
+                    Información
+                </h3>
 
-                <a href="#">
+                <a href="sobre-suralia.html">
                     Sobre Suralia
                 </a>
 
@@ -901,11 +1095,11 @@
                     Cómo funciona
                 </a>
 
-                <a href="#">
+                <a href="preguntas-frecuentes.html">
                     Preguntas frecuentes
                 </a>
 
-                <a href="#">
+                <a href="contacto.html">
                     Contacto
                 </a>
 
@@ -913,7 +1107,9 @@
 
             <div class="footer__columna">
 
-                <h3>Síguenos</h3>
+                <h3>
+                    Síguenos
+                </h3>
 
                 <div class="redes">
 
@@ -951,16 +1147,28 @@
             </p>
 
             <div>
-                <a href="#">Privacidad</a>
-                <a href="#">Cookies</a>
-                <a href="#">Aviso legal</a>
+
+                <a href="#">
+                    Privacidad
+                </a>
+
+                <a href="#">
+                    Cookies
+                </a>
+
+                <a href="#">
+                    Aviso legal
+                </a>
+
             </div>
 
         </div>
 
     </footer>
 
-    <!-- NOTIFICACIÓN -->
+    <!-- =================================================
+         NOTIFICACIÓN
+    ================================================== -->
 
     <div
         class="notificacion"
@@ -968,8 +1176,11 @@
         role="status"
         aria-live="polite"
     >
+
         <i class="fa-solid fa-circle-check"></i>
+
         <span></span>
+
     </div>
 
     <script src="js/main.js"></script>

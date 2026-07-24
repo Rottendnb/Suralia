@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Resuelve tus dudas sobre reservas, cuentas, pagos y publicación de actividades en Suralia."
+    >
+
+    <title>Preguntas frecuentes | Suralia</title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+</head>
+
+<body>
+
+    <!-- =================================================
+         HEADER
+    ================================================== -->
+
+    <header class="header">
+
+        <div class="contenedor header__contenido">
+
+            <a
+                href="index.html"
+                class="logo"
+                aria-label="Página de inicio de Suralia"
+            >
+
+                <span class="logo__icono">
+                    <i class="fa-solid fa-location-dot"></i>
+                </span>
+
+                <span class="logo__texto">
+                    Suralia
+                </span>
+
+            </a>
+
+            <nav
+                class="navegacion"
+                id="navegacion"
+            >
+
+                <a href="planes.html">
+                    Explorar planes
+                </a>
+
+                <a href="index.html#categorias">
+                    Categorías
+                </a>
+
+                <a href="index.html#como-funciona">
+                    Cómo funciona
+                </a>
+
+                <a
+                    href="preguntas-frecuentes.html"
+                    class="enlace-activo"
+                    aria-current="page"
+                >
+                    Preguntas frecuentes
+                </a>
+
+                <a
+                    href="login.html"
+                    class="enlace-publicar"
+                >
+                    <i class="fa-solid fa-plus"></i>
+                    Publicar un plan
+                </a>
+
+                <a
+                    href="login.html"
+                    class="login-movil"
+                >
+                    <i class="fa-regular fa-user"></i>
+                    Iniciar sesión
+                </a>
+
+            </nav>
+
+            <div class="header__acciones">
+
+                <a
+                    href="login.html"
+                    class="boton-login"
+                >
+                    Iniciar sesión
+                </a>
+
+                <button
+                    class="boton-menu"
+                    id="boton-menu"
+                    type="button"
+                    aria-label="Abrir menú"
+                    aria-expanded="false"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <main>
+
+        <!-- =================================================
+             CABECERA
+        ================================================== -->
+
+        <section class="faq-cabecera">
+
+            <div
+                class="faq-cabecera__decoracion faq-cabecera__decoracion--uno"
+            ></div>
+
+            <div
+                class="faq-cabecera__decoracion faq-cabecera__decoracion--dos"
+            ></div>
+
+            <div class="contenedor faq-cabecera__contenido">
+
+                <span class="etiqueta">
+                    <i class="fa-regular fa-circle-question"></i>
+                    Centro de ayuda
+                </span>
+
+                <h1>
+                    ¿En qué podemos ayudarte?
+                </h1>
+
+                <p>
+                    Encuentra respuestas sobre reservas, cuentas,
+                    cancelaciones, pagos y publicación de actividades.
+                </p>
+
+                <form
+                    class="faq-buscador"
+                    id="faq-buscador"
+                >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="search"
+                        id="faq-busqueda"
+                        placeholder="Buscar una pregunta..."
+                        autocomplete="off"
+                    >
+
+                    <button
+                        type="submit"
+                        aria-label="Buscar preguntas"
+                    >
+                        Buscar
+                    </button>
+
+                </form>
+
+            </div>
+
+        </section>
+
+        <!-- =================================================
+             CATEGORÍAS
+        ================================================== -->
+
+        <section class="seccion faq">
+
+            <div class="contenedor">
+
+                <div class="faq-categorias">
+
+                    <button
+                        type="button"
+                        class="faq-categoria activa"
+                        data-categoria="todas"
+                    >
+                        <i class="fa-solid fa-layer-group"></i>
+                        Todas
+                    </button>
+
+                    <button
+                        type="button"
+                        class="faq-categoria"
+                        data-categoria="reservas"
+                    >
+                        <i class="fa-solid fa-ticket"></i>
+                        Reservas
+                    </button>
+
+                    <button
+                        type="button"
+                        class="faq-categoria"
+                        data-categoria="cuenta"
+                    >
+                        <i class="fa-regular fa-user"></i>
+                        Mi cuenta
+                    </button>
+
+                    <button
+                        type="button"
+                        class="faq-categoria"
+                        data-categoria="pagos"
+                    >
+                        <i class="fa-regular fa-credit-card"></i>
+                        Pagos
+                    </button>
+
+                    <button
+                        type="button"
+                        class="faq-categoria"
+                        data-categoria="publicacion"
+                    >
+                        <i class="fa-solid fa-plus"></i>
+                        Publicar planes
+                    </button>
+
+                </div>
+
+                <div class="faq__grid">
+
+                    <!-- COLUMNA IZQUIERDA -->
+
+                    <div class="faq__contenido">
+
+                        <div class="faq__encabezado">
+
+                            <span class="subtitulo">
+                                Preguntas frecuentes
+                            </span>
+
+                            <h2>
+                                Resuelve tus dudas
+                            </h2>
+
+                            <p id="faq-resultados-texto">
+                                Mostrando todas las preguntas.
+                            </p>
+
+                        </div>
+
+                        <div
+                            class="faq-lista"
+                            id="faq-lista"
+                        >
+
+                            <!-- RESERVAS -->
+
+                            <article
+                                class="faq-item"
+                                data-categoria="reservas"
+                                data-pregunta="como puedo reservar una actividad"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="faq-item__pregunta"
+                                    aria-expanded="false"
+                                >
+
+                                    <span>
+                                        ¿Cómo puedo reservar una actividad?
+                                    </span>
+
+                                    <i class="fa-solid fa-plus"></i>
+
+                                </button>
+
+                                <div class="faq-item__respuesta">
+
+                                    <div>
+
+                                        <p>
+                                            Entra en el detalle del plan,
+                                            selecciona la fecha, la hora y el
+                                            número de personas. Después pulsa
+                                            el botón de reserva.
+                                        </p>
+
+                                        <p>
+                                            Para completar la reserva debes
+                                            haber iniciado sesión en Suralia.
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <article
+                                class="faq-item"
+                                data-categoria="reservas"
+                                data-pregunta="donde puedo ver mis reservas"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="faq-item__pregunta"
+                                    aria-expanded="false"
+                                >
+
+                                    <span>
+                                        ¿Dónde puedo consultar mis reservas?
+                                    </span>
+
+                                    <i class="fa-solid fa-plus"></i>
+
+                                </button>
+
+                                <div class="faq-item__respuesta">
+
+                                    <div>
+
+                                        <p>
+                                            Puedes verlas desde tu perfil,
+                                            entrando en la sección
+                                            <strong>Mis reservas</strong>.
+                                        </p>
+
+                                        <a href="perfil.html#reservas">
+                                            Ir a mis reservas
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <article
+                                class="faq-item"
+                                data-categoria="reservas"
+                                data-pregunta="como cancelo una reserva"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="faq-item__pregunta"
+                                    aria-expanded="false"
+                                >
+
+                                    <span>
+                                        ¿Cómo puedo cancelar una reserva?
+                                    </span>
+
+                                    <i class="fa-solid fa-plus"></i>
+
+                                </button>
+
+                                <div class="faq-item__respuesta">
+
+                                    <div>
+
+                                        <p>
+                                            Entra en tu perfil, abre
+                                            <strong>Mis reservas</strong> y
+                                            pulsa en
+                                            <strong>Cancelar reserva</strong>.
+                                        </p>
+
+                                        <p>
+                                            Tendrás que confirmar la
+                                            cancelación antes de que se elimine.
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <!-- CUENTA -->
+
+                            <article
+                                class="faq-item"
+                                data-categoria="cuenta"
+                                data-pregunta="como creo una cuenta"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="faq-item__pregunta"
+                                    aria-expanded="false"
+                                >
+
+                                    <span>
+                                        ¿Cómo puedo crear una cuenta?
+                                    </span>
+
+                                    <i class="fa-solid fa-plus"></i>
+
+                                </button>
+
+                                <div class="faq-item__respuesta">
+
+                                    <div>
+
+                                        <p>
+                                            Pulsa en
+                                            <strong>Iniciar sesión</strong> y
+                                            selecciona la opción de registro.
+                                        </p>
+
+                                        <p>
+                                            Completa tus datos personales y
+                                            crea una contraseña segura.
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <article
+                                class="faq-item"
+                                data-categoria="cuenta"
+                                data-pregunta="puedo cambiar mis datos personales"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="faq-item__pregunta"
+                                    aria-expanded="false"
+                                >
+
+                                    <span>
+                                        ¿Puedo cambiar mis datos personales?
+                                    </span>
+
+                                    <i class="fa-solid fa-plus"></i>
+
+                                </button>
+
+                                <div class="faq-item__respuesta">
+
+                                    <div>
+
+                                        <p>
+                                            Sí. Desde tu perfil puedes cambiar
+                                            tu nombre, apellidos, correo,
+                                            teléfono y fotografía.
+                                        </p>
+
+                                        <a href="perfil.html#datos">
+                                            Editar mis datos
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <article
+                                class="faq-item"
+                                data-categoria="cuenta"
+                                data-pregunta="como cierro sesion"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="faq-item__pregunta"
+                                    aria-expanded="false"
+                                >
+
+                                    <span>
+                                        ¿Cómo puedo cerrar sesión?
+                                    </span>
+
+                                    <i class="fa-solid fa-plus"></i>
+
+                                </button>
+
+                                <div class="faq-item__respuesta">
+
+                                    <div>
+
+                                        <p>
+                                            Entra en tu perfil y pulsa el botón
+                                            <strong>Cerrar sesión</strong> del
+                                            menú lateral.
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <!-- PAGOS -->
+
+                            <article
+                                class="faq-item"
+                                data-categoria="pagos"
+                                data-pregunta="que metodos de pago se aceptan"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="faq-item__pregunta"
+                                    aria-expanded="false"
+                                >
+
+                                    <span>
+                                        ¿Qué métodos de pago se aceptan?
+                                    </span>
+
+                                    <i class="fa-solid fa-plus"></i>
+
+                                </button>
+
+                                <div class="faq-item__respuesta">
+
+                                    <div>
+
+                                        <p>
+                                            Actualmente Suralia es un proyecto
+                                            de demostración y no procesa pagos
+                                            reales.
+                                        </p>
+
+                                        <p>
+                                            Las reservas de pago se simulan
+                                            dentro del navegador.
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <article
+                                class="faq-item"
+                                data-categoria="pagos"
+                                data-pregunta="hay planes gratuitos"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="faq-item__pregunta"
+                                    aria-expanded="false"
+                                >
+
+                                    <span>
+                                        ¿Hay actividades gratuitas?
+                                    </span>
+
+                                    <i class="fa-solid fa-plus"></i>
+
+                                </button>
+
+                                <div class="faq-item__respuesta">
+
+                                    <div>
+
+                                        <p>
+                                            Sí. Puedes encontrar actividades
+                                            gratuitas en el catálogo de planes.
+                                        </p>
+
+                                        <a href="planes.html">
+                                            Ver planes disponibles
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <article
+                                class="faq-item"
+                                data-categoria="pagos"
+                                data-pregunta="recibo un justificante de reserva"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="faq-item__pregunta"
+                                    aria-expanded="false"
+                                >
+
+                                    <span>
+                                        ¿Recibo un justificante de reserva?
+                                    </span>
+
+                                    <i class="fa-solid fa-plus"></i>
+
+                                </button>
+
+                                <div class="faq-item__respuesta">
+
+                                    <div>
+
+                                        <p>
+                                            La reserva queda registrada en tu
+                                            perfil, donde puedes consultar la
+                                            actividad, la fecha, la hora, el
+                                            número de personas y el precio.
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <!-- PUBLICACIÓN -->
+
+                            <article
+                                class="faq-item"
+                                data-categoria="publicacion"
+                                data-pregunta="como publico un plan"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="faq-item__pregunta"
+                                    aria-expanded="false"
+                                >
+
+                                    <span>
+                                        ¿Cómo puedo publicar un plan?
+                                    </span>
+
+                                    <i class="fa-solid fa-plus"></i>
+
+                                </button>
+
+                                <div class="faq-item__respuesta">
+
+                                    <div>
+
+                                        <p>
+                                            Inicia sesión y pulsa
+                                            <strong>Publicar un plan</strong>.
+                                            Después completa los datos de la
+                                            actividad, fecha, ubicación,
+                                            plazas, precio e imagen.
+                                        </p>
+
+                                        <a href="login.html">
+                                            Publicar una actividad
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <article
+                                class="faq-item"
+                                data-categoria="publicacion"
+                                data-pregunta="puedo guardar un borrador"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="faq-item__pregunta"
+                                    aria-expanded="false"
+                                >
+
+                                    <span>
+                                        ¿Puedo guardar un plan como borrador?
+                                    </span>
+
+                                    <i class="fa-solid fa-plus"></i>
+
+                                </button>
+
+                                <div class="faq-item__respuesta">
+
+                                    <div>
+
+                                        <p>
+                                            Sí. Puedes guardar el formulario
+                                            sin terminar y continuar más tarde
+                                            desde la sección
+                                            <strong>Mis publicaciones</strong>
+                                            de tu perfil.
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <article
+                                class="faq-item"
+                                data-categoria="publicacion"
+                                data-pregunta="puedo eliminar una publicacion"
+                            >
+
+                                <button
+                                    type="button"
+                                    class="faq-item__pregunta"
+                                    aria-expanded="false"
+                                >
+
+                                    <span>
+                                        ¿Puedo eliminar una publicación?
+                                    </span>
+
+                                    <i class="fa-solid fa-plus"></i>
+
+                                </button>
+
+                                <div class="faq-item__respuesta">
+
+                                    <div>
+
+                                        <p>
+                                            Sí. Desde tu perfil puedes eliminar
+                                            tanto publicaciones pendientes
+                                            como borradores.
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                        </div>
+
+                        <!-- SIN RESULTADOS -->
+
+                        <div
+                            class="faq-sin-resultados oculto"
+                            id="faq-sin-resultados"
+                        >
+
+                            <span>
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+
+                            <h3>
+                                No hemos encontrado resultados
+                            </h3>
+
+                            <p>
+                                Prueba con otras palabras o selecciona otra
+                                categoría.
+                            </p>
+
+                            <button
+                                type="button"
+                                id="faq-limpiar-busqueda"
+                            >
+                                Limpiar búsqueda
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- COLUMNA DERECHA -->
+
+                    <aside class="faq__lateral">
+
+                        <div class="faq-ayuda">
+
+                            <span class="faq-ayuda__icono">
+                                <i class="fa-regular fa-comments"></i>
+                            </span>
+
+                            <h3>
+                                ¿No encuentras la respuesta?
+                            </h3>
+
+                            <p>
+                                Escríbenos y cuéntanos tu duda. Intentaremos
+                                ayudarte lo antes posible.
+                            </p>
+
+                            <a href="contacto.html">
+                                Contactar con Suralia
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+
+                        </div>
+
+                        <div class="faq-enlaces">
+
+                            <h3>
+                                Enlaces útiles
+                            </h3>
+
+                            <a href="planes.html">
+
+                                <span>
+                                    <i class="fa-solid fa-compass"></i>
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        Explorar planes
+                                    </strong>
+
+                                    <small>
+                                        Descubre nuevas actividades
+                                    </small>
+                                </div>
+
+                                <i class="fa-solid fa-chevron-right"></i>
+
+                            </a>
+
+                            <a href="perfil.html#reservas">
+
+                                <span>
+                                    <i class="fa-solid fa-ticket"></i>
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        Mis reservas
+                                    </strong>
+
+                                    <small>
+                                        Consulta tus actividades
+                                    </small>
+                                </div>
+
+                                <i class="fa-solid fa-chevron-right"></i>
+
+                            </a>
+
+                            <a href="login.html">
+
+                                <span>
+                                    <i class="fa-solid fa-plus"></i>
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        Publicar un plan
+                                    </strong>
+
+                                    <small>
+                                        Comparte una actividad
+                                    </small>
+                                </div>
+
+                                <i class="fa-solid fa-chevron-right"></i>
+
+                            </a>
+
+                        </div>
+
+                    </aside>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =================================================
+             CTA
+        ================================================== -->
+
+        <section class="faq-cta">
+
+            <div class="contenedor">
+
+                <div class="faq-cta__contenido">
+
+                    <div>
+
+                        <span class="subtitulo subtitulo--claro">
+                            Seguimos aquí
+                        </span>
+
+                        <h2>
+                            ¿Todavía tienes alguna duda?
+                        </h2>
+
+                        <p>
+                            Escríbenos y te ayudaremos con tu cuenta,
+                            reserva o publicación.
+                        </p>
+
+                    </div>
+
+                    <a
+                        href="contacto.html"
+                        class="boton-claro"
+                    >
+                        Contactar
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- =================================================
+         FOOTER
+    ================================================== -->
+
+    <footer class="footer">
+
+        <div class="contenedor footer__grid">
+
+            <div class="footer__marca">
+
+                <a
+                    href="index.html"
+                    class="logo logo--footer"
+                >
+
+                    <span class="logo__icono">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </span>
+
+                    <span class="logo__texto">
+                        Suralia
+                    </span>
+
+                </a>
+
+                <p>
+                    Descubre planes, lugares y experiencias diferentes
+                    para disfrutar Sevilla y sus alrededores.
+                </p>
+
+                <span class="footer__eslogan">
+                    Descubre el sur a tu manera.
+                </span>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>
+                    Descubre
+                </h3>
+
+                <a href="planes.html">
+                    Todos los planes
+                </a>
+
+                <a href="planes.html">
+                    Este fin de semana
+                </a>
+
+                <a href="planes.html">
+                    Planes gratuitos
+                </a>
+
+                <a href="planes.html">
+                    Nuevas actividades
+                </a>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>
+                    Información
+                </h3>
+
+                <a href="sobre-suralia.html">
+                    Sobre Suralia
+                </a>
+
+                <a href="index.html#como-funciona">
+                    Cómo funciona
+                </a>
+
+                <a href="preguntas-frecuentes.html">
+                    Preguntas frecuentes
+                </a>
+
+                <a href="contacto.html">
+                    Contacto
+                </a>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>
+                    Síguenos
+                </h3>
+
+                <div class="redes">
+
+                    <a
+                        href="#"
+                        aria-label="Instagram"
+                    >
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+
+                    <a
+                        href="#"
+                        aria-label="TikTok"
+                    >
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+
+                    <a
+                        href="#"
+                        aria-label="Facebook"
+                    >
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="contenedor footer__inferior">
+
+            <p>
+                © 2026 Suralia. Proyecto desarrollado por Fernando.
+            </p>
+
+            <div>
+
+                <a href="#">
+                    Privacidad
+                </a>
+
+                <a href="#">
+                    Cookies
+                </a>
+
+                <a href="#">
+                    Aviso legal
+                </a>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+    <!-- =================================================
+         NOTIFICACIÓN
+    ================================================== -->
+
+    <div
+        class="notificacion"
+        id="notificacion"
+        role="status"
+        aria-live="polite"
+    >
+
+        <i class="fa-solid fa-circle-check"></i>
+
+        <span></span>
+
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/preguntas-frecuentes.js"></script>
+
+</body>
+
+</html>

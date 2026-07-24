@@ -158,10 +158,7 @@ let reservaPendienteCancelar = null;
    FUNCIONES GENERALES
 ===================================================== */
 
-function obtenerIniciales(
-    nombre,
-    apellidos
-) {
+function obtenerIniciales(nombre, apellidos) {
     const inicialNombre =
         nombre?.trim().charAt(0) || "";
 
@@ -216,6 +213,57 @@ function escaparHTML(valor = "") {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+
+/* =====================================================
+   IMÁGENES DE RESPALDO
+===================================================== */
+
+const imagenFallback = `
+    data:image/svg+xml;charset=UTF-8,
+    %3Csvg xmlns='http://www.w3.org/2000/svg'
+    width='800' height='500'
+    viewBox='0 0 800 500'%3E
+    %3Crect width='800' height='500'
+    fill='%23f5f2ef'/%3E
+    %3Cpath d='M335 210h130v95H335z'
+    fill='none' stroke='%2395a09c'
+    stroke-width='12'/%3E
+    %3Ccircle cx='375' cy='245' r='16'
+    fill='%2395a09c'/%3E
+    %3Cpath d='M350 290l35-32 28 25 22-18 30 25'
+    fill='none' stroke='%2395a09c'
+    stroke-width='12'
+    stroke-linejoin='round'/%3E
+    %3C/svg%3E
+`.replace(/\s+/g, "");
+
+
+function activarFallbackImagenes(contenedor = document) {
+    contenedor
+        .querySelectorAll(
+            "img[data-imagen-fallback]"
+        )
+        .forEach((imagen) => {
+            imagen.addEventListener(
+                "error",
+                () => {
+                    if (
+                        imagen.dataset.fallbackAplicado ===
+                        "true"
+                    ) {
+                        return;
+                    }
+
+                    imagen.dataset.fallbackAplicado =
+                        "true";
+
+                    imagen.src =
+                        imagenFallback;
+                }
+            );
+        });
 }
 
 
@@ -331,15 +379,9 @@ function actualizarAvataresUsuario() {
 }
 
 
-function guardarAvatarUsuario(
-    tipo,
-    valor
-) {
-    usuarioGuardado.avatarTipo =
-        tipo;
-
-    usuarioGuardado.avatarValor =
-        valor;
+function guardarAvatarUsuario(tipo, valor) {
+    usuarioGuardado.avatarTipo = tipo;
+    usuarioGuardado.avatarValor = valor;
 
     const guardadoCorrecto =
         guardarLocalStorage(
@@ -383,7 +425,7 @@ function reducirImagenAvatar(archivo) {
                     if (!contexto) {
                         reject(
                             new Error(
-                                "No se ha podido crear el editor de imagen."
+                                "No se ha podido procesar la imagen."
                             )
                         );
 
@@ -392,26 +434,27 @@ function reducirImagenAvatar(archivo) {
 
                     const medidaMaxima = 350;
 
-                    let ancho =
-                        imagen.width;
-
-                    let alto =
-                        imagen.height;
+                    let ancho = imagen.width;
+                    let alto = imagen.height;
 
                     if (ancho > alto) {
                         alto =
                             alto *
-                            (medidaMaxima / ancho);
+                            (
+                                medidaMaxima /
+                                ancho
+                            );
 
-                        ancho =
-                            medidaMaxima;
+                        ancho = medidaMaxima;
                     } else {
                         ancho =
                             ancho *
-                            (medidaMaxima / alto);
+                            (
+                                medidaMaxima /
+                                alto
+                            );
 
-                        alto =
-                            medidaMaxima;
+                        alto = medidaMaxima;
                     }
 
                     canvas.width =
@@ -428,21 +471,18 @@ function reducirImagenAvatar(archivo) {
                         canvas.height
                     );
 
-                    const imagenReducida =
+                    resolve(
                         canvas.toDataURL(
                             "image/jpeg",
                             0.78
-                        );
-
-                    resolve(
-                        imagenReducida
+                        )
                     );
                 };
 
                 imagen.onerror = () => {
                     reject(
                         new Error(
-                            "No se ha podido procesar la imagen."
+                            "No se ha podido abrir la imagen."
                         )
                     );
                 };
@@ -526,13 +566,12 @@ if (inputAvatar) {
                         archivo
                     );
 
-                const guardado =
+                if (
                     guardarAvatarUsuario(
                         "imagen",
                         imagenReducida
-                    );
-
-                if (guardado) {
+                    )
+                ) {
                     mostrarNotificacion(
                         "La foto de perfil se ha actualizado."
                     );
@@ -564,13 +603,12 @@ botonesAvatarPredeterminado.forEach(
                     return;
                 }
 
-                const guardado =
+                if (
                     guardarAvatarUsuario(
                         "emoji",
                         avatar
-                    );
-
-                if (guardado) {
+                    )
+                ) {
                     mostrarNotificacion(
                         "El avatar se ha actualizado."
                     );
@@ -710,10 +748,14 @@ function cargarDatosUsuario() {
 
 
 /* =====================================================
-   CAMBIAR SECCIONES DEL PERFIL
+   NAVEGACIÓN DEL PERFIL
 ===================================================== */
 
 function cambiarSeccion(nombreSeccion) {
+    if (!nombreSeccion) {
+        return;
+    }
+
     botonesMenuPerfil.forEach(
         (boton) => {
             boton.classList.toggle(
@@ -733,18 +775,20 @@ function cambiarSeccion(nombreSeccion) {
             );
         }
     );
+
+    window.location.hash =
+        nombreSeccion;
 }
 
-
-/* =====================================================
-   NAVEGACIÓN DEL PERFIL
-===================================================== */
 
 botonesMenuPerfil.forEach(
     (boton) => {
         boton.addEventListener(
             "click",
-            () => {
+            (evento) => {
+                evento.preventDefault();
+                evento.stopPropagation();
+
                 cambiarSeccion(
                     boton.dataset.seccion
                 );
@@ -758,7 +802,9 @@ enlacesSeccion.forEach(
     (boton) => {
         boton.addEventListener(
             "click",
-            () => {
+            (evento) => {
+                evento.preventDefault();
+
                 cambiarSeccion(
                     boton.dataset.irSeccion
                 );
@@ -766,6 +812,36 @@ enlacesSeccion.forEach(
         );
     }
 );
+
+
+function cargarSeccionDesdeURL() {
+    const seccionURL =
+        window.location.hash
+            .replace("#", "")
+            .trim();
+
+    const seccionesPermitidas = [
+        "resumen",
+        "reservas",
+        "favoritos",
+        "publicados",
+        "datos"
+    ];
+
+    if (
+        seccionesPermitidas.includes(
+            seccionURL
+        )
+    ) {
+        cambiarSeccion(
+            seccionURL
+        );
+
+        return;
+    }
+
+    cambiarSeccion("resumen");
+}
 
 
 if (botonCerrarSesion) {
@@ -989,51 +1065,47 @@ function actualizarEmailGuardado(
         "borradoresSuralia"
     ];
 
-    claves.forEach(
-        (clave) => {
-            const datos =
-                leerLocalStorage(
-                    clave,
-                    []
-                );
-
-            if (!Array.isArray(datos)) {
-                return;
-            }
-
-            const datosActualizados =
-                datos.map(
-                    (elemento) => {
-                        const elementoActualizado = {
-                            ...elemento
-                        };
-
-                        if (
-                            elemento.usuarioEmail ===
-                            emailAnterior
-                        ) {
-                            elementoActualizado.usuarioEmail =
-                                emailNuevo;
-                        }
-
-                        if (
-                            elemento.creadoPor ===
-                            emailAnterior
-                        ) {
-                            elementoActualizado.creadoPor =
-                                emailNuevo;
-                        }
-
-                        return elementoActualizado;
-                    }
-                );
-
-            guardarLocalStorage(
+    claves.forEach((clave) => {
+        const datos =
+            leerLocalStorage(
                 clave,
-                datosActualizados
+                []
             );
+
+        if (!Array.isArray(datos)) {
+            return;
         }
-    );
+
+        const datosActualizados =
+            datos.map((elemento) => {
+                const actualizado = {
+                    ...elemento
+                };
+
+                if (
+                    elemento.usuarioEmail ===
+                    emailAnterior
+                ) {
+                    actualizado.usuarioEmail =
+                        emailNuevo;
+                }
+
+                if (
+                    elemento.creadoPor ===
+                    emailAnterior
+                ) {
+                    actualizado.creadoPor =
+                        emailNuevo;
+                }
+
+                return actualizado;
+            });
+
+        guardarLocalStorage(
+            clave,
+            datosActualizados
+        );
+    });
 }
 
 
@@ -1075,9 +1147,7 @@ function obtenerReservasGuardadas() {
 }
 
 
-function obtenerFechaOrdenReserva(
-    reserva
-) {
+function obtenerFechaOrdenReserva(reserva) {
     const fechaIso =
         reserva.fechaIso ||
         reserva.fecha;
@@ -1112,6 +1182,12 @@ function obtenerFechaOrdenReserva(
         "8-agosto-2026":
             "2026-08-08",
 
+        "15-agosto-2026":
+            "2026-08-15",
+
+        "22-agosto-2026":
+            "2026-08-22",
+
         "21-noviembre-2026":
             "2026-11-21"
     };
@@ -1144,33 +1220,33 @@ function obtenerFechaOrdenReserva(
 
 function obtenerReservasUsuario() {
     return obtenerReservasGuardadas()
-        .filter(
-            (reserva) => {
-                return (
-                    reserva.usuarioEmail ===
-                        usuarioGuardado.email &&
-                    reserva.estado ===
-                        "confirmada"
-                );
-            }
-        )
-        .sort(
-            (reservaA, reservaB) => {
-                return (
-                    obtenerFechaOrdenReserva(
-                        reservaA
-                    ) -
-                    obtenerFechaOrdenReserva(
-                        reservaB
-                    )
-                );
-            }
-        );
+        .filter((reserva) => {
+            return (
+                reserva.usuarioEmail ===
+                    usuarioGuardado.email &&
+                reserva.estado ===
+                    "confirmada"
+            );
+        })
+        .sort((reservaA, reservaB) => {
+            return (
+                obtenerFechaOrdenReserva(
+                    reservaA
+                ) -
+                obtenerFechaOrdenReserva(
+                    reservaB
+                )
+            );
+        });
 }
 
 
 function obtenerEnlaceReserva(reserva) {
-    if (reserva.enlace) {
+    if (
+        reserva.enlace &&
+        reserva.enlace !==
+            "detalle-plan.html"
+    ) {
         return reserva.enlace;
     }
 
@@ -1182,23 +1258,23 @@ function obtenerEnlaceReserva(reserva) {
             "detalle-kayak.html",
 
         "poncho-k-cartuja":
-            "detalle-poncho-k.html"
+            "detalle-poncho-k.html",
+
+        "sierra-norte":
+            "detalle-sierra-norte.html"
     };
 
     return (
         enlacesPorPlan[
             reserva.planId
         ] ||
+        reserva.enlace ||
         "planes.html"
     );
 }
 
 
 function obtenerImagenReserva(reserva) {
-    if (reserva.imagen) {
-        return reserva.imagen;
-    }
-
     const imagenesPorPlan = {
         italica:
             "img/italica principal.jpg",
@@ -1207,15 +1283,29 @@ function obtenerImagenReserva(reserva) {
             "img/kayak principal.jpg",
 
         "poncho-k-cartuja":
-            "img/poncho-k.jpg"
+            "img/poncho-k.jpg",
+
+        "sierra-norte":
+            "img/sierra-norte-principal.jpg"
     };
 
-    return (
+    const imagenAsignada =
         imagenesPorPlan[
             reserva.planId
-        ] ||
-        ""
-    );
+        ];
+
+    if (imagenAsignada) {
+        return imagenAsignada;
+    }
+
+    if (
+        reserva.imagen &&
+        reserva.imagen.trim()
+    ) {
+        return reserva.imagen;
+    }
+
+    return imagenFallback;
 }
 
 
@@ -1284,9 +1374,7 @@ function obtenerPrecioReserva(reserva) {
 }
 
 
-function obtenerFechaTextoReserva(
-    reserva
-) {
+function obtenerFechaTextoReserva(reserva) {
     return (
         reserva.fechaTexto ||
         reserva.fecha ||
@@ -1303,9 +1391,7 @@ function obtenerHoraReserva(reserva) {
 }
 
 
-function crearProximaReservaHTML(
-    reserva
-) {
+function crearProximaReservaHTML(reserva) {
     const enlace =
         obtenerEnlaceReserva(
             reserva
@@ -1321,20 +1407,14 @@ function crearProximaReservaHTML(
 
             <div class="reserva-resumen__imagen">
 
-                ${
-                    imagen
-                        ? `
-                            <img
-                                src="${escaparHTML(imagen)}"
-                                alt="${escaparHTML(reserva.titulo)}"
-                            >
-                        `
-                        : `
-                            <div class="publicacion-item__sin-imagen">
-                                <i class="fa-regular fa-image"></i>
-                            </div>
-                        `
-                }
+                <img
+                    src="${escaparHTML(imagen)}"
+                    alt="${escaparHTML(
+                        reserva.titulo ||
+                        "Actividad reservada"
+                    )}"
+                    data-imagen-fallback
+                >
 
             </div>
 
@@ -1346,7 +1426,10 @@ function crearProximaReservaHTML(
                 </span>
 
                 <h3>
-                    ${escaparHTML(reserva.titulo)}
+                    ${escaparHTML(
+                        reserva.titulo ||
+                        "Actividad reservada"
+                    )}
                 </h3>
 
                 <p>
@@ -1433,25 +1516,21 @@ function crearReservaHTML(reserva) {
     return `
         <article
             class="reserva-item"
-            data-reserva-id="${Number(reserva.id)}"
+            data-reserva-id="${Number(
+                reserva.id
+            )}"
         >
 
             <div class="reserva-item__imagen">
 
-                ${
-                    imagen
-                        ? `
-                            <img
-                                src="${escaparHTML(imagen)}"
-                                alt="${escaparHTML(reserva.titulo)}"
-                            >
-                        `
-                        : `
-                            <div class="publicacion-item__sin-imagen">
-                                <i class="fa-regular fa-image"></i>
-                            </div>
-                        `
-                }
+                <img
+                    src="${escaparHTML(imagen)}"
+                    alt="${escaparHTML(
+                        reserva.titulo ||
+                        "Actividad reservada"
+                    )}"
+                    data-imagen-fallback
+                >
 
             </div>
 
@@ -1467,7 +1546,10 @@ function crearReservaHTML(reserva) {
                         </span>
 
                         <h3>
-                            ${escaparHTML(reserva.titulo)}
+                            ${escaparHTML(
+                                reserva.titulo ||
+                                "Actividad reservada"
+                            )}
                         </h3>
 
                         <span class="reserva-item__categoria">
@@ -1547,7 +1629,9 @@ function crearReservaHTML(reserva) {
                     <button
                         type="button"
                         class="boton-cancelar-reserva"
-                        data-reserva-id="${Number(reserva.id)}"
+                        data-reserva-id="${Number(
+                            reserva.id
+                        )}"
                     >
                         <i class="fa-regular fa-calendar-xmark"></i>
                         Cancelar reserva
@@ -1579,8 +1663,7 @@ function mostrarReservasPerfil() {
     }
 
     if (reservas.length === 0) {
-        listaReservasPerfil.innerHTML =
-            "";
+        listaReservasPerfil.innerHTML = "";
 
         listaReservasPerfil.classList.add(
             "oculto"
@@ -1645,18 +1728,24 @@ function mostrarReservasPerfil() {
             .map(crearReservaHTML)
             .join("");
 
+    activarFallbackImagenes(
+        proximaReservaPerfil
+    );
+
+    activarFallbackImagenes(
+        listaReservasPerfil
+    );
+
     activarBotonesCancelarReserva();
 }
 
 
 function activarBotonesCancelarReserva() {
-    const botonesCancelar =
-        document.querySelectorAll(
+    document
+        .querySelectorAll(
             ".boton-cancelar-reserva"
-        );
-
-    botonesCancelar.forEach(
-        (boton) => {
+        )
+        .forEach((boton) => {
             boton.addEventListener(
                 "click",
                 () => {
@@ -1672,8 +1761,7 @@ function activarBotonesCancelarReserva() {
                     }
                 }
             );
-        }
-    );
+        });
 }
 
 
@@ -1689,24 +1777,21 @@ function cancelarReservaGuardada() {
         obtenerReservasGuardadas();
 
     const reservasActualizadas =
-        reservas.filter(
-            (reserva) => {
-                return (
-                    Number(reserva.id) !==
-                    Number(
-                        reservaPendienteCancelar
-                    )
-                );
-            }
-        );
+        reservas.filter((reserva) => {
+            return (
+                Number(reserva.id) !==
+                Number(
+                    reservaPendienteCancelar
+                )
+            );
+        });
 
     guardarLocalStorage(
         "reservasSuralia",
         reservasActualizadas
     );
 
-    reservaPendienteCancelar =
-        null;
+    reservaPendienteCancelar = null;
 
     if (modalCancelacion) {
         modalCancelacion.classList.remove(
@@ -1723,8 +1808,7 @@ function cancelarReservaGuardada() {
 
 
 function cerrarModalCancelacion() {
-    reservaPendienteCancelar =
-        null;
+    reservaPendienteCancelar = null;
 
     if (modalCancelacion) {
         modalCancelacion.classList.remove(
@@ -1766,7 +1850,7 @@ if (modalCancelacion) {
 
 
 /* =====================================================
-   FAVORITOS DINÁMICOS
+   FAVORITOS
 ===================================================== */
 
 const listaFavoritosPerfil =
@@ -1797,26 +1881,24 @@ function obtenerFavoritosUsuario() {
     }
 
     return favoritos
-        .filter(
-            (favorito) => {
-                return (
-                    favorito.usuarioEmail ===
-                    usuarioGuardado.email
-                );
-            }
-        )
-        .sort(
-            (favoritoA, favoritoB) => {
-                return (
-                    new Date(
-                        favoritoB.fechaGuardado
-                    ) -
-                    new Date(
-                        favoritoA.fechaGuardado
-                    )
-                );
-            }
-        );
+        .filter((favorito) => {
+            return (
+                favorito.usuarioEmail ===
+                usuarioGuardado.email
+            );
+        })
+        .sort((favoritoA, favoritoB) => {
+            return (
+                new Date(
+                    favoritoB.fechaGuardado ||
+                    0
+                ) -
+                new Date(
+                    favoritoA.fechaGuardado ||
+                    0
+                )
+            );
+        });
 }
 
 
@@ -1835,7 +1917,71 @@ function obtenerPrecioFavorito(precio) {
 }
 
 
+function obtenerImagenFavorito(favorito) {
+    const imagenesActualizadas = {
+        "sierra-norte":
+            "img/sierra-norte-principal.jpg",
+
+        "kayak-atardecer":
+            "img/kayak principal.jpg",
+
+        "exposicion-contemporanea":
+            "img/andaluz1.jpg",
+
+        "italica":
+            "img/italica principal.jpg",
+
+        "poncho-k-cartuja":
+            "img/poncho-k.jpg",
+
+        "tapas-triana":
+            "img/triana1.jpg",
+
+        "cerro-hierro":
+            "img/cerro1.jpg"
+    };
+
+    return (
+        imagenesActualizadas[favorito.planId] ||
+        favorito.imagen ||
+        imagenFallback
+    );
+}
+
+function obtenerEnlaceFavorito(favorito) {
+    const enlaces = {
+        italica:
+            "detalle-plan.html",
+
+        "kayak-atardecer":
+            "detalle-kayak.html",
+
+        "poncho-k-cartuja":
+            "detalle-poncho-k.html",
+
+        "sierra-norte":
+            "detalle-sierra-norte.html"
+    };
+
+    return (
+        enlaces[favorito.planId] ||
+        favorito.enlace ||
+        "planes.html"
+    );
+}
+
+
 function crearFavoritoHTML(favorito) {
+    const imagen =
+        obtenerImagenFavorito(
+            favorito
+        );
+
+    const enlace =
+        obtenerEnlaceFavorito(
+            favorito
+        );
+
     return `
         <article
             class="tarjeta-plan"
@@ -1847,12 +1993,12 @@ function crearFavoritoHTML(favorito) {
             <div class="tarjeta-plan__imagen">
 
                 <img
-                    src="${escaparHTML(
-                        favorito.imagen
-                    )}"
+                    src="${escaparHTML(imagen)}"
                     alt="${escaparHTML(
-                        favorito.titulo
+                        favorito.titulo ||
+                        "Plan favorito"
                     )}"
+                    data-imagen-fallback
                 >
 
                 <span class="tarjeta-plan__precio">
@@ -1895,7 +2041,8 @@ function crearFavoritoHTML(favorito) {
 
                 <h3>
                     ${escaparHTML(
-                        favorito.titulo
+                        favorito.titulo ||
+                        "Plan favorito"
                     )}
                 </h3>
 
@@ -1933,10 +2080,7 @@ function crearFavoritoHTML(favorito) {
                 </div>
 
                 <a
-                    href="${escaparHTML(
-                        favorito.enlace ||
-                        "detalle-plan.html"
-                    )}"
+                    href="${escaparHTML(enlace)}"
                     class="boton-principal-pequeno"
                 >
                     Ver actividad
@@ -1966,8 +2110,7 @@ function mostrarFavoritosPerfil() {
     }
 
     if (favoritos.length === 0) {
-        listaFavoritosPerfil.innerHTML =
-            "";
+        listaFavoritosPerfil.innerHTML = "";
 
         listaFavoritosPerfil.classList.add(
             "oculto"
@@ -1993,6 +2136,10 @@ function mostrarFavoritosPerfil() {
             .map(crearFavoritoHTML)
             .join("");
 
+    activarFallbackImagenes(
+        listaFavoritosPerfil
+    );
+
     activarBotonesEliminarFavorito();
 }
 
@@ -2002,27 +2149,23 @@ function activarBotonesEliminarFavorito() {
         .querySelectorAll(
             ".boton-eliminar-favorito"
         )
-        .forEach(
-            (boton) => {
-                boton.addEventListener(
-                    "click",
-                    () => {
-                        const planId =
-                            boton.dataset.planId;
+        .forEach((boton) => {
+            boton.addEventListener(
+                "click",
+                (evento) => {
+                    evento.preventDefault();
+                    evento.stopPropagation();
 
-                        eliminarFavoritoGuardado(
-                            planId
-                        );
-                    }
-                );
-            }
-        );
+                    eliminarFavoritoGuardado(
+                        boton.dataset.planId
+                    );
+                }
+            );
+        });
 }
 
 
-function eliminarFavoritoGuardado(
-    planId
-) {
+function eliminarFavoritoGuardado(planId) {
     const favoritos =
         leerLocalStorage(
             "favoritosSuralia",
@@ -2034,22 +2177,20 @@ function eliminarFavoritoGuardado(
     }
 
     const favoritosActualizados =
-        favoritos.filter(
-            (favorito) => {
-                const perteneceAlUsuario =
-                    favorito.usuarioEmail ===
-                    usuarioGuardado.email;
+        favoritos.filter((favorito) => {
+            const perteneceAlUsuario =
+                favorito.usuarioEmail ===
+                usuarioGuardado.email;
 
-                const esMismoPlan =
-                    favorito.planId ===
-                    planId;
+            const esMismoPlan =
+                favorito.planId ===
+                planId;
 
-                return !(
-                    perteneceAlUsuario &&
-                    esMismoPlan
-                );
-            }
-        );
+            return !(
+                perteneceAlUsuario &&
+                esMismoPlan
+            );
+        });
 
     guardarLocalStorage(
         "favoritosSuralia",
@@ -2113,11 +2254,8 @@ const confirmarEliminarPlan =
         "#confirmar-eliminar-plan"
     );
 
-let planPendienteEliminar =
-    null;
-
-let filtroPublicacionActual =
-    "todos";
+let planPendienteEliminar = null;
+let filtroPublicacionActual = "todos";
 
 
 function obtenerPlanesUsuario() {
@@ -2146,63 +2284,53 @@ function obtenerPlanesUsuario() {
     const emailUsuario =
         usuarioGuardado.email;
 
-    const planesPublicadosUsuario =
+    const publicadosUsuario =
         listaPublicados
-            .filter(
-                (plan) => {
-                    return (
-                        plan.creadoPor ===
-                        emailUsuario
-                    );
-                }
-            )
-            .map(
-                (plan) => {
-                    return {
-                        ...plan,
-                        almacenamiento:
-                            "planesPublicadosSuralia"
-                    };
-                }
-            );
+            .filter((plan) => {
+                return (
+                    plan.creadoPor ===
+                    emailUsuario
+                );
+            })
+            .map((plan) => {
+                return {
+                    ...plan,
+                    almacenamiento:
+                        "planesPublicadosSuralia"
+                };
+            });
 
     const borradoresUsuario =
         listaBorradores
-            .filter(
-                (plan) => {
-                    return (
-                        plan.creadoPor ===
-                        emailUsuario
-                    );
-                }
-            )
-            .map(
-                (plan) => {
-                    return {
-                        ...plan,
-                        almacenamiento:
-                            "borradoresSuralia"
-                    };
-                }
-            );
+            .filter((plan) => {
+                return (
+                    plan.creadoPor ===
+                    emailUsuario
+                );
+            })
+            .map((plan) => {
+                return {
+                    ...plan,
+                    almacenamiento:
+                        "borradoresSuralia"
+                };
+            });
 
     return [
-        ...planesPublicadosUsuario,
+        ...publicadosUsuario,
         ...borradoresUsuario
-    ].sort(
-        (planA, planB) => {
-            return (
-                new Date(
-                    planB.fechaCreacion ||
-                    0
-                ) -
-                new Date(
-                    planA.fechaCreacion ||
-                    0
-                )
-            );
-        }
-    );
+    ].sort((planA, planB) => {
+        return (
+            new Date(
+                planB.fechaCreacion ||
+                0
+            ) -
+            new Date(
+                planA.fechaCreacion ||
+                0
+            )
+        );
+    });
 }
 
 
@@ -2227,14 +2355,9 @@ function formatearFechaPlan(fecha) {
     return new Intl.DateTimeFormat(
         "es-ES",
         {
-            day:
-                "numeric",
-
-            month:
-                "long",
-
-            year:
-                "numeric"
+            day: "numeric",
+            month: "long",
+            year: "numeric"
         }
     ).format(fechaPlan);
 }
@@ -2265,28 +2388,32 @@ function crearPublicacionHTML(plan) {
         Number(plan.precio) === 0
             ? "Gratis"
             : `${Number(
-                plan.precio || 0
+                plan.precio ||
+                0
             )
                 .toFixed(2)
                 .replace(".00", "")
                 .replace(".", ",")} €`;
 
-    const imagenPlan = plan.imagen
-        ? `
-            <img
-                src="${escaparHTML(
-                    plan.imagen
-                )}"
-                alt="${escaparHTML(
-                    plan.titulo
-                )}"
-            >
-        `
-        : `
-            <div class="publicacion-item__sin-imagen">
-                <i class="fa-regular fa-image"></i>
-            </div>
-        `;
+    const imagenPlan =
+        plan.imagen
+            ? `
+                <img
+                    src="${escaparHTML(
+                        plan.imagen
+                    )}"
+                    alt="${escaparHTML(
+                        plan.titulo ||
+                        "Plan publicado"
+                    )}"
+                    data-imagen-fallback
+                >
+            `
+            : `
+                <div class="publicacion-item__sin-imagen">
+                    <i class="fa-regular fa-image"></i>
+                </div>
+            `;
 
     const botonPrincipal =
         plan.estado === "borrador"
@@ -2328,7 +2455,8 @@ function crearPublicacionHTML(plan) {
                 plan.id
             )}"
             data-plan-estado="${escaparHTML(
-                plan.estado
+                plan.estado ||
+                ""
             )}"
         >
 
@@ -2346,7 +2474,8 @@ function crearPublicacionHTML(plan) {
                             class="
                                 estado-publicacion
                                 estado-publicacion--${escaparHTML(
-                                    plan.estado
+                                    plan.estado ||
+                                    ""
                                 )}
                             "
                         >
@@ -2376,7 +2505,7 @@ function crearPublicacionHTML(plan) {
 
                     ${escaparHTML(
                         plan.descripcion ||
-                        "Este borrador todavía no tiene descripción."
+                        "Este plan todavía no tiene descripción."
                     )}
 
                 </p>
@@ -2465,9 +2594,7 @@ function crearPublicacionHTML(plan) {
 }
 
 
-function actualizarContadoresPublicaciones(
-    planes
-) {
+function actualizarContadoresPublicaciones(planes) {
     if (contadorPublicaciones) {
         contadorPublicaciones.textContent =
             planes.length;
@@ -2475,26 +2602,22 @@ function actualizarContadoresPublicaciones(
 
     if (contadorPendientes) {
         contadorPendientes.textContent =
-            planes.filter(
-                (plan) => {
-                    return (
-                        plan.estado ===
-                        "pendiente"
-                    );
-                }
-            ).length;
+            planes.filter((plan) => {
+                return (
+                    plan.estado ===
+                    "pendiente"
+                );
+            }).length;
     }
 
     if (contadorBorradores) {
         contadorBorradores.textContent =
-            planes.filter(
-                (plan) => {
-                    return (
-                        plan.estado ===
-                        "borrador"
-                    );
-                }
-            ).length;
+            planes.filter((plan) => {
+                return (
+                    plan.estado ===
+                    "borrador"
+                );
+            }).length;
     }
 }
 
@@ -2515,21 +2638,19 @@ function mostrarPublicaciones() {
     );
 
     const planesFiltrados =
-        todosLosPlanes.filter(
-            (plan) => {
-                if (
-                    filtroPublicacionActual ===
-                    "todos"
-                ) {
-                    return true;
-                }
-
-                return (
-                    plan.estado ===
-                    filtroPublicacionActual
-                );
+        todosLosPlanes.filter((plan) => {
+            if (
+                filtroPublicacionActual ===
+                "todos"
+            ) {
+                return true;
             }
-        );
+
+            return (
+                plan.estado ===
+                filtroPublicacionActual
+            );
+        });
 
     listaPublicaciones.innerHTML =
         planesFiltrados
@@ -2575,18 +2696,20 @@ function mostrarPublicaciones() {
         `;
     }
 
+    activarFallbackImagenes(
+        listaPublicaciones
+    );
+
     activarEventosPublicaciones();
 }
 
 
 function activarEventosPublicaciones() {
-    const botonesEliminar =
-        document.querySelectorAll(
+    document
+        .querySelectorAll(
             ".boton-eliminar-plan"
-        );
-
-    botonesEliminar.forEach(
-        (boton) => {
+        )
+        .forEach((boton) => {
             boton.addEventListener(
                 "click",
                 () => {
@@ -2607,43 +2730,34 @@ function activarEventosPublicaciones() {
                     }
                 }
             );
-        }
-    );
+        });
 
-    const botonesEditar =
-        document.querySelectorAll(
+    document
+        .querySelectorAll(
             ".boton-editar-plan"
-        );
-
-    botonesEditar.forEach(
-        (boton) => {
+        )
+        .forEach((boton) => {
             boton.addEventListener(
                 "click",
                 () => {
-                    const idPlan =
-                        Number(
-                            boton.dataset.planId
-                        );
-
                     localStorage.setItem(
                         "borradorEditarSuralia",
-                        String(idPlan)
+                        String(
+                            boton.dataset.planId
+                        )
                     );
 
                     window.location.href =
                         "publicar-plan.html";
                 }
             );
-        }
-    );
+        });
 
-    const botonesVer =
-        document.querySelectorAll(
+    document
+        .querySelectorAll(
             ".boton-ver-plan"
-        );
-
-    botonesVer.forEach(
-        (boton) => {
+        )
+        .forEach((boton) => {
             boton.addEventListener(
                 "click",
                 () => {
@@ -2652,8 +2766,7 @@ function activarEventosPublicaciones() {
                     );
                 }
             );
-        }
-    );
+        });
 }
 
 
@@ -2676,14 +2789,12 @@ function eliminarPlanGuardado() {
     }
 
     const planesActualizados =
-        planes.filter(
-            (plan) => {
-                return (
-                    Number(plan.id) !==
-                    planPendienteEliminar.id
-                );
-            }
-        );
+        planes.filter((plan) => {
+            return (
+                Number(plan.id) !==
+                planPendienteEliminar.id
+            );
+        });
 
     guardarLocalStorage(
         clave,
@@ -2696,8 +2807,7 @@ function eliminarPlanGuardado() {
         );
     }
 
-    planPendienteEliminar =
-        null;
+    planPendienteEliminar = null;
 
     mostrarPublicaciones();
 
@@ -2706,10 +2816,6 @@ function eliminarPlanGuardado() {
     );
 }
 
-
-/* =====================================================
-   EVENTOS DE LOS FILTROS DE PUBLICACIONES
-===================================================== */
 
 filtrosPublicaciones.forEach(
     (boton) => {
@@ -2723,8 +2829,7 @@ filtrosPublicaciones.forEach(
                     (filtro) => {
                         filtro.classList.toggle(
                             "activo",
-                            filtro ===
-                                boton
+                            filtro === boton
                         );
                     }
                 );
@@ -2746,8 +2851,7 @@ if (cancelarEliminarPlan) {
                 );
             }
 
-            planPendienteEliminar =
-                null;
+            planPendienteEliminar = null;
         }
     );
 }
@@ -2773,8 +2877,7 @@ if (modalEliminarPlan) {
                     "visible"
                 );
 
-                planPendienteEliminar =
-                    null;
+                planPendienteEliminar = null;
             }
         }
     );
@@ -2809,8 +2912,7 @@ document.addEventListener(
                 "visible"
             );
 
-            planPendienteEliminar =
-                null;
+            planPendienteEliminar = null;
         }
     }
 );
@@ -2825,6 +2927,8 @@ function iniciarPerfil() {
     mostrarReservasPerfil();
     mostrarFavoritosPerfil();
     mostrarPublicaciones();
+    cargarSeccionDesdeURL();
+    activarFallbackImagenes();
 }
 
 
