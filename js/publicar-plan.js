@@ -160,7 +160,7 @@ function procesarImagen(archivo) {
         "image/webp"
     ];
 
-    const tamanoMaximo = 4 * 1024 * 1024;
+    const tamanoMaximo = 2 * 1024 * 1024;
 
     document.querySelector("#error-plan-imagen").textContent = "";
 
@@ -173,7 +173,7 @@ function procesarImagen(archivo) {
 
     if (archivo.size > tamanoMaximo) {
         document.querySelector("#error-plan-imagen").textContent =
-            "La imagen no puede superar los 4 MB.";
+            "La imagen no puede superar los 2 MB.";
 
         return;
     }
@@ -337,11 +337,24 @@ guardarBorrador.addEventListener("click", () => {
 
     datos.estado = "borrador";
 
-    guardarPlan(datos, "borradoresSuralia");
+guardarPlan(
+    datos,
+    "borradoresSuralia"
+);
 
-    mostrarNotificacion(
-        "El borrador se ha guardado correctamente."
-    );
+localStorage.setItem(
+    "borradorActualSuralia",
+    String(datos.id)
+);
+
+localStorage.setItem(
+    "borradorEditarSuralia",
+    String(datos.id)
+);
+
+mostrarNotificacion(
+    "El borrador se ha guardado correctamente."
+);
 });
 
 formularioPublicar.addEventListener("submit", (evento) => {
@@ -522,8 +535,9 @@ if (idBorradorActual) {
     );
 
     setTimeout(() => {
-        window.location.href = "perfil.html";
-    }, 1500);
+    window.location.href =
+        "perfil.html#publicaciones";
+}, 1500);
 });
 
 confirmarPlan.addEventListener("change", () => {

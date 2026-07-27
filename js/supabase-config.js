@@ -1,8 +1,8 @@
 const SUPABASE_URL =
-    "AQUI_IRA_LA_URL";
+    "https://brvujbqdvwvbllgfuklo.supabase.co";
 
 const SUPABASE_PUBLIC_KEY =
-    "AQUI_IRA_LA_CLAVE_PUBLICA";
+    "sb_publishable_ohrA6m0SeDlAluDvWB5obQ_o67pWmMn";
 
 const clienteSupabase =
     supabase.createClient(

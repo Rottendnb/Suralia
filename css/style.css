@@ -7541,3 +7541,335 @@ img {
         grid-row: 3;
     }
 }
+
+/* =====================================================
+   USUARIO CONECTADO EN EL HEADER
+===================================================== */
+
+.usuario-cabecera {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 12px 6px 7px;
+}
+
+.usuario-cabecera__avatar {
+    display: grid;
+    place-items: center;
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #eaf4ef;
+    color: #2f7d5b;
+    font-size: 0.74rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.usuario-cabecera__avatar--imagen {
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.usuario-cabecera__nombre {
+    display: block;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.usuario-cabecera__flecha {
+    color: #77827d;
+    font-size: 0.7rem;
+}
+
+
+/* =====================================================
+   USUARIO CONECTADO EN EL MENÚ MÓVIL
+===================================================== */
+
+.login-movil .usuario-cabecera__avatar {
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
+    background-color: rgba(47, 125, 91, 0.12);
+}
+
+/* =====================================================
+   USUARIO CONECTADO EN EL HEADER
+===================================================== */
+
+.usuario-cabecera {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 12px 6px 7px;
+}
+
+.usuario-cabecera__avatar {
+    display: grid;
+    place-items: center;
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #eaf4ef;
+    color: #2f7d5b;
+    font-size: 0.74rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.usuario-cabecera__avatar--imagen {
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.usuario-cabecera__nombre {
+    display: block;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.usuario-cabecera__flecha {
+    color: #77827d;
+    font-size: 0.7rem;
+}
+
+.login-movil .usuario-cabecera__avatar {
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
+    background-color: rgba(47, 125, 91, 0.12);
+}
+
+
+/* =====================================================
+   HEADER EN MÓVIL
+===================================================== */
+
+@media (max-width: 850px) {
+    .header__acciones {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .boton-login.usuario-cabecera {
+        display: inline-flex;
+        padding: 0;
+        min-width: auto;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .boton-login.usuario-cabecera .usuario-cabecera__nombre,
+    .boton-login.usuario-cabecera .usuario-cabecera__flecha {
+        display: none;
+    }
+
+    .boton-login.usuario-cabecera .usuario-cabecera__avatar {
+        width: 42px;
+        height: 42px;
+        flex-basis: 42px;
+        border: 2px solid #edf3f0;
+    }
+
+    /* si NO hay sesión, el botón iniciar sesión de escritorio se oculta */
+    .boton-login:not(.usuario-cabecera) {
+        display: none;
+    }
+
+    .login-movil {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+}
+
+/* =====================================================
+   MENÚ DESPLEGABLE DEL USUARIO
+===================================================== */
+
+.menu-usuario {
+    position: relative;
+}
+
+.menu-usuario__desplegable {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    z-index: 1000;
+
+    display: none;
+    width: 230px;
+    padding: 10px;
+
+    border: 1px solid #e5ebe8;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 18px 45px rgba(24, 49, 38, 0.15);
+}
+
+.menu-usuario.abierto .menu-usuario__desplegable {
+    display: block;
+}
+
+.menu-usuario__desplegable a,
+.menu-usuario__cerrar {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    padding: 11px 12px;
+
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #33443c;
+
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.menu-usuario__desplegable a:hover,
+.menu-usuario__cerrar:hover {
+    background: #f1f7f4;
+    color: #2f7d5b;
+}
+
+.menu-usuario__desplegable i {
+    width: 18px;
+    color: #2f7d5b;
+    text-align: center;
+}
+
+.menu-usuario__separador {
+    display: block;
+    height: 1px;
+    margin: 7px 4px;
+    background: #e5ebe8;
+}
+
+.menu-usuario__cerrar {
+    color: #b23b3b;
+}
+
+.menu-usuario__cerrar i {
+    color: #b23b3b;
+}
+
+
+/* =====================================================
+   OPCIONES DE USUARIO EN MÓVIL
+===================================================== */
+
+.opcion-usuario-movil {
+    display: none;
+}
+
+.cerrar-sesion-movil {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+@media (max-width: 850px) {
+    .menu-usuario__desplegable {
+        display: none !important;
+    }
+
+    .navegacion.usuario-conectado
+    .opcion-usuario-movil {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .navegacion.usuario-conectado
+    .cerrar-sesion-movil {
+        color: #b23b3b;
+    }
+}
+
+/* =====================================================
+   RESTABLECER CONTRASEÑA
+===================================================== */
+
+.auth__estado {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(190, 60, 60, 0.2);
+    border-radius: 16px;
+    background: rgba(190, 60, 60, 0.08);
+}
+
+.auth__estado--oculto {
+    display: none;
+}
+
+.auth__estado > i {
+    margin-top: 3px;
+    color: #b83c3c;
+    font-size: 22px;
+}
+
+.auth__estado strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.auth__estado p {
+    margin: 0 0 12px;
+}
+
+.auth__estado a {
+    font-weight: 700;
+}
+
+.seguridad-password {
+    margin-top: 10px;
+}
+
+.seguridad-password__barra {
+    width: 100%;
+    height: 6px;
+    overflow: hidden;
+    margin-bottom: 7px;
+    border-radius: 999px;
+    background: #e8e8e8;
+}
+
+.seguridad-password__barra span {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: currentColor;
+    transition:
+        width 0.25s ease,
+        background-color 0.25s ease;
+}
+
+#texto-seguridad-password {
+    color: var(--color-texto-suave);
+}

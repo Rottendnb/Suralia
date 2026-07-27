@@ -120,6 +120,12 @@ const sesionActual =
         null
     );
 
+const usuarioActual =
+    leerLocalStorage(
+        "usuarioSuralia",
+        null
+    );
+
 const botonLogin =
     document.querySelector(
         ".boton-login"
@@ -136,27 +142,192 @@ const enlacesPublicar =
     );
 
 
+/* =====================================================
+   OBTENER DATOS DEL USUARIO
+===================================================== */
+
+function obtenerNombreUsuarioCabecera() {
+    return (
+        usuarioActual?.nombre ||
+        sesionActual?.nombre ||
+        "Mi perfil"
+    );
+}
+
+
+function obtenerInicialesCabecera() {
+    const nombre =
+        usuarioActual?.nombre ||
+        sesionActual?.nombre ||
+        "";
+
+    const apellidos =
+        usuarioActual?.apellidos ||
+        "";
+
+    const inicialNombre =
+        nombre.trim().charAt(0);
+
+    const inicialApellido =
+        apellidos.trim().charAt(0);
+
+    return (
+        inicialNombre +
+        inicialApellido
+    ).toUpperCase() || "SU";
+}
+
+
+function escaparAtributoHTML(valor = "") {
+    return String(valor)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
+
+function escaparTextoHTML(valor = "") {
+    return String(valor)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+function obtenerAvatarCabeceraHTML() {
+    const avatarTipo =
+        usuarioActual?.avatarTipo;
+
+    const avatarValor =
+        usuarioActual?.avatarValor;
+
+    if (
+        avatarTipo === "imagen" &&
+        avatarValor
+    ) {
+        return `
+            <span
+                class="
+                    usuario-cabecera__avatar
+                    usuario-cabecera__avatar--imagen
+                "
+                style="
+                    background-image:
+                    url('${escaparAtributoHTML(
+                        avatarValor
+                    )}')
+                "
+                aria-hidden="true"
+            ></span>
+        `;
+    }
+
+    if (
+        avatarTipo === "emoji" &&
+        avatarValor
+    ) {
+        return `
+            <span
+                class="usuario-cabecera__avatar"
+                aria-hidden="true"
+            >
+                ${escaparTextoHTML(
+                    avatarValor
+                )}
+            </span>
+        `;
+    }
+
+    return `
+        <span
+            class="usuario-cabecera__avatar"
+            aria-hidden="true"
+        >
+            ${escaparTextoHTML(
+                obtenerInicialesCabecera()
+            )}
+        </span>
+    `;
+}
+
+
+/* =====================================================
+   ACTUALIZAR HEADER SEGÚN LA SESIÓN
+===================================================== */
+
 function actualizarCabeceraSesion() {
-    if (sesionActual?.conectado) {
+    const usuarioConectado =
+        Boolean(
+            sesionActual?.conectado
+        );
+
+    if (usuarioConectado) {
+        const nombreUsuario =
+            obtenerNombreUsuarioCabecera();
+
+        const avatarHTML =
+            obtenerAvatarCabeceraHTML();
+
+        /* ESCRITORIO */
+
         if (botonLogin) {
             botonLogin.href =
                 "perfil.html";
 
+            botonLogin.classList.add(
+                "usuario-cabecera"
+            );
+
+            botonLogin.setAttribute(
+                "aria-label",
+                `Abrir perfil de ${nombreUsuario}`
+            );
+
             botonLogin.innerHTML = `
-                <i class="fa-regular fa-user"></i>
-                ${sesionActual.nombre || "Mi perfil"}
+                ${avatarHTML}
+
+                <span class="usuario-cabecera__nombre">
+                    ${escaparTextoHTML(
+                        nombreUsuario
+                    )}
+                </span>
+
+                <i
+                    class="
+                        fa-solid
+                        fa-chevron-down
+                        usuario-cabecera__flecha
+                    "
+                    aria-hidden="true"
+                ></i>
             `;
         }
+
+        /* MÓVIL */
 
         if (loginMovil) {
             loginMovil.href =
                 "perfil.html";
 
+            loginMovil.setAttribute(
+                "aria-label",
+                `Abrir perfil de ${nombreUsuario}`
+            );
+
             loginMovil.innerHTML = `
-                <i class="fa-regular fa-user"></i>
-                Mi perfil
+                ${avatarHTML}
+
+                <span>
+                    Mi perfil
+                </span>
             `;
         }
+
+        /* PUBLICAR PLAN */
 
         enlacesPublicar.forEach(
             (enlace) => {
@@ -164,16 +335,225 @@ function actualizarCabeceraSesion() {
                     "publicar-plan.html";
             }
         );
-    } else {
-        enlacesPublicar.forEach(
-            (enlace) => {
-                enlace.href =
-                    "login.html";
+
+        return;
+    }
+
+    /* USUARIO SIN SESIÓN */
+
+    if (botonLogin) {
+        botonLogin.href =
+            "login.html";
+
+        botonLogin.classList.remove(
+            "usuario-cabecera"
+        );
+
+        botonLogin.removeAttribute(
+            "aria-label"
+        );
+
+        botonLogin.textContent =
+            "Iniciar sesión";
+    }
+
+    if (loginMovil) {
+        loginMovil.href =
+            "login.html";
+
+        loginMovil.innerHTML = `
+            <i class="fa-regular fa-user"></i>
+
+            <span>
+                Iniciar sesión
+            </span>
+        `;
+    }
+
+    enlacesPublicar.forEach(
+        (enlace) => {
+            enlace.href =
+                "login.html";
+        }
+    );
+}
+
+/* =====================================================
+   MENÚ DESPLEGABLE DEL USUARIO
+===================================================== */
+
+const contenedorMenuUsuario =
+    document.querySelector(
+        "#menu-usuario"
+    );
+
+const botonUsuario =
+    document.querySelector(
+        "#boton-usuario"
+    );
+
+const botonCerrarSesionHeader =
+    document.querySelector(
+        "#cerrar-sesion"
+    );
+
+const botonCerrarSesionMovil =
+    document.querySelector(
+        "#cerrar-sesion-movil"
+    );
+
+const opcionesUsuarioMovil =
+    document.querySelectorAll(
+        ".opcion-usuario-movil"
+    );
+
+
+function cerrarMenuUsuario() {
+    if (!contenedorMenuUsuario) {
+        return;
+    }
+
+    contenedorMenuUsuario.classList.remove(
+        "abierto"
+    );
+
+    botonUsuario?.setAttribute(
+        "aria-expanded",
+        "false"
+    );
+}
+
+
+function alternarMenuUsuario(
+    evento
+) {
+    if (!sesionActual?.conectado) {
+        return;
+    }
+
+    evento.preventDefault();
+    evento.stopPropagation();
+
+    const menuAbierto =
+        contenedorMenuUsuario?.classList.toggle(
+            "abierto"
+        );
+
+    botonUsuario?.setAttribute(
+        "aria-expanded",
+        String(Boolean(menuAbierto))
+    );
+}
+
+async function cerrarSesionSuralia() {
+    console.log(
+    "Cliente Supabase al cerrar:",
+    window.clienteSupabase
+);
+    try {
+        if (
+            window.clienteSupabase
+        ) {
+            const {
+                error
+            } =
+                await window.clienteSupabase
+                    .auth
+                    .signOut();
+
+            if (error) {
+                console.error(
+                    "Error al cerrar la sesión de Supabase:",
+                    error
+                );
             }
+        }
+    } catch (error) {
+        console.error(
+            "No se ha podido cerrar la sesión:",
+            error
+        );
+    } finally {
+        localStorage.removeItem(
+            "sesionSuralia"
+        );
+
+        
+
+        sessionStorage.removeItem(
+            "destinoDespuesLoginSuralia"
+        );
+
+        cerrarMenuUsuario();
+
+        window.location.replace(
+            "login.html"
         );
     }
 }
 
+if (
+    sesionActual?.conectado &&
+    navegacion
+) {
+    navegacion.classList.add(
+        "usuario-conectado"
+    );
+} else {
+    opcionesUsuarioMovil.forEach(
+        (opcion) => {
+            opcion.remove();
+        }
+    );
+}
+
+
+if (
+    botonUsuario &&
+    contenedorMenuUsuario
+) {
+    botonUsuario.addEventListener(
+        "click",
+        alternarMenuUsuario
+    );
+}
+
+
+botonCerrarSesionHeader?.addEventListener(
+    "click",
+    cerrarSesionSuralia
+);
+
+
+botonCerrarSesionMovil?.addEventListener(
+    "click",
+    cerrarSesionSuralia
+);
+
+
+document.addEventListener(
+    "click",
+    (evento) => {
+        if (
+            contenedorMenuUsuario &&
+            !contenedorMenuUsuario.contains(
+                evento.target
+            )
+        ) {
+            cerrarMenuUsuario();
+        }
+    }
+);
+
+
+document.addEventListener(
+    "keydown",
+    (evento) => {
+        if (evento.key === "Escape") {
+            cerrarMenuUsuario();
+        }
+    }
+);
 
 /* =====================================================
    BUSCADOR DE LA PORTADA
@@ -835,10 +1215,9 @@ function actualizarContadorSierraNorte() {
 }
 
 
-/*
-    Si las reservas cambian desde otra pestaña,
-    el contador se actualiza automáticamente.
-*/
+/* =====================================================
+   CAMBIOS DESDE OTRAS PESTAÑAS
+===================================================== */
 
 window.addEventListener(
     "storage",
@@ -856,6 +1235,15 @@ window.addEventListener(
         ) {
             cargarFavoritosPortada();
             actualizarFavoritoSierraNorte();
+        }
+
+        if (
+            evento.key ===
+                "sesionSuralia" ||
+            evento.key ===
+                "usuarioSuralia"
+        ) {
+            window.location.reload();
         }
     }
 );

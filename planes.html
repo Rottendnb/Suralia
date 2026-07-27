@@ -41,84 +41,159 @@
 
     <header class="header">
 
-        <div class="contenedor header__contenido">
+    <div class="contenedor header__contenido">
+
+        <a
+            href="index.html"
+            class="logo"
+            aria-label="Página de inicio de Suralia"
+        >
+            <span class="logo__icono">
+                <i class="fa-solid fa-location-dot"></i>
+            </span>
+
+            <span class="logo__texto">
+                Suralia
+            </span>
+        </a>
+
+        <nav
+            class="navegacion"
+            id="navegacion"
+        >
 
             <a
-                href="index.html"
-                class="logo"
-                aria-label="Página de inicio de Suralia"
+                href="planes.html"
+                class="enlace-activo"
             >
-                <span class="logo__icono">
-                    <i class="fa-solid fa-location-dot"></i>
-                </span>
+                Explorar planes
+            </a>
 
-                <span class="logo__texto">
-                    Suralia
+            <a href="index.html#categorias">
+                Categorías
+            </a>
+
+            <a href="index.html#como-funciona">
+                Cómo funciona
+            </a>
+
+            <a
+                href="login.html"
+                class="enlace-publicar"
+            >
+                <i class="fa-solid fa-plus"></i>
+                Publicar un plan
+            </a>
+
+            <a
+                href="login.html"
+                class="login-movil"
+            >
+                <i class="fa-regular fa-user"></i>
+
+                <span>
+                    Iniciar sesión
                 </span>
             </a>
 
-            <nav
-                class="navegacion"
-                id="navegacion"
+            <a
+                href="perfil.html#reservas"
+                class="opcion-usuario-movil"
             >
+                <i class="fa-regular fa-calendar-check"></i>
+                Mis reservas
+            </a>
 
-                <a
-                    href="planes.html"
-                    class="enlace-activo"
-                >
-                    Explorar planes
-                </a>
+            <a
+                href="perfil.html#favoritos"
+                class="opcion-usuario-movil"
+            >
+                <i class="fa-regular fa-heart"></i>
+                Favoritos
+            </a>
 
-                <a href="index.html#categorias">
-                    Categorías
-                </a>
+            <button
+                type="button"
+                class="opcion-usuario-movil cerrar-sesion-movil"
+                id="cerrar-sesion-movil"
+            >
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                Cerrar sesión
+            </button>
 
-                <a href="index.html#como-funciona">
-                    Cómo funciona
-                </a>
+        </nav>
 
-                <a
-                    href="publicar-plan.html"
-                    class="enlace-publicar"
-                >
-                    <i class="fa-solid fa-plus"></i>
-                    Publicar un plan
-                </a>
+        <div class="header__acciones">
 
-                <a
-                    href="login.html"
-                    class="login-movil"
-                >
-                    <i class="fa-regular fa-user"></i>
-                    Iniciar sesión
-                </a>
-
-            </nav>
-
-            <div class="header__acciones">
+            <div
+                class="menu-usuario"
+                id="menu-usuario"
+            >
 
                 <a
                     href="login.html"
                     class="boton-login"
+                    id="boton-usuario"
+                    aria-expanded="false"
                 >
                     Iniciar sesión
                 </a>
 
-                <button
-                    class="boton-menu"
-                    id="boton-menu"
-                    type="button"
-                    aria-label="Abrir menú"
-                    aria-expanded="false"
+                <div
+                    class="menu-usuario__desplegable"
+                    id="menu-usuario-desplegable"
                 >
-                    <i class="fa-solid fa-bars"></i>
-                </button>
+
+                    <a href="perfil.html">
+                        <i class="fa-regular fa-user"></i>
+                        Mi perfil
+                    </a>
+
+                    <a href="perfil.html#reservas">
+                        <i class="fa-regular fa-calendar-check"></i>
+                        Mis reservas
+                    </a>
+
+                    <a href="perfil.html#favoritos">
+                        <i class="fa-regular fa-heart"></i>
+                        Favoritos
+                    </a>
+
+                    <a href="publicar-plan.html">
+                        <i class="fa-solid fa-plus"></i>
+                        Publicar un plan
+                    </a>
+
+                    <span class="menu-usuario__separador"></span>
+
+                    <button
+                        type="button"
+                        id="cerrar-sesion"
+                        class="menu-usuario__cerrar"
+                    >
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        Cerrar sesión
+                    </button>
+
+                </div>
 
             </div>
 
+            <button
+                class="boton-menu"
+                id="boton-menu"
+                type="button"
+                aria-label="Abrir menú"
+                aria-expanded="false"
+            >
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
         </div>
 
-    </header>
+    </div>
+
+</header>
 
     <main>
 
@@ -936,7 +1011,7 @@
 
                 <h3>Información</h3>
 
-                <a href="#">
+                <a href="sobre-suralia.html">
                     Sobre Suralia
                 </a>
 
@@ -994,9 +1069,19 @@
             </p>
 
             <div>
-                <a href="#">Privacidad</a>
-                <a href="#">Cookies</a>
-                <a href="#">Aviso legal</a>
+
+                    <a href="privacidad.html">
+                        Privacidad
+                    </a>
+
+                    <a href="cookies.html">
+                        Cookies
+                    </a>
+
+                    <a href="aviso-legal.html">
+                        Aviso legal
+                    </a>
+
             </div>
 
         </div>
@@ -1013,8 +1098,79 @@
         <span></span>
     </div>
 
+     <!-- =================================================
+     BANNER DE COOKIES
+================================================== -->
+
+<section
+    class="banner-cookies oculto"
+    id="banner-cookies"
+    aria-label="Configuración de cookies"
+>
+    <div class="banner-cookies__contenido">
+
+        <div class="banner-cookies__texto">
+
+            <span class="banner-cookies__icono">
+                <i class="fa-solid fa-cookie-bite"></i>
+            </span>
+
+            <div>
+
+                <h2>
+                    Tu privacidad es importante
+                </h2>
+
+                <p>
+                    Utilizamos tecnologías necesarias para que la web
+                    funcione y, con tu permiso, cookies opcionales para
+                    preferencias y analítica.
+
+                    <a href="cookies.html">
+                        Más información
+                    </a>
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="banner-cookies__acciones">
+
+            <button
+                type="button"
+                class="banner-cookies__rechazar"
+                id="rechazar-cookies"
+            >
+                Rechazar opcionales
+            </button>
+
+            <button
+                type="button"
+                class="banner-cookies__configurar"
+                id="configurar-cookies"
+            >
+                Configurar
+            </button>
+
+            <button
+                type="button"
+                class="banner-cookies__aceptar"
+                id="aceptar-cookies"
+            >
+                Aceptar todas
+            </button>
+
+        </div>
+
+    </div>
+</section>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
     <script src="js/main.js"></script>
     <script src="js/planes.js"></script>
+    <script src="js/cookies.js"></script>
 
 </body>
 
