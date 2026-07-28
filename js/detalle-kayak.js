@@ -17,7 +17,7 @@ const datosPlanKayak = {
 
     imagen:
         document.body.dataset.planImagen ||
-        "img/kayak.jpg",
+        "img/kayak principal.jpg",
 
     precio:
         Number(
@@ -32,6 +32,10 @@ const datosPlanKayak = {
     fechaTexto:
         document.body.dataset.planFecha ||
         "27 de julio de 2026",
+
+    fechaIso:
+        document.body.dataset.planFechaIso ||
+        "2026-07-27",
 
     ubicacion:
         document.body.dataset.planUbicacion ||
@@ -135,11 +139,15 @@ function obtenerSesion() {
 
 function obtenerFavoritos() {
     try {
-        return JSON.parse(
+        const favoritos = JSON.parse(
             localStorage.getItem(
                 "favoritosSuralia"
             )
-        ) || [];
+        );
+
+        return Array.isArray(favoritos)
+            ? favoritos
+            : [];
     } catch (error) {
         console.error(
             "No se pudieron leer los favoritos:",
@@ -153,11 +161,15 @@ function obtenerFavoritos() {
 
 function obtenerReservas() {
     try {
-        return JSON.parse(
+        const reservas = JSON.parse(
             localStorage.getItem(
                 "reservasSuralia"
             )
-        ) || [];
+        );
+
+        return Array.isArray(reservas)
+            ? reservas
+            : [];
     } catch (error) {
         console.error(
             "No se pudieron leer las reservas:",
@@ -471,6 +483,11 @@ function alternarFavorito() {
         obtenerSesion();
 
     if (!sesion?.conectado) {
+        sessionStorage.setItem(
+            "destinoDespuesLoginSuralia",
+            window.location.href
+        );
+
         mostrarNotificacion(
             "Debes iniciar sesión para guardar favoritos."
         );
@@ -532,10 +549,23 @@ function alternarFavorito() {
         );
     }
 
-    localStorage.setItem(
-        "favoritosSuralia",
-        JSON.stringify(favoritos)
-    );
+    try {
+        localStorage.setItem(
+            "favoritosSuralia",
+            JSON.stringify(favoritos)
+        );
+    } catch (error) {
+        console.error(
+            "No se pudieron guardar los favoritos:",
+            error
+        );
+
+        mostrarNotificacion(
+            "No se ha podido actualizar favoritos."
+        );
+
+        return;
+    }
 
     actualizarBotonFavorito(
         quedaGuardado
@@ -610,6 +640,23 @@ function obtenerTextoOpcionSeleccionada(
 }
 
 
+function obtenerFechaIsoReserva(
+    fechaValor
+) {
+    const fechasIso = {
+        "27-julio-2026": "2026-07-27",
+        "29-julio-2026": "2026-07-29",
+        "1-agosto-2026": "2026-08-01"
+    };
+
+    return (
+        fechasIso[fechaValor] ||
+        datosPlanKayak.fechaIso ||
+        ""
+    );
+}
+
+
 function existeReserva(
     reservas,
     email,
@@ -623,8 +670,11 @@ function existeReserva(
                     email &&
                 reserva.planId ===
                     planId &&
-                reserva.fechaValor ===
-                    fecha &&
+                (
+                    reserva.fecha === fecha ||
+                    reserva.fechaIso === fecha ||
+                    reserva.fechaValor === fecha
+                ) &&
                 reserva.estado !==
                     "cancelada"
             );
@@ -643,6 +693,11 @@ if (formularioReserva) {
                 obtenerSesion();
 
             if (!sesion?.conectado) {
+                sessionStorage.setItem(
+                    "destinoDespuesLoginSuralia",
+                    window.location.href
+                );
+
                 mostrarNotificacion(
                     "Debes iniciar sesión para reservar."
                 );
@@ -663,6 +718,11 @@ if (formularioReserva) {
                     fechaReserva
                 );
 
+            const fechaIso =
+                obtenerFechaIsoReserva(
+                    fechaValor
+                );
+
             const personas = Number(
                 personasReserva?.value || 1
             );
@@ -678,7 +738,7 @@ if (formularioReserva) {
                 existeReserva(
                     reservas,
                     sesion.email,
-                    fechaValor,
+                    fechaIso,
                     datosPlanKayak.planId
                 )
             ) {
@@ -711,6 +771,9 @@ if (formularioReserva) {
                 enlace:
                     datosPlanKayak.enlace,
 
+                precio:
+                    datosPlanKayak.precio,
+
                 precioUnitario:
                     datosPlanKayak.precio,
 
@@ -718,6 +781,11 @@ if (formularioReserva) {
 
                 precioTotal:
                     total,
+
+                fecha:
+                    fechaIso,
+
+                fechaIso,
 
                 fechaValor,
 
@@ -740,18 +808,35 @@ if (formularioReserva) {
                 nuevaReserva
             );
 
-            localStorage.setItem(
-                "reservasSuralia",
-                JSON.stringify(reservas)
-            );
+            try {
+                localStorage.setItem(
+                    "reservasSuralia",
+                    JSON.stringify(reservas)
+                );
+            } catch (error) {
+                console.error(
+                    "No se pudo guardar la reserva:",
+                    error
+                );
+
+                mostrarNotificacion(
+                    "No se ha podido guardar la reserva."
+                );
+
+                return;
+            }
 
             mostrarNotificacion(
                 "Reserva realizada correctamente."
             );
 
             formularioReserva.reset();
-
             actualizarPrecioReserva();
+
+            setTimeout(() => {
+                window.location.href =
+                    "perfil.html#reservas";
+            }, 900);
         }
     );
 }
@@ -812,6 +897,26 @@ function crearMapaKayak() {
     }, 150);
 }
 
+
+
+
+/* =====================================================
+   SINCRONIZACIÓN ENTRE PESTAÑAS
+===================================================== */
+
+window.addEventListener(
+    "storage",
+    (evento) => {
+        if (
+            evento.key ===
+                "favoritosSuralia" ||
+            evento.key ===
+                "sesionSuralia"
+        ) {
+            cargarEstadoFavorito();
+        }
+    }
+);
 
 /* =====================================================
    CARGA INICIAL

@@ -7873,3 +7873,25 @@ img {
 #texto-seguridad-password {
     color: var(--color-texto-suave);
 }
+
+/* Igualar altura y posición del botón en favoritos del perfil */
+
+#lista-favoritos-perfil .tarjeta-plan {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#lista-favoritos-perfil .tarjeta-plan__contenido {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+#lista-favoritos-perfil .tarjeta-plan__pie {
+    margin-top: auto;
+}
+
+#lista-favoritos-perfil .boton-principal-pequeno {
+    margin-top: 18px;
+}

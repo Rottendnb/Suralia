@@ -491,7 +491,11 @@ function obtenerDatosTarjeta(
 
         enlace:
             tarjeta.dataset.enlace ||
-            "detalle-plan.html"
+            (
+                tarjeta.dataset.planId
+                    ? `detalle-plan.html?id=${tarjeta.dataset.planId}`
+                    : "planes.html"
+            )
     };
 }
 
@@ -583,6 +587,11 @@ function alternarFavoritoTarjeta(
         obtenerSesionPlanes();
 
     if (!sesion?.conectado) {
+        sessionStorage.setItem(
+            "destinoDespuesLoginSuralia",
+            window.location.href
+        );
+
         mostrarNotificacion(
             "Debes iniciar sesión para guardar favoritos."
         );
@@ -667,10 +676,23 @@ function alternarFavoritoTarjeta(
         );
     }
 
-    localStorage.setItem(
-        "favoritosSuralia",
-        JSON.stringify(favoritos)
-    );
+    try {
+        localStorage.setItem(
+            "favoritosSuralia",
+            JSON.stringify(favoritos)
+        );
+    } catch (error) {
+        console.error(
+            "No se pudieron guardar los favoritos:",
+            error
+        );
+
+        mostrarNotificacion(
+            "No se ha podido actualizar favoritos."
+        );
+
+        return;
+    }
 
     actualizarBotonFavoritoTarjeta(
         boton,
@@ -695,6 +717,26 @@ botonesFavoritosPlanes.forEach(
     }
 );
 
+
+
+
+/* =====================================================
+   SINCRONIZACIÓN ENTRE PESTAÑAS
+===================================================== */
+
+window.addEventListener(
+    "storage",
+    (evento) => {
+        if (
+            evento.key ===
+                "favoritosSuralia" ||
+            evento.key ===
+                "sesionSuralia"
+        ) {
+            cargarEstadoFavoritosTarjetas();
+        }
+    }
+);
 
 /* =====================================================
    CARGA INICIAL

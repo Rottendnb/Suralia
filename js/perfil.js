@@ -439,15 +439,6 @@ function guardarAvatarUsuario(tipo, valor) {
 
     cargarDatosUsuario();
 
-    console.log("Avatar guardado:", {
-        avatarTipo:
-            usuarioGuardado.avatarTipo,
-        tieneImagen:
-            Boolean(
-                usuarioGuardado.avatarValor
-            )
-    });
-
     return true;
 }
 
@@ -793,9 +784,14 @@ function actualizarEmailEnDatosGuardados(emailAnterior, emailNuevo) {
     ];
 
     claves.forEach((clave) => {
-        const datos = JSON.parse(
-            localStorage.getItem(clave)
-        ) || [];
+        const datos = leerDatoLocal(
+            clave,
+            []
+        );
+
+        if (!Array.isArray(datos)) {
+            return;
+        }
 
         const datosActualizados = datos.map((elemento) => {
             if (elemento.usuarioEmail === emailAnterior) {
@@ -842,10 +838,223 @@ const contadorReservasPerfil = document.querySelector(
     "#contador-reservas-perfil"
 );
 
+const catalogoPlanesReservas = {
+    italica: {
+        planId: "italica",
+        titulo: "Visita guiada por Itálica",
+        categoria: "Cultura",
+        imagen: "img/italica principal.jpg",
+        ubicacion: "Santiponce, Sevilla",
+        precio: 0,
+        hora: "10:30",
+        enlace: "detalle-plan.html?id=italica"
+    },
+
+    "kayak-atardecer": {
+        planId: "kayak-atardecer",
+        titulo: "Kayak al atardecer",
+        categoria: "Aventura",
+        imagen: "img/kayak principal.jpg",
+        ubicacion: "Río Guadalquivir, Sevilla",
+        precio: 18,
+        hora: "19:00",
+        enlace: "detalle-kayak.html"
+    },
+
+    "poncho-k-cartuja": {
+        planId: "poncho-k-cartuja",
+        titulo: "PONCHO K - Cartuja Center CITE",
+        categoria: "Música",
+        imagen: "img/poncho-k.jpg",
+        ubicacion: "Cartuja Center CITE, Sevilla",
+        precio: 25,
+        hora: "21:00",
+        enlace: "detalle-poncho-k.html"
+    },
+
+    "cerro-hierro": {
+        planId: "cerro-hierro",
+        titulo: "Ruta por el Cerro del Hierro",
+        categoria: "Naturaleza",
+        imagen: "img/cerro1.jpg",
+        ubicacion: "San Nicolás del Puerto",
+        precio: 8,
+        hora: "09:00",
+        enlace: "detalle-plan.html?id=cerro-hierro"
+    },
+
+    "tapas-triana": {
+        planId: "tapas-triana",
+        titulo: "Ruta de tapas por Triana",
+        categoria: "Gastronomía",
+        imagen: "img/triana1.jpg",
+        ubicacion: "Triana, Sevilla",
+        precio: 25,
+        hora: "13:00",
+        enlace: "detalle-plan.html?id=tapas-triana"
+    },
+
+    "exposicion-contemporanea": {
+        planId: "exposicion-contemporanea",
+        titulo: "Exposición de arte contemporáneo",
+        categoria: "Cultura",
+        imagen: "img/andaluz1.jpg",
+        ubicacion: "Centro de Sevilla",
+        precio: 0,
+        hora: "11:00",
+        enlace: "detalle-plan.html?id=exposicion-contemporanea"
+    },
+
+    "sierra-norte": {
+        planId: "sierra-norte",
+        titulo: "Ruta por la Sierra Norte",
+        categoria: "Naturaleza",
+        imagen: "img/rutasierranorte.jpg",
+        ubicacion: "Constantina, Sevilla",
+        precio: 0,
+        hora: "09:00",
+        enlace: "detalle-sierra-norte.html"
+    }
+};
+
+
+function obtenerIdPlanReserva(reserva) {
+    const idDirecto =
+        reserva?.planId ||
+        reserva?.idPlan ||
+        "";
+
+    if (idDirecto) {
+        return String(idDirecto);
+    }
+
+    const titulo = String(
+        reserva?.titulo ||
+        reserva?.nombre ||
+        ""
+    )
+        .trim()
+        .toLowerCase();
+
+    const idsPorTitulo = {
+        "visita guiada por itálica": "italica",
+        "visita guiada por italica": "italica",
+        "kayak al atardecer": "kayak-atardecer",
+        "poncho k - cartuja center cite": "poncho-k-cartuja",
+        "ruta por el cerro del hierro": "cerro-hierro",
+        "ruta de tapas por triana": "tapas-triana",
+        "exposición de arte contemporáneo":
+            "exposicion-contemporanea",
+        "exposicion de arte contemporaneo":
+            "exposicion-contemporanea",
+        "ruta por la sierra norte": "sierra-norte"
+    };
+
+    return idsPorTitulo[titulo] || "";
+}
+
+
+function normalizarReserva(reserva) {
+    const planId =
+        obtenerIdPlanReserva(reserva);
+
+    const datosOficiales =
+        catalogoPlanesReservas[planId];
+
+    if (!datosOficiales) {
+        return {
+            ...reserva,
+            planId:
+                planId ||
+                String(
+                    reserva?.planId ||
+                    reserva?.id ||
+                    ""
+                ),
+            imagen:
+                reserva?.imagen ||
+                "img/placeholder-plan.jpg",
+            enlace:
+                reserva?.enlace ||
+                "planes.html"
+        };
+    }
+
+    return {
+        ...reserva,
+        ...datosOficiales,
+
+        /*
+           Se conservan los datos propios de la reserva:
+           fecha elegida, texto de fecha, personas,
+           estado, usuario e identificador.
+        */
+        id:
+            reserva.id,
+
+        fecha:
+            reserva.fecha,
+
+        fechaIso:
+            reserva.fechaIso ||
+            reserva.fecha,
+
+        fechaTexto:
+            reserva.fechaTexto ||
+            reserva.fecha ||
+            "Fecha pendiente",
+
+        personas:
+            reserva.personas ||
+            reserva.entradas ||
+            1,
+
+        estado:
+            reserva.estado ||
+            "confirmada",
+
+        usuarioEmail:
+            reserva.usuarioEmail ||
+            usuarioGuardado.email,
+
+        fechaReserva:
+            reserva.fechaReserva ||
+            new Date().toISOString()
+    };
+}
+
+
+function migrarReservasAntiguas() {
+    const reservas =
+        leerDatoLocal(
+            "reservasSuralia",
+            []
+        );
+
+    if (!Array.isArray(reservas)) {
+        guardarDatoLocal(
+            "reservasSuralia",
+            []
+        );
+
+        return [];
+    }
+
+    const reservasActualizadas =
+        reservas.map(normalizarReserva);
+
+    guardarDatoLocal(
+        "reservasSuralia",
+        reservasActualizadas
+    );
+
+    return reservasActualizadas;
+}
+
+
 function obtenerReservasUsuario() {
-    const reservas = JSON.parse(
-        localStorage.getItem("reservasSuralia")
-    ) || [];
+    const reservas =
+        migrarReservasAntiguas();
 
     return reservas
         .filter((reserva) => {
@@ -867,6 +1076,26 @@ function obtenerReservasUsuario() {
         });
 }
 
+
+function obtenerEnlacePlan(plan) {
+    if (plan?.enlace) {
+        return plan.enlace;
+    }
+
+    const enlacesPorPlan = {
+        italica: "detalle-plan.html?id=italica",
+        "kayak-atardecer": "detalle-kayak.html",
+        "poncho-k-cartuja": "detalle-poncho-k.html",
+        "cerro-hierro": "detalle-plan.html?id=cerro-hierro",
+        "tapas-triana": "detalle-plan.html?id=tapas-triana",
+        "exposicion-contemporanea":
+            "detalle-plan.html?id=exposicion-contemporanea",
+        "sierra-norte": "detalle-sierra-norte.html"
+    };
+
+    return enlacesPorPlan[plan?.planId] || "planes.html";
+}
+
 function crearProximaReservaHTML(reserva) {
     return `
         <article class="reserva-resumen">
@@ -875,6 +1104,10 @@ function crearProximaReservaHTML(reserva) {
                 <img
                     src="${reserva.imagen}"
                     alt="${reserva.titulo}"
+                    onerror="
+                        this.onerror=null;
+                        this.src='img/placeholder-plan.jpg';
+                    "
                 >
             </div>
 
@@ -912,7 +1145,7 @@ function crearProximaReservaHTML(reserva) {
                 </p>
 
                 <a
-                    href="detalle-plan.html"
+                    href="${obtenerEnlacePlan(reserva)}"
                     class="boton-ver-reserva"
                 >
                     Ver actividad
@@ -935,6 +1168,10 @@ function crearReservaHTML(reserva) {
                 <img
                     src="${reserva.imagen}"
                     alt="${reserva.titulo}"
+                    onerror="
+                        this.onerror=null;
+                        this.src='img/placeholder-plan.jpg';
+                    "
                 >
             </div>
 
@@ -984,7 +1221,7 @@ function crearReservaHTML(reserva) {
                 <div class="reserva-item__acciones">
 
                     <a
-                        href="detalle-plan.html"
+                        href="${obtenerEnlacePlan(reserva)}"
                         class="boton-principal-pequeno"
                     >
                         Ver actividad
@@ -1157,99 +1394,203 @@ const contadorFavoritosPerfil =
     );
 
 /*
- * Datos actuales de los planes.
- *
- * Este mapa tiene prioridad sobre las rutas antiguas que puedan
- * seguir guardadas en localStorage. Así, los favoritos creados
- * antes de actualizar las fotografías también muestran las
- * imágenes y enlaces actuales.
- */
-const datosActualesPlanesFavoritos = {
-    "sierra-norte": {
-        imagen:
-            "img/sierra-norte-nueva.png",
-        enlace:
-            "detalle-sierra-norte.html",
-        categoria:
-            "Naturaleza",
-        titulo:
-            "Ruta por la Sierra Norte",
-        precio:
-            0
-    },
+   Datos oficiales de los planes.
 
+   Estos valores coinciden con planes.html.
+   También se incluye Sierra Norte, que aparece
+   como plan destacado de la portada.
+*/
+const catalogoPlanesFavoritos = {
     italica: {
-        imagen:
-            "img/italica principal.jpg",
-        enlace:
-            "detalle-plan.html",
-        categoria:
-            "Cultura",
-        titulo:
-            "Visita guiada por Itálica",
-        precio:
-            0
+        planId: "italica",
+        titulo: "Visita guiada por Itálica",
+        categoria: "Cultura",
+        precio: 0,
+        valoracion: 4.8,
+        fechaTexto: "25 de julio",
+        fechaIso: "2026-07-25",
+        ubicacion: "Santiponce, Sevilla",
+        imagen: "img/italica principal.jpg",
+        enlace: "detalle-plan.html?id=italica"
     },
 
     "kayak-atardecer": {
-        imagen:
-            "img/kayak principal.jpg",
-        enlace:
-            "detalle-kayak.html",
-        categoria:
-            "Aventura",
-        titulo:
-            "Kayak al atardecer",
-        precio:
-            18
+        planId: "kayak-atardecer",
+        titulo: "Kayak al atardecer",
+        categoria: "Aventura",
+        precio: 18,
+        valoracion: 4.9,
+        fechaTexto: "27 de julio",
+        fechaIso: "2026-07-27",
+        ubicacion: "Río Guadalquivir, Sevilla",
+        imagen: "img/kayak principal.jpg",
+        enlace: "detalle-kayak.html"
     },
 
     "poncho-k-cartuja": {
+        planId: "poncho-k-cartuja",
+        titulo: "PONCHO K - Cartuja Center CITE",
+        categoria: "Música",
+        precio: 25,
+        valoracion: 4.8,
+        fechaTexto: "21 de noviembre de 2026",
+        fechaIso: "2026-11-21",
+        ubicacion: "Cartuja Center CITE, Sevilla",
+        imagen: "img/poncho-k.jpg",
+        enlace: "detalle-poncho-k.html"
+    },
+
+    "cerro-hierro": {
+        planId: "cerro-hierro",
+        titulo: "Ruta por el Cerro del Hierro",
+        categoria: "Naturaleza",
+        precio: 8,
+        valoracion: 4.9,
+        fechaTexto: "2 de agosto",
+        fechaIso: "2026-08-02",
+        ubicacion: "San Nicolás del Puerto",
         imagen:
-            "img/poncho-k.jpg",
-        enlace:
-            "detalle-poncho-k.html",
-        categoria:
-            "Música",
-        titulo:
-            "PONCHO K - Cartuja Center CITE",
-        precio:
-            25
+            "img/cerro1.jpg",
+        enlace: "detalle-plan.html?id=cerro-hierro"
+    },
+
+    "tapas-triana": {
+        planId: "tapas-triana",
+        titulo: "Ruta de tapas por Triana",
+        categoria: "Gastronomía",
+        precio: 25,
+        valoracion: 4.6,
+        fechaTexto: "3 de agosto",
+        fechaIso: "2026-08-03",
+        ubicacion: "Triana, Sevilla",
+        imagen:
+            "img/triana1.jpg",
+        enlace: "detalle-plan.html?id=tapas-triana"
+    },
+
+    "exposicion-contemporanea": {
+        planId: "exposicion-contemporanea",
+        titulo: "Exposición de arte contemporáneo",
+        categoria: "Cultura",
+        precio: 0,
+        valoracion: 4.5,
+        fechaTexto: "Hasta el 10 de agosto",
+        fechaIso: "2026-08-10",
+        ubicacion: "Centro de Sevilla",
+        imagen:
+            "img/andaluz1.jpg",
+        enlace: "detalle-plan.html?id=exposicion-contemporanea"
+    },
+
+    "sierra-norte": {
+        planId: "sierra-norte",
+        titulo: "Ruta por la Sierra Norte",
+        categoria: "Naturaleza",
+        precio: 0,
+        valoracion: 4.9,
+        fechaTexto: "Este sábado",
+        ubicacion: "Constantina, Sevilla",
+        imagen: "img/rutasierranorte.jpg",
+        enlace: "detalle-sierra-norte.html"
     }
 };
 
+function obtenerIdPlanFavorito(favorito) {
+    const idDirecto =
+        favorito?.planId ||
+        favorito?.idPlan ||
+        "";
 
-function normalizarIdPlanFavorito(
-    favorito
-) {
-    return String(
-        favorito.planId ||
-        favorito.id ||
-        ""
-    )
-        .trim()
-        .toLowerCase();
+    if (idDirecto) {
+        return String(idDirecto);
+    }
+
+    const titulo =
+        String(
+            favorito?.titulo ||
+            favorito?.nombre ||
+            ""
+        )
+            .trim()
+            .toLowerCase();
+
+    const idsPorTitulo = {
+        "visita guiada por itálica":
+            "italica",
+
+        "visita guiada por italica":
+            "italica",
+
+        "kayak al atardecer":
+            "kayak-atardecer",
+
+        "poncho k - cartuja center cite":
+            "poncho-k-cartuja",
+
+        "ruta por el cerro del hierro":
+            "cerro-hierro",
+
+        "ruta de tapas por triana":
+            "tapas-triana",
+
+        "exposición de arte contemporáneo":
+            "exposicion-contemporanea",
+
+        "exposicion de arte contemporaneo":
+            "exposicion-contemporanea",
+
+        "ruta por la sierra norte":
+            "sierra-norte"
+    };
+
+    return idsPorTitulo[titulo] || "";
 }
 
-
-function obtenerDatosActualesFavorito(
-    favorito
-) {
+function normalizarFavorito(favorito) {
     const planId =
-        normalizarIdPlanFavorito(
+        obtenerIdPlanFavorito(
             favorito
         );
 
-    return (
-        datosActualesPlanesFavoritos[
+    const datosOficiales =
+        catalogoPlanesFavoritos[
             planId
-        ] ||
-        {}
-    );
+        ];
+
+    if (!datosOficiales) {
+        return {
+            ...favorito,
+            planId:
+                planId ||
+                String(
+                    favorito.planId ||
+                    favorito.id ||
+                    ""
+                ),
+            imagen:
+                favorito.imagen ||
+                "img/placeholder-plan.jpg",
+            enlace:
+                favorito.enlace ||
+                "planes.html"
+        };
+    }
+
+    /*
+       Los datos oficiales se colocan al final
+       para sustituir imágenes, precios y enlaces
+       antiguos guardados en localStorage.
+    */
+    return {
+        ...favorito,
+        ...datosOficiales,
+        usuarioEmail:
+            favorito.usuarioEmail ||
+            usuarioGuardado.email
+    };
 }
 
-
-function actualizarFavoritosAntiguos() {
+function migrarFavoritosAntiguos() {
     const favoritos =
         leerDatoLocal(
             "favoritosSuralia",
@@ -1257,178 +1598,70 @@ function actualizarFavoritosAntiguos() {
         );
 
     if (!Array.isArray(favoritos)) {
+        guardarDatoLocal(
+            "favoritosSuralia",
+            []
+        );
+
         return [];
     }
 
-    let huboCambios = false;
-
     const favoritosActualizados =
         favoritos.map(
-            (favorito) => {
-                const datosActuales =
-                    obtenerDatosActualesFavorito(
-                        favorito
-                    );
-
-                if (
-                    !datosActuales.imagen &&
-                    !datosActuales.enlace
-                ) {
-                    return favorito;
-                }
-
-                const favoritoActualizado = {
-                    ...favorito,
-
-                    imagen:
-                        datosActuales.imagen ||
-                        favorito.imagen,
-
-                    enlace:
-                        datosActuales.enlace ||
-                        favorito.enlace,
-
-                    categoria:
-                        favorito.categoria ||
-                        datosActuales.categoria ||
-                        "Actividad",
-
-                    titulo:
-                        favorito.titulo ||
-                        datosActuales.titulo ||
-                        "Plan favorito"
-                };
-
-                if (
-                    JSON.stringify(
-                        favoritoActualizado
-                    ) !==
-                    JSON.stringify(
-                        favorito
-                    )
-                ) {
-                    huboCambios = true;
-                }
-
-                return favoritoActualizado;
-            }
+            normalizarFavorito
         );
 
-    if (huboCambios) {
-        guardarDatoLocal(
-            "favoritosSuralia",
-            favoritosActualizados
-        );
-    }
+    guardarDatoLocal(
+        "favoritosSuralia",
+        favoritosActualizados
+    );
 
     return favoritosActualizados;
 }
 
-
 function obtenerFavoritosUsuario() {
     const favoritos =
-        actualizarFavoritosAntiguos();
+        migrarFavoritosAntiguos();
 
     return favoritos
-        .filter(
-            (favorito) => {
-                return (
-                    favorito.usuarioEmail ===
-                    usuarioGuardado.email
+        .filter((favorito) => {
+            return (
+                favorito.usuarioEmail ===
+                usuarioGuardado.email
+            );
+        })
+        .sort((favoritoA, favoritoB) => {
+            const fechaA =
+                new Date(
+                    favoritoA.fechaGuardado ||
+                    0
                 );
-            }
-        )
-        .sort(
-            (
-                favoritoA,
-                favoritoB
-            ) => {
-                const fechaA =
-                    new Date(
-                        favoritoA.fechaGuardado ||
-                        0
-                    ).getTime();
 
-                const fechaB =
-                    new Date(
-                        favoritoB.fechaGuardado ||
-                        0
-                    ).getTime();
+            const fechaB =
+                new Date(
+                    favoritoB.fechaGuardado ||
+                    0
+                );
 
-                return fechaB - fechaA;
-            }
-        );
+            return fechaB - fechaA;
+        });
 }
 
-
-function obtenerPrecioFavorito(
-    precio
-) {
+function formatearPrecioFavorito(precio) {
     const precioNumerico =
-        Number(precio);
+        Number(precio || 0);
 
-    if (
-        !Number.isFinite(
-            precioNumerico
-        ) ||
-        precioNumerico === 0
-    ) {
+    if (precioNumerico === 0) {
         return "Gratis";
     }
 
-    return new Intl.NumberFormat(
-        "es-ES",
-        {
-            style: "currency",
-            currency: "EUR",
-            minimumFractionDigits:
-                Number.isInteger(
-                    precioNumerico
-                )
-                    ? 0
-                    : 2
-        }
-    ).format(
-        precioNumerico
-    );
+    return `${precioNumerico
+        .toFixed(2)
+        .replace(".00", "")
+        .replace(".", ",")} €`;
 }
 
-
-function obtenerImagenFavorito(
-    favorito
-) {
-    const datosActuales =
-        obtenerDatosActualesFavorito(
-            favorito
-        );
-
-    return (
-        datosActuales.imagen ||
-        favorito.imagen ||
-        "img/placeholder-plan.jpg"
-    );
-}
-
-
-function obtenerEnlaceFavorito(
-    favorito
-) {
-    const datosActuales =
-        obtenerDatosActualesFavorito(
-            favorito
-        );
-
-    return (
-        datosActuales.enlace ||
-        favorito.enlace ||
-        "planes.html"
-    );
-}
-
-
-function escaparTextoFavorito(
-    valor = ""
-) {
+function escaparHTML(valor = "") {
     return String(valor)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -1437,199 +1670,145 @@ function escaparTextoFavorito(
         .replace(/'/g, "&#039;");
 }
 
-
-function crearFavoritoHTML(
-    favorito
-) {
-    const datosActuales =
-        obtenerDatosActualesFavorito(
-            favorito
+function crearFavoritoHTML(favoritoOriginal) {
+    const favorito =
+        normalizarFavorito(
+            favoritoOriginal
         );
 
     const planId =
-        normalizarIdPlanFavorito(
-            favorito
+        escaparHTML(
+            favorito.planId ||
+            favorito.id ||
+            ""
+        );
+
+    const titulo =
+        escaparHTML(
+            favorito.titulo ||
+            "Plan guardado"
+        );
+
+    const categoria =
+        escaparHTML(
+            favorito.categoria ||
+            "Actividad"
+        );
+
+    const ubicacion =
+        escaparHTML(
+            favorito.ubicacion ||
+            "Ubicación pendiente"
+        );
+
+    const fecha =
+        escaparHTML(
+            favorito.fechaTexto ||
+            favorito.fecha ||
+            "Fecha por confirmar"
         );
 
     const imagen =
-        datosActuales.imagen ||
-        favorito.imagen ||
-        "img/placeholder-plan.jpg";
+        escaparHTML(
+            favorito.imagen ||
+            "img/placeholder-plan.jpg"
+        );
 
     const enlace =
-        datosActuales.enlace ||
-        favorito.enlace ||
-        "planes.html";
-
-    const titulo =
-        datosActuales.titulo ||
-        favorito.titulo ||
-        "Plan favorito";
-
-    const categoria =
-        datosActuales.categoria ||
-        favorito.categoria ||
-        "Actividad";
+        escaparHTML(
+            favorito.enlace ||
+            "planes.html"
+        );
 
     const precio =
-        datosActuales.precio ??
-        favorito.precio ??
-        0;
-
-    const fecha =
-        favorito.fechaTexto ||
-        favorito.fecha ||
-        "Fecha por confirmar";
-
-    const ubicacion =
-        favorito.ubicacion ||
-        "Ubicación pendiente";
+        formatearPrecioFavorito(
+            favorito.precio
+        );
 
     return `
         <article
             class="tarjeta-plan"
-            data-favorito-plan-id="${planId}"
+            data-plan-id="${planId}"
         >
 
-            <a
-                href="${enlace}"
-                class="tarjeta-plan__enlace"
-            >
+            <div class="tarjeta-plan__imagen">
 
-                <div class="tarjeta-plan__imagen">
+                <img
+                    src="${imagen}"
+                    alt="${titulo}"
+                    loading="lazy"
+                    onerror="
+                        this.onerror=null;
+                        this.src='img/placeholder-plan.jpg';
+                    "
+                >
 
-                    <img
-                        src="${imagen}"
-                        alt="${titulo}"
-                        onerror="
-                            this.onerror=null;
-                            this.src='img/placeholder-plan.jpg';
-                        "
-                    >
+                <span class="tarjeta-plan__precio">
+                    ${precio}
+                </span>
 
-                    <button
-                        type="button"
-                        class="tarjeta-plan__favorito favorito-activo boton-eliminar-favorito"
-                        data-plan-id="${planId}"
-                        aria-label="Eliminar de favoritos"
-                    >
-                        <i class="fa-solid fa-heart"></i>
-                    </button>
+                <button
+                    type="button"
+                    class="
+                        tarjeta-plan__favorito
+                        favorito-activo
+                    "
+                    data-eliminar-favorito="${planId}"
+                    aria-label="Eliminar ${titulo} de favoritos"
+                >
+                    <i class="fa-solid fa-heart"></i>
+                </button>
 
-                </div>
+            </div>
 
-                <div class="tarjeta-plan__contenido">
+            <div class="tarjeta-plan__contenido">
 
-                    <div class="tarjeta-plan__meta">
-                        <span>
-                            <i class="fa-regular fa-calendar"></i>
-                            ${fecha}
-                        </span>
-                    </div>
+                <div class="tarjeta-plan__meta">
 
-                    <h3>${titulo}</h3>
-
-                    <p class="tarjeta-plan__ubicacion">
-                        <i class="fa-solid fa-location-dot"></i>
-                        ${ubicacion}
-                    </p>
-
-                    <div class="tarjeta-plan__pie">
-                        <span>${categoria}</span>
-
-                        <strong>
-                            ${obtenerPrecioFavorito(precio)}
-                        </strong>
-                    </div>
+                    <span>
+                        <i class="fa-regular fa-calendar"></i>
+                        ${fecha}
+                    </span>
 
                 </div>
 
-            </a>
+                <h3>
+                    ${titulo}
+                </h3>
+
+                <p class="tarjeta-plan__ubicacion">
+                    <i class="fa-solid fa-location-dot"></i>
+                    ${ubicacion}
+                </p>
+
+                <div class="tarjeta-plan__pie">
+
+                    <span>
+                        ${categoria}
+                    </span>
+
+                    <strong>
+                        ${String(
+                            favorito.valoracion || 0
+                        ).replace(".", ",")}
+                        <i class="fa-solid fa-star"></i>
+                    </strong>
+
+                </div>
+
+                <a
+                    href="${enlace}"
+                    class="boton-principal-pequeno"
+                >
+                    Ver actividad
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+            </div>
 
         </article>
     `;
 }
-
-function mostrarFavoritosPerfil() {
-    const favoritos =
-        obtenerFavoritosUsuario();
-
-    if (
-        contadorFavoritosPerfil
-    ) {
-        contadorFavoritosPerfil
-            .textContent =
-            favoritos.length;
-    }
-
-    if (
-        !listaFavoritosPerfil ||
-        !estadoVacioFavoritos
-    ) {
-        return;
-    }
-
-    const hayFavoritos =
-        favoritos.length > 0;
-
-    listaFavoritosPerfil
-        .classList.toggle(
-            "oculto",
-            !hayFavoritos
-        );
-
-    listaFavoritosPerfil
-        .classList.toggle(
-            "oculta",
-            !hayFavoritos
-        );
-
-    estadoVacioFavoritos
-        .classList.toggle(
-            "oculto",
-            hayFavoritos
-        );
-
-    if (!hayFavoritos) {
-        listaFavoritosPerfil.innerHTML =
-            "";
-
-        return;
-    }
-
-    listaFavoritosPerfil.innerHTML =
-        favoritos
-            .map(
-                crearFavoritoHTML
-            )
-            .join("");
-
-    activarBotonesEliminarFavorito();
-}
-
-
-function activarBotonesEliminarFavorito() {
-    listaFavoritosPerfil
-        ?.querySelectorAll(
-            ".boton-eliminar-favorito"
-        )
-        .forEach(
-            (boton) => {
-                boton.addEventListener(
-                    "click",
-                    (evento) => {
-                        evento.preventDefault();
-                        evento.stopPropagation();
-
-                        eliminarFavoritoGuardado(
-                            boton.dataset.planId
-                        );
-                    }
-                );
-            }
-        );
-}
-
 
 function eliminarFavoritoGuardado(
     planId
@@ -1647,21 +1826,21 @@ function eliminarFavoritoGuardado(
     const favoritosActualizados =
         favoritos.filter(
             (favorito) => {
-                const mismoPlan =
-                    normalizarIdPlanFavorito(
+                const idFavorito =
+                    obtenerIdPlanFavorito(
                         favorito
-                    ) ===
-                    String(planId)
-                        .trim()
-                        .toLowerCase();
-
-                const mismoUsuario =
-                    favorito.usuarioEmail ===
-                    usuarioGuardado.email;
+                    ) ||
+                    String(
+                        favorito.planId ||
+                        favorito.id ||
+                        ""
+                    );
 
                 return !(
-                    mismoPlan &&
-                    mismoUsuario
+                    idFavorito ===
+                        String(planId) &&
+                    favorito.usuarioEmail ===
+                        usuarioGuardado.email
                 );
             }
         );
@@ -1676,6 +1855,81 @@ function eliminarFavoritoGuardado(
     mostrarNotificacion(
         "El plan se ha eliminado de favoritos."
     );
+}
+
+function activarBotonesEliminarFavorito() {
+    document
+        .querySelectorAll(
+            "[data-eliminar-favorito]"
+        )
+        .forEach((boton) => {
+            boton.addEventListener(
+                "click",
+                (evento) => {
+                    evento.preventDefault();
+                    evento.stopPropagation();
+
+                    eliminarFavoritoGuardado(
+                        boton.dataset
+                            .eliminarFavorito
+                    );
+                }
+            );
+        });
+}
+
+function mostrarFavoritosPerfil() {
+    const favoritos =
+        obtenerFavoritosUsuario();
+
+    if (contadorFavoritosPerfil) {
+        contadorFavoritosPerfil
+            .textContent =
+            favoritos.length;
+    }
+
+    if (
+        !listaFavoritosPerfil ||
+        !estadoVacioFavoritos
+    ) {
+        return;
+    }
+
+    if (favoritos.length === 0) {
+        listaFavoritosPerfil.innerHTML =
+            "";
+
+        listaFavoritosPerfil
+            .classList.add(
+                "oculta"
+            );
+
+        estadoVacioFavoritos
+            .classList.remove(
+                "oculto"
+            );
+
+        return;
+    }
+
+    listaFavoritosPerfil
+        .classList.remove(
+            "oculta"
+        );
+
+    estadoVacioFavoritos
+        .classList.add(
+            "oculto"
+        );
+
+    listaFavoritosPerfil.innerHTML =
+        favoritos
+            .map(
+                crearFavoritoHTML
+            )
+            .join("");
+
+    activarBotonesEliminarFavorito();
 }
 
 /* =========================================

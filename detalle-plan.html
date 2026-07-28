@@ -13,7 +13,7 @@
         content="Descubre todos los detalles de esta experiencia en Sevilla con Suralia."
     >
 
-    <title>Visita guiada por Itálica | Suralia</title>
+    <title id="titulo-pagina">Visita guiada por Itálica | Suralia</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,7 +36,20 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body>
+<body
+    id="detalle-plan"
+    data-plan-id="italica"
+    data-titulo="Visita guiada por Itálica"
+    data-categoria="cultura"
+    data-categoria-texto="Cultura"
+    data-precio="0"
+    data-valoracion="4.8"
+    data-fecha="25 de julio"
+    data-fecha-iso="2026-07-25"
+    data-ubicacion="Santiponce, Sevilla"
+    data-imagen="img/italica principal.jpg"
+    data-enlace="detalle-plan.html?id=italica"
+>
 
     <header class="header">
 
@@ -211,7 +224,7 @@
 
                     <i class="fa-solid fa-chevron-right"></i>
 
-                    <span>
+                    <span id="miga-plan">
                         Visita guiada por Itálica
                     </span>
 
@@ -221,12 +234,12 @@
 
                     <div>
 
-                        <span class="detalle-categoria">
-                            <i class="fa-solid fa-landmark"></i>
-                            Cultura
+                        <span class="detalle-categoria" id="detalle-categoria">
+                            <i class="fa-solid fa-landmark" id="detalle-categoria-icono"></i>
+                            <span id="detalle-categoria-texto">Cultura</span>
                         </span>
 
-                        <h1>
+                        <h1 id="detalle-titulo">
                             Visita guiada por Itálica
                         </h1>
 
@@ -234,18 +247,18 @@
 
                             <span>
                                 <i class="fa-solid fa-star"></i>
-                                <strong>4,8</strong>
-                                37 opiniones
+                                <strong id="detalle-valoracion">4,8</strong>
+                                <span id="detalle-opiniones-texto">37 opiniones</span>
                             </span>
 
                             <span>
                                 <i class="fa-solid fa-location-dot"></i>
-                                Santiponce, Sevilla
+                                <span id="detalle-ubicacion-cabecera">Santiponce, Sevilla</span>
                             </span>
 
                             <span>
                                 <i class="fa-solid fa-user-group"></i>
-                                24 personas apuntadas
+                                <span id="detalle-personas-apuntadas">24 personas apuntadas</span>
                             </span>
 
                         </div>
@@ -288,36 +301,39 @@
                 <button
                     class="galeria-plan__principal"
                     type="button"
-                    data-imagen="img/Arquitectura histórica.jpg"
+                    data-imagen="img/Arquitectura histórica.jpg" id="galeria-boton-principal"
                     aria-label="Ampliar imagen principal"
                 >
                     <img
                         src="img/Arquitectura histórica.jpg"
                         alt="Ruinas del conjunto arqueológico de Itálica"
+                        id="galeria-imagen-principal"
                     >
                 </button>
 
                 <button
                     class="galeria-plan__secundaria"
                     type="button"
-                    data-imagen="img/Restos arqueológicos romanos.jpg"
+                    data-imagen="img/Restos arqueológicos romanos.jpg" id="galeria-boton-secundaria-1"
                     aria-label="Ampliar segunda imagen"
                 >
                     <img
                         src="img/Restos arqueológicos romanos.jpg"
                         alt="Restos arqueológicos romanos"
+                        id="galeria-imagen-secundaria-1"
                     >
                 </button>
 
                 <button
                     class="galeria-plan__secundaria galeria-plan__ultima"
                     type="button"
-                    data-imagen="img/Ruinas del conjunto arqueológico de Itálica.jpg"
+                    data-imagen="img/Ruinas del conjunto arqueológico de Itálica.jpg" id="galeria-boton-secundaria-2"
                     aria-label="Ampliar tercera imagen"
                 >
                     <img
                         src="img/Ruinas del conjunto arqueológico de Itálica.jpg"
                         alt="Arquitectura histórica"
+                        id="galeria-imagen-secundaria-2"
                     >
 
                     <span class="galeria-plan__contador">
@@ -340,13 +356,13 @@
 
                         <div class="resumen-plan__organizador">
 
-                            <div class="organizador-avatar">
+                            <div class="organizador-avatar" id="organizador-avatar">
                                 RS
                             </div>
 
                             <div>
                                 <span>Actividad organizada por</span>
-                                <h2>Rutas Sevilla</h2>
+                                <h2 id="organizador-nombre">Rutas Sevilla</h2>
 
                                 <p>
                                     Organizador verificado
@@ -364,8 +380,8 @@
                                 </span>
 
                                 <div>
-                                    <strong>Sábado, 25 de julio</strong>
-                                    <span>De 10:30 a 13:00</span>
+                                    <strong id="detalle-fecha-principal">Sábado, 25 de julio</strong>
+                                    <span id="detalle-horario">De 10:30 a 13:00</span>
                                 </div>
                             </article>
 
@@ -375,8 +391,8 @@
                                 </span>
 
                                 <div>
-                                    <strong>Grupo reducido</strong>
-                                    <span>Máximo 30 personas</span>
+                                    <strong id="detalle-tipo-grupo">Grupo reducido</strong>
+                                    <span id="detalle-max-personas">Máximo 30 personas</span>
                                 </div>
                             </article>
 
@@ -387,7 +403,7 @@
 
                                 <div>
                                     <strong>Idioma</strong>
-                                    <span>Actividad en español</span>
+                                    <span id="detalle-idioma">Actividad en español</span>
                                 </div>
                             </article>
 
@@ -398,6 +414,8 @@
                     <section class="bloque-detalle">
 
                         <h2>Sobre esta experiencia</h2>
+
+                        <div id="detalle-descripcion">
 
                         <p>
                             Descubre uno de los conjuntos arqueológicos más
@@ -416,6 +434,8 @@
                             en la historia, la arquitectura y el patrimonio de
                             Sevilla. No es necesario tener conocimientos previos.
                         </p>
+
+                        </div>
 
                         <button
                             type="button"
@@ -450,7 +470,7 @@
 
                         <h2>Qué incluye</h2>
 
-                        <div class="lista-incluye">
+                        <div class="lista-incluye" id="detalle-incluye">
 
                             <div>
                                 <i class="fa-solid fa-check"></i>
@@ -490,7 +510,7 @@
 
                         <h2>Ubicación</h2>
 
-                        <p class="texto-suave">
+                        <p class="texto-suave" id="detalle-direccion">
                             Conjunto Arqueológico de Itálica, avenida de
                             Extremadura, Santiponce.
                         </p>
@@ -499,6 +519,7 @@
 
                         <a
                             href="https://www.google.com/maps/search/?api=1&query=Itálica+Santiponce"
+                            id="enlace-como-llegar"
                             target="_blank"
                             rel="noopener noreferrer"
                             class="enlace-mapa"
@@ -518,8 +539,8 @@
 
                                 <p>
                                     <i class="fa-solid fa-star"></i>
-                                    <strong>4,8</strong>
-                                    · 37 valoraciones
+                                    <strong id="opiniones-valoracion">4,8</strong>
+                                    · <span id="opiniones-total">37 valoraciones</span>
                                 </p>
                             </div>
 
@@ -605,13 +626,13 @@
                         <div class="reserva-plan__precio">
 
                             <div>
-                                <strong>Gratis</strong>
+                                <strong id="detalle-precio">Gratis</strong>
                                 <span>por persona</span>
                             </div>
 
                             <span>
                                 <i class="fa-solid fa-star"></i>
-                                4,8
+                                <span id="reserva-valoracion">4,8</span>
                             </span>
 
                         </div>
@@ -691,17 +712,17 @@
 
                             <div>
                                 <span>Precio de la actividad</span>
-                                <strong>0 €</strong>
+                                <strong id="desglose-precio">0 €</strong>
                             </div>
 
                             <div>
                                 <span>Gastos de gestión</span>
-                                <strong>0 €</strong>
+                                <strong id="desglose-gestion">0 €</strong>
                             </div>
 
                             <div class="reserva-plan__total">
                                 <span>Total</span>
-                                <strong>0 €</strong>
+                                <strong id="desglose-total">0 €</strong>
                             </div>
 
                         </div>
@@ -767,7 +788,7 @@
 
                     <article class="tarjeta-plan">
 
-                        <a href="#" class="tarjeta-plan__enlace">
+                        <a href="detalle-plan.html?id=exposicion-contemporanea" class="tarjeta-plan__enlace">
 
                             <div class="tarjeta-plan__imagen imagen-plan--exposicion">
 
@@ -865,7 +886,7 @@
 
                     <article class="tarjeta-plan">
 
-                        <a href="#" class="tarjeta-plan__enlace">
+                        <a href="detalle-plan.html?id=tapas-triana" class="tarjeta-plan__enlace">
 
                             <div class="tarjeta-plan__imagen imagen-plan--tapas">
 

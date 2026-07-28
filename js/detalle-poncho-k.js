@@ -33,6 +33,10 @@ const datosPlanPonchoK = {
         document.body.dataset.planFecha ||
         "21 de noviembre de 2026",
 
+    fechaIso:
+        document.body.dataset.planFechaIso ||
+        "2026-11-21",
+
     ubicacion:
         document.body.dataset.planUbicacion ||
         "Cartuja Center CITE, Sevilla",
@@ -167,18 +171,40 @@ function obtenerReservas() {
 }
 
 
+function guardarLocalStorage(
+    clave,
+    valor
+) {
+    try {
+        localStorage.setItem(
+            clave,
+            JSON.stringify(valor)
+        );
+
+        return true;
+    } catch (error) {
+        console.error(
+            `No se pudo guardar ${clave}:`,
+            error
+        );
+
+        return false;
+    }
+}
+
+
 function guardarFavoritos(favoritos) {
-    localStorage.setItem(
+    return guardarLocalStorage(
         "favoritosSuralia",
-        JSON.stringify(favoritos)
+        favoritos
     );
 }
 
 
 function guardarReservas(reservas) {
-    localStorage.setItem(
+    return guardarLocalStorage(
         "reservasSuralia",
-        JSON.stringify(reservas)
+        reservas
     );
 }
 
@@ -526,6 +552,11 @@ function alternarFavorito() {
         obtenerSesion();
 
     if (!sesion?.conectado) {
+        sessionStorage.setItem(
+            "destinoDespuesLoginSuralia",
+            window.location.href
+        );
+
         mostrarNotificacion(
             "Debes iniciar sesión para guardar favoritos."
         );
@@ -587,9 +618,18 @@ function alternarFavorito() {
         );
     }
 
-    guardarFavoritos(
-        favoritos
-    );
+    const guardadoCorrecto =
+        guardarFavoritos(
+            favoritos
+        );
+
+    if (!guardadoCorrecto) {
+        mostrarNotificacion(
+            "No se ha podido actualizar favoritos."
+        );
+
+        return;
+    }
 
     actualizarBotonFavorito(
         quedaGuardado
@@ -664,6 +704,22 @@ function obtenerTextoSeleccionado(select) {
 }
 
 
+function obtenerFechaIsoReserva(
+    fechaValor
+) {
+    const fechasIso = {
+        "21-noviembre-2026":
+            "2026-11-21"
+    };
+
+    return (
+        fechasIso[fechaValor] ||
+        datosPlanPonchoK.fechaIso ||
+        ""
+    );
+}
+
+
 function existeReserva(
     reservas,
     email,
@@ -677,8 +733,14 @@ function existeReserva(
                     email &&
                 reserva.planId ===
                     planId &&
-                reserva.fechaValor ===
-                    fechaValor &&
+                (
+                    reserva.fecha ===
+                        fechaValor ||
+                    reserva.fechaIso ===
+                        fechaValor ||
+                    reserva.fechaValor ===
+                        fechaValor
+                ) &&
                 reserva.estado !==
                     "cancelada"
             );
@@ -697,6 +759,11 @@ if (formularioReserva) {
                 obtenerSesion();
 
             if (!sesion?.conectado) {
+                sessionStorage.setItem(
+                    "destinoDespuesLoginSuralia",
+                    window.location.href
+                );
+
                 mostrarNotificacion(
                     "Debes iniciar sesión para reservar entradas."
                 );
@@ -717,6 +784,11 @@ if (formularioReserva) {
                     fechaReserva
                 );
 
+            const fechaIso =
+                obtenerFechaIsoReserva(
+                    fechaValor
+                );
+
             const entradas = Number(
                 personasReserva?.value || 1
             );
@@ -733,7 +805,7 @@ if (formularioReserva) {
                     reservas,
                     sesion.email,
                     datosPlanPonchoK.planId,
-                    fechaValor
+                    fechaIso
                 )
             ) {
                 mostrarNotificacion(
@@ -765,6 +837,9 @@ if (formularioReserva) {
                 enlace:
                     datosPlanPonchoK.enlace,
 
+                precio:
+                    datosPlanPonchoK.precio,
+
                 precioUnitario:
                     datosPlanPonchoK.precio,
 
@@ -775,6 +850,11 @@ if (formularioReserva) {
 
                 precioTotal:
                     total,
+
+                fecha:
+                    fechaIso,
+
+                fechaIso,
 
                 fechaValor,
 
@@ -797,17 +877,30 @@ if (formularioReserva) {
                 nuevaReserva
             );
 
-            guardarReservas(
-                reservas
-            );
+            const reservaGuardada =
+                guardarReservas(
+                    reservas
+                );
+
+            if (!reservaGuardada) {
+                mostrarNotificacion(
+                    "No se ha podido guardar la reserva."
+                );
+
+                return;
+            }
 
             mostrarNotificacion(
                 "Entradas reservadas correctamente."
             );
 
             formularioReserva.reset();
-
             actualizarPrecioReserva();
+
+            setTimeout(() => {
+                window.location.href =
+                    "perfil.html#reservas";
+            }, 900);
         }
     );
 }
@@ -890,6 +983,26 @@ function crearMapaPonchoK() {
     }, 250);
 }
 
+
+
+
+/* =====================================================
+   SINCRONIZACIÓN ENTRE PESTAÑAS
+===================================================== */
+
+window.addEventListener(
+    "storage",
+    (evento) => {
+        if (
+            evento.key ===
+                "favoritosSuralia" ||
+            evento.key ===
+                "sesionSuralia"
+        ) {
+            cargarEstadoFavorito();
+        }
+    }
+);
 
 /* =====================================================
    CARGA INICIAL

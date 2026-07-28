@@ -33,6 +33,10 @@ const datosPlanSierraNorte = {
         document.body.dataset.planFecha ||
         "8 de agosto de 2026",
 
+    fechaIso:
+        document.body.dataset.planFechaIso ||
+        "2026-08-08",
+
     ubicacion:
         document.body.dataset.planUbicacion ||
         "Constantina, Sevilla",
@@ -173,18 +177,40 @@ function obtenerReservas() {
 }
 
 
+function guardarLocalStorage(
+    clave,
+    valor
+) {
+    try {
+        localStorage.setItem(
+            clave,
+            JSON.stringify(valor)
+        );
+
+        return true;
+    } catch (error) {
+        console.error(
+            `No se pudo guardar ${clave}:`,
+            error
+        );
+
+        return false;
+    }
+}
+
+
 function guardarFavoritos(favoritos) {
-    localStorage.setItem(
+    return guardarLocalStorage(
         "favoritosSuralia",
-        JSON.stringify(favoritos)
+        favoritos
     );
 }
 
 
 function guardarReservas(reservas) {
-    localStorage.setItem(
+    return guardarLocalStorage(
         "reservasSuralia",
-        JSON.stringify(reservas)
+        reservas
     );
 }
 
@@ -499,6 +525,13 @@ function actualizarBotonFavorito(
                 ? "Guardado"
                 : "Guardar";
     }
+
+    botonFavoritoPlan.setAttribute(
+        "aria-label",
+        esFavorito
+            ? "Eliminar ruta de favoritos"
+            : "Añadir ruta a favoritos"
+    );
 }
 
 
@@ -525,6 +558,11 @@ function alternarFavorito() {
         obtenerSesion();
 
     if (!sesion?.conectado) {
+        sessionStorage.setItem(
+            "destinoDespuesLoginSuralia",
+            window.location.href
+        );
+
         mostrarNotificacion(
             "Debes iniciar sesión para guardar favoritos."
         );
@@ -586,9 +624,18 @@ function alternarFavorito() {
         );
     }
 
-    guardarFavoritos(
-        favoritos
-    );
+    const guardadoCorrecto =
+        guardarFavoritos(
+            favoritos
+        );
+
+    if (!guardadoCorrecto) {
+        mostrarNotificacion(
+            "No se ha podido actualizar favoritos."
+        );
+
+        return;
+    }
 
     actualizarBotonFavorito(
         quedaGuardado
@@ -663,6 +710,23 @@ function obtenerTextoSeleccionado(select) {
 }
 
 
+function obtenerFechaIsoReserva(
+    fechaValor
+) {
+    const fechasIso = {
+        "8-agosto-2026": "2026-08-08",
+        "15-agosto-2026": "2026-08-15",
+        "22-agosto-2026": "2026-08-22"
+    };
+
+    return (
+        fechasIso[fechaValor] ||
+        datosPlanSierraNorte.fechaIso ||
+        ""
+    );
+}
+
+
 function existeReserva(
     reservas,
     email,
@@ -676,8 +740,14 @@ function existeReserva(
                     email &&
                 reserva.planId ===
                     planId &&
-                reserva.fechaValor ===
-                    fechaValor &&
+                (
+                    reserva.fecha ===
+                        fechaValor ||
+                    reserva.fechaIso ===
+                        fechaValor ||
+                    reserva.fechaValor ===
+                        fechaValor
+                ) &&
                 reserva.estado !==
                     "cancelada"
             );
@@ -696,6 +766,11 @@ if (formularioReserva) {
                 obtenerSesion();
 
             if (!sesion?.conectado) {
+                sessionStorage.setItem(
+                    "destinoDespuesLoginSuralia",
+                    window.location.href
+                );
+
                 mostrarNotificacion(
                     "Debes iniciar sesión para reservar."
                 );
@@ -716,6 +791,11 @@ if (formularioReserva) {
                     fechaReserva
                 );
 
+            const fechaIso =
+                obtenerFechaIsoReserva(
+                    fechaValor
+                );
+
             const personas = Number(
                 personasReserva?.value || 1
             );
@@ -732,7 +812,7 @@ if (formularioReserva) {
                     reservas,
                     sesion.email,
                     datosPlanSierraNorte.planId,
-                    fechaValor
+                    fechaIso
                 )
             ) {
                 mostrarNotificacion(
@@ -764,6 +844,9 @@ if (formularioReserva) {
                 enlace:
                     datosPlanSierraNorte.enlace,
 
+                precio:
+                    datosPlanSierraNorte.precio,
+
                 precioUnitario:
                     datosPlanSierraNorte.precio,
 
@@ -772,16 +855,14 @@ if (formularioReserva) {
                 precioTotal:
                     total,
 
+                fecha:
+                    fechaIso,
+
+                fechaIso,
+
                 fechaValor,
 
                 fechaTexto,
-
-                fechaIso:
-                    fechaValor === "8-agosto-2026"
-                        ? "2026-08-08"
-                        : fechaValor === "15-agosto-2026"
-                            ? "2026-08-15"
-                            : "2026-08-22",
 
                 hora:
                     "09:00",
@@ -800,17 +881,30 @@ if (formularioReserva) {
                 nuevaReserva
             );
 
-            guardarReservas(
-                reservas
-            );
+            const reservaGuardada =
+                guardarReservas(
+                    reservas
+                );
+
+            if (!reservaGuardada) {
+                mostrarNotificacion(
+                    "No se ha podido guardar la reserva."
+                );
+
+                return;
+            }
 
             mostrarNotificacion(
                 "Reserva realizada correctamente."
             );
 
             formularioReserva.reset();
-
             actualizarPrecioReserva();
+
+            setTimeout(() => {
+                window.location.href =
+                    "perfil.html#reservas";
+            }, 900);
         }
     );
 }
@@ -886,6 +980,26 @@ function crearMapaSierraNorte() {
     }, 250);
 }
 
+
+
+
+/* =====================================================
+   SINCRONIZACIÓN ENTRE PESTAÑAS
+===================================================== */
+
+window.addEventListener(
+    "storage",
+    (evento) => {
+        if (
+            evento.key ===
+                "favoritosSuralia" ||
+            evento.key ===
+                "sesionSuralia"
+        ) {
+            cargarEstadoFavorito();
+        }
+    }
+);
 
 /* =====================================================
    CARGA INICIAL

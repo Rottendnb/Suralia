@@ -446,10 +446,6 @@ function alternarMenuUsuario(
 }
 
 async function cerrarSesionSuralia() {
-    console.log(
-    "Cliente Supabase al cerrar:",
-    window.clienteSupabase
-);
     try {
         if (
             window.clienteSupabase
@@ -735,7 +731,11 @@ function obtenerDatosPlanPortada(
 
         enlace:
             tarjeta.dataset.enlace ||
-            "detalle-plan.html"
+            (
+                tarjeta.dataset.planId
+                    ? `detalle-plan.html?id=${tarjeta.dataset.planId}`
+                    : "planes.html"
+            )
     };
 }
 
@@ -830,6 +830,11 @@ function alternarFavoritoPortada(
     boton
 ) {
     if (!sesionActual?.conectado) {
+        sessionStorage.setItem(
+            "destinoDespuesLoginSuralia",
+            window.location.href
+        );
+
         mostrarNotificacionPrincipal(
             "Debes iniciar sesión para guardar favoritos."
         );
@@ -975,6 +980,7 @@ function obtenerDatosSierraNorte() {
             "Ruta por la Sierra Norte",
 
         categoria:
+            tarjeta?.dataset.categoriaTexto ||
             tarjeta?.dataset.categoria ||
             "Naturaleza",
 
@@ -985,6 +991,10 @@ function obtenerDatosSierraNorte() {
         fechaTexto:
             tarjeta?.dataset.fecha ||
             "Este sábado",
+
+        fechaIso:
+            tarjeta?.dataset.fechaIso ||
+            "",
 
         ubicacion:
             tarjeta?.dataset.ubicacion ||
@@ -1044,6 +1054,11 @@ function actualizarFavoritoSierraNorte() {
 
 function alternarFavoritoSierraNorte() {
     if (!sesionActual?.conectado) {
+        sessionStorage.setItem(
+            "destinoDespuesLoginSuralia",
+            window.location.href
+        );
+
         mostrarNotificacionPrincipal(
             "Debes iniciar sesión para guardar favoritos."
         );
