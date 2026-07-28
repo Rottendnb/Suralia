@@ -977,7 +977,7 @@ function obtenerDatosSierraNorte() {
 
         titulo:
             tarjeta?.dataset.titulo ||
-            "Ruta por la Sierra Norte",
+            "Ruta de senderismo por la Sierra Norte",
 
         categoria:
             tarjeta?.dataset.categoriaTexto ||
@@ -986,15 +986,15 @@ function obtenerDatosSierraNorte() {
 
         imagen:
             tarjeta?.dataset.imagen ||
-            "img/sierra-norte-nueva.png",
+            "img/sierra-norte-principal.jpg",
 
         fechaTexto:
             tarjeta?.dataset.fecha ||
-            "Este sábado",
+            "8 de agosto de 2026",
 
         fechaIso:
             tarjeta?.dataset.fechaIso ||
-            "",
+            "2026-08-08",
 
         ubicacion:
             tarjeta?.dataset.ubicacion ||
@@ -1003,7 +1003,7 @@ function obtenerDatosSierraNorte() {
         precio:
             Number(
                 tarjeta?.dataset.precio ||
-                0
+                12
             ),
 
         valoracion:
@@ -1014,7 +1014,7 @@ function obtenerDatosSierraNorte() {
 
         enlace:
             tarjeta?.dataset.enlace ||
-            "planes.html?busqueda=Naturaleza"
+            "detalle-sierra-norte.html"
     };
 }
 

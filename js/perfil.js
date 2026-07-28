@@ -907,11 +907,11 @@ const catalogoPlanesReservas = {
 
     "sierra-norte": {
         planId: "sierra-norte",
-        titulo: "Ruta por la Sierra Norte",
+        titulo: "Ruta de senderismo por la Sierra Norte",
         categoria: "Naturaleza",
-        imagen: "img/rutasierranorte.jpg",
+        imagen: "img/sierra-norte-principal.jpg",
         ubicacion: "Constantina, Sevilla",
-        precio: 0,
+        precio: 12,
         hora: "09:00",
         enlace: "detalle-sierra-norte.html"
     }
@@ -947,7 +947,8 @@ function obtenerIdPlanReserva(reserva) {
             "exposicion-contemporanea",
         "exposicion de arte contemporaneo":
             "exposicion-contemporanea",
-        "ruta por la sierra norte": "sierra-norte"
+        "ruta por la sierra norte": "sierra-norte",
+        "ruta de senderismo por la sierra norte": "sierra-norte"
     };
 
     return idsPorTitulo[titulo] || "";
@@ -1484,13 +1485,14 @@ const catalogoPlanesFavoritos = {
 
     "sierra-norte": {
         planId: "sierra-norte",
-        titulo: "Ruta por la Sierra Norte",
+        titulo: "Ruta de senderismo por la Sierra Norte",
         categoria: "Naturaleza",
-        precio: 0,
+        precio: 12,
         valoracion: 4.9,
-        fechaTexto: "Este sábado",
+        fechaTexto: "8 de agosto de 2026",
+        fechaIso: "2026-08-08",
         ubicacion: "Constantina, Sevilla",
-        imagen: "img/rutasierranorte.jpg",
+        imagen: "img/sierra-norte-principal.jpg",
         enlace: "detalle-sierra-norte.html"
     }
 };
@@ -1540,6 +1542,9 @@ function obtenerIdPlanFavorito(favorito) {
             "exposicion-contemporanea",
 
         "ruta por la sierra norte":
+            "sierra-norte",
+
+        "ruta de senderismo por la sierra norte":
             "sierra-norte"
     };
 

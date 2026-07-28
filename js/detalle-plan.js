@@ -308,10 +308,21 @@ function guardarDatosLocalStorage(
     clave,
     datos
 ) {
-    localStorage.setItem(
-        clave,
-        JSON.stringify(datos)
-    );
+    try {
+        localStorage.setItem(
+            clave,
+            JSON.stringify(datos)
+        );
+
+        return true;
+    } catch (error) {
+        console.error(
+            `No se pudo guardar ${clave}:`,
+            error
+        );
+
+        return false;
+    }
 }
 
 
@@ -781,9 +792,40 @@ if (botonCompartir) {
                     return;
                 }
 
-                await navigator.clipboard.writeText(
-                    window.location.href
-                );
+                if (
+                    navigator.clipboard &&
+                    window.isSecureContext
+                ) {
+                    await navigator.clipboard.writeText(
+                        window.location.href
+                    );
+                } else {
+                    const campoTemporal =
+                        document.createElement(
+                            "textarea"
+                        );
+
+                    campoTemporal.value =
+                        window.location.href;
+
+                    campoTemporal.style.position =
+                        "fixed";
+
+                    campoTemporal.style.opacity =
+                        "0";
+
+                    document.body.appendChild(
+                        campoTemporal
+                    );
+
+                    campoTemporal.select();
+
+                    document.execCommand(
+                        "copy"
+                    );
+
+                    campoTemporal.remove();
+                }
 
                 mostrarNotificacion(
                     "El enlace se ha copiado al portapapeles."
@@ -1092,10 +1134,19 @@ function alternarFavoritoDetalle() {
         );
     }
 
-    guardarDatosLocalStorage(
-        "favoritosSuralia",
-        favoritos
-    );
+    const favoritoGuardado =
+        guardarDatosLocalStorage(
+            "favoritosSuralia",
+            favoritos
+        );
+
+    if (!favoritoGuardado) {
+        mostrarNotificacion(
+            "No se ha podido actualizar favoritos."
+        );
+
+        return;
+    }
 
     actualizarBotonFavoritoDetalle();
 }
@@ -1205,10 +1256,16 @@ if (formularioReserva) {
                             sesionActual.email &&
                         reserva.planId ===
                             planActual.planId &&
-                        reserva.fecha ===
-                            fechaSeleccionada &&
-                        reserva.estado ===
-                            "confirmada"
+                        (
+                            reserva.fecha ===
+                                fechaSeleccionada ||
+                            reserva.fechaIso ===
+                                fechaSeleccionada ||
+                            reserva.fechaValor ===
+                                fechaSeleccionada
+                        ) &&
+                        reserva.estado !==
+                            "cancelada"
                 );
 
             if (reservaExistente) {
@@ -1256,6 +1313,13 @@ if (formularioReserva) {
                 precio:
                     planActual.precio,
 
+                precioUnitario:
+                    planActual.precio,
+
+                precioTotal:
+                    planActual.precio *
+                    numeroPersonas,
+
                 enlace:
                     planActual.enlace,
 
@@ -1273,10 +1337,19 @@ if (formularioReserva) {
                 nuevaReserva
             );
 
-            guardarDatosLocalStorage(
-                "reservasSuralia",
-                reservasGuardadas
-            );
+            const reservaGuardada =
+                guardarDatosLocalStorage(
+                    "reservasSuralia",
+                    reservasGuardadas
+                );
+
+            if (!reservaGuardada) {
+                mostrarNotificacion(
+                    "No se ha podido guardar la reserva."
+                );
+
+                return;
+            }
 
             mostrarNotificacion(
                 `Reserva confirmada para ${numeroPersonas} ${
