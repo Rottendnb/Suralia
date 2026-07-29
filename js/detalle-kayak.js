@@ -2,46 +2,80 @@
    DATOS DEL PLAN
 ===================================================== */
 
+function obtenerDatosOficialesKayak() {
+    if (
+        typeof window.obtenerPlanSuralia !==
+        "function"
+    ) {
+        return null;
+    }
+
+    return window.obtenerPlanSuralia(
+        "kayak-atardecer"
+    );
+}
+
+
+const datosCatalogoKayak =
+    obtenerDatosOficialesKayak();
+
+
 const datosPlanKayak = {
     planId:
+        datosCatalogoKayak?.planId ||
         document.body.dataset.planId ||
         "kayak-atardecer",
 
     titulo:
+        datosCatalogoKayak?.titulo ||
         document.body.dataset.planTitulo ||
         "Kayak al atardecer",
 
     categoria:
+        datosCatalogoKayak?.categoriaTexto ||
         document.body.dataset.planCategoria ||
         "Aventura",
 
     imagen:
+        datosCatalogoKayak?.imagen ||
         document.body.dataset.planImagen ||
         "img/kayak principal.jpg",
 
     precio:
         Number(
-            document.body.dataset.planPrecio || 18
+            datosCatalogoKayak?.precio ??
+            document.body.dataset.planPrecio ??
+            18
         ),
 
     valoracion:
         Number(
-            document.body.dataset.planValoracion || 4.9
+            datosCatalogoKayak?.valoracion ??
+            document.body.dataset.planValoracion ??
+            4.9
         ),
 
     fechaTexto:
+        datosCatalogoKayak?.fechaTexto ||
         document.body.dataset.planFecha ||
         "27 de julio de 2026",
 
     fechaIso:
+        datosCatalogoKayak?.fechaIso ||
         document.body.dataset.planFechaIso ||
         "2026-07-27",
 
+    hora:
+        datosCatalogoKayak?.hora ||
+        "19:00",
+
     ubicacion:
+        datosCatalogoKayak?.ubicacion ||
         document.body.dataset.planUbicacion ||
         "Río Guadalquivir, Sevilla",
 
     enlace:
+        datosCatalogoKayak?.enlace ||
         document.body.dataset.planEnlace ||
         "detalle-kayak.html"
 };
@@ -792,7 +826,7 @@ if (formularioReserva) {
                 fechaTexto,
 
                 hora:
-                    "19:00",
+                    datosPlanKayak.hora,
 
                 estado:
                     "confirmada",
@@ -921,6 +955,15 @@ window.addEventListener(
 /* =====================================================
    CARGA INICIAL
 ===================================================== */
+
+if (
+    typeof window.obtenerPlanSuralia !==
+    "function"
+) {
+    console.warn(
+        "No se ha cargado js/datos-planes.js. Se usarán los datos del HTML."
+    );
+}
 
 cargarEstadoFavorito();
 actualizarPrecioReserva();

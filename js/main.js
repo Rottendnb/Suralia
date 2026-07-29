@@ -63,50 +63,158 @@ const navegacion =
     );
 
 
+function actualizarBotonMenuMovil(
+    menuAbierto
+) {
+    if (!botonMenu) {
+        return;
+    }
+
+    botonMenu.setAttribute(
+        "aria-expanded",
+        String(menuAbierto)
+    );
+
+    botonMenu.setAttribute(
+        "aria-label",
+        menuAbierto
+            ? "Cerrar menú"
+            : "Abrir menú"
+    );
+
+    botonMenu.innerHTML =
+        menuAbierto
+            ? `
+                <i
+                    class="fa-solid fa-xmark"
+                    aria-hidden="true"
+                ></i>
+            `
+            : `
+                <i
+                    class="fa-solid fa-bars"
+                    aria-hidden="true"
+                ></i>
+            `;
+}
+
+
+function cerrarMenuMovil(
+    devolverFoco = false
+) {
+    if (
+        !botonMenu ||
+        !navegacion
+    ) {
+        return;
+    }
+
+    const estabaAbierto =
+        navegacion.classList.contains(
+            "activa"
+        );
+
+    navegacion.classList.remove(
+        "activa"
+    );
+
+    actualizarBotonMenuMovil(
+        false
+    );
+
+    if (
+        devolverFoco &&
+        estabaAbierto
+    ) {
+        botonMenu.focus();
+    }
+}
+
+
+function abrirMenuMovil() {
+    if (
+        !botonMenu ||
+        !navegacion
+    ) {
+        return;
+    }
+
+    navegacion.classList.add(
+        "activa"
+    );
+
+    actualizarBotonMenuMovil(
+        true
+    );
+}
+
+
 if (
     botonMenu &&
     navegacion
 ) {
+    actualizarBotonMenuMovil(
+        navegacion.classList.contains(
+            "activa"
+        )
+    );
+
     botonMenu.addEventListener(
         "click",
-        () => {
+        (evento) => {
+            evento.stopPropagation();
+
             const menuAbierto =
-                navegacion.classList.toggle(
+                navegacion.classList.contains(
                     "activa"
                 );
 
-            botonMenu.setAttribute(
-                "aria-expanded",
-                String(menuAbierto)
-            );
+            if (menuAbierto) {
+                cerrarMenuMovil();
+            } else {
+                abrirMenuMovil();
+            }
+        }
+    );
 
-            botonMenu.innerHTML =
-                menuAbierto
-                    ? '<i class="fa-solid fa-xmark"></i>'
-                    : '<i class="fa-solid fa-bars"></i>';
+    navegacion.addEventListener(
+        "click",
+        (evento) => {
+            evento.stopPropagation();
         }
     );
 
     navegacion
-        .querySelectorAll("a")
-        .forEach((enlace) => {
-            enlace.addEventListener(
+        .querySelectorAll(
+            "a, button"
+        )
+        .forEach((elemento) => {
+            elemento.addEventListener(
                 "click",
                 () => {
-                    navegacion.classList.remove(
-                        "activa"
-                    );
-
-                    botonMenu.setAttribute(
-                        "aria-expanded",
-                        "false"
-                    );
-
-                    botonMenu.innerHTML =
-                        '<i class="fa-solid fa-bars"></i>';
+                    cerrarMenuMovil();
                 }
             );
         });
+
+    document.addEventListener(
+        "click",
+        () => {
+            cerrarMenuMovil();
+        }
+    );
+
+    window.addEventListener(
+        "resize",
+        () => {
+            if (
+                window.innerWidth >
+                1050
+            ) {
+                cerrarMenuMovil();
+            }
+        }
+    );
 }
 
 
@@ -284,7 +392,17 @@ function actualizarCabeceraSesion() {
 
             botonLogin.setAttribute(
                 "aria-label",
-                `Abrir perfil de ${nombreUsuario}`
+                `Abrir menú de usuario de ${nombreUsuario}`
+            );
+
+            botonLogin.setAttribute(
+                "aria-haspopup",
+                "true"
+            );
+
+            botonLogin.setAttribute(
+                "aria-controls",
+                "menu-usuario-desplegable"
             );
 
             botonLogin.innerHTML = `
@@ -353,6 +471,19 @@ function actualizarCabeceraSesion() {
             "aria-label"
         );
 
+        botonLogin.removeAttribute(
+            "aria-haspopup"
+        );
+
+        botonLogin.removeAttribute(
+            "aria-controls"
+        );
+
+        botonLogin.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
         botonLogin.textContent =
             "Iniciar sesión";
     }
@@ -408,10 +539,17 @@ const opcionesUsuarioMovil =
     );
 
 
-function cerrarMenuUsuario() {
+function cerrarMenuUsuario(
+    devolverFoco = false
+) {
     if (!contenedorMenuUsuario) {
         return;
     }
+
+    const estabaAbierto =
+        contenedorMenuUsuario.classList.contains(
+            "abierto"
+        );
 
     contenedorMenuUsuario.classList.remove(
         "abierto"
@@ -421,6 +559,13 @@ function cerrarMenuUsuario() {
         "aria-expanded",
         "false"
     );
+
+    if (
+        devolverFoco &&
+        estabaAbierto
+    ) {
+        botonUsuario?.focus();
+    }
 }
 
 
@@ -545,8 +690,30 @@ document.addEventListener(
 document.addEventListener(
     "keydown",
     (evento) => {
-        if (evento.key === "Escape") {
-            cerrarMenuUsuario();
+        if (evento.key !== "Escape") {
+            return;
+        }
+
+        const menuMovilAbierto =
+            navegacion?.classList.contains(
+                "activa"
+            );
+
+        const menuUsuarioAbierto =
+            contenedorMenuUsuario?.classList.contains(
+                "abierto"
+            );
+
+        if (menuMovilAbierto) {
+            cerrarMenuMovil(
+                true
+            );
+        }
+
+        if (menuUsuarioAbierto) {
+            cerrarMenuUsuario(
+                true
+            );
         }
     }
 );
@@ -668,6 +835,103 @@ function mostrarNotificacionPrincipal(
 
 
 /* =====================================================
+   DATOS OFICIALES DESDE EL CATÁLOGO
+===================================================== */
+
+function obtenerPlanCatalogoPortada(
+    tarjeta
+) {
+    const planId =
+        tarjeta?.dataset.planId ||
+        "";
+
+    if (
+        !planId ||
+        typeof window.obtenerPlanSuralia !==
+            "function"
+    ) {
+        return null;
+    }
+
+    return window.obtenerPlanSuralia(
+        planId
+    );
+}
+
+
+function obtenerDatosCatalogoPortada(
+    tarjeta
+) {
+    const datosCatalogo =
+        obtenerPlanCatalogoPortada(
+            tarjeta
+        );
+
+    return {
+        planId:
+            datosCatalogo?.planId ||
+            tarjeta?.dataset.planId ||
+            "",
+
+        titulo:
+            datosCatalogo?.titulo ||
+            tarjeta?.dataset.titulo ||
+            tarjeta?.dataset.nombre ||
+            "",
+
+        categoria:
+            datosCatalogo?.categoriaTexto ||
+            tarjeta?.dataset.categoriaTexto ||
+            tarjeta?.dataset.categoria ||
+            "",
+
+        imagen:
+            datosCatalogo?.imagen ||
+            tarjeta?.dataset.imagen ||
+            "",
+
+        fechaTexto:
+            datosCatalogo?.fechaTexto ||
+            tarjeta?.dataset.fecha ||
+            "",
+
+        fechaIso:
+            datosCatalogo?.fechaIso ||
+            tarjeta?.dataset.fechaIso ||
+            "",
+
+        ubicacion:
+            datosCatalogo?.ubicacion ||
+            tarjeta?.dataset.ubicacion ||
+            "",
+
+        precio:
+            Number(
+                datosCatalogo?.precio ??
+                tarjeta?.dataset.precio ??
+                0
+            ),
+
+        valoracion:
+            Number(
+                datosCatalogo?.valoracion ??
+                tarjeta?.dataset.valoracion ??
+                0
+            ),
+
+        enlace:
+            datosCatalogo?.enlace ||
+            tarjeta?.dataset.enlace ||
+            (
+                tarjeta?.dataset.planId
+                    ? `detalle-plan.html?id=${tarjeta.dataset.planId}`
+                    : "planes.html"
+            )
+    };
+}
+
+
+/* =====================================================
    FAVORITOS DE LAS TARJETAS DE LA PORTADA
 ===================================================== */
 
@@ -693,50 +957,9 @@ function obtenerFavoritosPortada() {
 function obtenerDatosPlanPortada(
     tarjeta
 ) {
-    return {
-        planId:
-            tarjeta.dataset.planId,
-
-        titulo:
-            tarjeta.dataset.titulo ||
-            tarjeta.dataset.nombre,
-
-        categoria:
-            tarjeta.dataset.categoriaTexto ||
-            tarjeta.dataset.categoria,
-
-        imagen:
-            tarjeta.dataset.imagen,
-
-        fechaTexto:
-            tarjeta.dataset.fecha,
-
-        fechaIso:
-            tarjeta.dataset.fechaIso,
-
-        ubicacion:
-            tarjeta.dataset.ubicacion,
-
-        precio:
-            Number(
-                tarjeta.dataset.precio ||
-                0
-            ),
-
-        valoracion:
-            Number(
-                tarjeta.dataset.valoracion ||
-                0
-            ),
-
-        enlace:
-            tarjeta.dataset.enlace ||
-            (
-                tarjeta.dataset.planId
-                    ? `detalle-plan.html?id=${tarjeta.dataset.planId}`
-                    : "planes.html"
-            )
-    };
+    return obtenerDatosCatalogoPortada(
+        tarjeta
+    );
 }
 
 
@@ -922,10 +1145,19 @@ function alternarFavoritoPortada(
         );
     }
 
-    guardarLocalStorage(
-        "favoritosSuralia",
-        favoritos
-    );
+    const favoritoGuardado =
+        guardarLocalStorage(
+            "favoritosSuralia",
+            favoritos
+        );
+
+    if (!favoritoGuardado) {
+        mostrarNotificacionPrincipal(
+            "No se ha podido actualizar favoritos."
+        );
+
+        return;
+    }
 
     actualizarCorazonPortada(
         boton,
@@ -967,53 +1199,57 @@ function obtenerDatosSierraNorte() {
             ".tarjeta-principal"
         );
 
+    const datosPlan =
+        obtenerDatosCatalogoPortada(
+            tarjeta
+        );
+
     return {
         id:
             Date.now(),
 
         planId:
-            tarjeta?.dataset.planId ||
+            datosPlan.planId ||
             "sierra-norte",
 
         titulo:
-            tarjeta?.dataset.titulo ||
+            datosPlan.titulo ||
             "Ruta de senderismo por la Sierra Norte",
 
         categoria:
-            tarjeta?.dataset.categoriaTexto ||
-            tarjeta?.dataset.categoria ||
+            datosPlan.categoria ||
             "Naturaleza",
 
         imagen:
-            tarjeta?.dataset.imagen ||
+            datosPlan.imagen ||
             "img/sierra-norte-principal.jpg",
 
         fechaTexto:
-            tarjeta?.dataset.fecha ||
+            datosPlan.fechaTexto ||
             "8 de agosto de 2026",
 
         fechaIso:
-            tarjeta?.dataset.fechaIso ||
+            datosPlan.fechaIso ||
             "2026-08-08",
 
         ubicacion:
-            tarjeta?.dataset.ubicacion ||
+            datosPlan.ubicacion ||
             "Constantina, Sevilla",
 
         precio:
             Number(
-                tarjeta?.dataset.precio ||
+                datosPlan.precio ??
                 12
             ),
 
         valoracion:
             Number(
-                tarjeta?.dataset.valoracion ||
+                datosPlan.valoracion ??
                 4.9
             ),
 
         enlace:
-            tarjeta?.dataset.enlace ||
+            datosPlan.enlace ||
             "detalle-sierra-norte.html"
     };
 }
@@ -1120,10 +1356,19 @@ function alternarFavoritoSierraNorte() {
         );
     }
 
-    guardarLocalStorage(
-        "favoritosSuralia",
-        favoritos
-    );
+    const favoritoGuardado =
+        guardarLocalStorage(
+            "favoritosSuralia",
+            favoritos
+        );
+
+    if (!favoritoGuardado) {
+        mostrarNotificacionPrincipal(
+            "No se ha podido actualizar favoritos."
+        );
+
+        return;
+    }
 
     actualizarCorazonPortada(
         botonFavoritoSierraNorte,
@@ -1269,6 +1514,15 @@ window.addEventListener(
 ===================================================== */
 
 function iniciarPaginaPrincipal() {
+    if (
+        typeof window.obtenerPlanSuralia !==
+        "function"
+    ) {
+        console.warn(
+            "No se ha cargado js/datos-planes.js. Se usarán los datos del HTML."
+        );
+    }
+
     actualizarCabeceraSesion();
     cargarFavoritosPortada();
     actualizarFavoritoSierraNorte();

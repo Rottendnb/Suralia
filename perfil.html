@@ -56,7 +56,7 @@
             >
 
                 <span class="logo__icono">
-                    <i class="fa-solid fa-location-dot"></i>
+                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
                 </span>
 
                 <span class="logo__texto">
@@ -68,6 +68,7 @@
             <nav
                 class="navegacion"
                 id="navegacion"
+                aria-label="Navegación principal"
             >
 
                 <a href="planes.html">
@@ -86,7 +87,7 @@
                     href="publicar-plan.html"
                     class="enlace-publicar"
                 >
-                    <i class="fa-solid fa-plus"></i>
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
                     Publicar un plan
                 </a>
 
@@ -97,6 +98,8 @@
                 <a
                     href="perfil.html"
                     class="usuario-header"
+                    aria-current="page"
+                    aria-label="Abrir mi perfil"
                 >
 
                     <span
@@ -118,8 +121,9 @@
                     type="button"
                     aria-label="Abrir menú"
                     aria-expanded="false"
+                    aria-controls="navegacion"
                 >
-                    <i class="fa-solid fa-bars"></i>
+                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
                 </button>
 
             </div>
@@ -134,7 +138,10 @@
              CABECERA DEL PERFIL
         ================================================== -->
 
-        <section class="cabecera-perfil">
+        <section
+            class="cabecera-perfil"
+            aria-labelledby="nombre-perfil"
+        >
 
             <div class="contenedor cabecera-perfil__contenido">
 
@@ -170,7 +177,7 @@
                     class="boton-cerrar-sesion"
                     id="boton-cerrar-sesion"
                 >
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
                     Cerrar sesión
                 </button>
 
@@ -188,14 +195,23 @@
 
                 <!-- MENÚ LATERAL -->
 
-                <aside class="perfil-menu">
+                <aside
+                    class="perfil-menu"
+                    aria-label="Secciones del perfil"
+                    role="tablist"
+                    aria-orientation="vertical"
+                >
 
                     <button
                         type="button"
                         class="perfil-menu__enlace activo"
                         data-seccion="resumen"
+                        role="tab"
+                        aria-controls="seccion-resumen"
+                        aria-selected="true"
+                        tabindex="0"
                     >
-                        <i class="fa-solid fa-house"></i>
+                        <i class="fa-solid fa-house" aria-hidden="true"></i>
                         Resumen
                     </button>
 
@@ -203,8 +219,12 @@
                         type="button"
                         class="perfil-menu__enlace"
                         data-seccion="reservas"
+                        role="tab"
+                        aria-controls="seccion-reservas"
+                        aria-selected="false"
+                        tabindex="-1"
                     >
-                        <i class="fa-solid fa-ticket"></i>
+                        <i class="fa-solid fa-ticket" aria-hidden="true"></i>
                         Mis reservas
                     </button>
 
@@ -212,8 +232,12 @@
                         type="button"
                         class="perfil-menu__enlace"
                         data-seccion="favoritos"
+                        role="tab"
+                        aria-controls="seccion-favoritos"
+                        aria-selected="false"
+                        tabindex="-1"
                     >
-                        <i class="fa-regular fa-heart"></i>
+                        <i class="fa-regular fa-heart" aria-hidden="true"></i>
                         Favoritos
                     </button>
 
@@ -221,8 +245,12 @@
                         type="button"
                         class="perfil-menu__enlace"
                         data-seccion="publicados"
+                        role="tab"
+                        aria-controls="seccion-publicados"
+                        aria-selected="false"
+                        tabindex="-1"
                     >
-                        <i class="fa-regular fa-calendar-plus"></i>
+                        <i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>
                         Planes publicados
                     </button>
 
@@ -230,8 +258,12 @@
                         type="button"
                         class="perfil-menu__enlace"
                         data-seccion="datos"
+                        role="tab"
+                        aria-controls="seccion-datos"
+                        aria-selected="false"
+                        tabindex="-1"
                     >
-                        <i class="fa-regular fa-user"></i>
+                        <i class="fa-regular fa-user" aria-hidden="true"></i>
                         Datos personales
                     </button>
 
@@ -248,6 +280,9 @@
                     <section
                         class="perfil-seccion activa"
                         id="seccion-resumen"
+                        role="tabpanel"
+                        tabindex="0"
+                        aria-hidden="false"
                     >
 
                         <div class="perfil-seccion__cabecera">
@@ -279,11 +314,11 @@
                             <article>
 
                                 <span class="perfil-estadisticas__icono">
-                                    <i class="fa-solid fa-ticket"></i>
+                                    <i class="fa-solid fa-ticket" aria-hidden="true"></i>
                                 </span>
 
                                 <div>
-                                    <strong id="contador-reservas-perfil">
+                                    <strong id="contador-reservas-perfil" aria-live="polite">
                                         0
                                     </strong>
 
@@ -297,11 +332,11 @@
                             <article>
 
                                 <span class="perfil-estadisticas__icono">
-                                    <i class="fa-solid fa-heart"></i>
+                                    <i class="fa-solid fa-heart" aria-hidden="true"></i>
                                 </span>
 
                                 <div>
-                                    <strong id="contador-favoritos-perfil">
+                                    <strong id="contador-favoritos-perfil" aria-live="polite">
                                         0
                                     </strong>
 
@@ -315,11 +350,11 @@
                             <article>
 
                                 <span class="perfil-estadisticas__icono">
-                                    <i class="fa-solid fa-calendar-check"></i>
+                                    <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
                                 </span>
 
                                 <div>
-                                    <strong id="contador-planes-realizados">
+                                    <strong id="contador-planes-realizados" aria-live="polite">
                                         0
                                     </strong>
 
@@ -352,12 +387,12 @@
                                     data-ir-seccion="reservas"
                                 >
                                     Ver reservas
-                                    <i class="fa-solid fa-arrow-right"></i>
+                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                                 </button>
 
                             </div>
 
-                            <div id="proxima-reserva-perfil"></div>
+                            <div id="proxima-reserva-perfil" aria-live="polite" aria-atomic="false"></div>
 
                         </div>
 
@@ -370,6 +405,9 @@
                     <section
                         class="perfil-seccion"
                         id="seccion-reservas"
+                        role="tabpanel"
+                        tabindex="0"
+                        aria-hidden="true"
                     >
 
                         <div class="perfil-seccion__cabecera">
@@ -394,16 +432,16 @@
 
                         <div
                             class="lista-reservas"
-                            id="lista-reservas-perfil"
+                            id="lista-reservas-perfil" aria-live="polite" aria-atomic="false"
                         ></div>
 
                         <div
                             class="estado-vacio"
-                            id="estado-vacio-reservas"
+                            id="estado-vacio-reservas" role="status" aria-live="polite" aria-atomic="true"
                         >
 
                             <span class="estado-vacio__icono">
-                                <i class="fa-regular fa-calendar-xmark"></i>
+                                <i class="fa-regular fa-calendar-xmark" aria-hidden="true"></i>
                             </span>
 
                             <h3>
@@ -433,6 +471,9 @@
                     <section
                         class="perfil-seccion"
                         id="seccion-favoritos"
+                        role="tabpanel"
+                        tabindex="0"
+                        aria-hidden="true"
                     >
 
                         <div class="perfil-seccion__cabecera">
@@ -457,16 +498,16 @@
 
                         <div
                             class="planes__grid perfil-favoritos"
-                            id="lista-favoritos-perfil"
+                            id="lista-favoritos-perfil" aria-live="polite" aria-atomic="false"
                         ></div>
 
                         <div
                             class="estado-vacio"
-                            id="estado-vacio-favoritos"
+                            id="estado-vacio-favoritos" role="status" aria-live="polite" aria-atomic="true"
                         >
 
                             <span class="estado-vacio__icono">
-                                <i class="fa-regular fa-heart"></i>
+                                <i class="fa-regular fa-heart" aria-hidden="true"></i>
                             </span>
 
                             <h3>
@@ -496,6 +537,9 @@
                     <section
                         class="perfil-seccion"
                         id="seccion-publicados"
+                        role="tabpanel"
+                        tabindex="0"
+                        aria-hidden="true"
                     >
 
                         <div class="perfil-seccion__cabecera">
@@ -521,7 +565,7 @@
                                 href="publicar-plan.html"
                                 class="boton-principal-pequeno"
                             >
-                                <i class="fa-solid fa-plus"></i>
+                                <i class="fa-solid fa-plus" aria-hidden="true"></i>
                                 Publicar un plan
                             </a>
 
@@ -532,10 +576,10 @@
                             <button
                                 type="button"
                                 class="filtro-publicacion activo"
-                                data-filtro-publicacion="todos"
+                                data-filtro-publicacion="todos" aria-pressed="true"
                             >
                                 Todos
-                                <span id="contador-publicaciones">
+                                <span id="contador-publicaciones" aria-live="polite">
                                     0
                                 </span>
                             </button>
@@ -543,10 +587,10 @@
                             <button
                                 type="button"
                                 class="filtro-publicacion"
-                                data-filtro-publicacion="pendiente"
+                                data-filtro-publicacion="pendiente" aria-pressed="false"
                             >
                                 Pendientes
-                                <span id="contador-pendientes">
+                                <span id="contador-pendientes" aria-live="polite">
                                     0
                                 </span>
                             </button>
@@ -554,10 +598,10 @@
                             <button
                                 type="button"
                                 class="filtro-publicacion"
-                                data-filtro-publicacion="borrador"
+                                data-filtro-publicacion="borrador" aria-pressed="false"
                             >
                                 Borradores
-                                <span id="contador-borradores">
+                                <span id="contador-borradores" aria-live="polite">
                                     0
                                 </span>
                             </button>
@@ -566,16 +610,16 @@
 
                         <div
                             class="lista-publicaciones"
-                            id="lista-publicaciones"
+                            id="lista-publicaciones" aria-live="polite" aria-atomic="false"
                         ></div>
 
                         <div
                             class="estado-vacio"
-                            id="estado-vacio-publicaciones"
+                            id="estado-vacio-publicaciones" role="status" aria-live="polite" aria-atomic="true"
                         >
 
                             <span class="estado-vacio__icono">
-                                <i class="fa-regular fa-calendar-plus"></i>
+                                <i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>
                             </span>
 
                             <h3>
@@ -605,6 +649,9 @@
                     <section
                         class="perfil-seccion"
                         id="seccion-datos"
+                        role="tabpanel"
+                        tabindex="0"
+                        aria-hidden="true"
                     >
 
                         <div class="perfil-seccion__cabecera">
@@ -634,6 +681,8 @@
                             <div
                                 class="selector-avatar__vista"
                                 id="avatar-preview"
+                                role="img"
+                                aria-label="Vista previa de la imagen de perfil"
                             >
                                 FG
                             </div>
@@ -659,14 +708,16 @@
                                         for="input-avatar"
                                         class="boton-subir-avatar"
                                     >
-                                        <i class="fa-solid fa-camera"></i>
+                                        <i class="fa-solid fa-camera" aria-hidden="true"></i>
                                         Subir foto
                                     </label>
 
                                     <input
                                         type="file"
                                         id="input-avatar"
+                                        name="avatar"
                                         accept="image/jpeg,image/png,image/webp"
+                                        aria-describedby="error-avatar"
                                         hidden
                                     >
 
@@ -675,7 +726,7 @@
                                         class="boton-eliminar-avatar"
                                         id="boton-eliminar-avatar"
                                     >
-                                        <i class="fa-regular fa-trash-can"></i>
+                                        <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
                                         Quitar foto
                                     </button>
 
@@ -741,7 +792,7 @@
 
                                 <small
                                     class="mensaje-error"
-                                    id="error-avatar"
+                                    id="error-avatar" aria-live="polite"
                                 ></small>
 
                             </div>
@@ -753,6 +804,8 @@
                         <form
                             class="formulario-perfil"
                             id="formulario-perfil"
+                            aria-label="Editar datos personales"
+                            novalidate
                         >
 
                             <div class="formulario-doble">
@@ -765,11 +818,13 @@
 
                                     <div class="campo-formulario__control">
 
-                                        <i class="fa-regular fa-user"></i>
+                                        <i class="fa-regular fa-user" aria-hidden="true"></i>
 
                                         <input
                                             type="text"
                                             id="perfil-nombre"
+                                            name="nombre"
+                                            aria-describedby="error-perfil-nombre"
                                             autocomplete="given-name"
                                         >
 
@@ -777,7 +832,7 @@
 
                                     <small
                                         class="mensaje-error"
-                                        id="error-perfil-nombre"
+                                        id="error-perfil-nombre" aria-live="polite"
                                     ></small>
 
                                 </div>
@@ -790,11 +845,13 @@
 
                                     <div class="campo-formulario__control">
 
-                                        <i class="fa-regular fa-user"></i>
+                                        <i class="fa-regular fa-user" aria-hidden="true"></i>
 
                                         <input
                                             type="text"
                                             id="perfil-apellidos"
+                                            name="apellidos"
+                                            aria-describedby="error-perfil-apellidos"
                                             autocomplete="family-name"
                                         >
 
@@ -802,7 +859,7 @@
 
                                     <small
                                         class="mensaje-error"
-                                        id="error-perfil-apellidos"
+                                        id="error-perfil-apellidos" aria-live="polite"
                                     ></small>
 
                                 </div>
@@ -817,7 +874,7 @@
 
                                 <div class="campo-formulario__control">
 
-                                    <i class="fa-regular fa-envelope"></i>
+                                    <i class="fa-regular fa-envelope" aria-hidden="true"></i>
 
                                     <input
                                         type="email"
@@ -829,7 +886,7 @@
 
                                 <small
                                     class="mensaje-error"
-                                    id="error-perfil-email"
+                                    id="error-perfil-email" aria-live="polite"
                                 ></small>
 
                             </div>
@@ -842,7 +899,7 @@
 
                                 <div class="campo-formulario__control">
 
-                                    <i class="fa-solid fa-phone"></i>
+                                    <i class="fa-solid fa-phone" aria-hidden="true"></i>
 
                                     <input
                                         type="tel"
@@ -857,7 +914,7 @@
 
                                 <small
                                     class="mensaje-error"
-                                    id="error-perfil-telefono"
+                                    id="error-perfil-telefono" aria-live="polite"
                                 ></small>
 
                             </div>
@@ -867,7 +924,7 @@
                                 class="boton-auth boton-guardar-perfil"
                             >
                                 Guardar cambios
-                                <i class="fa-solid fa-check"></i>
+                                <i class="fa-solid fa-check" aria-hidden="true"></i>
                             </button>
 
                         </form>
@@ -921,8 +978,9 @@
         id="notificacion-perfil"
         role="status"
         aria-live="polite"
+        aria-atomic="true"
     >
-        <i class="fa-solid fa-circle-check"></i>
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
         <span></span>
     </div>
 
@@ -933,19 +991,24 @@
     <div
         class="modal-confirmacion"
         id="modal-cancelacion"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-modal-cancelacion"
+        aria-describedby="descripcion-modal-cancelacion"
+        aria-hidden="true"
     >
 
         <div class="modal-confirmacion__contenido">
 
             <span class="modal-confirmacion__icono">
-                <i class="fa-solid fa-triangle-exclamation"></i>
+                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
             </span>
 
-            <h2>
+            <h2 id="titulo-modal-cancelacion">
                 ¿Cancelar la reserva?
             </h2>
 
-            <p>
+            <p id="descripcion-modal-cancelacion">
                 Esta acción eliminará la reserva de tu perfil.
             </p>
 
@@ -980,19 +1043,24 @@
     <div
         class="modal-confirmacion"
         id="modal-eliminar-plan"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-modal-eliminar-plan"
+        aria-describedby="descripcion-modal-eliminar-plan"
+        aria-hidden="true"
     >
 
         <div class="modal-confirmacion__contenido">
 
             <span class="modal-confirmacion__icono">
-                <i class="fa-solid fa-trash"></i>
+                <i class="fa-solid fa-trash" aria-hidden="true"></i>
             </span>
 
-            <h2>
+            <h2 id="titulo-modal-eliminar-plan">
                 ¿Eliminar este plan?
             </h2>
 
-            <p>
+            <p id="descripcion-modal-eliminar-plan">
                 Esta acción eliminará el plan de tu perfil.
             </p>
 
@@ -1027,19 +1095,20 @@
 <section
     class="banner-cookies oculto"
     id="banner-cookies"
-    aria-label="Configuración de cookies"
+    role="region"
+    aria-labelledby="titulo-banner-cookies"
 >
     <div class="banner-cookies__contenido">
 
         <div class="banner-cookies__texto">
 
             <span class="banner-cookies__icono">
-                <i class="fa-solid fa-cookie-bite"></i>
+                <i class="fa-solid fa-cookie-bite" aria-hidden="true"></i>
             </span>
 
             <div>
 
-                <h2>
+                <h2 id="titulo-banner-cookies">
                     Tu privacidad es importante
                 </h2>
 
@@ -1090,6 +1159,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
+    <script src="js/datos-planes.js"></script>
     <script src="js/main.js"></script>
     <script src="js/perfil.js"></script>
     <script src="js/cookies.js"></script>

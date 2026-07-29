@@ -1085,11 +1085,6 @@ img {
         flex-direction: column;
     }
 
-    @media (max-width: 760px) {
-    .boton-login {
-        display: none;
-    }
-}
 }
 
 @media (max-width: 480px) {
@@ -7894,4 +7889,388 @@ img {
 
 #lista-favoritos-perfil .boton-principal-pequeno {
     margin-top: 18px;
+}
+
+/* =====================================================
+   ACCESIBILIDAD Y MEJORAS RESPONSIVE GENERALES
+===================================================== */
+
+/*
+   Foco visible para navegación con teclado.
+   Se utiliza :focus-visible para no mostrar el contorno
+   cuando el usuario hace clic con el ratón.
+*/
+
+:where(
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    [tabindex]:not([tabindex="-1"])
+):focus-visible {
+    outline: 3px solid var(--color-amarillo);
+    outline-offset: 3px;
+}
+
+:where(
+    .boton-buscar,
+    .boton-buscar-filtros,
+    .boton-principal,
+    .boton-principal-pequeno,
+    .boton-claro,
+    .boton-auth,
+    .boton-reservar,
+    .boton-publicar-plan
+):focus-visible {
+    outline-color: var(--color-secundario);
+}
+
+
+/* Evita que el contenido se desborde horizontalmente */
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+
+/* Mejora la legibilidad de los controles */
+
+select,
+textarea {
+    font: inherit;
+}
+
+input,
+select,
+textarea,
+button {
+    min-width: 0;
+}
+
+input[type="date"],
+select {
+    color-scheme: light;
+}
+
+
+/* Tamaño táctil mínimo recomendado */
+
+.navegacion a,
+.footer a,
+.enlace-ver-todos,
+.tarjeta-plan__favorito,
+.boton-favorito,
+.redes a,
+.boton-menu,
+.menu-usuario__desplegable a,
+.menu-usuario__cerrar,
+.opcion-usuario-movil {
+    min-height: 44px;
+}
+
+
+/* Los iconos no interfieren con el clic */
+
+button i,
+a i {
+    pointer-events: none;
+}
+
+
+/* Mejora de foco en campos compuestos */
+
+.buscador__campo:focus-within,
+.filtro-buscador:focus-within,
+.campo-reserva > div:focus-within {
+    border-color: var(--color-principal);
+    box-shadow: 0 0 0 4px rgba(232, 93, 50, 0.1);
+}
+
+
+/* Enlaces y botones desactivados */
+
+button:disabled,
+[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+
+/* =====================================================
+   HEADER Y MENÚ MÓVIL
+===================================================== */
+
+@media (max-width: 1050px) {
+    .navegacion {
+        max-height: calc(100dvh - 78px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .navegacion a,
+    .navegacion button {
+        width: 100%;
+        min-height: 48px;
+        padding: 11px 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-radius: 11px;
+    }
+
+    .navegacion a:hover,
+    .navegacion a:focus-visible,
+    .navegacion button:hover,
+    .navegacion button:focus-visible {
+        background-color: rgba(232, 93, 50, 0.08);
+    }
+
+    .navegacion .login-movil {
+        justify-content: flex-start;
+    }
+}
+
+
+/* =====================================================
+   PORTADA EN TABLET Y MÓVIL
+===================================================== */
+
+@media (max-width: 760px) {
+    .contenedor {
+        width: min(92%, var(--ancho-maximo));
+    }
+
+    .header__contenido {
+        min-height: 70px;
+        gap: 14px;
+    }
+
+    .navegacion {
+        top: 70px;
+    }
+
+    .hero {
+        padding-top: 58px;
+    }
+
+    .hero h1 {
+        font-size: clamp(2.45rem, 12vw, 3rem);
+        overflow-wrap: anywhere;
+    }
+
+    .hero__texto > p {
+        font-size: 16px;
+    }
+
+    .hero__datos {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .dato {
+        width: auto;
+        padding: 12px 8px;
+        border-radius: 13px;
+        background-color: rgba(255, 255, 255, 0.62);
+        text-align: center;
+    }
+
+    .dato strong {
+        font-size: 19px;
+    }
+
+    .dato span {
+        font-size: 10px;
+        line-height: 1.4;
+    }
+
+    .tarjeta-principal {
+        transform: none;
+    }
+
+    .tarjeta-principal__imagen {
+        min-height: min(440px, 112vw);
+    }
+
+    .tarjeta-principal__info h2 {
+        overflow-wrap: anywhere;
+    }
+
+    .encabezado-seccion {
+        margin-bottom: 28px;
+        gap: 14px;
+    }
+
+    .categoria,
+    .paso {
+        min-height: auto;
+    }
+
+    .tarjeta-plan__imagen {
+        height: 225px;
+    }
+
+    .cta {
+        padding-bottom: 75px;
+    }
+
+    .cta__contenido {
+        border-radius: 22px;
+    }
+
+    .boton-claro {
+        width: 100%;
+        justify-content: center;
+        min-height: 50px;
+    }
+}
+
+
+@media (max-width: 480px) {
+    .logo__icono {
+        width: 39px;
+        height: 39px;
+        border-radius: 12px;
+    }
+
+    .hero__datos {
+        grid-template-columns: 1fr;
+    }
+
+    .dato {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        text-align: left;
+    }
+
+    .buscador {
+        border-radius: 16px;
+    }
+
+    .tarjeta-principal__info {
+        right: 16px;
+        bottom: 18px;
+        left: 16px;
+    }
+
+    .tarjeta-principal__info h2 {
+        font-size: 1.35rem;
+    }
+
+    .tarjeta-principal__categoria {
+        max-width: calc(100% - 78px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .footer__inferior div {
+        gap: 14px;
+    }
+}
+
+
+/* =====================================================
+   TARJETAS Y BOTONES DE FAVORITOS
+===================================================== */
+
+.tarjeta-plan,
+.tarjeta-principal {
+    isolation: isolate;
+}
+
+.tarjeta-plan__enlace,
+.tarjeta-principal__enlace {
+    position: relative;
+    z-index: 1;
+}
+
+.tarjeta-plan__favorito,
+.boton-favorito-hero {
+    z-index: 5;
+}
+
+.tarjeta-plan__favorito:focus-visible,
+.boton-favorito:focus-visible,
+.boton-favorito-hero:focus-visible {
+    outline-color: var(--color-secundario);
+}
+
+
+/* =====================================================
+   MODALES Y NOTIFICACIONES
+===================================================== */
+
+.modal-imagen,
+.modal-confirmacion {
+    overscroll-behavior: contain;
+}
+
+.modal-imagen__cerrar,
+.modal-confirmacion button {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+@media (max-width: 480px) {
+    .notificacion {
+        max-width: calc(100% - 30px);
+        font-size: 0.9rem;
+    }
+}
+
+
+/* =====================================================
+   MOVIMIENTO REDUCIDO
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .tarjeta-principal,
+    .cabecera-pagina__icono,
+    .cabecera-publicar__icono,
+    .error-404__icono {
+        transform: none;
+    }
+}
+
+
+/* =====================================================
+   CONTRASTE FORZADO DEL SISTEMA
+===================================================== */
+
+@media (forced-colors: active) {
+    button,
+    a,
+    input,
+    select,
+    textarea {
+        forced-color-adjust: auto;
+    }
+
+    .tarjeta-plan,
+    .categoria,
+    .paso,
+    .buscador,
+    .panel-filtros {
+        border: 1px solid CanvasText;
+    }
 }

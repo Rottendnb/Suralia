@@ -2,46 +2,80 @@
    DATOS DEL PLAN
 ===================================================== */
 
+function obtenerDatosOficialesSierraNorte() {
+    if (
+        typeof window.obtenerPlanSuralia !==
+        "function"
+    ) {
+        return null;
+    }
+
+    return window.obtenerPlanSuralia(
+        "sierra-norte"
+    );
+}
+
+
+const datosCatalogoSierraNorte =
+    obtenerDatosOficialesSierraNorte();
+
+
 const datosPlanSierraNorte = {
     planId:
+        datosCatalogoSierraNorte?.planId ||
         document.body.dataset.planId ||
         "sierra-norte",
 
     titulo:
+        datosCatalogoSierraNorte?.titulo ||
         document.body.dataset.planTitulo ||
         "Ruta de senderismo por la Sierra Norte",
 
     categoria:
+        datosCatalogoSierraNorte?.categoriaTexto ||
         document.body.dataset.planCategoria ||
         "Naturaleza",
 
     imagen:
+        datosCatalogoSierraNorte?.imagen ||
         document.body.dataset.planImagen ||
         "img/sierra-norte-principal.jpg",
 
     precio:
         Number(
-            document.body.dataset.planPrecio || 12
+            datosCatalogoSierraNorte?.precio ??
+            document.body.dataset.planPrecio ??
+            12
         ),
 
     valoracion:
         Number(
-            document.body.dataset.planValoracion || 4.9
+            datosCatalogoSierraNorte?.valoracion ??
+            document.body.dataset.planValoracion ??
+            4.9
         ),
 
     fechaTexto:
+        datosCatalogoSierraNorte?.fechaTexto ||
         document.body.dataset.planFecha ||
         "8 de agosto de 2026",
 
     fechaIso:
+        datosCatalogoSierraNorte?.fechaIso ||
         document.body.dataset.planFechaIso ||
         "2026-08-08",
 
+    hora:
+        datosCatalogoSierraNorte?.hora ||
+        "09:00",
+
     ubicacion:
+        datosCatalogoSierraNorte?.ubicacion ||
         document.body.dataset.planUbicacion ||
         "Constantina, Sevilla",
 
     enlace:
+        datosCatalogoSierraNorte?.enlace ||
         document.body.dataset.planEnlace ||
         "detalle-sierra-norte.html"
 };
@@ -865,7 +899,7 @@ if (formularioReserva) {
                 fechaTexto,
 
                 hora:
-                    "09:00",
+                    datosPlanSierraNorte.hora,
 
                 estado:
                     "confirmada",
@@ -1006,6 +1040,15 @@ window.addEventListener(
 ===================================================== */
 
 function iniciarDetalleSierraNorte() {
+    if (
+        typeof window.obtenerPlanSuralia !==
+        "function"
+    ) {
+        console.warn(
+            "No se ha cargado js/datos-planes.js. Se usarán los datos del HTML."
+        );
+    }
+
     cargarEstadoFavorito();
     actualizarPrecioReserva();
     crearMapaSierraNorte();

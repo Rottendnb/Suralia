@@ -2,46 +2,80 @@
    DATOS DEL PLAN
 ===================================================== */
 
+function obtenerDatosOficialesPonchoK() {
+    if (
+        typeof window.obtenerPlanSuralia !==
+        "function"
+    ) {
+        return null;
+    }
+
+    return window.obtenerPlanSuralia(
+        "poncho-k-cartuja"
+    );
+}
+
+
+const datosCatalogoPonchoK =
+    obtenerDatosOficialesPonchoK();
+
+
 const datosPlanPonchoK = {
     planId:
+        datosCatalogoPonchoK?.planId ||
         document.body.dataset.planId ||
         "poncho-k-cartuja",
 
     titulo:
+        datosCatalogoPonchoK?.titulo ||
         document.body.dataset.planTitulo ||
         "PONCHO K - Cartuja Center CITE",
 
     categoria:
+        datosCatalogoPonchoK?.categoriaTexto ||
         document.body.dataset.planCategoria ||
         "Música",
 
     imagen:
+        datosCatalogoPonchoK?.imagen ||
         document.body.dataset.planImagen ||
         "img/poncho-k.jpg",
 
     precio:
         Number(
-            document.body.dataset.planPrecio || 25
+            datosCatalogoPonchoK?.precio ??
+            document.body.dataset.planPrecio ??
+            25
         ),
 
     valoracion:
         Number(
-            document.body.dataset.planValoracion || 4.8
+            datosCatalogoPonchoK?.valoracion ??
+            document.body.dataset.planValoracion ??
+            4.8
         ),
 
     fechaTexto:
+        datosCatalogoPonchoK?.fechaTexto ||
         document.body.dataset.planFecha ||
         "21 de noviembre de 2026",
 
     fechaIso:
+        datosCatalogoPonchoK?.fechaIso ||
         document.body.dataset.planFechaIso ||
         "2026-11-21",
 
+    hora:
+        datosCatalogoPonchoK?.hora ||
+        "21:00",
+
     ubicacion:
+        datosCatalogoPonchoK?.ubicacion ||
         document.body.dataset.planUbicacion ||
         "Cartuja Center CITE, Sevilla",
 
     enlace:
+        datosCatalogoPonchoK?.enlace ||
         document.body.dataset.planEnlace ||
         "detalle-poncho-k.html"
 };
@@ -861,7 +895,7 @@ if (formularioReserva) {
                 fechaTexto,
 
                 hora:
-                    "21:00",
+                    datosPlanPonchoK.hora,
 
                 estado:
                     "confirmada",
@@ -1009,6 +1043,15 @@ window.addEventListener(
 ===================================================== */
 
 function iniciarDetallePonchoK() {
+    if (
+        typeof window.obtenerPlanSuralia !==
+        "function"
+    ) {
+        console.warn(
+            "No se ha cargado js/datos-planes.js. Se usarán los datos del HTML."
+        );
+    }
+
     cargarEstadoFavorito();
     actualizarPrecioReserva();
     crearMapaPonchoK();

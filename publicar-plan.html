@@ -43,7 +43,7 @@
             aria-label="Página de inicio de Suralia"
         >
             <span class="logo__icono">
-                <i class="fa-solid fa-location-dot"></i>
+                <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
             </span>
 
             <span class="logo__texto">
@@ -54,6 +54,7 @@
         <nav
             class="navegacion"
             id="navegacion"
+            aria-label="Navegación principal"
         >
 
             <a href="planes.html">
@@ -73,7 +74,7 @@
                 class="enlace-publicar enlace-activo"
                 aria-current="page"
             >
-                <i class="fa-solid fa-plus"></i>
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
                 Publicar un plan
             </a>
 
@@ -81,7 +82,7 @@
                 href="login.html"
                 class="login-movil"
             >
-                <i class="fa-regular fa-user"></i>
+                <i class="fa-regular fa-user" aria-hidden="true"></i>
 
                 <span>
                     Iniciar sesión
@@ -92,7 +93,7 @@
                 href="perfil.html#reservas"
                 class="opcion-usuario-movil"
             >
-                <i class="fa-regular fa-calendar-check"></i>
+                <i class="fa-regular fa-calendar-check" aria-hidden="true"></i>
                 Mis reservas
             </a>
 
@@ -100,7 +101,7 @@
                 href="perfil.html#favoritos"
                 class="opcion-usuario-movil"
             >
-                <i class="fa-regular fa-heart"></i>
+                <i class="fa-regular fa-heart" aria-hidden="true"></i>
                 Favoritos
             </a>
 
@@ -109,7 +110,7 @@
                 class="opcion-usuario-movil cerrar-sesion-movil"
                 id="cerrar-sesion-movil"
             >
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
                 Cerrar sesión
             </button>
 
@@ -127,6 +128,8 @@
                     class="boton-login"
                     id="boton-usuario"
                     aria-expanded="false"
+                    aria-haspopup="true"
+                    aria-controls="menu-usuario-desplegable"
                 >
                     Iniciar sesión
                 </a>
@@ -137,22 +140,22 @@
                 >
 
                     <a href="perfil.html">
-                        <i class="fa-regular fa-user"></i>
+                        <i class="fa-regular fa-user" aria-hidden="true"></i>
                         Mi perfil
                     </a>
 
                     <a href="perfil.html#reservas">
-                        <i class="fa-regular fa-calendar-check"></i>
+                        <i class="fa-regular fa-calendar-check" aria-hidden="true"></i>
                         Mis reservas
                     </a>
 
                     <a href="perfil.html#favoritos">
-                        <i class="fa-regular fa-heart"></i>
+                        <i class="fa-regular fa-heart" aria-hidden="true"></i>
                         Favoritos
                     </a>
 
-                    <a href="perfil.html#publicaciones">
-                        <i class="fa-regular fa-rectangle-list"></i>
+                    <a href="perfil.html#publicados">
+                        <i class="fa-regular fa-rectangle-list" aria-hidden="true"></i>
                         Mis publicaciones
                     </a>
 
@@ -163,7 +166,7 @@
                         id="cerrar-sesion"
                         class="menu-usuario__cerrar"
                     >
-                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
                         Cerrar sesión
                     </button>
 
@@ -177,8 +180,9 @@
                 type="button"
                 aria-label="Abrir menú"
                 aria-expanded="false"
+                aria-controls="navegacion"
             >
-                <i class="fa-solid fa-bars"></i>
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
             </button>
 
         </div>
@@ -189,7 +193,10 @@
 
     <main>
 
-        <section class="cabecera-publicar">
+        <section
+            class="cabecera-publicar"
+            aria-labelledby="titulo-publicar-plan"
+        >
 
             <div class="contenedor cabecera-publicar__contenido">
 
@@ -199,7 +206,9 @@
                         Comparte una experiencia
                     </span>
 
-                    <h1>Publica un nuevo plan</h1>
+                    <h1 id="titulo-publicar-plan">
+                        Publica un nuevo plan
+                    </h1>
 
                     <p>
                         Completa la información de la actividad para que otras
@@ -209,7 +218,7 @@
                 </div>
 
                 <div class="cabecera-publicar__icono">
-                    <i class="fa-regular fa-calendar-plus"></i>
+                    <i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>
                 </div>
 
             </div>
@@ -223,10 +232,14 @@
                 <form
                     class="formulario-publicar"
                     id="formulario-publicar"
+                    aria-label="Formulario para publicar un plan"
                     novalidate
                 >
 
-                    <section class="bloque-formulario-publicar">
+                    <section
+                        class="bloque-formulario-publicar"
+                        aria-labelledby="titulo-bloque-informacion"
+                    >
 
                         <div class="bloque-formulario-publicar__cabecera">
 
@@ -235,7 +248,9 @@
                             </span>
 
                             <div>
-                                <h2>Información principal</h2>
+                                <h2 id="titulo-bloque-informacion">
+                                    Información principal
+                                </h2>
 
                                 <p>
                                     Introduce el nombre y la categoría de la
@@ -252,11 +267,11 @@
                             </label>
 
                             <div class="campo-formulario__control">
-                                <i class="fa-solid fa-heading"></i>
+                                <i class="fa-solid fa-heading" aria-hidden="true"></i>
 
                                 <input
                                     type="text"
-                                    id="plan-titulo"
+                                    id="plan-titulo" aria-describedby="error-plan-titulo contador-titulo"
                                     name="titulo"
                                     maxlength="70"
                                     placeholder="Ejemplo: Ruta nocturna por Sevilla"
@@ -267,10 +282,10 @@
 
                                 <small
                                     class="mensaje-error"
-                                    id="error-plan-titulo"
+                                    id="error-plan-titulo" aria-live="polite"
                                 ></small>
 
-                                <small id="contador-titulo">
+                                <small id="contador-titulo" aria-live="polite">
                                     0/70
                                 </small>
 
@@ -287,10 +302,10 @@
                                 </label>
 
                                 <div class="campo-formulario__control">
-                                    <i class="fa-solid fa-layer-group"></i>
+                                    <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
 
                                     <select
-                                        id="plan-categoria"
+                                        id="plan-categoria" aria-describedby="error-plan-categoria"
                                         name="categoria"
                                     >
                                         <option value="">
@@ -325,7 +340,7 @@
 
                                 <small
                                     class="mensaje-error"
-                                    id="error-plan-categoria"
+                                    id="error-plan-categoria" aria-live="polite"
                                 ></small>
 
                             </div>
@@ -337,7 +352,7 @@
                                 </label>
 
                                 <div class="campo-formulario__control">
-                                    <i class="fa-solid fa-map"></i>
+                                    <i class="fa-solid fa-map" aria-hidden="true"></i>
 
                                     <select
                                         id="plan-provincia"
@@ -366,7 +381,7 @@
                             <div class="campo-formulario__control campo-formulario__control--textarea">
 
                                 <textarea
-                                    id="plan-descripcion"
+                                    id="plan-descripcion" aria-describedby="error-plan-descripcion contador-descripcion"
                                     name="descripcion"
                                     rows="7"
                                     maxlength="600"
@@ -379,10 +394,10 @@
 
                                 <small
                                     class="mensaje-error"
-                                    id="error-plan-descripcion"
+                                    id="error-plan-descripcion" aria-live="polite"
                                 ></small>
 
-                                <small id="contador-descripcion">
+                                <small id="contador-descripcion" aria-live="polite">
                                     0/600
                                 </small>
 
@@ -392,7 +407,10 @@
 
                     </section>
 
-                    <section class="bloque-formulario-publicar">
+                    <section
+                        class="bloque-formulario-publicar"
+                        aria-labelledby="titulo-bloque-fecha"
+                    >
 
                         <div class="bloque-formulario-publicar__cabecera">
 
@@ -401,7 +419,9 @@
                             </span>
 
                             <div>
-                                <h2>Fecha y disponibilidad</h2>
+                                <h2 id="titulo-bloque-fecha">
+                                    Fecha y disponibilidad
+                                </h2>
 
                                 <p>
                                     Indica cuándo se realizará y cuántas plazas
@@ -420,18 +440,18 @@
                                 </label>
 
                                 <div class="campo-formulario__control">
-                                    <i class="fa-regular fa-calendar"></i>
+                                    <i class="fa-regular fa-calendar" aria-hidden="true"></i>
 
                                     <input
                                         type="date"
-                                        id="plan-fecha"
+                                        id="plan-fecha" aria-describedby="error-plan-fecha"
                                         name="fecha"
                                     >
                                 </div>
 
                                 <small
                                     class="mensaje-error"
-                                    id="error-plan-fecha"
+                                    id="error-plan-fecha" aria-live="polite"
                                 ></small>
 
                             </div>
@@ -443,18 +463,18 @@
                                 </label>
 
                                 <div class="campo-formulario__control">
-                                    <i class="fa-regular fa-clock"></i>
+                                    <i class="fa-regular fa-clock" aria-hidden="true"></i>
 
                                     <input
                                         type="time"
-                                        id="plan-hora"
+                                        id="plan-hora" aria-describedby="error-plan-hora"
                                         name="hora"
                                     >
                                 </div>
 
                                 <small
                                     class="mensaje-error"
-                                    id="error-plan-hora"
+                                    id="error-plan-hora" aria-live="polite"
                                 ></small>
 
                             </div>
@@ -470,10 +490,10 @@
                                 </label>
 
                                 <div class="campo-formulario__control">
-                                    <i class="fa-solid fa-hourglass-half"></i>
+                                    <i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>
 
                                     <select
-                                        id="plan-duracion"
+                                        id="plan-duracion" aria-describedby="error-plan-duracion"
                                         name="duracion"
                                     >
                                         <option value="">
@@ -504,7 +524,7 @@
 
                                 <small
                                     class="mensaje-error"
-                                    id="error-plan-duracion"
+                                    id="error-plan-duracion" aria-live="polite"
                                 ></small>
 
                             </div>
@@ -516,12 +536,13 @@
                                 </label>
 
                                 <div class="campo-formulario__control">
-                                    <i class="fa-solid fa-user-group"></i>
+                                    <i class="fa-solid fa-user-group" aria-hidden="true"></i>
 
                                     <input
                                         type="number"
-                                        id="plan-plazas"
+                                        id="plan-plazas" aria-describedby="error-plan-plazas"
                                         name="plazas"
+                                        inputmode="numeric"
                                         min="1"
                                         max="500"
                                         placeholder="Ejemplo: 20"
@@ -530,7 +551,7 @@
 
                                 <small
                                     class="mensaje-error"
-                                    id="error-plan-plazas"
+                                    id="error-plan-plazas" aria-live="polite"
                                 ></small>
 
                             </div>
@@ -539,7 +560,10 @@
 
                     </section>
 
-                    <section class="bloque-formulario-publicar">
+                    <section
+                        class="bloque-formulario-publicar"
+                        aria-labelledby="titulo-bloque-ubicacion"
+                    >
 
                         <div class="bloque-formulario-publicar__cabecera">
 
@@ -548,7 +572,9 @@
                             </span>
 
                             <div>
-                                <h2>Ubicación y precio</h2>
+                                <h2 id="titulo-bloque-ubicacion">
+                                    Ubicación y precio
+                                </h2>
 
                                 <p>
                                     Añade el lugar de encuentro y el precio por
@@ -565,11 +591,11 @@
                             </label>
 
                             <div class="campo-formulario__control">
-                                <i class="fa-solid fa-location-dot"></i>
+                                <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
 
                                 <input
                                     type="text"
-                                    id="plan-ubicacion"
+                                    id="plan-ubicacion" aria-describedby="error-plan-ubicacion"
                                     name="ubicacion"
                                     placeholder="Ejemplo: Alameda de Hércules, Sevilla"
                                 >
@@ -577,7 +603,7 @@
 
                             <small
                                 class="mensaje-error"
-                                id="error-plan-ubicacion"
+                                id="error-plan-ubicacion" aria-live="polite"
                             ></small>
 
                         </div>
@@ -591,12 +617,13 @@
                                 </label>
 
                                 <div class="campo-formulario__control">
-                                    <i class="fa-solid fa-euro-sign"></i>
+                                    <i class="fa-solid fa-euro-sign" aria-hidden="true"></i>
 
                                     <input
                                         type="number"
-                                        id="plan-precio"
+                                        id="plan-precio" aria-describedby="error-plan-precio"
                                         name="precio"
+                                        inputmode="decimal"
                                         min="0"
                                         max="9999"
                                         step="0.01"
@@ -606,7 +633,7 @@
 
                                 <small
                                     class="mensaje-error"
-                                    id="error-plan-precio"
+                                    id="error-plan-precio" aria-live="polite"
                                 ></small>
 
                             </div>
@@ -618,7 +645,7 @@
                                 </label>
 
                                 <div class="campo-formulario__control">
-                                    <i class="fa-solid fa-signal"></i>
+                                    <i class="fa-solid fa-signal" aria-hidden="true"></i>
 
                                     <select
                                         id="plan-dificultad"
@@ -648,7 +675,10 @@
 
                     </section>
 
-                    <section class="bloque-formulario-publicar">
+                    <section
+                        class="bloque-formulario-publicar"
+                        aria-labelledby="titulo-bloque-imagen"
+                    >
 
                         <div class="bloque-formulario-publicar__cabecera">
 
@@ -657,7 +687,9 @@
                             </span>
 
                             <div>
-                                <h2>Imagen del plan</h2>
+                                <h2 id="titulo-bloque-imagen">
+                                    Imagen del plan
+                                </h2>
 
                                 <p>
                                     Añade una imagen atractiva que represente la
@@ -671,9 +703,10 @@
 
                             <input
                                 type="file"
-                                id="plan-imagen"
+                                id="plan-imagen" aria-describedby="error-plan-imagen"
                                 name="imagen"
                                 accept="image/png, image/jpeg, image/webp"
+                                aria-describedby="error-plan-imagen"
                                 hidden
                             >
 
@@ -681,10 +714,13 @@
                                 for="plan-imagen"
                                 class="subida-imagen__zona"
                                 id="zona-subida-imagen"
+                                role="button"
+                                tabindex="0"
+                                aria-controls="plan-imagen"
                             >
 
                                 <span class="subida-imagen__icono">
-                                    <i class="fa-regular fa-image"></i>
+                                    <i class="fa-regular fa-image" aria-hidden="true"></i>
                                 </span>
 
                                 <strong>
@@ -704,6 +740,8 @@
                             <div
                                 class="subida-imagen__resultado"
                                 id="resultado-imagen"
+                                aria-live="polite"
+                                aria-atomic="true"
                             >
 
                                 <img
@@ -719,7 +757,7 @@
                                         type="button"
                                         id="eliminar-imagen"
                                     >
-                                        <i class="fa-solid fa-trash"></i>
+                                        <i class="fa-solid fa-trash" aria-hidden="true"></i>
                                         Eliminar
                                     </button>
                                 </div>
@@ -728,7 +766,7 @@
 
                             <small
                                 class="mensaje-error"
-                                id="error-plan-imagen"
+                                id="error-plan-imagen" aria-live="polite"
                             ></small>
 
                         </div>
@@ -741,7 +779,7 @@
 
                             <input
                                 type="checkbox"
-                                id="confirmar-plan"
+                                id="confirmar-plan" aria-describedby="error-confirmar-plan"
                             >
 
                             <span>
@@ -754,7 +792,7 @@
 
                         <small
                             class="mensaje-error"
-                            id="error-confirmar-plan"
+                            id="error-confirmar-plan" aria-live="polite"
                         ></small>
 
                         <div class="acciones-publicar">
@@ -764,7 +802,7 @@
                                 class="boton-guardar-borrador"
                                 id="guardar-borrador"
                             >
-                                <i class="fa-regular fa-floppy-disk"></i>
+                                <i class="fa-regular fa-floppy-disk" aria-hidden="true"></i>
                                 Guardar borrador
                             </button>
 
@@ -773,7 +811,7 @@
                                 class="boton-publicar-plan"
                             >
                                 Publicar actividad
-                                <i class="fa-solid fa-arrow-right"></i>
+                                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                             </button>
 
                         </div>
@@ -782,11 +820,16 @@
 
                 </form>
 
-                <aside class="vista-previa-plan">
+                <aside
+                    class="vista-previa-plan"
+                    aria-labelledby="titulo-vista-previa"
+                >
 
                     <div class="vista-previa-plan__encabezado">
 
-                        <span>Vista previa</span>
+                        <span id="titulo-vista-previa">
+                            Vista previa
+                        </span>
 
                         <p>
                             Así se mostrará tu actividad.
@@ -794,7 +837,11 @@
 
                     </div>
 
-                    <article class="tarjeta-plan tarjeta-plan--vista-previa">
+                    <article
+                        class="tarjeta-plan tarjeta-plan--vista-previa"
+                        aria-live="polite"
+                        aria-atomic="false"
+                    >
 
                         <div
                             class="tarjeta-plan__imagen vista-previa-imagen"
@@ -812,12 +859,14 @@
                                 type="button"
                                 class="tarjeta-plan__favorito"
                                 aria-label="Favorito de demostración"
+                                tabindex="-1"
+                                aria-disabled="true"
                             >
-                                <i class="fa-regular fa-heart"></i>
+                                <i class="fa-regular fa-heart" aria-hidden="true"></i>
                             </button>
 
                             <div class="vista-previa-imagen__vacia">
-                                <i class="fa-regular fa-image"></i>
+                                <i class="fa-regular fa-image" aria-hidden="true"></i>
                                 <span>Añade una imagen</span>
                             </div>
 
@@ -828,12 +877,12 @@
                             <div class="tarjeta-plan__meta">
 
                                 <span id="vista-previa-fecha">
-                                    <i class="fa-regular fa-calendar"></i>
+                                    <i class="fa-regular fa-calendar" aria-hidden="true"></i>
                                     Fecha pendiente
                                 </span>
 
                                 <span id="vista-previa-hora">
-                                    <i class="fa-regular fa-clock"></i>
+                                    <i class="fa-regular fa-clock" aria-hidden="true"></i>
                                     Hora pendiente
                                 </span>
 
@@ -854,7 +903,7 @@
                                 class="tarjeta-plan__ubicacion"
                                 id="vista-previa-ubicacion"
                             >
-                                <i class="fa-solid fa-location-dot"></i>
+                                <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
                                 Ubicación pendiente
                             </p>
 
@@ -877,7 +926,7 @@
                     <div class="consejos-publicacion">
 
                         <h3>
-                            <i class="fa-regular fa-lightbulb"></i>
+                            <i class="fa-regular fa-lightbulb" aria-hidden="true"></i>
                             Consejos para destacar
                         </h3>
 
@@ -921,27 +970,29 @@
         id="notificacion-publicar"
         role="status"
         aria-live="polite"
+        aria-atomic="true"
     >
-        <i class="fa-solid fa-circle-check"></i>
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
         <span></span>
     </div>
 
     <section
     class="banner-cookies oculto"
     id="banner-cookies"
-    aria-label="Configuración de cookies"
+    role="region"
+    aria-labelledby="titulo-banner-cookies"
 >
     <div class="banner-cookies__contenido">
 
         <div class="banner-cookies__texto">
 
             <span class="banner-cookies__icono">
-                <i class="fa-solid fa-cookie-bite"></i>
+                <i class="fa-solid fa-cookie-bite" aria-hidden="true"></i>
             </span>
 
             <div>
 
-                <h2>
+                <h2 id="titulo-banner-cookies">
                     Tu privacidad es importante
                 </h2>
 

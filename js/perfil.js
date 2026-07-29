@@ -87,6 +87,7 @@ const confirmarCancelacion = document.querySelector(
 );
 
 let reservaPendienteCancelar = null;
+let elementoQueAbrioModalCancelacion = null;
 
 /* =========================================
    FUNCIONES GENERALES
@@ -255,28 +256,60 @@ function cargarDatosUsuario() {
     }
 }
 
-function cambiarSeccion(nombreSeccion) {
-    const seccionExiste =
+function cambiarSeccion(
+    nombreSeccion,
+    moverFoco = false
+) {
+    let seccionActiva =
         document.querySelector(
             `#seccion-${nombreSeccion}`
         );
 
-    if (!seccionExiste) {
+    if (!seccionActiva) {
         nombreSeccion = "resumen";
+
+        seccionActiva =
+            document.querySelector(
+                "#seccion-resumen"
+            );
     }
 
     botonesMenuPerfil.forEach((boton) => {
+        const esActivo =
+            boton.dataset.seccion ===
+            nombreSeccion;
+
         boton.classList.toggle(
             "activo",
-            boton.dataset.seccion === nombreSeccion
+            esActivo
+        );
+
+        boton.setAttribute(
+            "aria-selected",
+            String(esActivo)
+        );
+
+        boton.setAttribute(
+            "tabindex",
+            esActivo
+                ? "0"
+                : "-1"
         );
     });
 
     seccionesPerfil.forEach((seccion) => {
+        const esActiva =
+            seccion.id ===
+            `seccion-${nombreSeccion}`;
+
         seccion.classList.toggle(
             "activa",
-            seccion.id ===
-                `seccion-${nombreSeccion}`
+            esActiva
+        );
+
+        seccion.setAttribute(
+            "aria-hidden",
+            String(!esActiva)
         );
     });
 
@@ -290,24 +323,123 @@ function cambiarSeccion(nombreSeccion) {
             `#${nombreSeccion}`
         );
     }
+
+    if (
+        moverFoco &&
+        seccionActiva
+    ) {
+        seccionActiva.focus({
+            preventScroll: true
+        });
+
+        seccionActiva.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }
 }
 
 /* =========================================
    NAVEGACIÓN DEL PERFIL
 ========================================= */
 
-botonesMenuPerfil.forEach((boton) => {
-    boton.addEventListener(
-        "click",
-        (evento) => {
-            evento.preventDefault();
+botonesMenuPerfil.forEach(
+    (boton, indice) => {
+        boton.addEventListener(
+            "click",
+            (evento) => {
+                evento.preventDefault();
 
-            cambiarSeccion(
-                boton.dataset.seccion
-            );
-        }
-    );
-});
+                cambiarSeccion(
+                    boton.dataset.seccion,
+                    true
+                );
+            }
+        );
+
+        boton.addEventListener(
+            "keydown",
+            (evento) => {
+                const teclasPermitidas = [
+                    "ArrowRight",
+                    "ArrowLeft",
+                    "ArrowDown",
+                    "ArrowUp",
+                    "Home",
+                    "End"
+                ];
+
+                if (
+                    !teclasPermitidas.includes(
+                        evento.key
+                    )
+                ) {
+                    return;
+                }
+
+                evento.preventDefault();
+
+                let nuevoIndice = indice;
+
+                if (
+                    evento.key ===
+                        "ArrowRight" ||
+                    evento.key ===
+                        "ArrowDown"
+                ) {
+                    nuevoIndice =
+                        (
+                            indice + 1
+                        ) %
+                        botonesMenuPerfil.length;
+                }
+
+                if (
+                    evento.key ===
+                        "ArrowLeft" ||
+                    evento.key ===
+                        "ArrowUp"
+                ) {
+                    nuevoIndice =
+                        (
+                            indice -
+                            1 +
+                            botonesMenuPerfil.length
+                        ) %
+                        botonesMenuPerfil.length;
+                }
+
+                if (
+                    evento.key === "Home"
+                ) {
+                    nuevoIndice = 0;
+                }
+
+                if (
+                    evento.key === "End"
+                ) {
+                    nuevoIndice =
+                        botonesMenuPerfil.length -
+                        1;
+                }
+
+                const nuevoBoton =
+                    botonesMenuPerfil[
+                        nuevoIndice
+                    ];
+
+                nuevoBoton?.focus();
+
+                if (nuevoBoton) {
+                    cambiarSeccion(
+                        nuevoBoton.dataset
+                            .seccion
+                    );
+                }
+            }
+        );
+    }
+);
 
 enlacesSeccion.forEach((boton) => {
     boton.addEventListener(
@@ -316,7 +448,8 @@ enlacesSeccion.forEach((boton) => {
             evento.preventDefault();
 
             cambiarSeccion(
-                boton.dataset.irSeccion
+                boton.dataset.irSeccion,
+                true
             );
         }
     );
@@ -438,6 +571,7 @@ function guardarAvatarUsuario(tipo, valor) {
     }
 
     cargarDatosUsuario();
+    actualizarEstadoAvatares();
 
     return true;
 }
@@ -617,8 +751,36 @@ if (inputAvatar) {
     );
 }
 
+function actualizarEstadoAvatares() {
+    botonesAvatarPredeterminado.forEach(
+        (boton) => {
+            const esActivo =
+                usuarioGuardado.avatarTipo ===
+                    "emoji" &&
+                usuarioGuardado.avatarValor ===
+                    boton.dataset.avatar;
+
+            boton.classList.toggle(
+                "activo",
+                esActivo
+            );
+
+            boton.setAttribute(
+                "aria-pressed",
+                String(esActivo)
+            );
+        }
+    );
+}
+
+
 botonesAvatarPredeterminado.forEach(
     (boton) => {
+        boton.setAttribute(
+            "aria-pressed",
+            "false"
+        );
+
         boton.addEventListener(
             "click",
             () => {
@@ -631,6 +793,8 @@ botonesAvatarPredeterminado.forEach(
                             ""
                     )
                 ) {
+                    actualizarEstadoAvatares();
+
                     mostrarNotificacion(
                         "El avatar se ha actualizado."
                     );
@@ -702,6 +866,18 @@ if (formularioPerfil) {
             errorEmail.textContent = "";
         }
 
+        [
+            campoNombre,
+            campoApellidos,
+            campoEmail,
+            campoTelefono
+        ].forEach((campo) => {
+            campo?.setAttribute(
+                "aria-invalid",
+                "false"
+            );
+        });
+
         let formularioValido = true;
 
         if (nombre.length < 2) {
@@ -733,7 +909,44 @@ if (formularioPerfil) {
             formularioValido = false;
         }
 
+        const camposValidacion = [
+            {
+                campo: campoNombre,
+                invalido:
+                    nombre.length < 2
+            },
+            {
+                campo: campoApellidos,
+                invalido:
+                    apellidos.length < 2
+            },
+            {
+                campo: campoEmail,
+                invalido:
+                    !expresionEmail.test(
+                        email
+                    )
+            }
+        ];
+
+        camposValidacion.forEach(
+            ({ campo, invalido }) => {
+                campo?.setAttribute(
+                    "aria-invalid",
+                    String(invalido)
+                );
+            }
+        );
+
         if (!formularioValido) {
+            camposValidacion
+                .find(
+                    ({ invalido }) =>
+                        invalido
+                )
+                ?.campo
+                ?.focus();
+
             return;
         }
 
@@ -818,6 +1031,117 @@ function actualizarEmailEnDatosGuardados(emailAnterior, emailNuevo) {
     });
 }
 
+function abrirModalAccesible(
+    modal,
+    elementoFocoInicial,
+    elementoOrigen
+) {
+    if (!modal) {
+        return;
+    }
+
+    modal.classList.add(
+        "visible"
+    );
+
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    document.body.style.overflow =
+        "hidden";
+
+    elementoFocoInicial?.focus();
+
+    return elementoOrigen || null;
+}
+
+
+function cerrarModalAccesible(
+    modal,
+    elementoOrigen
+) {
+    if (!modal) {
+        return;
+    }
+
+    modal.classList.remove(
+        "visible"
+    );
+
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+    document.body.style.overflow =
+        "";
+
+    elementoOrigen?.focus();
+}
+
+
+function mantenerFocoDentroModal(
+    evento,
+    modal
+) {
+    if (
+        evento.key !== "Tab" ||
+        !modal?.classList.contains(
+            "visible"
+        )
+    ) {
+        return;
+    }
+
+    const elementosEnfocables =
+        Array.from(
+            modal.querySelectorAll(
+                `
+                    button:not([disabled]),
+                    a[href],
+                    input:not([disabled]),
+                    select:not([disabled]),
+                    textarea:not([disabled]),
+                    [tabindex]:not([tabindex="-1"])
+                `
+            )
+        );
+
+    if (
+        elementosEnfocables.length === 0
+    ) {
+        return;
+    }
+
+    const primero =
+        elementosEnfocables[0];
+
+    const ultimo =
+        elementosEnfocables[
+            elementosEnfocables.length -
+            1
+        ];
+
+    if (
+        evento.shiftKey &&
+        document.activeElement ===
+            primero
+    ) {
+        evento.preventDefault();
+        ultimo.focus();
+    } else if (
+        !evento.shiftKey &&
+        document.activeElement ===
+            ultimo
+    ) {
+        evento.preventDefault();
+        primero.focus();
+    }
+}
+
+
 /* =========================================
    RESERVAS DINÁMICAS
 ========================================= */
@@ -838,84 +1162,39 @@ const contadorReservasPerfil = document.querySelector(
     "#contador-reservas-perfil"
 );
 
-const catalogoPlanesReservas = {
-    italica: {
-        planId: "italica",
-        titulo: "Visita guiada por Itálica",
-        categoria: "Cultura",
-        imagen: "img/italica principal.jpg",
-        ubicacion: "Santiponce, Sevilla",
-        precio: 0,
-        hora: "10:30",
-        enlace: "detalle-plan.html?id=italica"
-    },
-
-    "kayak-atardecer": {
-        planId: "kayak-atardecer",
-        titulo: "Kayak al atardecer",
-        categoria: "Aventura",
-        imagen: "img/kayak principal.jpg",
-        ubicacion: "Río Guadalquivir, Sevilla",
-        precio: 18,
-        hora: "19:00",
-        enlace: "detalle-kayak.html"
-    },
-
-    "poncho-k-cartuja": {
-        planId: "poncho-k-cartuja",
-        titulo: "PONCHO K - Cartuja Center CITE",
-        categoria: "Música",
-        imagen: "img/poncho-k.jpg",
-        ubicacion: "Cartuja Center CITE, Sevilla",
-        precio: 25,
-        hora: "21:00",
-        enlace: "detalle-poncho-k.html"
-    },
-
-    "cerro-hierro": {
-        planId: "cerro-hierro",
-        titulo: "Ruta por el Cerro del Hierro",
-        categoria: "Naturaleza",
-        imagen: "img/cerro1.jpg",
-        ubicacion: "San Nicolás del Puerto",
-        precio: 8,
-        hora: "09:00",
-        enlace: "detalle-plan.html?id=cerro-hierro"
-    },
-
-    "tapas-triana": {
-        planId: "tapas-triana",
-        titulo: "Ruta de tapas por Triana",
-        categoria: "Gastronomía",
-        imagen: "img/triana1.jpg",
-        ubicacion: "Triana, Sevilla",
-        precio: 25,
-        hora: "13:00",
-        enlace: "detalle-plan.html?id=tapas-triana"
-    },
-
-    "exposicion-contemporanea": {
-        planId: "exposicion-contemporanea",
-        titulo: "Exposición de arte contemporáneo",
-        categoria: "Cultura",
-        imagen: "img/andaluz1.jpg",
-        ubicacion: "Centro de Sevilla",
-        precio: 0,
-        hora: "11:00",
-        enlace: "detalle-plan.html?id=exposicion-contemporanea"
-    },
-
-    "sierra-norte": {
-        planId: "sierra-norte",
-        titulo: "Ruta de senderismo por la Sierra Norte",
-        categoria: "Naturaleza",
-        imagen: "img/sierra-norte-principal.jpg",
-        ubicacion: "Constantina, Sevilla",
-        precio: 12,
-        hora: "09:00",
-        enlace: "detalle-sierra-norte.html"
+function construirCatalogoPlanesPerfil() {
+    if (
+        typeof window.obtenerTodosPlanesSuralia !==
+        "function"
+    ) {
+        return {};
     }
-};
+
+    return window.obtenerTodosPlanesSuralia()
+        .reduce(
+            (catalogo, plan) => {
+                catalogo[plan.planId] = {
+                    ...plan,
+
+                    /*
+                       En el perfil mostramos el nombre
+                       legible de la categoría.
+                    */
+                    categoria:
+                        plan.categoriaTexto ||
+                        plan.categoria ||
+                        "Actividad"
+                };
+
+                return catalogo;
+            },
+            {}
+        );
+}
+
+
+const catalogoPlanesReservas =
+    construirCatalogoPlanesPerfil();
 
 
 function obtenerIdPlanReserva(reserva) {
@@ -1081,6 +1360,21 @@ function obtenerReservasUsuario() {
 function obtenerEnlacePlan(plan) {
     if (plan?.enlace) {
         return plan.enlace;
+    }
+
+    if (
+        plan?.planId &&
+        typeof window.obtenerPlanSuralia ===
+            "function"
+    ) {
+        const datosCatalogo =
+            window.obtenerPlanSuralia(
+                plan.planId
+            );
+
+        if (datosCatalogo?.enlace) {
+            return datosCatalogo.enlace;
+        }
     }
 
     const enlacesPorPlan = {
@@ -1311,9 +1605,12 @@ function activarBotonesCancelarReserva() {
                     boton.dataset.reservaId
                 );
 
-                if (modalCancelacion) {
-                    modalCancelacion.classList.add("visible");
-                }
+                elementoQueAbrioModalCancelacion =
+                    abrirModalAccesible(
+                        modalCancelacion,
+                        mantenerReserva,
+                        boton
+                    );
             });
         });
 }
@@ -1338,9 +1635,13 @@ function cancelarReservaGuardada() {
 
     reservaPendienteCancelar = null;
 
-    if (modalCancelacion) {
-        modalCancelacion.classList.remove("visible");
-    }
+    cerrarModalAccesible(
+        modalCancelacion,
+        elementoQueAbrioModalCancelacion
+    );
+
+    elementoQueAbrioModalCancelacion =
+        null;
 
     mostrarReservasPerfil();
 
@@ -1353,9 +1654,13 @@ if (mantenerReserva) {
     mantenerReserva.addEventListener("click", () => {
         reservaPendienteCancelar = null;
 
-        if (modalCancelacion) {
-            modalCancelacion.classList.remove("visible");
-        }
+        cerrarModalAccesible(
+            modalCancelacion,
+            elementoQueAbrioModalCancelacion
+        );
+
+        elementoQueAbrioModalCancelacion =
+            null;
     });
 }
 
@@ -1369,8 +1674,16 @@ if (confirmarCancelacion) {
 if (modalCancelacion) {
     modalCancelacion.addEventListener("click", (evento) => {
         if (evento.target === modalCancelacion) {
-            modalCancelacion.classList.remove("visible");
-            reservaPendienteCancelar = null;
+            cerrarModalAccesible(
+                modalCancelacion,
+                elementoQueAbrioModalCancelacion
+            );
+
+            elementoQueAbrioModalCancelacion =
+                null;
+
+            reservaPendienteCancelar =
+                null;
         }
     });
 }
@@ -1395,107 +1708,11 @@ const contadorFavoritosPerfil =
     );
 
 /*
-   Datos oficiales de los planes.
-
-   Estos valores coinciden con planes.html.
-   También se incluye Sierra Norte, que aparece
-   como plan destacado de la portada.
+   Reservas y favoritos utilizan el mismo catálogo
+   oficial cargado desde js/datos-planes.js.
 */
-const catalogoPlanesFavoritos = {
-    italica: {
-        planId: "italica",
-        titulo: "Visita guiada por Itálica",
-        categoria: "Cultura",
-        precio: 0,
-        valoracion: 4.8,
-        fechaTexto: "25 de julio",
-        fechaIso: "2026-07-25",
-        ubicacion: "Santiponce, Sevilla",
-        imagen: "img/italica principal.jpg",
-        enlace: "detalle-plan.html?id=italica"
-    },
-
-    "kayak-atardecer": {
-        planId: "kayak-atardecer",
-        titulo: "Kayak al atardecer",
-        categoria: "Aventura",
-        precio: 18,
-        valoracion: 4.9,
-        fechaTexto: "27 de julio",
-        fechaIso: "2026-07-27",
-        ubicacion: "Río Guadalquivir, Sevilla",
-        imagen: "img/kayak principal.jpg",
-        enlace: "detalle-kayak.html"
-    },
-
-    "poncho-k-cartuja": {
-        planId: "poncho-k-cartuja",
-        titulo: "PONCHO K - Cartuja Center CITE",
-        categoria: "Música",
-        precio: 25,
-        valoracion: 4.8,
-        fechaTexto: "21 de noviembre de 2026",
-        fechaIso: "2026-11-21",
-        ubicacion: "Cartuja Center CITE, Sevilla",
-        imagen: "img/poncho-k.jpg",
-        enlace: "detalle-poncho-k.html"
-    },
-
-    "cerro-hierro": {
-        planId: "cerro-hierro",
-        titulo: "Ruta por el Cerro del Hierro",
-        categoria: "Naturaleza",
-        precio: 8,
-        valoracion: 4.9,
-        fechaTexto: "2 de agosto",
-        fechaIso: "2026-08-02",
-        ubicacion: "San Nicolás del Puerto",
-        imagen:
-            "img/cerro1.jpg",
-        enlace: "detalle-plan.html?id=cerro-hierro"
-    },
-
-    "tapas-triana": {
-        planId: "tapas-triana",
-        titulo: "Ruta de tapas por Triana",
-        categoria: "Gastronomía",
-        precio: 25,
-        valoracion: 4.6,
-        fechaTexto: "3 de agosto",
-        fechaIso: "2026-08-03",
-        ubicacion: "Triana, Sevilla",
-        imagen:
-            "img/triana1.jpg",
-        enlace: "detalle-plan.html?id=tapas-triana"
-    },
-
-    "exposicion-contemporanea": {
-        planId: "exposicion-contemporanea",
-        titulo: "Exposición de arte contemporáneo",
-        categoria: "Cultura",
-        precio: 0,
-        valoracion: 4.5,
-        fechaTexto: "Hasta el 10 de agosto",
-        fechaIso: "2026-08-10",
-        ubicacion: "Centro de Sevilla",
-        imagen:
-            "img/andaluz1.jpg",
-        enlace: "detalle-plan.html?id=exposicion-contemporanea"
-    },
-
-    "sierra-norte": {
-        planId: "sierra-norte",
-        titulo: "Ruta de senderismo por la Sierra Norte",
-        categoria: "Naturaleza",
-        precio: 12,
-        valoracion: 4.9,
-        fechaTexto: "8 de agosto de 2026",
-        fechaIso: "2026-08-08",
-        ubicacion: "Constantina, Sevilla",
-        imagen: "img/sierra-norte-principal.jpg",
-        enlace: "detalle-sierra-norte.html"
-    }
-};
+const catalogoPlanesFavoritos =
+    catalogoPlanesReservas;
 
 function obtenerIdPlanFavorito(favorito) {
     const idDirecto =
@@ -1979,6 +2196,7 @@ const confirmarEliminarPlan = document.querySelector(
 
 let planPendienteEliminar = null;
 let filtroPublicacionActual = "todos";
+let elementoQueAbrioModalEliminar = null;
 
 function obtenerPlanesUsuario() {
     const publicados = JSON.parse(
@@ -2253,9 +2471,12 @@ function activarEventosPublicaciones() {
                     almacenamiento: boton.dataset.almacenamiento
                 };
 
-                if (modalEliminarPlan) {
-                    modalEliminarPlan.classList.add("visible");
-                }
+                elementoQueAbrioModalEliminar =
+                    abrirModalAccesible(
+                        modalEliminarPlan,
+                        cancelarEliminarPlan,
+                        boton
+                    );
             });
         });
 
@@ -2305,9 +2526,13 @@ function eliminarPlanGuardado() {
         JSON.stringify(planesActualizados)
     );
 
-    if (modalEliminarPlan) {
-        modalEliminarPlan.classList.remove("visible");
-    }
+    cerrarModalAccesible(
+        modalEliminarPlan,
+        elementoQueAbrioModalEliminar
+    );
+
+    elementoQueAbrioModalEliminar =
+        null;
 
     mostrarNotificacion(
         "El plan se ha eliminado correctamente."
@@ -2324,9 +2549,17 @@ filtrosPublicaciones.forEach((boton) => {
             boton.dataset.filtroPublicacion;
 
         filtrosPublicaciones.forEach((filtro) => {
+            const esActivo =
+                filtro === boton;
+
             filtro.classList.toggle(
                 "activo",
-                filtro === boton
+                esActivo
+            );
+
+            filtro.setAttribute(
+                "aria-pressed",
+                String(esActivo)
             );
         });
 
@@ -2336,9 +2569,13 @@ filtrosPublicaciones.forEach((boton) => {
 
 if (cancelarEliminarPlan) {
     cancelarEliminarPlan.addEventListener("click", () => {
-        if (modalEliminarPlan) {
-            modalEliminarPlan.classList.remove("visible");
-        }
+        cerrarModalAccesible(
+            modalEliminarPlan,
+            elementoQueAbrioModalEliminar
+        );
+
+        elementoQueAbrioModalEliminar =
+            null;
 
         planPendienteEliminar = null;
     });
@@ -2354,18 +2591,92 @@ if (confirmarEliminarPlan) {
 if (modalEliminarPlan) {
     modalEliminarPlan.addEventListener("click", (evento) => {
         if (evento.target === modalEliminarPlan) {
-            modalEliminarPlan.classList.remove("visible");
-            planPendienteEliminar = null;
+            cerrarModalAccesible(
+                modalEliminarPlan,
+                elementoQueAbrioModalEliminar
+            );
+
+            elementoQueAbrioModalEliminar =
+                null;
+
+            planPendienteEliminar =
+                null;
         }
     });
 }
+
+document.addEventListener(
+    "keydown",
+    (evento) => {
+        mantenerFocoDentroModal(
+            evento,
+            modalCancelacion
+        );
+
+        mantenerFocoDentroModal(
+            evento,
+            modalEliminarPlan
+        );
+
+        if (evento.key !== "Escape") {
+            return;
+        }
+
+        if (
+            modalCancelacion?.classList.contains(
+                "visible"
+            )
+        ) {
+            reservaPendienteCancelar =
+                null;
+
+            cerrarModalAccesible(
+                modalCancelacion,
+                elementoQueAbrioModalCancelacion
+            );
+
+            elementoQueAbrioModalCancelacion =
+                null;
+
+            return;
+        }
+
+        if (
+            modalEliminarPlan?.classList.contains(
+                "visible"
+            )
+        ) {
+            planPendienteEliminar =
+                null;
+
+            cerrarModalAccesible(
+                modalEliminarPlan,
+                elementoQueAbrioModalEliminar
+            );
+
+            elementoQueAbrioModalEliminar =
+                null;
+        }
+    }
+);
+
 
 /* =========================================
    CARGA INICIAL
 ========================================= */
 
 function iniciarPerfil() {
+    if (
+        typeof window.obtenerTodosPlanesSuralia !==
+        "function"
+    ) {
+        console.warn(
+            "No se ha cargado js/datos-planes.js. El perfil usará únicamente los datos guardados."
+        );
+    }
+
     cargarDatosUsuario();
+    actualizarEstadoAvatares();
     mostrarReservasPerfil();
     mostrarFavoritosPerfil();
     mostrarPublicaciones();

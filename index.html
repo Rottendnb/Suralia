@@ -59,7 +59,7 @@
                 aria-label="Página de inicio de Suralia"
             >
                 <span class="logo__icono">
-                    <i class="fa-solid fa-location-dot"></i>
+                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
                 </span>
 
                 <span class="logo__texto">
@@ -70,6 +70,7 @@
             <nav
                 class="navegacion"
                 id="navegacion"
+                aria-label="Navegación principal"
             >
 
                 <a href="planes.html">
@@ -88,7 +89,7 @@
                     href="login.html"
                     class="enlace-publicar"
                 >
-                    <i class="fa-solid fa-plus"></i>
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
                     Publicar un plan
                 </a>
 
@@ -96,7 +97,7 @@
                     href="login.html"
                     class="login-movil"
                 >
-                    <i class="fa-regular fa-user"></i>
+                    <i class="fa-regular fa-user" aria-hidden="true"></i>
                     <span>
                         Iniciar sesión
                     </span>
@@ -106,7 +107,7 @@
                     href="perfil.html#reservas"
                     class="opcion-usuario-movil"
                 >
-                    <i class="fa-regular fa-calendar-check"></i>
+                    <i class="fa-regular fa-calendar-check" aria-hidden="true"></i>
                     Mis reservas
                 </a>
 
@@ -114,7 +115,7 @@
                     href="perfil.html#favoritos"
                     class="opcion-usuario-movil"
                 >
-                    <i class="fa-regular fa-heart"></i>
+                    <i class="fa-regular fa-heart" aria-hidden="true"></i>
                     Favoritos
                 </a>
 
@@ -123,7 +124,7 @@
                     class="opcion-usuario-movil cerrar-sesion-movil"
                     id="cerrar-sesion-movil"
                 >
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
                     Cerrar sesión
                 </button>
 
@@ -141,6 +142,8 @@
                         class="boton-login"
                         id="boton-usuario"
                         aria-expanded="false"
+                        aria-haspopup="true"
+                        aria-controls="menu-usuario-desplegable"
                     >
                         Iniciar sesión
                     </a>
@@ -151,22 +154,22 @@
                     >
 
                         <a href="perfil.html">
-                            <i class="fa-regular fa-user"></i>
+                            <i class="fa-regular fa-user" aria-hidden="true"></i>
                             Mi perfil
                         </a>
 
                         <a href="perfil.html#reservas">
-                            <i class="fa-regular fa-calendar-check"></i>
+                            <i class="fa-regular fa-calendar-check" aria-hidden="true"></i>
                             Mis reservas
                         </a>
 
                         <a href="perfil.html#favoritos">
-                            <i class="fa-regular fa-heart"></i>
+                            <i class="fa-regular fa-heart" aria-hidden="true"></i>
                             Favoritos
                         </a>
 
                         <a href="publicar-plan.html">
-                            <i class="fa-solid fa-plus"></i>
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i>
                             Publicar un plan
                         </a>
 
@@ -177,7 +180,7 @@
                             id="cerrar-sesion"
                             class="menu-usuario__cerrar"
                         >
-                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
                             Cerrar sesión
                         </button>
 
@@ -191,8 +194,9 @@
                     type="button"
                     aria-label="Abrir menú"
                     aria-expanded="false"
+                    aria-controls="navegacion"
                 >
-                    <i class="fa-solid fa-bars"></i>
+                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
                 </button>
 
             </div>
@@ -222,7 +226,7 @@
                 <div class="hero__texto">
 
                     <span class="etiqueta">
-                        <i class="fa-solid fa-sun"></i>
+                        <i class="fa-solid fa-sun" aria-hidden="true"></i>
                         Planes para disfrutar Sevilla
                     </span>
 
@@ -239,11 +243,13 @@
                     <form
                         class="buscador"
                         id="formulario-buscador"
+                        role="search"
+                        aria-label="Buscar planes en Sevilla"
                     >
 
                         <div class="buscador__campo">
 
-                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
 
                             <div>
 
@@ -256,6 +262,7 @@
                                     id="busqueda"
                                     name="busqueda"
                                     placeholder="Conciertos, rutas, talleres..."
+                                    autocomplete="off"
                                 >
 
                             </div>
@@ -266,7 +273,7 @@
 
                         <div class="buscador__campo">
 
-                            <i class="fa-regular fa-calendar"></i>
+                            <i class="fa-regular fa-calendar" aria-hidden="true"></i>
 
                             <div>
 
@@ -288,7 +295,7 @@
                             type="submit"
                             class="boton-buscar"
                         >
-                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
 
                             <span>
                                 Buscar planes
@@ -367,7 +374,7 @@
                                 <div class="tarjeta-principal__gradiente"></div>
 
                                 <span class="tarjeta-principal__categoria">
-                                    <i class="fa-solid fa-person-hiking"></i>
+                                    <i class="fa-solid fa-person-hiking" aria-hidden="true"></i>
                                     Naturaleza
                                 </span>
 
@@ -382,7 +389,7 @@
                                     </h2>
 
                                     <p>
-                                        <i class="fa-solid fa-location-dot"></i>
+                                        <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
                                         Constantina, Sevilla
                                     </p>
 
@@ -398,7 +405,7 @@
                             type="button"
                             aria-label="Añadir ruta de senderismo por la Sierra Norte a favoritos"
                         >
-                            <i class="fa-regular fa-heart"></i>
+                            <i class="fa-regular fa-heart" aria-hidden="true"></i>
                         </button>
 
                     </article>
@@ -431,7 +438,7 @@
                         class="tarjeta-flotante tarjeta-flotante--valoracion"
                     >
 
-                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star" aria-hidden="true"></i>
 
                         <div>
 
@@ -460,6 +467,7 @@
         <section
             class="seccion categorias"
             id="categorias"
+            aria-labelledby="titulo-categorias"
         >
 
             <div class="contenedor">
@@ -472,7 +480,7 @@
                             Explora a tu manera
                         </span>
 
-                        <h2>
+                        <h2 id="titulo-categorias">
                             ¿Qué te apetece hacer?
                         </h2>
 
@@ -483,7 +491,7 @@
                         class="enlace-ver-todos"
                     >
                         Ver todas
-                        <i class="fa-solid fa-arrow-right"></i>
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                     </a>
 
                 </div>
@@ -496,7 +504,7 @@
                     >
 
                         <span class="categoria__icono">
-                            <i class="fa-solid fa-music"></i>
+                            <i class="fa-solid fa-music" aria-hidden="true"></i>
                         </span>
 
                         <div>
@@ -513,7 +521,7 @@
 
                         <i
                             class="fa-solid fa-arrow-right categoria__flecha"
-                        ></i>
+                         aria-hidden="true"></i>
 
                     </a>
 
@@ -523,7 +531,7 @@
                     >
 
                         <span class="categoria__icono">
-                            <i class="fa-solid fa-person-hiking"></i>
+                            <i class="fa-solid fa-person-hiking" aria-hidden="true"></i>
                         </span>
 
                         <div>
@@ -540,7 +548,7 @@
 
                         <i
                             class="fa-solid fa-arrow-right categoria__flecha"
-                        ></i>
+                         aria-hidden="true"></i>
 
                     </a>
 
@@ -550,7 +558,7 @@
                     >
 
                         <span class="categoria__icono">
-                            <i class="fa-solid fa-utensils"></i>
+                            <i class="fa-solid fa-utensils" aria-hidden="true"></i>
                         </span>
 
                         <div>
@@ -567,7 +575,7 @@
 
                         <i
                             class="fa-solid fa-arrow-right categoria__flecha"
-                        ></i>
+                         aria-hidden="true"></i>
 
                     </a>
 
@@ -577,7 +585,7 @@
                     >
 
                         <span class="categoria__icono">
-                            <i class="fa-solid fa-palette"></i>
+                            <i class="fa-solid fa-palette" aria-hidden="true"></i>
                         </span>
 
                         <div>
@@ -594,7 +602,7 @@
 
                         <i
                             class="fa-solid fa-arrow-right categoria__flecha"
-                        ></i>
+                         aria-hidden="true"></i>
 
                     </a>
 
@@ -611,6 +619,7 @@
         <section
             class="seccion planes"
             id="planes"
+            aria-labelledby="titulo-planes-destacados"
         >
 
             <div class="contenedor">
@@ -623,7 +632,7 @@
                             Planes destacados
                         </span>
 
-                        <h2>
+                        <h2 id="titulo-planes-destacados">
                             Ideas para los próximos días
                         </h2>
 
@@ -634,7 +643,7 @@
                         class="enlace-ver-todos"
                     >
                         Explorar planes
-                        <i class="fa-solid fa-arrow-right"></i>
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                     </a>
 
                 </div>
@@ -662,6 +671,7 @@
                         <a
                             href="detalle-plan.html?id=italica"
                             class="tarjeta-plan__enlace"
+                            aria-label="Ver detalles de Visita guiada por Itálica"
                         >
 
                             <div
@@ -677,7 +687,7 @@
                                     type="button"
                                     aria-label="Añadir visita a Itálica a favoritos"
                                 >
-                                    <i class="fa-regular fa-heart"></i>
+                                    <i class="fa-regular fa-heart" aria-hidden="true"></i>
                                 </button>
 
                             </div>
@@ -687,12 +697,12 @@
                                 <div class="tarjeta-plan__meta">
 
                                     <span>
-                                        <i class="fa-regular fa-calendar"></i>
+                                        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
                                         25 de julio
                                     </span>
 
                                     <span>
-                                        <i class="fa-regular fa-clock"></i>
+                                        <i class="fa-regular fa-clock" aria-hidden="true"></i>
                                         10:30
                                     </span>
 
@@ -704,7 +714,7 @@
 
                                 <p class="tarjeta-plan__ubicacion">
 
-                                    <i class="fa-solid fa-location-dot"></i>
+                                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
 
                                     Santiponce, Sevilla
 
@@ -718,7 +728,7 @@
 
                                     <strong>
                                         4,8
-                                        <i class="fa-solid fa-star"></i>
+                                        <i class="fa-solid fa-star" aria-hidden="true"></i>
                                     </strong>
 
                                 </div>
@@ -750,6 +760,7 @@
                         <a
                             href="detalle-kayak.html"
                             class="tarjeta-plan__enlace"
+                            aria-label="Ver detalles de Kayak al atardecer"
                         >
 
                             <div
@@ -765,7 +776,7 @@
                                     type="button"
                                     aria-label="Añadir kayak a favoritos"
                                 >
-                                    <i class="fa-regular fa-heart"></i>
+                                    <i class="fa-regular fa-heart" aria-hidden="true"></i>
                                 </button>
 
                             </div>
@@ -775,12 +786,12 @@
                                 <div class="tarjeta-plan__meta">
 
                                     <span>
-                                        <i class="fa-regular fa-calendar"></i>
+                                        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
                                         27 de julio
                                     </span>
 
                                     <span>
-                                        <i class="fa-regular fa-clock"></i>
+                                        <i class="fa-regular fa-clock" aria-hidden="true"></i>
                                         19:00
                                     </span>
 
@@ -792,7 +803,7 @@
 
                                 <p class="tarjeta-plan__ubicacion">
 
-                                    <i class="fa-solid fa-location-dot"></i>
+                                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
 
                                     Río Guadalquivir
 
@@ -806,7 +817,7 @@
 
                                     <strong>
                                         4,9
-                                        <i class="fa-solid fa-star"></i>
+                                        <i class="fa-solid fa-star" aria-hidden="true"></i>
                                     </strong>
 
                                 </div>
@@ -838,6 +849,7 @@
                         <a
                             href="detalle-poncho-k.html"
                             class="tarjeta-plan__enlace"
+                            aria-label="Ver detalles de PONCHO K en Cartuja Center CITE"
                         >
 
                             <div
@@ -853,7 +865,7 @@
                                     type="button"
                                     aria-label="Añadir concierto de Poncho K a favoritos"
                                 >
-                                    <i class="fa-regular fa-heart"></i>
+                                    <i class="fa-regular fa-heart" aria-hidden="true"></i>
                                 </button>
 
                             </div>
@@ -863,12 +875,12 @@
                                 <div class="tarjeta-plan__meta">
 
                                     <span>
-                                        <i class="fa-regular fa-calendar"></i>
+                                        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
                                         21 de noviembre
                                     </span>
 
                                     <span>
-                                        <i class="fa-regular fa-clock"></i>
+                                        <i class="fa-regular fa-clock" aria-hidden="true"></i>
                                         21:00
                                     </span>
 
@@ -880,7 +892,7 @@
 
                                 <p class="tarjeta-plan__ubicacion">
 
-                                    <i class="fa-solid fa-location-dot"></i>
+                                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
 
                                     Cartuja Center CITE, Sevilla
 
@@ -894,7 +906,7 @@
 
                                     <strong>
                                         4,8
-                                        <i class="fa-solid fa-star"></i>
+                                        <i class="fa-solid fa-star" aria-hidden="true"></i>
                                     </strong>
 
                                 </div>
@@ -918,6 +930,7 @@
         <section
             class="seccion como-funciona"
             id="como-funciona"
+            aria-labelledby="titulo-como-funciona"
         >
 
             <div class="contenedor">
@@ -928,7 +941,7 @@
                         Así de sencillo
                     </span>
 
-                    <h2>
+                    <h2 id="titulo-como-funciona">
                         Encuentra un plan en pocos minutos
                     </h2>
 
@@ -948,7 +961,7 @@
                         </span>
 
                         <div class="paso__icono">
-                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                         </div>
 
                         <h3>
@@ -969,7 +982,7 @@
                         </span>
 
                         <div class="paso__icono">
-                            <i class="fa-regular fa-heart"></i>
+                            <i class="fa-regular fa-heart" aria-hidden="true"></i>
                         </div>
 
                         <h3>
@@ -990,7 +1003,7 @@
                         </span>
 
                         <div class="paso__icono">
-                            <i class="fa-solid fa-ticket"></i>
+                            <i class="fa-solid fa-ticket" aria-hidden="true"></i>
                         </div>
 
                         <h3>
@@ -1042,7 +1055,7 @@
                         class="boton-claro enlace-publicar"
                     >
                         Publicar un plan
-                        <i class="fa-solid fa-arrow-right"></i>
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                     </a>
 
                 </div>
@@ -1066,10 +1079,11 @@
                 <a
                     href="index.html"
                     class="logo logo--footer"
+                    aria-label="Página de inicio de Suralia"
                 >
 
                     <span class="logo__icono">
-                        <i class="fa-solid fa-location-dot"></i>
+                        <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
                     </span>
 
                     <span class="logo__texto">
@@ -1147,23 +1161,23 @@
 
                     <a
                         href="#"
-                        aria-label="Instagram"
+                        aria-label="Instagram de Suralia"
                     >
-                        <i class="fa-brands fa-instagram"></i>
+                        <i class="fa-brands fa-instagram" aria-hidden="true"></i>
                     </a>
 
                     <a
                         href="#"
-                        aria-label="TikTok"
+                        aria-label="TikTok de Suralia"
                     >
-                        <i class="fa-brands fa-tiktok"></i>
+                        <i class="fa-brands fa-tiktok" aria-hidden="true"></i>
                     </a>
 
                     <a
                         href="#"
-                        aria-label="Facebook"
+                        aria-label="Facebook de Suralia"
                     >
-                        <i class="fa-brands fa-facebook-f"></i>
+                        <i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
                     </a>
 
                 </div>
@@ -1207,9 +1221,10 @@
         id="notificacion"
         role="status"
         aria-live="polite"
+        aria-atomic="true"
     >
 
-        <i class="fa-solid fa-circle-check"></i>
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
 
         <span></span>
 
@@ -1222,7 +1237,8 @@
     <section
         class="banner-cookies oculto"
         id="banner-cookies"
-        aria-label="Configuración de cookies"
+        role="region"
+        aria-labelledby="titulo-banner-cookies"
     >
 
         <div class="banner-cookies__contenido">
@@ -1230,12 +1246,12 @@
             <div class="banner-cookies__texto">
 
                 <span class="banner-cookies__icono">
-                    <i class="fa-solid fa-cookie-bite"></i>
+                    <i class="fa-solid fa-cookie-bite" aria-hidden="true"></i>
                 </span>
 
                 <div>
 
-                    <h2>
+                    <h2 id="titulo-banner-cookies">
                         Tu privacidad es importante
                     </h2>
 
@@ -1287,6 +1303,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
+    <script src="js/datos-planes.js"></script>
     <script src="js/main.js"></script>
     <script src="js/cookies.js"></script>
 

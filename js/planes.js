@@ -40,6 +40,108 @@ const planes = Array.from(
     )
 );
 
+
+/* =====================================================
+   DATOS OFICIALES DESDE EL CATÁLOGO
+===================================================== */
+
+function obtenerPlanCatalogo(
+    tarjeta
+) {
+    const planId =
+        tarjeta?.dataset.planId ||
+        "";
+
+    if (
+        !planId ||
+        typeof window.obtenerPlanSuralia !==
+            "function"
+    ) {
+        return null;
+    }
+
+    return window.obtenerPlanSuralia(
+        planId
+    );
+}
+
+
+function obtenerDatosPlan(
+    tarjeta
+) {
+    const datosCatalogo =
+        obtenerPlanCatalogo(
+            tarjeta
+        );
+
+    return {
+        planId:
+            datosCatalogo?.planId ||
+            tarjeta?.dataset.planId ||
+            "",
+
+        titulo:
+            datosCatalogo?.titulo ||
+            tarjeta?.dataset.titulo ||
+            tarjeta?.dataset.nombre ||
+            "",
+
+        categoria:
+            datosCatalogo?.categoria ||
+            tarjeta?.dataset.categoria ||
+            "",
+
+        categoriaTexto:
+            datosCatalogo?.categoriaTexto ||
+            tarjeta?.dataset.categoriaTexto ||
+            tarjeta?.dataset.categoria ||
+            "",
+
+        imagen:
+            datosCatalogo?.imagen ||
+            tarjeta?.dataset.imagen ||
+            "",
+
+        fechaTexto:
+            datosCatalogo?.fechaTexto ||
+            tarjeta?.dataset.fecha ||
+            "",
+
+        fechaIso:
+            datosCatalogo?.fechaIso ||
+            tarjeta?.dataset.fechaIso ||
+            "",
+
+        ubicacion:
+            datosCatalogo?.ubicacion ||
+            tarjeta?.dataset.ubicacion ||
+            "",
+
+        precio:
+            Number(
+                datosCatalogo?.precio ??
+                tarjeta?.dataset.precio ??
+                0
+            ),
+
+        valoracion:
+            Number(
+                datosCatalogo?.valoracion ??
+                tarjeta?.dataset.valoracion ??
+                0
+            ),
+
+        enlace:
+            datosCatalogo?.enlace ||
+            tarjeta?.dataset.enlace ||
+            (
+                tarjeta?.dataset.planId
+                    ? `detalle-plan.html?id=${tarjeta.dataset.planId}`
+                    : "planes.html"
+            )
+    };
+}
+
 const numeroResultados = document.querySelector(
     "#numero-resultados"
 );
@@ -48,7 +150,17 @@ const sinResultados = document.querySelector(
     "#sin-resultados"
 );
 
+const resumenResultados = document.querySelector(
+    "#resumen-resultados"
+);
+
+const botonVista = document.querySelector(
+    ".boton-vista"
+);
+
 let fechaBuscadaDesdePortada = "";
+
+let vistaCompactaActiva = false;
 
 
 /* =====================================================
@@ -170,21 +282,27 @@ function ordenarPlanes(
 
     return planesVisibles.sort(
         (planA, planB) => {
-            const precioA = Number(
-                planA.dataset.precio || 0
-            );
+            const datosPlanA =
+                obtenerDatosPlan(
+                    planA
+                );
 
-            const precioB = Number(
-                planB.dataset.precio || 0
-            );
+            const datosPlanB =
+                obtenerDatosPlan(
+                    planB
+                );
 
-            const valoracionA = Number(
-                planA.dataset.valoracion || 0
-            );
+            const precioA =
+                datosPlanA.precio;
 
-            const valoracionB = Number(
-                planB.dataset.valoracion || 0
-            );
+            const precioB =
+                datosPlanB.precio;
+
+            const valoracionA =
+                datosPlanA.valoracion;
+
+            const valoracionB =
+                datosPlanB.valoracion;
 
             if (orden === "precio-menor") {
                 return precioA - precioB;
@@ -201,6 +319,106 @@ function ordenarPlanes(
             return 0;
         }
     );
+}
+
+
+function obtenerTextoResultados(
+    cantidad
+) {
+    return cantidad === 1
+        ? "Mostrando 1 resultado"
+        : `Mostrando ${cantidad} resultados`;
+}
+
+
+function actualizarResumenResultados(
+    cantidad
+) {
+    if (numeroResultados) {
+        numeroResultados.textContent =
+            cantidad;
+    }
+
+    if (resumenResultados) {
+        resumenResultados.setAttribute(
+            "aria-label",
+            obtenerTextoResultados(
+                cantidad
+            )
+        );
+    }
+}
+
+
+function actualizarEstadoSinResultados(
+    cantidad
+) {
+    if (!sinResultados) {
+        return;
+    }
+
+    const sinCoincidencias =
+        cantidad === 0;
+
+    sinResultados.classList.toggle(
+        "visible",
+        sinCoincidencias
+    );
+
+    sinResultados.setAttribute(
+        "aria-hidden",
+        String(!sinCoincidencias)
+    );
+
+    if (listaPlanes) {
+        listaPlanes.setAttribute(
+            "aria-hidden",
+            String(sinCoincidencias)
+        );
+    }
+}
+
+
+function actualizarBotonVista() {
+    if (!botonVista) {
+        return;
+    }
+
+    botonVista.setAttribute(
+        "aria-pressed",
+        String(vistaCompactaActiva)
+    );
+
+    botonVista.setAttribute(
+        "aria-label",
+        vistaCompactaActiva
+            ? "Mostrar resultados en tarjetas grandes"
+            : "Mostrar resultados en vista compacta"
+    );
+
+    botonVista.setAttribute(
+        "title",
+        vistaCompactaActiva
+            ? "Vista de tarjetas grandes"
+            : "Vista compacta"
+    );
+}
+
+
+function alternarVistaResultados() {
+    if (!listaPlanes) {
+        return;
+    }
+
+    vistaCompactaActiva =
+        !vistaCompactaActiva;
+
+    listaPlanes.classList.toggle(
+        "vista-compacta",
+        vistaCompactaActiva
+    );
+
+    actualizarBotonVista();
 }
 
 
@@ -226,32 +444,39 @@ function aplicarFiltros() {
 
     let planesVisibles = planes.filter(
         (plan) => {
-            const nombre = normalizarTexto(
-                plan.dataset.nombre || ""
-            );
+            const datosPlan =
+                obtenerDatosPlan(
+                    plan
+                );
 
-            const titulo = normalizarTexto(
-                plan.dataset.titulo || ""
-            );
+            const nombre =
+                normalizarTexto(
+                    datosPlan.titulo
+                );
 
-            const ubicacion = normalizarTexto(
-                plan.dataset.ubicacion || ""
-            );
+            const titulo =
+                normalizarTexto(
+                    datosPlan.titulo
+                );
+
+            const ubicacion =
+                normalizarTexto(
+                    datosPlan.ubicacion
+                );
 
             const categoriaTexto =
                 normalizarTexto(
-                    plan.dataset.categoriaTexto || ""
+                    datosPlan.categoriaTexto
                 );
 
             const categoria =
-                plan.dataset.categoria || "";
+                datosPlan.categoria;
 
-            const precio = Number(
-                plan.dataset.precio || 0
-            );
+            const precio =
+                datosPlan.precio;
 
             const fechaIso =
-                plan.dataset.fechaIso || "";
+                datosPlan.fechaIso;
 
             const coincideTexto =
                 !textoBuscado ||
@@ -300,21 +525,19 @@ function aplicarFiltros() {
         listaPlanes.appendChild(plan);
     });
 
-    if (numeroResultados) {
-        numeroResultados.textContent =
-            planesVisibles.length;
-    }
+    actualizarResumenResultados(
+        planesVisibles.length
+    );
 
-    if (sinResultados) {
-        sinResultados.classList.toggle(
-            "visible",
-            planesVisibles.length === 0
-        );
-    }
+    actualizarEstadoSinResultados(
+        planesVisibles.length
+    );
 }
 
 
-function limpiarFiltros() {
+function limpiarFiltros(
+    devolverFoco = false
+) {
     if (filtroTexto) {
         filtroTexto.value = "";
     }
@@ -341,6 +564,13 @@ function limpiarFiltros() {
     );
 
     aplicarFiltros();
+
+    if (
+        devolverFoco &&
+        filtroTexto
+    ) {
+        filtroTexto.focus();
+    }
 }
 
 
@@ -389,7 +619,11 @@ if (filtroOrden) {
 if (botonLimpiar) {
     botonLimpiar.addEventListener(
         "click",
-        limpiarFiltros
+        () => {
+            limpiarFiltros(
+                true
+            );
+        }
     );
 }
 
@@ -397,8 +631,22 @@ if (botonLimpiar) {
 if (botonRestablecer) {
     botonRestablecer.addEventListener(
         "click",
-        limpiarFiltros
+        () => {
+            limpiarFiltros(
+                true
+            );
+        }
     );
+}
+
+
+if (botonVista) {
+    botonVista.addEventListener(
+        "click",
+        alternarVistaResultados
+    );
+
+    actualizarBotonVista();
 }
 
 
@@ -455,47 +703,41 @@ function obtenerFavoritosPlanes() {
 function obtenerDatosTarjeta(
     tarjeta
 ) {
+    const datosPlan =
+        obtenerDatosPlan(
+            tarjeta
+        );
+
     return {
         planId:
-            tarjeta.dataset.planId,
+            datosPlan.planId,
 
         titulo:
-            tarjeta.dataset.titulo ||
-            tarjeta.dataset.nombre,
+            datosPlan.titulo,
 
         categoria:
-            tarjeta.dataset.categoriaTexto ||
-            tarjeta.dataset.categoria,
+            datosPlan.categoriaTexto,
 
         imagen:
-            tarjeta.dataset.imagen,
+            datosPlan.imagen,
 
         fechaTexto:
-            tarjeta.dataset.fecha,
+            datosPlan.fechaTexto,
 
         fechaIso:
-            tarjeta.dataset.fechaIso,
+            datosPlan.fechaIso,
 
         ubicacion:
-            tarjeta.dataset.ubicacion,
+            datosPlan.ubicacion,
 
         precio:
-            Number(
-                tarjeta.dataset.precio || 0
-            ),
+            datosPlan.precio,
 
         valoracion:
-            Number(
-                tarjeta.dataset.valoracion || 0
-            ),
+            datosPlan.valoracion,
 
         enlace:
-            tarjeta.dataset.enlace ||
-            (
-                tarjeta.dataset.planId
-                    ? `detalle-plan.html?id=${tarjeta.dataset.planId}`
-                    : "planes.html"
-            )
+            datosPlan.enlace
     };
 }
 
@@ -525,22 +767,43 @@ function actualizarBotonFavoritoTarjeta(
     const icono =
         boton.querySelector("i");
 
+    const tarjeta =
+        boton.closest(
+            ".tarjeta-plan"
+        );
+
+    const tituloPlan =
+        obtenerDatosPlan(
+            tarjeta
+        ).titulo ||
+        "este plan";
+
     boton.classList.toggle(
         "favorito-activo",
         esFavorito
+    );
+
+    boton.setAttribute(
+        "aria-pressed",
+        String(esFavorito)
     );
 
     if (icono) {
         icono.className = esFavorito
             ? "fa-solid fa-heart"
             : "fa-regular fa-heart";
+
+        icono.setAttribute(
+            "aria-hidden",
+            "true"
+        );
     }
 
     boton.setAttribute(
         "aria-label",
         esFavorito
-            ? "Eliminar de favoritos"
-            : "Añadir a favoritos"
+            ? `Eliminar ${tituloPlan} de favoritos`
+            : `Añadir ${tituloPlan} a favoritos`
     );
 }
 
@@ -720,6 +983,19 @@ botonesFavoritosPlanes.forEach(
 
 
 
+if (filtroTexto) {
+    filtroTexto.addEventListener(
+        "keydown",
+        (evento) => {
+            if (evento.key === "Escape") {
+                filtroTexto.value = "";
+                aplicarFiltros();
+            }
+        }
+    );
+}
+
+
 /* =====================================================
    SINCRONIZACIÓN ENTRE PESTAÑAS
 ===================================================== */
@@ -742,6 +1018,16 @@ window.addEventListener(
    CARGA INICIAL
 ===================================================== */
 
+if (
+    typeof window.obtenerPlanSuralia !==
+    "function"
+) {
+    console.warn(
+        "No se ha cargado js/datos-planes.js. Se usarán los datos del HTML."
+    );
+}
+
 aplicarParametrosIniciales();
+actualizarBotonVista();
 aplicarFiltros();
 cargarEstadoFavoritosTarjetas();

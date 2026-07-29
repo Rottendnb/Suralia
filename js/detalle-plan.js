@@ -256,9 +256,78 @@ const parametrosUrl = new URLSearchParams(
 const planIdUrl =
     parametrosUrl.get("id") || "italica";
 
+function combinarConCatalogo(
+    planDetalle
+) {
+    if (
+        !planDetalle ||
+        typeof window.obtenerPlanSuralia !==
+            "function"
+    ) {
+        return planDetalle;
+    }
+
+    const datosCatalogo =
+        window.obtenerPlanSuralia(
+            planDetalle.planId
+        );
+
+    if (!datosCatalogo) {
+        return planDetalle;
+    }
+
+    return {
+        ...planDetalle,
+
+        /*
+           Los datos comunes del catálogo se colocan
+           al final para que sean la fuente oficial.
+        */
+        planId:
+            datosCatalogo.planId,
+
+        titulo:
+            datosCatalogo.titulo,
+
+        categoria:
+            datosCatalogo.categoria,
+
+        categoriaTexto:
+            datosCatalogo.categoriaTexto,
+
+        precio:
+            datosCatalogo.precio,
+
+        valoracion:
+            datosCatalogo.valoracion,
+
+        fechaTexto:
+            datosCatalogo.fechaTexto,
+
+        fechaIso:
+            datosCatalogo.fechaIso,
+
+        hora:
+            datosCatalogo.hora ||
+            planDetalle.hora,
+
+        ubicacion:
+            datosCatalogo.ubicacion,
+
+        imagen:
+            datosCatalogo.imagen,
+
+        enlace:
+            datosCatalogo.enlace
+    };
+}
+
+
 const planActual =
-    PLANES_DETALLE[planIdUrl] ||
-    PLANES_DETALLE.italica;
+    combinarConCatalogo(
+        PLANES_DETALLE[planIdUrl] ||
+        PLANES_DETALLE.italica
+    );
 
 
 /* =====================================================
@@ -359,6 +428,7 @@ const botonFavoritoPlan =
 
 let temporizadorNotificacion;
 let mapaPlan;
+let elementoQueAbrioModalImagen = null;
 
 
 /* =====================================================
@@ -418,6 +488,11 @@ function cargarDatosBasicos() {
     if (iconoCategoria) {
         iconoCategoria.className =
             planActual.categoriaIcono;
+
+        iconoCategoria.setAttribute(
+            "aria-hidden",
+            "true"
+        );
     }
 
     cambiarTexto(
@@ -449,6 +524,14 @@ function cargarDatosBasicos() {
     cambiarTexto(
         "#organizador-avatar",
         planActual.organizadorIniciales
+    );
+
+    const avatarOrganizador =
+        seleccionar("#organizador-avatar");
+
+    avatarOrganizador?.setAttribute(
+        "aria-label",
+        `Avatar de ${planActual.organizador}`
     );
 
     cambiarTexto(
@@ -614,6 +697,13 @@ function cargarGaleria() {
             if (boton) {
                 boton.dataset.imagen =
                     rutaImagen;
+
+                boton.setAttribute(
+                    "aria-label",
+                    `Ampliar imagen ${
+                        indice + 1
+                    } de ${planActual.titulo}`
+                );
             }
 
             if (imagen) {
@@ -621,7 +711,7 @@ function cargarGaleria() {
                     rutaImagen;
 
                 imagen.alt =
-                    `${planActual.titulo} - imagen ${
+                    `${planActual.titulo}, imagen ${
                         indice + 1
                     }`;
             }
@@ -671,16 +761,22 @@ function cargarIncluye() {
                     tipo === "no";
 
                 return `
-                    <div${
-                        noIncluido
-                            ? ' class="no-incluido"'
-                            : ""
-                    }>
-                        <i class="fa-solid ${
+                    <div
+                        ${
                             noIncluido
-                                ? "fa-xmark"
-                                : "fa-check"
-                        }"></i>
+                                ? 'class="no-incluido"'
+                                : ""
+                        }
+                        role="listitem"
+                    >
+                        <i
+                            class="fa-solid ${
+                                noIncluido
+                                    ? "fa-xmark"
+                                    : "fa-check"
+                            }"
+                            aria-hidden="true"
+                        ></i>
                         ${texto}
                     </div>
                 `;
@@ -859,15 +955,31 @@ if (
                     "visible"
                 );
 
+            botonLeerMas.setAttribute(
+                "aria-expanded",
+                String(estaVisible)
+            );
+
+            descripcionAmpliada.setAttribute(
+                "aria-hidden",
+                String(!estaVisible)
+            );
+
             botonLeerMas.innerHTML =
                 estaVisible
                     ? `
                         Mostrar menos
-                        <i class="fa-solid fa-chevron-up"></i>
+                        <i
+                            class="fa-solid fa-chevron-up"
+                            aria-hidden="true"
+                        ></i>
                     `
                     : `
                         Leer descripción completa
-                        <i class="fa-solid fa-chevron-down"></i>
+                        <i
+                            class="fa-solid fa-chevron-down"
+                            aria-hidden="true"
+                        ></i>
                     `;
         }
     );
@@ -896,12 +1008,29 @@ document
                 imagenModal.src =
                     boton.dataset.imagen;
 
+                const imagenGaleria =
+                    boton.querySelector("img");
+
+                imagenModal.alt =
+                    imagenGaleria?.alt ||
+                    `Imagen ampliada de ${planActual.titulo}`;
+
+                elementoQueAbrioModalImagen =
+                    boton;
+
                 modalImagen.classList.add(
                     "visible"
                 );
 
+                modalImagen.setAttribute(
+                    "aria-hidden",
+                    "false"
+                );
+
                 document.body.style.overflow =
                     "hidden";
+
+                cerrarModalImagen?.focus();
             }
         );
     });
@@ -919,9 +1048,20 @@ function cerrarModal() {
         "visible"
     );
 
+    modalImagen.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
     imagenModal.src = "";
+    imagenModal.alt =
+        "Imagen ampliada del plan";
 
     document.body.style.overflow = "";
+
+    elementoQueAbrioModalImagen?.focus();
+
+    elementoQueAbrioModalImagen = null;
 }
 
 
@@ -947,9 +1087,66 @@ if (modalImagen) {
 }
 
 
+function mantenerFocoEnModalImagen(
+    evento
+) {
+    if (
+        evento.key !== "Tab" ||
+        !modalImagen?.classList.contains(
+            "visible"
+        )
+    ) {
+        return;
+    }
+
+    const elementosEnfocables =
+        Array.from(
+            modalImagen.querySelectorAll(
+                `
+                    button:not([disabled]),
+                    a[href],
+                    [tabindex]:not([tabindex="-1"])
+                `
+            )
+        );
+
+    if (
+        elementosEnfocables.length === 0
+    ) {
+        return;
+    }
+
+    const primero =
+        elementosEnfocables[0];
+
+    const ultimo =
+        elementosEnfocables[
+            elementosEnfocables.length - 1
+        ];
+
+    if (
+        evento.shiftKey &&
+        document.activeElement === primero
+    ) {
+        evento.preventDefault();
+        ultimo.focus();
+    } else if (
+        !evento.shiftKey &&
+        document.activeElement === ultimo
+    ) {
+        evento.preventDefault();
+        primero.focus();
+    }
+}
+
+
 document.addEventListener(
     "keydown",
     (evento) => {
+        mantenerFocoEnModalImagen(
+            evento
+        );
+
         if (
             evento.key === "Escape" &&
             modalImagen?.classList.contains(
@@ -1042,11 +1239,23 @@ function actualizarBotonFavoritoDetalle() {
     }
 
     botonFavoritoPlan.setAttribute(
+        "aria-pressed",
+        String(esFavorito)
+    );
+
+    botonFavoritoPlan.setAttribute(
         "aria-label",
         esFavorito
-            ? "Eliminar plan de favoritos"
-            : "Añadir plan a favoritos"
+            ? `Eliminar ${planActual.titulo} de favoritos`
+            : `Añadir ${planActual.titulo} a favoritos`
     );
+
+    if (icono) {
+        icono.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+    }
 }
 
 
@@ -1160,6 +1369,105 @@ if (botonFavoritoPlan) {
 }
 
 
+function actualizarDesgloseReserva() {
+    const selectorPersonas =
+        seleccionar(
+            "#personas-reserva"
+        );
+
+    const numeroPersonas =
+        Number(
+            selectorPersonas?.value ||
+            1
+        );
+
+    const precioUnitario =
+        Number(
+            planActual.precio ||
+            0
+        );
+
+    const total =
+        precioUnitario *
+        (
+            Number.isFinite(
+                numeroPersonas
+            )
+                ? numeroPersonas
+                : 1
+        );
+
+    cambiarTexto(
+        "#desglose-precio",
+        `${precioUnitario.toLocaleString(
+            "es-ES"
+        )} €`
+    );
+
+    cambiarTexto(
+        "#desglose-gestion",
+        "0 €"
+    );
+
+    cambiarTexto(
+        "#desglose-total",
+        `${total.toLocaleString(
+            "es-ES"
+        )} €`
+    );
+}
+
+
+function marcarCampoReserva(
+    campo,
+    invalido
+) {
+    campo?.setAttribute(
+        "aria-invalid",
+        String(invalido)
+    );
+}
+
+
+const selectorFechaReserva =
+    seleccionar("#fecha-reserva");
+
+const selectorPersonasReserva =
+    seleccionar("#personas-reserva");
+
+selectorFechaReserva?.setAttribute(
+    "aria-invalid",
+    "false"
+);
+
+selectorPersonasReserva?.setAttribute(
+    "aria-invalid",
+    "false"
+);
+
+selectorFechaReserva?.addEventListener(
+    "change",
+    () => {
+        marcarCampoReserva(
+            selectorFechaReserva,
+            false
+        );
+    }
+);
+
+selectorPersonasReserva?.addEventListener(
+    "change",
+    () => {
+        marcarCampoReserva(
+            selectorPersonasReserva,
+            false
+        );
+
+        actualizarDesgloseReserva();
+    }
+);
+
+
 /* =====================================================
    RESERVAS
 ===================================================== */
@@ -1224,12 +1532,24 @@ if (formularioReserva) {
                 );
 
             if (!fechaSeleccionada) {
+                marcarCampoReserva(
+                    selectorFecha,
+                    true
+                );
+
                 mostrarNotificacion(
                     "Selecciona una fecha."
                 );
 
+                selectorFecha.focus();
+
                 return;
             }
+
+            marcarCampoReserva(
+                selectorFecha,
+                false
+            );
 
             if (
                 !Number.isInteger(
@@ -1237,12 +1557,24 @@ if (formularioReserva) {
                 ) ||
                 numeroPersonas < 1
             ) {
+                marcarCampoReserva(
+                    selectorPersonas,
+                    true
+                );
+
                 mostrarNotificacion(
                     "Selecciona el número de personas."
                 );
 
+                selectorPersonas.focus();
+
                 return;
             }
+
+            marcarCampoReserva(
+                selectorPersonas,
+                false
+            );
 
             const reservasGuardadas =
                 obtenerDatosLocalStorage(
@@ -1391,10 +1723,38 @@ window.addEventListener(
    INICIALIZACIÓN
 ===================================================== */
 
+if (
+    typeof window.obtenerPlanSuralia !==
+    "function"
+) {
+    console.warn(
+        "No se ha cargado js/datos-planes.js. Se usarán los datos internos del detalle."
+    );
+}
+
 cargarDatosBasicos();
 cargarGaleria();
 cargarDescripcion();
 cargarIncluye();
 cargarFechasReserva();
 cargarMapa();
+actualizarDesgloseReserva();
 actualizarBotonFavoritoDetalle();
+
+descripcionAmpliada?.setAttribute(
+    "aria-hidden",
+    descripcionAmpliada.classList.contains(
+        "visible"
+    )
+        ? "false"
+        : "true"
+);
+
+modalImagen?.setAttribute(
+    "aria-hidden",
+    modalImagen.classList.contains(
+        "visible"
+    )
+        ? "false"
+        : "true"
+);

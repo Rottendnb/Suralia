@@ -57,15 +57,32 @@ const notificacionPublicar = document.querySelector(
 let imagenBase64 = "";
 let temporizadorNotificacion;
 
+resultadoImagen?.setAttribute(
+    "aria-hidden",
+    resultadoImagen.classList.contains(
+        "visible"
+    )
+        ? "false"
+        : "true"
+);
+
 const fechaActual = new Date();
 const fechaMinima = fechaActual.toISOString().split("T")[0];
 
 fecha.min = fechaMinima;
 
 function mostrarNotificacion(mensaje) {
+    if (!notificacionPublicar) {
+        console.log(mensaje);
+        return;
+    }
+
     const texto = notificacionPublicar.querySelector("span");
 
-    texto.textContent = mensaje;
+    if (texto) {
+        texto.textContent = mensaje;
+    }
+
     notificacionPublicar.classList.add("visible");
 
     clearTimeout(temporizadorNotificacion);
@@ -78,9 +95,16 @@ function mostrarNotificacion(mensaje) {
 function mostrarError(input, idError, mensaje) {
     const error = document.querySelector(`#${idError}`);
 
-    error.textContent = mensaje;
+    if (error) {
+        error.textContent = mensaje;
+    }
 
-    const control = input.closest(".campo-formulario__control");
+    input?.setAttribute(
+        "aria-invalid",
+        "true"
+    );
+
+    const control = input?.closest(".campo-formulario__control");
 
     if (control) {
         control.classList.add("error");
@@ -90,9 +114,16 @@ function mostrarError(input, idError, mensaje) {
 function limpiarError(input, idError) {
     const error = document.querySelector(`#${idError}`);
 
-    error.textContent = "";
+    if (error) {
+        error.textContent = "";
+    }
 
-    const control = input.closest(".campo-formulario__control");
+    input?.setAttribute(
+        "aria-invalid",
+        "false"
+    );
+
+    const control = input?.closest(".campo-formulario__control");
 
     if (control) {
         control.classList.remove("error");
@@ -125,17 +156,26 @@ function actualizarVistaPrevia() {
         "Categoría";
 
     vistaFecha.innerHTML = `
-        <i class="fa-regular fa-calendar"></i>
+        <i
+            class="fa-regular fa-calendar"
+            aria-hidden="true"
+        ></i>
         ${formatearFecha(fecha.value)}
     `;
 
     vistaHora.innerHTML = `
-        <i class="fa-regular fa-clock"></i>
+        <i
+            class="fa-regular fa-clock"
+            aria-hidden="true"
+        ></i>
         ${hora.value || "Hora pendiente"}
     `;
 
     vistaUbicacion.innerHTML = `
-        <i class="fa-solid fa-location-dot"></i>
+        <i
+            class="fa-solid fa-location-dot"
+            aria-hidden="true"
+        ></i>
         ${ubicacion.value.trim() || "Ubicación pendiente"}
     `;
 
@@ -162,18 +202,42 @@ function procesarImagen(archivo) {
 
     const tamanoMaximo = 2 * 1024 * 1024;
 
-    document.querySelector("#error-plan-imagen").textContent = "";
+    const errorImagen =
+        document.querySelector("#error-plan-imagen");
+
+    if (errorImagen) {
+        errorImagen.textContent = "";
+    }
+
+    imagen?.setAttribute(
+        "aria-invalid",
+        "false"
+    );
 
     if (!tiposPermitidos.includes(archivo.type)) {
-        document.querySelector("#error-plan-imagen").textContent =
-            "Selecciona una imagen JPG, PNG o WEBP.";
+        if (errorImagen) {
+            errorImagen.textContent =
+                "Selecciona una imagen JPG, PNG o WEBP.";
+        }
+
+        imagen?.setAttribute(
+            "aria-invalid",
+            "true"
+        );
 
         return;
     }
 
     if (archivo.size > tamanoMaximo) {
-        document.querySelector("#error-plan-imagen").textContent =
-            "La imagen no puede superar los 2 MB.";
+        if (errorImagen) {
+            errorImagen.textContent =
+                "La imagen no puede superar los 2 MB.";
+        }
+
+        imagen?.setAttribute(
+            "aria-invalid",
+            "true"
+        );
 
         return;
     }
@@ -187,7 +251,16 @@ function procesarImagen(archivo) {
         nombreImagen.textContent = archivo.name;
 
         resultadoImagen.classList.add("visible");
+        resultadoImagen.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
         zonaSubida.style.display = "none";
+        zonaSubida.setAttribute(
+            "aria-hidden",
+            "true"
+        );
 
         vistaImagen.style.backgroundImage =
             `url("${imagenBase64}")`;
@@ -206,18 +279,41 @@ imagen.addEventListener("change", () => {
     }
 });
 
+zonaSubida?.addEventListener(
+    "keydown",
+    (evento) => {
+        if (
+            evento.key === "Enter" ||
+            evento.key === " "
+        ) {
+            evento.preventDefault();
+            imagen?.click();
+        }
+    }
+);
+
 zonaSubida.addEventListener("dragover", (evento) => {
     evento.preventDefault();
     zonaSubida.classList.add("arrastrando");
+    zonaSubida.setAttribute(
+        "aria-label",
+        "Suelta la imagen para seleccionarla"
+    );
 });
 
 zonaSubida.addEventListener("dragleave", () => {
     zonaSubida.classList.remove("arrastrando");
+    zonaSubida.removeAttribute(
+        "aria-label"
+    );
 });
 
 zonaSubida.addEventListener("drop", (evento) => {
     evento.preventDefault();
     zonaSubida.classList.remove("arrastrando");
+    zonaSubida.removeAttribute(
+        "aria-label"
+    );
 
     const archivo = evento.dataTransfer.files[0];
 
@@ -234,13 +330,36 @@ eliminarImagen.addEventListener("click", () => {
     nombreImagen.textContent = "";
 
     resultadoImagen.classList.remove("visible");
+    resultadoImagen.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
     zonaSubida.style.display = "flex";
+    zonaSubida.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    imagen?.setAttribute(
+        "aria-invalid",
+        "false"
+    );
+
+    const errorImagen =
+        document.querySelector(
+            "#error-plan-imagen"
+        );
+
+    if (errorImagen) {
+        errorImagen.textContent = "";
+    }
 
     vistaImagen.style.backgroundImage = "";
     vistaImagen.classList.remove("tiene-imagen");
 });
 
-[
+const camposVistaPrevia = [
     titulo,
     categoria,
     descripcion,
@@ -248,13 +367,23 @@ eliminarImagen.addEventListener("click", () => {
     hora,
     ubicacion,
     precio
-].forEach((campo) => {
+];
+
+camposVistaPrevia.forEach((campo) => {
     campo.addEventListener("input", () => {
         actualizarVistaPrevia();
+        campo.setAttribute(
+            "aria-invalid",
+            "false"
+        );
     });
 
     campo.addEventListener("change", () => {
         actualizarVistaPrevia();
+        campo.setAttribute(
+            "aria-invalid",
+            "false"
+        );
     });
 });
 
@@ -322,6 +451,11 @@ function guardarPlan(datos, clave) {
 }
 
 guardarBorrador.addEventListener("click", () => {
+    limpiarError(
+        titulo,
+        "error-plan-titulo"
+    );
+
     const datos = obtenerDatosFormulario();
 
     if (!datos.titulo) {
@@ -372,8 +506,33 @@ formularioPublicar.addEventListener("submit", (evento) => {
     limpiarError(ubicacion, "error-plan-ubicacion");
     limpiarError(precio, "error-plan-precio");
 
-    document.querySelector("#error-plan-imagen").textContent = "";
-    document.querySelector("#error-confirmar-plan").textContent = "";
+    const errorImagen =
+        document.querySelector(
+            "#error-plan-imagen"
+        );
+
+    const errorConfirmacion =
+        document.querySelector(
+            "#error-confirmar-plan"
+        );
+
+    if (errorImagen) {
+        errorImagen.textContent = "";
+    }
+
+    if (errorConfirmacion) {
+        errorConfirmacion.textContent = "";
+    }
+
+    imagen?.setAttribute(
+        "aria-invalid",
+        "false"
+    );
+
+    confirmarPlan?.setAttribute(
+        "aria-invalid",
+        "false"
+    );
 
     if (titulo.value.trim().length < 8) {
         mostrarError(
@@ -481,15 +640,29 @@ formularioPublicar.addEventListener("submit", (evento) => {
     }
 
     if (!imagenBase64) {
-        document.querySelector("#error-plan-imagen").textContent =
-            "Selecciona una imagen para la actividad.";
+        if (errorImagen) {
+            errorImagen.textContent =
+                "Selecciona una imagen para la actividad.";
+        }
+
+        imagen?.setAttribute(
+            "aria-invalid",
+            "true"
+        );
 
         formularioValido = false;
     }
 
     if (!confirmarPlan.checked) {
-        document.querySelector("#error-confirmar-plan").textContent =
-            "Debes confirmar la información antes de publicar.";
+        if (errorConfirmacion) {
+            errorConfirmacion.textContent =
+                "Debes confirmar la información antes de publicar.";
+        }
+
+        confirmarPlan.setAttribute(
+            "aria-invalid",
+            "true"
+        );
 
         formularioValido = false;
     }
@@ -498,6 +671,13 @@ formularioPublicar.addEventListener("submit", (evento) => {
         mostrarNotificacion(
             "Revisa los campos señalados del formulario."
         );
+
+        const primerCampoInvalido =
+            formularioPublicar.querySelector(
+                '[aria-invalid="true"]'
+            );
+
+        primerCampoInvalido?.focus();
 
         return;
     }
@@ -536,12 +716,24 @@ if (idBorradorActual) {
 
     setTimeout(() => {
     window.location.href =
-        "perfil.html#publicaciones";
+        "perfil.html#publicados";
 }, 1500);
 });
 
 confirmarPlan.addEventListener("change", () => {
-    document.querySelector("#error-confirmar-plan").textContent = "";
+    const errorConfirmacion =
+        document.querySelector(
+            "#error-confirmar-plan"
+        );
+
+    if (errorConfirmacion) {
+        errorConfirmacion.textContent = "";
+    }
+
+    confirmarPlan.setAttribute(
+        "aria-invalid",
+        "false"
+    );
 });
 
 
@@ -586,7 +778,16 @@ function cargarBorradorParaEditar() {
         nombreImagen.textContent = "Imagen del borrador";
 
         resultadoImagen.classList.add("visible");
+        resultadoImagen.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
         zonaSubida.style.display = "none";
+        zonaSubida.setAttribute(
+            "aria-hidden",
+            "true"
+        );
 
         vistaImagen.style.backgroundImage =
             `url("${borrador.imagen}")`;
@@ -606,6 +807,25 @@ function cargarBorradorParaEditar() {
         "Borrador cargado. Puedes continuar editándolo."
     );
 }
+
+[
+    titulo,
+    categoria,
+    descripcion,
+    fecha,
+    hora,
+    duracion,
+    plazas,
+    ubicacion,
+    precio,
+    imagen,
+    confirmarPlan
+].forEach((campo) => {
+    campo?.setAttribute(
+        "aria-invalid",
+        "false"
+    );
+});
 
 cargarBorradorParaEditar();
 
