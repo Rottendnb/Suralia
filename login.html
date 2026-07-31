@@ -15,6 +15,12 @@
 
     <title>Iniciar sesión | Suralia</title>
 
+    <link
+        rel="icon"
+        type="image/png"
+        href="img/suralia-favicon.png?v=10"
+    >
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -34,6 +40,7 @@
 <body class="pagina-auth">
 
     <header class="header">
+
         <div class="contenedor header__contenido">
 
             <a
@@ -41,21 +48,22 @@
                 class="logo"
                 aria-label="Página de inicio de Suralia"
             >
-                <span class="logo__icono">
-                    <i class="fa-solid fa-location-dot"></i>
-                </span>
-
-                <span class="logo__texto">
-                    Suralia
-                </span>
+                <img
+                    src="img/suralia-logo.png"
+                    alt="Suralia"
+                    class="logo__imagen"
+                    width="1138"
+                    height="392"
+                >
             </a>
 
             <a href="index.html" class="volver-inicio">
-                <i class="fa-solid fa-arrow-left"></i>
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
                 Volver al inicio
             </a>
 
         </div>
+
     </header>
 
     <main class="auth">
@@ -65,7 +73,7 @@
             <div class="auth__presentacion-contenido">
 
                 <span class="etiqueta etiqueta--auth">
-                    <i class="fa-solid fa-sun"></i>
+                    <i class="fa-solid fa-sun" aria-hidden="true"></i>
                     Descubre Sevilla
                 </span>
 
@@ -83,7 +91,7 @@
 
                     <article>
                         <span>
-                            <i class="fa-regular fa-heart"></i>
+                            <i class="fa-regular fa-heart" aria-hidden="true"></i>
                         </span>
 
                         <div>
@@ -94,7 +102,7 @@
 
                     <article>
                         <span>
-                            <i class="fa-solid fa-ticket"></i>
+                            <i class="fa-solid fa-ticket" aria-hidden="true"></i>
                         </span>
 
                         <div>
@@ -105,7 +113,7 @@
 
                     <article>
                         <span>
-                            <i class="fa-solid fa-compass"></i>
+                            <i class="fa-solid fa-compass" aria-hidden="true"></i>
                         </span>
 
                         <div>
@@ -143,7 +151,7 @@
                         </label>
 
                         <div class="campo-formulario__control">
-                            <i class="fa-regular fa-envelope"></i>
+                            <i class="fa-regular fa-envelope" aria-hidden="true"></i>
 
                             <input
                                 type="email"
@@ -157,6 +165,7 @@
                         <small
                             class="mensaje-error"
                             id="error-login-email"
+                            aria-live="polite"
                         ></small>
 
                     </div>
@@ -168,17 +177,17 @@
                                 Contraseña
                             </label>
 
-                           <button
-                            type="button"
-                            class="enlace-recuperar"
-                            id="recuperar-password"
+                            <button
+                                type="button"
+                                class="enlace-recuperar"
+                                id="recuperar-password"
                             >
-                            ¿La has olvidado?
+                                ¿La has olvidado?
                             </button>
                         </div>
 
                         <div class="campo-formulario__control">
-                            <i class="fa-solid fa-lock"></i>
+                            <i class="fa-solid fa-lock" aria-hidden="true"></i>
 
                             <input
                                 type="password"
@@ -194,13 +203,14 @@
                                 data-password="login-password"
                                 aria-label="Mostrar contraseña"
                             >
-                                <i class="fa-regular fa-eye"></i>
+                                <i class="fa-regular fa-eye" aria-hidden="true"></i>
                             </button>
                         </div>
 
                         <small
                             class="mensaje-error"
                             id="error-login-password"
+                            aria-live="polite"
                         ></small>
 
                     </div>
@@ -220,7 +230,7 @@
                         class="boton-auth"
                     >
                         Iniciar sesión
-                        <i class="fa-solid fa-arrow-right"></i>
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                     </button>
 
                 </form>
@@ -234,7 +244,7 @@
                     class="boton-social"
                     id="login-google"
                 >
-                    <i class="fa-brands fa-google"></i>
+                    <i class="fa-brands fa-google" aria-hidden="true"></i>
                     Continuar con Google
                 </button>
 
@@ -252,22 +262,113 @@
 
     </main>
 
+    <footer class="footer">
+
+        <div class="contenedor footer__grid">
+
+            <div class="footer__marca">
+
+                <a
+                    href="index.html"
+                    class="logo logo--footer"
+                    aria-label="Página de inicio de Suralia"
+                >
+                    <img
+                        src="img/suralia-logo.png"
+                        alt="Suralia"
+                        class="logo__imagen logo__imagen--footer"
+                        width="1138"
+                        height="392"
+                    >
+                </a>
+
+                <p>
+                    Descubre planes, lugares y experiencias diferentes
+                    para disfrutar Sevilla y sus alrededores.
+                </p>
+
+                <span class="footer__eslogan">
+                    Descubre el sur a tu manera.
+                </span>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>Descubre</h3>
+
+                <a href="planes.html">Todos los planes</a>
+                <a href="planes.html">Este fin de semana</a>
+                <a href="planes.html">Planes gratuitos</a>
+                <a href="planes.html">Nuevas actividades</a>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>Información</h3>
+
+                <a href="sobre-suralia.html">Sobre Suralia</a>
+                <a href="index.html#como-funciona">Cómo funciona</a>
+                <a href="preguntas-frecuentes.html">Preguntas frecuentes</a>
+                <a href="contacto.html">Contacto</a>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>Síguenos</h3>
+
+                <div class="redes">
+
+                    <a href="#" aria-label="Instagram de Suralia">
+                        <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+                    </a>
+
+                    <a href="#" aria-label="TikTok de Suralia">
+                        <i class="fa-brands fa-tiktok" aria-hidden="true"></i>
+                    </a>
+
+                    <a href="#" aria-label="Facebook de Suralia">
+                        <i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="contenedor footer__inferior">
+
+            <p>
+                © 2026 Suralia. Proyecto desarrollado por Fernando.
+            </p>
+
+            <div>
+                <a href="privacidad.html">Privacidad</a>
+                <a href="cookies.html">Cookies</a>
+                <a href="aviso-legal.html">Aviso legal</a>
+            </div>
+
+        </div>
+
+    </footer>
+
     <div
         class="notificacion"
         id="notificacion-auth"
         role="status"
         aria-live="polite"
+        aria-atomic="true"
     >
-        <i class="fa-solid fa-circle-check"></i>
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
         <span></span>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
-    
-    <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
-
-
 
 </body>
 </html>

@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Descubre cómo funciona Suralia: encuentra planes, guarda favoritos, realiza reservas y publica actividades en Sevilla."
+    >
+
+    <title>Cómo funciona Suralia | Guía completa</title>
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="img/suralia-favicon.png?v=10"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="pagina-como-funciona">
+
+    <header class="header">
+
+        <div class="contenedor header__contenido">
+
+            <a
+                href="index.html"
+                class="logo"
+                aria-label="Página de inicio de Suralia"
+            >
+                <img
+                    src="img/suralia-logo.png"
+                    alt="Suralia"
+                    class="logo__imagen"
+                    width="1138"
+                    height="392"
+                >
+            </a>
+
+            <nav
+                class="navegacion"
+                id="navegacion"
+                aria-label="Navegación principal"
+            >
+
+                <a href="planes.html">
+                    Explorar planes
+                </a>
+
+                <a href="index.html#categorias">
+                    Categorías
+                </a>
+
+                <a
+                    href="como-funciona.html"
+                    class="enlace-activo"
+                    aria-current="page"
+                >
+                    Cómo funciona
+                </a>
+
+                <a
+                    href="login.html"
+                    class="enlace-publicar"
+                >
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                    Publicar un plan
+                </a>
+
+                <a
+                    href="login.html"
+                    class="login-movil"
+                >
+                    <i class="fa-regular fa-user" aria-hidden="true"></i>
+
+                    <span>
+                        Iniciar sesión
+                    </span>
+                </a>
+
+                <a
+                    href="perfil.html#reservas"
+                    class="opcion-usuario-movil"
+                >
+                    <i class="fa-regular fa-calendar-check" aria-hidden="true"></i>
+                    Mis reservas
+                </a>
+
+                <a
+                    href="perfil.html#favoritos"
+                    class="opcion-usuario-movil"
+                >
+                    <i class="fa-regular fa-heart" aria-hidden="true"></i>
+                    Favoritos
+                </a>
+
+                <button
+                    type="button"
+                    class="opcion-usuario-movil cerrar-sesion-movil"
+                    id="cerrar-sesion-movil"
+                >
+                    <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+                    Cerrar sesión
+                </button>
+
+            </nav>
+
+            <div class="header__acciones">
+
+                <div
+                    class="menu-usuario"
+                    id="menu-usuario"
+                >
+
+                    <a
+                        href="login.html"
+                        class="boton-login"
+                        id="boton-usuario"
+                        aria-expanded="false"
+                        aria-haspopup="true"
+                        aria-controls="menu-usuario-desplegable"
+                    >
+                        Iniciar sesión
+                    </a>
+
+                    <div
+                        class="menu-usuario__desplegable"
+                        id="menu-usuario-desplegable"
+                    >
+
+                        <a href="perfil.html">
+                            <i class="fa-regular fa-user" aria-hidden="true"></i>
+                            Mi perfil
+                        </a>
+
+                        <a href="perfil.html#reservas">
+                            <i class="fa-regular fa-calendar-check" aria-hidden="true"></i>
+                            Mis reservas
+                        </a>
+
+                        <a href="perfil.html#favoritos">
+                            <i class="fa-regular fa-heart" aria-hidden="true"></i>
+                            Favoritos
+                        </a>
+
+                        <a href="publicar-plan.html">
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                            Publicar un plan
+                        </a>
+
+                        <span class="menu-usuario__separador"></span>
+
+                        <button
+                            type="button"
+                            id="cerrar-sesion"
+                            class="menu-usuario__cerrar"
+                        >
+                            <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+                            Cerrar sesión
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <button
+                    class="boton-menu"
+                    id="boton-menu"
+                    type="button"
+                    aria-label="Abrir menú"
+                    aria-expanded="false"
+                    aria-controls="navegacion"
+                >
+                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <main>
+
+        <section class="funciona-hero">
+
+            <div class="funciona-hero__decoracion funciona-hero__decoracion--uno"></div>
+            <div class="funciona-hero__decoracion funciona-hero__decoracion--dos"></div>
+
+            <div class="contenedor funciona-hero__contenido">
+
+                <div class="funciona-hero__texto">
+
+                    <span class="etiqueta">
+                        <i class="fa-solid fa-route" aria-hidden="true"></i>
+                        Guía completa de Suralia
+                    </span>
+
+                    <h1>
+                        Todo lo que necesitas para
+                        <span>encontrar tu próximo plan</span>
+                    </h1>
+
+                    <p>
+                        Suralia reúne experiencias de Sevilla en un único lugar.
+                        Busca actividades, guarda tus favoritas, reserva plazas
+                        y comparte tus propios planes de forma sencilla.
+                    </p>
+
+                    <div class="funciona-hero__acciones">
+
+                        <a
+                            href="planes.html"
+                            class="funciona-boton funciona-boton--principal"
+                        >
+                            Explorar planes
+                            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+
+                        <a
+                            href="#guia"
+                            class="funciona-boton funciona-boton--secundario"
+                        >
+                            Ver la guía paso a paso
+                        </a>
+
+                    </div>
+
+                    <div class="funciona-hero__datos">
+
+                        <div>
+                            <strong>01</strong>
+                            <span>Busca y compara</span>
+                        </div>
+
+                        <div>
+                            <strong>02</strong>
+                            <span>Guarda o reserva</span>
+                        </div>
+
+                        <div>
+                            <strong>03</strong>
+                            <span>Gestiona tu perfil</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="funciona-hero__visual">
+
+                    <div class="funciona-panel">
+
+                        <div class="funciona-panel__cabecera">
+                            <span>
+                                <i class="fa-solid fa-compass" aria-hidden="true"></i>
+                            </span>
+
+                            <div>
+                                <strong>Tu experiencia en Suralia</strong>
+                                <small>Clara, rápida y organizada</small>
+                            </div>
+                        </div>
+
+                        <div class="funciona-panel__pasos">
+
+                            <article>
+                                <span>1</span>
+                                <div>
+                                    <strong>Encuentra una actividad</strong>
+                                    <small>Utiliza el buscador, las categorías y los filtros.</small>
+                                </div>
+                                <i class="fa-solid fa-check" aria-hidden="true"></i>
+                            </article>
+
+                            <article>
+                                <span>2</span>
+                                <div>
+                                    <strong>Revisa todos los detalles</strong>
+                                    <small>Consulta fecha, precio, ubicación, plazas y opiniones.</small>
+                                </div>
+                                <i class="fa-solid fa-check" aria-hidden="true"></i>
+                            </article>
+
+                            <article>
+                                <span>3</span>
+                                <div>
+                                    <strong>Guarda o reserva</strong>
+                                    <small>Organiza tus favoritos y confirma tu asistencia.</small>
+                                </div>
+                                <i class="fa-solid fa-check" aria-hidden="true"></i>
+                            </article>
+
+                        </div>
+
+                        <div class="funciona-panel__seguridad">
+                            <i class="fa-solid fa-shield-heart" aria-hidden="true"></i>
+
+                            <div>
+                                <strong>Tu información protegida</strong>
+                                <span>Sesiones seguras y preferencias bajo tu control.</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section
+            class="seccion funciona-resumen"
+            aria-labelledby="titulo-resumen-funciona"
+        >
+
+            <div class="contenedor">
+
+                <div class="encabezado-centrado">
+
+                    <span class="subtitulo">
+                        Una plataforma para disfrutar más
+                    </span>
+
+                    <h2 id="titulo-resumen-funciona">
+                        ¿Qué puedes hacer en Suralia?
+                    </h2>
+
+                    <p>
+                        Todas las herramientas necesarias para organizar tu
+                        tiempo libre desde un mismo lugar.
+                    </p>
+
+                </div>
+
+                <div class="funciona-resumen__grid">
+
+                    <article>
+                        <span>
+                            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        </span>
+                        <h3>Descubrir planes</h3>
+                        <p>
+                            Encuentra actividades por categoría, fecha, precio,
+                            ubicación o palabra clave.
+                        </p>
+                    </article>
+
+                    <article>
+                        <span>
+                            <i class="fa-regular fa-heart" aria-hidden="true"></i>
+                        </span>
+                        <h3>Guardar favoritos</h3>
+                        <p>
+                            Crea tu propia selección de planes y recupérala
+                            cuando quieras desde el perfil.
+                        </p>
+                    </article>
+
+                    <article>
+                        <span>
+                            <i class="fa-solid fa-ticket" aria-hidden="true"></i>
+                        </span>
+                        <h3>Realizar reservas</h3>
+                        <p>
+                            Elige fecha, horario y número de personas antes de
+                            confirmar la actividad.
+                        </p>
+                    </article>
+
+                    <article>
+                        <span>
+                            <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>
+                        </span>
+                        <h3>Publicar actividades</h3>
+                        <p>
+                            Comparte experiencias, añade imágenes y gestiona
+                            borradores o publicaciones.
+                        </p>
+                    </article>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section
+            class="seccion funciona-guia"
+            id="guia"
+            aria-labelledby="titulo-guia-funciona"
+        >
+
+            <div class="contenedor">
+
+                <div class="encabezado-centrado">
+
+                    <span class="subtitulo">
+                        Guía paso a paso
+                    </span>
+
+                    <h2 id="titulo-guia-funciona">
+                        Desde la búsqueda hasta la reserva
+                    </h2>
+
+                    <p>
+                        Te explicamos todo el proceso para que puedas utilizar
+                        Suralia con total confianza.
+                    </p>
+
+                </div>
+
+                <div class="funciona-guia__lista">
+
+                    <article class="funciona-paso">
+
+                        <div class="funciona-paso__numero">01</div>
+
+                        <div class="funciona-paso__contenido">
+
+                            <span class="funciona-paso__icono">
+                                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                            </span>
+
+                            <div>
+
+                                <span class="subtitulo">Primer paso</span>
+
+                                <h3>Busca una experiencia</h3>
+
+                                <p>
+                                    Desde la página principal puedes escribir
+                                    qué actividad te apetece y seleccionar una
+                                    fecha. También puedes entrar en el catálogo
+                                    completo y utilizar filtros.
+                                </p>
+
+                                <ul>
+                                    <li>Busca por nombre o palabra clave.</li>
+                                    <li>Filtra por categoría y precio.</li>
+                                    <li>Elige una fecha concreta.</li>
+                                    <li>Ordena los resultados disponibles.</li>
+                                </ul>
+
+                                <a href="planes.html">
+                                    Explorar el catálogo
+                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <article class="funciona-paso funciona-paso--invertido">
+
+                        <div class="funciona-paso__numero">02</div>
+
+                        <div class="funciona-paso__contenido">
+
+                            <span class="funciona-paso__icono">
+                                <i class="fa-regular fa-rectangle-list" aria-hidden="true"></i>
+                            </span>
+
+                            <div>
+
+                                <span class="subtitulo">Antes de decidir</span>
+
+                                <h3>Consulta toda la información</h3>
+
+                                <p>
+                                    Cada actividad cuenta con una página de
+                                    detalle donde puedes revisar los datos más
+                                    importantes antes de guardar o reservar.
+                                </p>
+
+                                <ul>
+                                    <li>Descripción completa de la experiencia.</li>
+                                    <li>Fecha, horario, duración y ubicación.</li>
+                                    <li>Precio, plazas e información incluida.</li>
+                                    <li>Galería, mapa y opiniones de usuarios.</li>
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <article class="funciona-paso">
+
+                        <div class="funciona-paso__numero">03</div>
+
+                        <div class="funciona-paso__contenido">
+
+                            <span class="funciona-paso__icono">
+                                <i class="fa-regular fa-user" aria-hidden="true"></i>
+                            </span>
+
+                            <div>
+
+                                <span class="subtitulo">Tu espacio personal</span>
+
+                                <h3>Crea una cuenta o inicia sesión</h3>
+
+                                <p>
+                                    Para realizar reservas, guardar favoritos
+                                    y publicar planes necesitas una cuenta de
+                                    usuario.
+                                </p>
+
+                                <ul>
+                                    <li>Registro mediante correo y contraseña.</li>
+                                    <li>Acceso con Google cuando esté configurado.</li>
+                                    <li>Recuperación de contraseña.</li>
+                                    <li>Sesión protegida mediante Supabase.</li>
+                                </ul>
+
+                                <div class="funciona-paso__acciones">
+
+                                    <a href="registro.html">
+                                        Crear una cuenta
+                                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                                    </a>
+
+                                    <a href="login.html" class="enlace-secundario">
+                                        Iniciar sesión
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <article class="funciona-paso funciona-paso--invertido">
+
+                        <div class="funciona-paso__numero">04</div>
+
+                        <div class="funciona-paso__contenido">
+
+                            <span class="funciona-paso__icono">
+                                <i class="fa-regular fa-heart" aria-hidden="true"></i>
+                            </span>
+
+                            <div>
+
+                                <span class="subtitulo">Organiza tus ideas</span>
+
+                                <h3>Guarda planes en favoritos</h3>
+
+                                <p>
+                                    Pulsa el icono del corazón para guardar una
+                                    actividad. Podrás consultar tu selección
+                                    desde el perfil sin volver a buscarla.
+                                </p>
+
+                                <ul>
+                                    <li>Guarda planes desde las tarjetas.</li>
+                                    <li>Añade o elimina favoritos desde el detalle.</li>
+                                    <li>Consulta toda tu selección en el perfil.</li>
+                                    <li>Accede rápidamente a cada actividad.</li>
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <article class="funciona-paso">
+
+                        <div class="funciona-paso__numero">05</div>
+
+                        <div class="funciona-paso__contenido">
+
+                            <span class="funciona-paso__icono">
+                                <i class="fa-solid fa-ticket" aria-hidden="true"></i>
+                            </span>
+
+                            <div>
+
+                                <span class="subtitulo">Confirma tu asistencia</span>
+
+                                <h3>Realiza una reserva</h3>
+
+                                <p>
+                                    En la tarjeta de reserva selecciona la fecha
+                                    disponible y el número de personas. Antes de
+                                    confirmar podrás revisar el precio total.
+                                </p>
+
+                                <ul>
+                                    <li>Selecciona fecha y horario.</li>
+                                    <li>Indica el número de asistentes.</li>
+                                    <li>Comprueba el desglose del precio.</li>
+                                    <li>Confirma la reserva desde tu cuenta.</li>
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <article class="funciona-paso funciona-paso--invertido">
+
+                        <div class="funciona-paso__numero">06</div>
+
+                        <div class="funciona-paso__contenido">
+
+                            <span class="funciona-paso__icono">
+                                <i class="fa-solid fa-table-columns" aria-hidden="true"></i>
+                            </span>
+
+                            <div>
+
+                                <span class="subtitulo">Todo bajo control</span>
+
+                                <h3>Gestiona tu actividad desde el perfil</h3>
+
+                                <p>
+                                    El perfil reúne tu información, reservas,
+                                    favoritos y publicaciones en un único
+                                    espacio.
+                                </p>
+
+                                <ul>
+                                    <li>Consulta tus próximas reservas.</li>
+                                    <li>Cancela una reserva cuando esté permitido.</li>
+                                    <li>Revisa tus planes favoritos.</li>
+                                    <li>Edita tus datos personales.</li>
+                                </ul>
+
+                                <a href="perfil.html">
+                                    Ir a mi perfil
+                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section
+            class="seccion funciona-publicar"
+            aria-labelledby="titulo-publicar-funciona"
+        >
+
+            <div class="contenedor funciona-publicar__grid">
+
+                <div class="funciona-publicar__contenido">
+
+                    <span class="subtitulo">
+                        Para organizadores
+                    </span>
+
+                    <h2 id="titulo-publicar-funciona">
+                        Publica tu propia actividad
+                    </h2>
+
+                    <p>
+                        Suralia también permite compartir planes y experiencias
+                        con otras personas. El formulario de publicación te
+                        guía para añadir toda la información necesaria.
+                    </p>
+
+                    <div class="funciona-publicar__lista">
+
+                        <div>
+                            <i class="fa-solid fa-check" aria-hidden="true"></i>
+                            <span>Título, descripción y categoría.</span>
+                        </div>
+
+                        <div>
+                            <i class="fa-solid fa-check" aria-hidden="true"></i>
+                            <span>Fecha, horario, ubicación y plazas.</span>
+                        </div>
+
+                        <div>
+                            <i class="fa-solid fa-check" aria-hidden="true"></i>
+                            <span>Precio, imágenes y datos del organizador.</span>
+                        </div>
+
+                        <div>
+                            <i class="fa-solid fa-check" aria-hidden="true"></i>
+                            <span>Guardado como borrador o publicación final.</span>
+                        </div>
+
+                    </div>
+
+                    <a
+                        href="publicar-plan.html"
+                        class="funciona-boton funciona-boton--principal enlace-publicar"
+                    >
+                        Publicar un plan
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+
+                </div>
+
+                <div class="funciona-publicar__panel">
+
+                    <div class="funciona-publicar__panel-cabecera">
+
+                        <span>
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                        </span>
+
+                        <div>
+                            <strong>Nueva actividad</strong>
+                            <small>Información completa y profesional</small>
+                        </div>
+
+                    </div>
+
+                    <div class="funciona-publicar__campo">
+                        <span>Título del plan</span>
+                        <div></div>
+                    </div>
+
+                    <div class="funciona-publicar__doble">
+                        <div>
+                            <span>Categoría</span>
+                            <div></div>
+                        </div>
+
+                        <div>
+                            <span>Fecha</span>
+                            <div></div>
+                        </div>
+                    </div>
+
+                    <div class="funciona-publicar__campo">
+                        <span>Descripción</span>
+                        <div class="funciona-publicar__campo--grande"></div>
+                    </div>
+
+                    <div class="funciona-publicar__estado">
+                        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                        Información lista para publicar
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section
+            class="seccion funciona-seguridad"
+            aria-labelledby="titulo-seguridad-funciona"
+        >
+
+            <div class="contenedor">
+
+                <div class="encabezado-centrado">
+
+                    <span class="subtitulo">
+                        Confianza y transparencia
+                    </span>
+
+                    <h2 id="titulo-seguridad-funciona">
+                        Seguridad, privacidad y pagos
+                    </h2>
+
+                    <p>
+                        La plataforma está diseñada para ofrecer información
+                        clara y proteger los datos del usuario.
+                    </p>
+
+                </div>
+
+                <div class="funciona-seguridad__grid">
+
+                    <article>
+                        <span>
+                            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                        </span>
+
+                        <h3>Sesiones seguras</h3>
+
+                        <p>
+                            El acceso de usuarios se gestiona mediante Supabase,
+                            evitando almacenar contraseñas directamente en la web.
+                        </p>
+                    </article>
+
+                    <article>
+                        <span>
+                            <i class="fa-solid fa-cookie-bite" aria-hidden="true"></i>
+                        </span>
+
+                        <h3>Preferencias bajo control</h3>
+
+                        <p>
+                            Puedes aceptar, rechazar o configurar las cookies
+                            opcionales desde el panel de privacidad.
+                        </p>
+                    </article>
+
+                    <article>
+                        <span>
+                            <i class="fa-regular fa-credit-card" aria-hidden="true"></i>
+                        </span>
+
+                        <h3>Pagos transparentes</h3>
+
+                        <p>
+                            Actualmente las reservas son demostrativas. Cuando
+                            existan pagos reales se mostrará el desglose completo.
+                        </p>
+                    </article>
+
+                </div>
+
+                <div class="funciona-seguridad__enlaces">
+
+                    <a href="privacidad.html">
+                        Política de privacidad
+                    </a>
+
+                    <a href="cookies.html">
+                        Política de cookies
+                    </a>
+
+                    <a href="aviso-legal.html">
+                        Aviso legal
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="funciona-ayuda">
+
+            <div class="contenedor funciona-ayuda__contenido">
+
+                <div>
+
+                    <span class="subtitulo subtitulo--claro">
+                        ¿Todavía tienes alguna duda?
+                    </span>
+
+                    <h2>
+                        Estamos aquí para ayudarte
+                    </h2>
+
+                    <p>
+                        Consulta las preguntas frecuentes o escríbenos si
+                        necesitas ayuda con una reserva, cuenta o publicación.
+                    </p>
+
+                </div>
+
+                <div class="funciona-ayuda__acciones">
+
+                    <a
+                        href="preguntas-frecuentes.html"
+                        class="boton-claro"
+                    >
+                        Preguntas frecuentes
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+
+                    <a
+                        href="contacto.html"
+                        class="funciona-ayuda__secundario"
+                    >
+                        Contactar
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="footer">
+
+        <div class="contenedor footer__grid">
+
+            <div class="footer__marca">
+
+                <a
+                    href="index.html"
+                    class="logo logo--footer"
+                    aria-label="Página de inicio de Suralia"
+                >
+                    <img
+                        src="img/suralia-logo.png"
+                        alt="Suralia"
+                        class="logo__imagen logo__imagen--footer"
+                        width="1138"
+                        height="392"
+                    >
+                </a>
+
+                <p>
+                    Descubre planes, lugares y experiencias diferentes
+                    para disfrutar Sevilla y sus alrededores.
+                </p>
+
+                <span class="footer__eslogan">
+                    Descubre el sur a tu manera.
+                </span>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>Descubre</h3>
+
+                <a href="planes.html">Todos los planes</a>
+                <a href="planes.html">Este fin de semana</a>
+                <a href="planes.html">Planes gratuitos</a>
+                <a href="planes.html">Nuevas actividades</a>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>Información</h3>
+
+                <a href="sobre-suralia.html">Sobre Suralia</a>
+                <a href="como-funciona.html">Cómo funciona</a>
+                <a href="preguntas-frecuentes.html">Preguntas frecuentes</a>
+                <a href="contacto.html">Contacto</a>
+
+            </div>
+
+            <div class="footer__columna">
+
+                <h3>Síguenos</h3>
+
+                <div class="redes">
+
+                    <a href="#" aria-label="Instagram de Suralia">
+                        <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+                    </a>
+
+                    <a href="#" aria-label="TikTok de Suralia">
+                        <i class="fa-brands fa-tiktok" aria-hidden="true"></i>
+                    </a>
+
+                    <a href="#" aria-label="Facebook de Suralia">
+                        <i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="contenedor footer__inferior">
+
+            <p>
+                © 2026 Suralia. Proyecto desarrollado por Fernando.
+            </p>
+
+            <div>
+                <a href="privacidad.html">Privacidad</a>
+                <a href="cookies.html">Cookies</a>
+                <a href="aviso-legal.html">Aviso legal</a>
+            </div>
+
+        </div>
+
+    </footer>
+
+    <div
+        class="notificacion"
+        id="notificacion"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+    >
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+        <span></span>
+    </div>
+
+    <section
+        class="banner-cookies oculto"
+        id="banner-cookies"
+        aria-label="Configuración de cookies"
+    >
+
+        <div class="banner-cookies__contenido">
+
+            <div class="banner-cookies__texto">
+
+                <span class="banner-cookies__icono">
+                    <i class="fa-solid fa-cookie-bite" aria-hidden="true"></i>
+                </span>
+
+                <div>
+
+                    <h2>
+                        Tu privacidad es importante
+                    </h2>
+
+                    <p>
+                        Utilizamos tecnologías necesarias para que la web
+                        funcione y, con tu permiso, cookies opcionales para
+                        preferencias y analítica.
+
+                        <a href="cookies.html">
+                            Más información
+                        </a>
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="banner-cookies__acciones">
+
+                <button
+                    type="button"
+                    class="banner-cookies__rechazar"
+                    id="rechazar-cookies"
+                >
+                    Rechazar opcionales
+                </button>
+
+                <button
+                    type="button"
+                    class="banner-cookies__configurar"
+                    id="configurar-cookies"
+                >
+                    Configurar
+                </button>
+
+                <button
+                    type="button"
+                    class="banner-cookies__aceptar"
+                    id="aceptar-cookies"
+                >
+                    Aceptar todas
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/cookies.js"></script>
+
+</body>
+
+</html>
