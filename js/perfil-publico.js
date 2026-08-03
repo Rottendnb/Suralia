@@ -4237,6 +4237,17 @@ function crearAfinidadHTML(afinidad) {
 
                     <button
                         type="button"
+                        class="boton-ver-personas-afinidad"
+                        data-ver-personas-afinidad="${planId}"
+                        aria-expanded="false"
+                        aria-controls="personas-afinidad-${planId}"
+                    >
+                        <i class="fa-solid fa-people-group"></i>
+                        Ver personas interesadas
+                    </button>
+
+                    <button
+                        type="button"
                         class="boton-desactivar-afinidad"
                         data-desactivar-afinidad="${planId}"
                     >
@@ -4245,6 +4256,13 @@ function crearAfinidadHTML(afinidad) {
                     </button>
 
                 </div>
+
+                <div
+                    class="personas-afinidad oculto"
+                    id="personas-afinidad-${planId}"
+                    data-lista-personas-afinidad="${planId}"
+                    aria-live="polite"
+                ></div>
 
             </div>
 
@@ -4295,6 +4313,7 @@ function mostrarAfinidadesPerfil() {
             .join("");
 
     activarBotonesDesactivarAfinidad();
+    activarBotonesVerPersonasAfinidad();
 }
 
 
@@ -4531,6 +4550,344 @@ async function desactivarAfinidadPerfil(
 
         boton.disabled = false;
     }
+}
+
+
+function textoInteresesComunes(
+    cantidad
+) {
+    const total =
+        Number(cantidad || 0);
+
+    if (total === 0) {
+        return "Sin intereses en común todavía";
+    }
+
+    if (total === 1) {
+        return "1 interés en común";
+    }
+
+    return `${total} intereses en común`;
+}
+
+
+function crearPersonaAfinidadHTML(
+    persona
+) {
+    const perfilId =
+        escaparHTML(
+            persona.perfil_id || ""
+        );
+
+    const nombre =
+        escaparHTML(
+            persona.nombre ||
+            "Usuario de Suralia"
+        );
+
+    const localidad =
+        escaparHTML(
+            persona.localidad ||
+            "Localidad no indicada"
+        );
+
+    const ocupacion =
+        escaparHTML(
+            persona.ocupacion ||
+            ""
+        );
+
+    const foto =
+        escaparHTML(
+            persona.foto_principal ||
+            ""
+        );
+
+    const edad =
+        Number(persona.edad || 0);
+
+    const verificado =
+        Boolean(
+            persona.verificado
+        );
+
+    const interesesComunes =
+        textoInteresesComunes(
+            persona.intereses_comunes
+        );
+
+    return `
+        <article class="persona-afinidad">
+
+            <div class="persona-afinidad__foto">
+
+                ${
+                    foto
+                        ? `
+                            <img
+                                src="${foto}"
+                                alt="Fotografía de ${nombre}"
+                                loading="lazy"
+                            >
+                        `
+                        : `
+                            <i
+                                class="fa-regular fa-user"
+                                aria-hidden="true"
+                            ></i>
+                        `
+                }
+
+            </div>
+
+            <div class="persona-afinidad__contenido">
+
+                <div class="persona-afinidad__superior">
+
+                    <div>
+
+                        <h4>
+                            ${nombre}
+                            ${
+                                edad > 0
+                                    ? `, ${edad}`
+                                    : ""
+                            }
+                        </h4>
+
+                        ${
+                            verificado
+                                ? `
+                                    <span class="persona-afinidad__verificado">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        Perfil verificado
+                                    </span>
+                                `
+                                : ""
+                        }
+
+                    </div>
+
+                </div>
+
+                <div class="persona-afinidad__datos">
+
+                    <span>
+                        <i class="fa-solid fa-location-dot"></i>
+                        ${localidad}
+                    </span>
+
+                    ${
+                        ocupacion
+                            ? `
+                                <span>
+                                    <i class="fa-solid fa-briefcase"></i>
+                                    ${ocupacion}
+                                </span>
+                            `
+                            : ""
+                    }
+
+                </div>
+
+                <span class="persona-afinidad__coincidencias">
+                    <i class="fa-solid fa-link"></i>
+                    ${escaparHTML(interesesComunes)}
+                </span>
+
+                <a
+                    href="perfil-publico.html?id=${encodeURIComponent(
+                        perfilId
+                    )}"
+                    class="boton-principal-pequeno"
+                >
+                    Ver perfil
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+            </div>
+
+        </article>
+    `;
+}
+
+
+async function cargarPersonasAfinidad(
+    planId,
+    contenedor,
+    boton
+) {
+    const cliente =
+        obtenerClienteAfinidades();
+
+    if (
+        !cliente ||
+        !contenedor
+    ) {
+        return;
+    }
+
+    contenedor.classList.remove(
+        "oculto"
+    );
+
+    contenedor.innerHTML = `
+        <div class="personas-afinidad__cargando">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Cargando personas interesadas...
+        </div>
+    `;
+
+    boton.disabled =
+        true;
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente.rpc(
+            "obtener_personas_afinidad",
+            {
+                plan_buscado:
+                    planId
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        const personas =
+            Array.isArray(data)
+                ? data
+                : [];
+
+        if (personas.length === 0) {
+            contenedor.innerHTML = `
+                <div class="personas-afinidad__vacio">
+
+                    <span>
+                        <i class="fa-regular fa-user"></i>
+                    </span>
+
+                    <div>
+                        <h4>
+                            Todavía no hay otras personas visibles
+                        </h4>
+
+                        <p>
+                            Cuando alguien active esta afinidad y tenga
+                            el perfil social visible, aparecerá aquí.
+                        </p>
+                    </div>
+
+                </div>
+            `;
+
+            return;
+        }
+
+        contenedor.innerHTML = `
+            <div class="personas-afinidad__cabecera">
+
+                <div>
+                    <span class="subtitulo">
+                        Personas interesadas
+                    </span>
+
+                    <h4>
+                        ${
+                            personas.length === 1
+                                ? "1 perfil disponible"
+                                : `${personas.length} perfiles disponibles`
+                        }
+                    </h4>
+                </div>
+
+            </div>
+
+            <div class="personas-afinidad__grid">
+                ${personas
+                    .map(
+                        crearPersonaAfinidadHTML
+                    )
+                    .join("")}
+            </div>
+        `;
+    } catch (error) {
+        console.error(
+            "No se pudieron cargar las personas interesadas:",
+            error
+        );
+
+        contenedor.innerHTML = `
+            <div class="personas-afinidad__error">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                No se han podido cargar las personas interesadas.
+            </div>
+        `;
+    } finally {
+        boton.disabled =
+            false;
+    }
+}
+
+
+function activarBotonesVerPersonasAfinidad() {
+    document
+        .querySelectorAll(
+            "[data-ver-personas-afinidad]"
+        )
+        .forEach(
+            (boton) => {
+                boton.addEventListener(
+                    "click",
+                    async () => {
+                        const planId =
+                            boton.dataset
+                                .verPersonasAfinidad;
+
+                        const contenedor =
+                            document.querySelector(
+                                `[data-lista-personas-afinidad="${planId}"]`
+                            );
+
+                        if (!contenedor) {
+                            return;
+                        }
+
+                        const estaAbierto =
+                            !contenedor.classList.contains(
+                                "oculto"
+                            );
+
+                        if (estaAbierto) {
+                            contenedor.classList.add(
+                                "oculto"
+                            );
+
+                            boton.setAttribute(
+                                "aria-expanded",
+                                "false"
+                            );
+
+                            return;
+                        }
+
+                        boton.setAttribute(
+                            "aria-expanded",
+                            "true"
+                        );
+
+                        await cargarPersonasAfinidad(
+                            planId,
+                            contenedor,
+                            boton
+                        );
+                    }
+                );
+            }
+        );
 }
 
 

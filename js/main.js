@@ -1541,3 +1541,43 @@ if (
 } else {
     iniciarPaginaPrincipal();
 }
+
+/* =========================================
+   BOTÓN VOLVER ARRIBA
+========================================= */
+
+const botonVolverArriba =
+    document.querySelector(
+        "#boton-volver-arriba"
+    );
+
+function actualizarBotonVolverArriba() {
+    if (!botonVolverArriba) {
+        return;
+    }
+
+    botonVolverArriba.classList.toggle(
+        "visible",
+        window.scrollY > 350
+    );
+}
+
+botonVolverArriba?.addEventListener(
+    "click",
+    () => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+);
+
+window.addEventListener(
+    "scroll",
+    actualizarBotonVolverArriba,
+    {
+        passive: true
+    }
+);
+
+actualizarBotonVolverArriba();

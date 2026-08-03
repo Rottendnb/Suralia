@@ -22,9 +22,9 @@ const notificacionAuth =
         "#notificacion-auth"
     );
 
-const botonGoogle =
-    document.querySelector(
-        "#login-google"
+const botonesGoogle =
+    document.querySelectorAll(
+        "[data-google-auth]"
     );
 
 const botonRecuperarPassword =
@@ -242,6 +242,25 @@ function cambiarEstadoBoton(
    SESIÓN LOCAL PARA SURALIA
 ===================================================== */
 
+function separarNombreCompleto(
+    nombreCompleto = ""
+) {
+    const partes =
+        String(nombreCompleto)
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
+
+    return {
+        nombre:
+            partes.shift() || "",
+
+        apellidos:
+            partes.join(" ")
+    };
+}
+
+
 function guardarSesionSuralia(
     usuarioSupabase
 ) {
@@ -249,31 +268,76 @@ function guardarSesionSuralia(
         usuarioSupabase.user_metadata ||
         {};
 
-    const usuarioAnterior =
-        JSON.parse(
-            localStorage.getItem(
-                "usuarioSuralia"
-            )
-        ) || {};
+    let usuarioAnterior = {};
+
+    try {
+        usuarioAnterior =
+            JSON.parse(
+                localStorage.getItem(
+                    "usuarioSuralia"
+                )
+            ) || {};
+    } catch (error) {
+        console.error(
+            "No se pudo leer el usuario local:",
+            error
+        );
+    }
+
+    const nombreCompletoGoogle =
+        metadatos.full_name ||
+        metadatos.name ||
+        "";
+
+    const nombreSeparado =
+        separarNombreCompleto(
+            nombreCompletoGoogle
+        );
+
+    const mismoUsuario =
+        !usuarioAnterior.email ||
+        usuarioAnterior.email ===
+            usuarioSupabase.email;
 
     const nombre =
         metadatos.nombre ||
-        metadatos.full_name
-            ?.split(" ")[0] ||
-        usuarioAnterior.nombre ||
+        metadatos.given_name ||
+        nombreSeparado.nombre ||
+        (
+            mismoUsuario
+                ? usuarioAnterior.nombre
+                : ""
+        ) ||
         usuarioSupabase.email
             ?.split("@")[0] ||
         "Usuario";
 
     const apellidos =
         metadatos.apellidos ||
-        usuarioAnterior.apellidos ||
+        metadatos.family_name ||
+        nombreSeparado.apellidos ||
+        (
+            mismoUsuario
+                ? usuarioAnterior.apellidos
+                : ""
+        ) ||
         "";
 
-    const mismoUsuario =
-        !usuarioAnterior.email ||
-        usuarioAnterior.email ===
-            usuarioSupabase.email;
+    const fotoGoogle =
+        metadatos.avatar_url ||
+        metadatos.picture ||
+        "";
+
+    const conservarFotoAnterior =
+        mismoUsuario &&
+        usuarioAnterior.avatarTipo ===
+            "imagen" &&
+        usuarioAnterior.avatarValor;
+
+    const avatarValor =
+        conservarFotoAnterior
+            ? usuarioAnterior.avatarValor
+            : fotoGoogle;
 
     const usuarioSuralia = {
         id:
@@ -294,16 +358,11 @@ function guardarSesionSuralia(
                 : "",
 
         avatarTipo:
-            mismoUsuario
-                ? usuarioAnterior.avatarTipo ||
-                  ""
+            avatarValor
+                ? "imagen"
                 : "",
 
-        avatarValor:
-            mismoUsuario
-                ? usuarioAnterior.avatarValor ||
-                  ""
-                : ""
+        avatarValor
     };
 
     const sesionSuralia = {
@@ -336,6 +395,130 @@ function guardarSesionSuralia(
         )
     );
 }
+
+
+/* =====================================================
+   PERFIL SOCIAL AUTOMÁTICO
+===================================================== */
+
+async function sincronizarPerfilSocial(
+    usuarioSupabase
+) {
+    if (
+        !clienteAuth ||
+        !usuarioSupabase
+    ) {
+        return;
+    }
+
+    const metadatos =
+        usuarioSupabase.user_metadata ||
+        {};
+
+    const nombreCompleto =
+        metadatos.full_name ||
+        metadatos.name ||
+        "";
+
+    const nombreSeparado =
+        separarNombreCompleto(
+            nombreCompleto
+        );
+
+    const nombreVisible =
+        metadatos.nombre ||
+        metadatos.given_name ||
+        nombreSeparado.nombre ||
+        usuarioSupabase.email
+            ?.split("@")[0] ||
+        "Usuario";
+
+    const fotoGoogle =
+        metadatos.avatar_url ||
+        metadatos.picture ||
+        null;
+
+    const {
+        data: perfilExistente,
+        error: errorConsulta
+    } = await clienteAuth
+        .from("perfiles_sociales")
+        .select(
+            `
+                usuario_id,
+                nombre_visible,
+                foto_principal_url
+            `
+        )
+        .eq(
+            "usuario_id",
+            usuarioSupabase.id
+        )
+        .maybeSingle();
+
+    if (errorConsulta) {
+        throw errorConsulta;
+    }
+
+    const datosPerfil = {
+        usuario_id:
+            usuarioSupabase.id,
+
+        actualizado_en:
+            new Date().toISOString()
+    };
+
+    /*
+       Solo usamos los datos de Google cuando el perfil
+       todavía no tiene esos campos completados.
+    */
+    if (
+        !perfilExistente
+            ?.nombre_visible
+    ) {
+        datosPerfil.nombre_visible =
+            nombreVisible;
+    }
+
+    if (
+        !perfilExistente
+            ?.foto_principal_url &&
+        fotoGoogle
+    ) {
+        datosPerfil.foto_principal_url =
+            fotoGoogle;
+    }
+
+    /*
+       Estos valores solo se añaden al crear la fila.
+       Así no cambiamos después la privacidad elegida
+       por el usuario.
+    */
+    if (!perfilExistente) {
+        datosPerfil.perfil_visible =
+            true;
+
+        datosPerfil.mostrar_edad =
+            true;
+    }
+
+    const {
+        error: errorGuardado
+    } = await clienteAuth
+        .from("perfiles_sociales")
+        .upsert(
+            datosPerfil,
+            {
+                onConflict:
+                    "usuario_id"
+            }
+        );
+
+    if (errorGuardado) {
+        throw errorGuardado;
+    }
+}
+
 
 /* =====================================================
    REDIRECCIÓN DESPUÉS DEL LOGIN
@@ -445,7 +628,26 @@ async function comprobarSesionActiva() {
         return;
     }
 
+    const parametros =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const vuelveDeGoogle =
+        parametros.get("oauth") ===
+        "google";
+
     try {
+        if (vuelveDeGoogle) {
+            await new Promise(
+                (resolve) =>
+                    setTimeout(
+                        resolve,
+                        250
+                    )
+            );
+        }
+
         const {
             data,
             error
@@ -458,6 +660,13 @@ async function comprobarSesionActiva() {
                 error
             );
 
+            if (vuelveDeGoogle) {
+                mostrarNotificacion(
+                    "Google ha devuelto un error al iniciar sesión.",
+                    "error"
+                );
+            }
+
             return;
         }
 
@@ -465,12 +674,36 @@ async function comprobarSesionActiva() {
             data.session?.user;
 
         if (!usuario) {
+            if (vuelveDeGoogle) {
+                mostrarNotificacion(
+                    "No se ha podido completar el acceso con Google.",
+                    "error"
+                );
+
+                history.replaceState(
+                    null,
+                    "",
+                    "login.html"
+                );
+            }
+
             return;
         }
 
         guardarSesionSuralia(
             usuario
         );
+
+        try {
+            await sincronizarPerfilSocial(
+                usuario
+            );
+        } catch (errorPerfil) {
+            console.error(
+                "No se pudo sincronizar el perfil social:",
+                errorPerfil
+            );
+        }
 
         const paginaActual =
             window.location.pathname
@@ -492,6 +725,13 @@ async function comprobarSesionActiva() {
             "No se pudo comprobar la sesión:",
             error
         );
+
+        if (vuelveDeGoogle) {
+            mostrarNotificacion(
+                "No se ha podido completar el acceso con Google.",
+                "error"
+            );
+        }
     }
 }
 
@@ -635,6 +875,17 @@ if (formularioLogin) {
                 guardarSesionSuralia(
                     data.user
                 );
+
+                try {
+                    await sincronizarPerfilSocial(
+                        data.user
+                    );
+                } catch (errorPerfil) {
+                    console.error(
+                        "No se pudo crear el perfil social:",
+                        errorPerfil
+                    );
+                }
 
                 mostrarNotificacion(
                     `Bienvenido de nuevo, ${
@@ -1054,6 +1305,17 @@ if (formularioRegistro) {
                         data.user
                     );
 
+                    try {
+                        await sincronizarPerfilSocial(
+                            data.user
+                        );
+                    } catch (errorPerfil) {
+                        console.error(
+                            "No se pudo crear el perfil social:",
+                            errorPerfil
+                        );
+                    }
+
                     mostrarNotificacion(
                         "Tu cuenta se ha creado correctamente."
                     );
@@ -1154,71 +1416,196 @@ if (formularioRegistro) {
    ACCESO CON GOOGLE
 ===================================================== */
 
-if (botonGoogle) {
-    botonGoogle.addEventListener(
-        "click",
-        async () => {
-            if (!clienteAuth) {
-                mostrarNotificacion(
-                    "No se ha podido conectar con Google.",
-                    "error"
-                );
+function obtenerURLRetornoGoogle() {
+    const urlRetorno =
+        new URL(
+            "login.html",
+            window.location.href
+        );
 
-                return;
-            }
+    urlRetorno.searchParams.set(
+        "oauth",
+        "google"
+    );
 
-            botonGoogle.disabled = true;
+    return urlRetorno.href;
+}
 
-            botonGoogle.innerHTML = `
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                Conectando con Google...
-            `;
 
-            try {
-                const urlRedireccion =
-                    new URL(
-                        "perfil.html",
-                        window.location.href
-                    ).href;
+function guardarDestinoAntesDeGoogle() {
+    const parametros =
+        new URLSearchParams(
+            window.location.search
+        );
 
-                const {
-                    error
-                } =
-                    await clienteAuth.auth
-                        .signInWithOAuth({
-                            provider:
-                                "google",
-                            options: {
-                                redirectTo:
-                                    urlRedireccion
-                            }
-                        });
+    const destinoURL =
+        parametros.get(
+            "redirect"
+        );
 
-                if (error) {
-                    throw error;
-                }
-            } catch (error) {
-                console.error(
-                    "Error con Google:",
-                    error
-                );
+    const destinoGuardado =
+        sessionStorage.getItem(
+            "destinoDespuesLoginSuralia"
+        );
 
-                mostrarNotificacion(
-                    "No se ha podido iniciar sesión con Google.",
-                    "error"
-                );
+    const destino =
+        destinoURL ||
+        destinoGuardado ||
+        "perfil.html";
 
-                botonGoogle.disabled =
-                    false;
+    if (
+        destino.startsWith("http://") ||
+        destino.startsWith("https://") ||
+        destino.startsWith("//")
+    ) {
+        sessionStorage.setItem(
+            "destinoDespuesLoginSuralia",
+            "perfil.html"
+        );
 
-                botonGoogle.innerHTML = `
-                    <i class="fa-brands fa-google"></i>
-                    Continuar con Google
-                `;
-            }
-        }
+        return;
+    }
+
+    sessionStorage.setItem(
+        "destinoDespuesLoginSuralia",
+        destino
     );
 }
+
+
+function traducirErrorGoogle(
+    mensaje = ""
+) {
+    const mensajeNormalizado =
+        String(mensaje)
+            .toLowerCase();
+
+    if (
+        mensajeNormalizado.includes(
+            "provider is not enabled"
+        )
+    ) {
+        return "El acceso con Google todavía no está activado correctamente en Supabase.";
+    }
+
+    if (
+        mensajeNormalizado.includes(
+            "redirect"
+        )
+    ) {
+        return "La dirección de retorno de Google no está autorizada en Supabase.";
+    }
+
+    return "No se ha podido iniciar sesión con Google.";
+}
+
+
+botonesGoogle.forEach(
+    (botonGoogle) => {
+        botonGoogle.addEventListener(
+            "click",
+            async () => {
+                if (
+                    botonGoogle.id ===
+                    "registro-google"
+                ) {
+                    const aceptarCondiciones =
+                        document.querySelector(
+                            "#aceptar-condiciones"
+                        );
+
+                    const errorCondiciones =
+                        document.querySelector(
+                            "#error-condiciones"
+                        );
+
+                    if (
+                        !aceptarCondiciones
+                            ?.checked
+                    ) {
+                        if (errorCondiciones) {
+                            errorCondiciones.textContent =
+                                "Debes aceptar la política de privacidad y las condiciones para continuar con Google.";
+                        }
+
+                        aceptarCondiciones?.focus();
+
+                        return;
+                    }
+
+                    if (errorCondiciones) {
+                        errorCondiciones.textContent =
+                            "";
+                    }
+                }
+
+                if (!clienteAuth) {
+                    mostrarNotificacion(
+                        "No se ha podido conectar con Google.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                guardarDestinoAntesDeGoogle();
+
+                botonGoogle.disabled =
+                    true;
+
+                botonGoogle.innerHTML = `
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Conectando con Google...
+                `;
+
+                try {
+                    const {
+                        error
+                    } =
+                        await clienteAuth.auth
+                            .signInWithOAuth({
+                                provider:
+                                    "google",
+
+                                options: {
+                                    redirectTo:
+                                        obtenerURLRetornoGoogle(),
+
+                                    queryParams: {
+                                        prompt:
+                                            "select_account"
+                                    }
+                                }
+                            });
+
+                    if (error) {
+                        throw error;
+                    }
+                } catch (error) {
+                    console.error(
+                        "Error con Google:",
+                        error
+                    );
+
+                    mostrarNotificacion(
+                        traducirErrorGoogle(
+                            error?.message
+                        ),
+                        "error"
+                    );
+
+                    botonGoogle.disabled =
+                        false;
+
+                    botonGoogle.innerHTML = `
+                        <i class="fa-brands fa-google"></i>
+                        Continuar con Google
+                    `;
+                }
+            }
+        );
+    }
+);
 
 
 /* =====================================================
