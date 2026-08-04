@@ -95,6 +95,73 @@
         </div>
     </main>
 
+    <div
+        class="modal-seguridad-perfil"
+        id="modal-eliminar-conversacion"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-modal-eliminar-conversacion"
+        aria-describedby="texto-modal-eliminar-conversacion"
+        aria-hidden="true"
+    >
+        <div class="modal-seguridad-perfil__panel">
+
+            <button
+                type="button"
+                class="modal-seguridad-perfil__cerrar"
+                id="cerrar-modal-eliminar-conversacion"
+                aria-label="Cerrar"
+            >
+                <i
+                    class="fa-solid fa-xmark"
+                    aria-hidden="true"
+                ></i>
+            </button>
+
+            <span class="modal-seguridad-perfil__icono">
+                <i
+                    class="fa-regular fa-trash-can"
+                    aria-hidden="true"
+                ></i>
+            </span>
+
+            <h2 id="titulo-modal-eliminar-conversacion">
+                ¿Eliminar esta conversación?
+            </h2>
+
+            <p id="texto-modal-eliminar-conversacion">
+                La conversación desaparecerá de tu bandeja, pero no se borrará
+                para la otra persona. Si recibes un mensaje nuevo, volverá a aparecer.
+            </p>
+
+            <div class="modal-seguridad-perfil__acciones">
+
+                <button
+                    type="button"
+                    class="modal-seguridad-perfil__boton-secundario"
+                    id="cancelar-eliminar-conversacion"
+                >
+                    Mantener conversación
+                </button>
+
+                <button
+                    type="button"
+                    class="modal-seguridad-perfil__boton-peligro"
+                    id="confirmar-eliminar-conversacion"
+                >
+                    <i
+                        class="fa-regular fa-trash-can"
+                        aria-hidden="true"
+                    ></i>
+
+                    Eliminar de mi bandeja
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/main.js"></script>

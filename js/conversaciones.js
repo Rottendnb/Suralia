@@ -248,7 +248,41 @@ const botonNotificacionesNavegador =
         "#boton-notificaciones-navegador"
     );
 
+const modalEliminarConversacion =
+    document.querySelector(
+        "#modal-eliminar-conversacion"
+    );
+
+const cerrarModalEliminarConversacion =
+    document.querySelector(
+        "#cerrar-modal-eliminar-conversacion"
+    );
+
+const cancelarEliminarConversacion =
+    document.querySelector(
+        "#cancelar-eliminar-conversacion"
+    );
+
+const confirmarEliminarConversacion =
+    document.querySelector(
+        "#confirmar-eliminar-conversacion"
+    );
+
+const textoModalEliminarConversacion =
+    document.querySelector(
+        "#texto-modal-eliminar-conversacion"
+    );
+
 let usuarioActual = null;
+
+let conversacionPendienteEliminar =
+    null;
+
+let botonPendienteEliminar =
+    null;
+
+let focoAnteriorModal =
+    null;
 let canalConversaciones = null;
 
 function escaparHTML(valor = "") {
@@ -361,30 +395,73 @@ function tarjeta(conversacion) {
     const pendientes = conversacion.pendientes || 0;
 
     return `
-        <a class="conversacion-tarjeta" href="mensajes.html?id=${encodeURIComponent(conversacion.id)}">
-            <span class="conversacion-tarjeta__avatar">
-                ${avatarPerfil(perfil)}
-            </span>
+        <article class="conversacion-tarjeta">
 
-            <span class="conversacion-tarjeta__contenido">
-                <span class="conversacion-tarjeta__superior">
-                    <strong>${escaparHTML(nombre)}</strong>
-                    <time>${escaparHTML(formatearFecha(ultimo?.creado_en || conversacion.actualizado_en))}</time>
+            <a
+                class="conversacion-tarjeta__enlace"
+                href="mensajes.html?id=${encodeURIComponent(
+                    conversacion.id
+                )}"
+            >
+                <span class="conversacion-tarjeta__avatar">
+                    ${avatarPerfil(perfil)}
                 </span>
 
-                <span class="conversacion-tarjeta__inferior">
-                    <span class="conversacion-tarjeta__mensaje">
-                        ${escaparHTML(ultimo?.contenido || "Conversación iniciada")}
+                <span class="conversacion-tarjeta__contenido">
+                    <span class="conversacion-tarjeta__superior">
+                        <strong>${escaparHTML(nombre)}</strong>
+
+                        <time>
+                            ${escaparHTML(
+                                formatearFecha(
+                                    ultimo?.creado_en ||
+                                    conversacion.actualizado_en
+                                )
+                            )}
+                        </time>
                     </span>
 
-                    ${pendientes > 0 ? `
-                        <span class="conversacion-tarjeta__contador" aria-label="${pendientes} mensajes pendientes">
-                            ${pendientes > 99 ? "99+" : pendientes}
+                    <span class="conversacion-tarjeta__inferior">
+                        <span class="conversacion-tarjeta__mensaje">
+                            ${escaparHTML(
+                                ultimo?.contenido ||
+                                "Conversación iniciada"
+                            )}
                         </span>
-                    ` : ""}
+
+                        ${pendientes > 0 ? `
+                            <span
+                                class="conversacion-tarjeta__contador"
+                                aria-label="${pendientes} mensajes pendientes"
+                            >
+                                ${pendientes > 99 ? "99+" : pendientes}
+                            </span>
+                        ` : ""}
+                    </span>
                 </span>
-            </span>
-        </a>
+            </a>
+
+            <button
+                type="button"
+                class="conversacion-tarjeta__eliminar"
+                data-eliminar-conversacion="${escaparHTML(
+                    conversacion.id
+                )}"
+                data-nombre-conversacion="${escaparHTML(
+                    nombre
+                )}"
+                aria-label="Eliminar conversación con ${escaparHTML(
+                    nombre
+                )}"
+                title="Eliminar conversación"
+            >
+                <i
+                    class="fa-regular fa-trash-can"
+                    aria-hidden="true"
+                ></i>
+            </button>
+
+        </article>
     `;
 }
 
@@ -502,14 +579,67 @@ async function cargarConversaciones() {
             return;
         }
 
-        const { data: conversaciones, error } = await cliente
-            .from("conversaciones")
-            .select("id,usuario_uno_id,usuario_dos_id,actualizado_en")
-            .order("actualizado_en", { ascending: false });
+        const [
+            conversacionesResultado,
+            ocultasResultado
+        ] = await Promise.all([
+            cliente
+                .from("conversaciones")
+                .select(
+                    "id,usuario_uno_id,usuario_dos_id,actualizado_en"
+                )
+                .order(
+                    "actualizado_en",
+                    {
+                        ascending:
+                            false
+                    }
+                ),
 
-        if (error) throw error;
+            cliente
+                .from("conversaciones_ocultas")
+                .select("conversacion_id")
+                .eq(
+                    "usuario_id",
+                    usuarioActual.id
+                )
+        ]);
 
-        if (!conversaciones?.length) {
+        if (conversacionesResultado.error) {
+            throw conversacionesResultado.error;
+        }
+
+        if (ocultasResultado.error) {
+            throw ocultasResultado.error;
+        }
+
+        const idsOcultas =
+            new Set(
+                (
+                    ocultasResultado.data ||
+                    []
+                ).map(
+                    (
+                        fila
+                    ) =>
+                        fila.conversacion_id
+                )
+            );
+
+        const conversaciones =
+            (
+                conversacionesResultado.data ||
+                []
+            ).filter(
+                (
+                    conversacion
+                ) =>
+                    !idsOcultas.has(
+                        conversacion.id
+                    )
+            );
+
+        if (!conversaciones.length) {
             carga?.classList.add("oculto");
             errorBloque?.classList.add("oculto");
             lista?.classList.add("oculto");
@@ -571,7 +701,15 @@ async function cargarConversaciones() {
             };
         });
 
-        lista.innerHTML = preparadas.map(tarjeta).join("");
+        lista.innerHTML =
+            preparadas
+                .map(
+                    tarjeta
+                )
+                .join("");
+
+        activarBotonesEliminarConversacion();
+
         carga?.classList.add("oculto");
         errorBloque?.classList.add("oculto");
         vacio?.classList.add("oculto");
@@ -581,6 +719,168 @@ async function cargarConversaciones() {
         mostrarError("No se han podido cargar tus conversaciones.");
     }
 }
+
+
+function abrirModalEliminarConversacion(
+    conversacionId,
+    nombre,
+    boton
+) {
+    if (
+        !modalEliminarConversacion ||
+        !conversacionId
+    ) {
+        return;
+    }
+
+    conversacionPendienteEliminar =
+        conversacionId;
+
+    botonPendienteEliminar =
+        boton ||
+        null;
+
+    focoAnteriorModal =
+        document.activeElement;
+
+    if (textoModalEliminarConversacion) {
+        textoModalEliminarConversacion.textContent =
+            `La conversación con ${nombre || "este usuario"} desaparecerá de tu bandeja, pero no se borrará para la otra persona. Si recibes un mensaje nuevo, volverá a aparecer.`;
+    }
+
+    modalEliminarConversacion.classList.add(
+        "visible"
+    );
+
+    modalEliminarConversacion.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    document.body.style.overflow =
+        "hidden";
+
+    cerrarModalEliminarConversacion?.focus();
+}
+
+
+function cerrarModalConversacion() {
+    if (!modalEliminarConversacion) {
+        return;
+    }
+
+    modalEliminarConversacion.classList.remove(
+        "visible"
+    );
+
+    modalEliminarConversacion.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+    document.body.style.overflow =
+        "";
+
+    focoAnteriorModal?.focus?.();
+
+    focoAnteriorModal =
+        null;
+
+    conversacionPendienteEliminar =
+        null;
+
+    botonPendienteEliminar =
+        null;
+}
+
+
+async function eliminarConversacionDeMiBandeja() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (
+        !cliente ||
+        !conversacionPendienteEliminar ||
+        !confirmarEliminarConversacion
+    ) {
+        return;
+    }
+
+    const conversacionId =
+        conversacionPendienteEliminar;
+
+    confirmarEliminarConversacion.disabled =
+        true;
+
+    confirmarEliminarConversacion.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Eliminando...
+    `;
+
+    try {
+        const {
+            error
+        } = await cliente.rpc(
+            "ocultar_conversacion",
+            {
+                conversacion_buscada:
+                    conversacionId
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        cerrarModalConversacion();
+
+        await cargarConversaciones();
+    } catch (error) {
+        console.error(
+            "No se pudo ocultar la conversación:",
+            error
+        );
+
+        window.alert(
+            "No se ha podido eliminar la conversación de tu bandeja."
+        );
+    } finally {
+        confirmarEliminarConversacion.disabled =
+            false;
+
+        confirmarEliminarConversacion.innerHTML = `
+            <i class="fa-regular fa-trash-can"></i>
+            Eliminar de mi bandeja
+        `;
+    }
+}
+
+
+function activarBotonesEliminarConversacion() {
+    document
+        .querySelectorAll(
+            "[data-eliminar-conversacion]"
+        )
+        .forEach(
+            (
+                boton
+            ) => {
+                boton.addEventListener(
+                    "click",
+                    () => {
+                        abrirModalEliminarConversacion(
+                            boton.dataset
+                                .eliminarConversacion,
+                            boton.dataset
+                                .nombreConversacion,
+                            boton
+                        );
+                    }
+                );
+            }
+        );
+}
+
 
 function activarTiempoReal() {
     const cliente = window.clienteSupabase;
@@ -632,6 +932,59 @@ window.addEventListener("beforeunload", () => {
 botonNotificacionesNavegador?.addEventListener(
     "click",
     solicitarNotificacionesNavegador
+);
+
+
+cerrarModalEliminarConversacion?.addEventListener(
+    "click",
+    cerrarModalConversacion
+);
+
+
+cancelarEliminarConversacion?.addEventListener(
+    "click",
+    cerrarModalConversacion
+);
+
+
+confirmarEliminarConversacion?.addEventListener(
+    "click",
+    eliminarConversacionDeMiBandeja
+);
+
+
+modalEliminarConversacion?.addEventListener(
+    "click",
+    (
+        evento
+    ) => {
+        if (
+            evento.target ===
+            modalEliminarConversacion
+        ) {
+            cerrarModalConversacion();
+        }
+    }
+);
+
+
+document.addEventListener(
+    "keydown",
+    (
+        evento
+    ) => {
+        if (
+            evento.key ===
+                "Escape" &&
+            modalEliminarConversacion
+                ?.classList
+                .contains(
+                    "visible"
+                )
+        ) {
+            cerrarModalConversacion();
+        }
+    }
 );
 
 

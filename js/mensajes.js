@@ -41,6 +41,16 @@ const chatAvatar =
         "#chat-avatar"
     );
 
+const chatVerPerfil =
+    document.querySelector(
+        "#chat-ver-perfil"
+    );
+
+let chatEscribiendo =
+    document.querySelector(
+        "#chat-escribiendo"
+    );
+
 const listaMensajes =
     document.querySelector(
         "#chat-lista-mensajes"
@@ -70,6 +80,24 @@ let conversacionActualId =
 
 let canalMensajes =
     null;
+
+let canalMensajesListo =
+    false;
+
+let canalEscrituraTabla =
+    null;
+
+let intervaloEscrituraLocal =
+    null;
+
+let temporizadorEscrituraLocal =
+    null;
+
+let temporizadorEscrituraRemota =
+    null;
+
+let usuarioEstaEscribiendo =
+    false;
 
 const mensajesRenderizados =
     new Set();
@@ -237,7 +265,8 @@ async function cargarUsuarioHeaderMensajes() {
             .select(
                 `
                     nombre_visible,
-                    foto_principal_url
+                    foto_principal_url,
+                    perfil_publico_id
                 `
             )
             .eq(
@@ -284,6 +313,170 @@ async function cargarUsuarioHeaderMensajes() {
         );
     }
 }
+
+
+let contextoAudioChat =
+    null;
+
+let sonidoChatPreparado =
+    false;
+
+
+function prepararSonidoChat() {
+    if (sonidoChatPreparado) {
+        return;
+    }
+
+    const AudioContexto =
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+    if (!AudioContexto) {
+        return;
+    }
+
+    try {
+        contextoAudioChat =
+            contextoAudioChat ||
+            new AudioContexto();
+
+        if (
+            contextoAudioChat.state ===
+            "suspended"
+        ) {
+            contextoAudioChat.resume();
+        }
+
+        sonidoChatPreparado =
+            true;
+    } catch (error) {
+        console.error(
+            "No se pudo preparar el sonido del chat:",
+            error
+        );
+    }
+}
+
+
+async function reproducirSonidoChat() {
+    prepararSonidoChat();
+
+    if (!contextoAudioChat) {
+        return;
+    }
+
+    try {
+        if (
+            contextoAudioChat.state ===
+            "suspended"
+        ) {
+            await contextoAudioChat.resume();
+        }
+
+        if (
+            contextoAudioChat.state !==
+            "running"
+        ) {
+            return;
+        }
+
+        const ahora =
+            contextoAudioChat.currentTime;
+
+        const ganancia =
+            contextoAudioChat.createGain();
+
+        const tonoUno =
+            contextoAudioChat.createOscillator();
+
+        const tonoDos =
+            contextoAudioChat.createOscillator();
+
+        ganancia.gain.setValueAtTime(
+            0.0001,
+            ahora
+        );
+
+        ganancia.gain.exponentialRampToValueAtTime(
+            0.13,
+            ahora + 0.015
+        );
+
+        ganancia.gain.exponentialRampToValueAtTime(
+            0.0001,
+            ahora + 0.34
+        );
+
+        tonoUno.type =
+            "sine";
+
+        tonoUno.frequency.setValueAtTime(
+            720,
+            ahora
+        );
+
+        tonoDos.type =
+            "sine";
+
+        tonoDos.frequency.setValueAtTime(
+            980,
+            ahora + 0.09
+        );
+
+        tonoUno.connect(
+            ganancia
+        );
+
+        tonoDos.connect(
+            ganancia
+        );
+
+        ganancia.connect(
+            contextoAudioChat.destination
+        );
+
+        tonoUno.start(
+            ahora
+        );
+
+        tonoUno.stop(
+            ahora + 0.18
+        );
+
+        tonoDos.start(
+            ahora + 0.09
+        );
+
+        tonoDos.stop(
+            ahora + 0.32
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo reproducir el sonido del chat:",
+            error
+        );
+    }
+}
+
+
+[
+    "click",
+    "keydown",
+    "touchstart"
+].forEach(
+    (
+        tipoEvento
+    ) => {
+        document.addEventListener(
+            tipoEvento,
+            prepararSonidoChat,
+            {
+                passive:
+                    true
+            }
+        );
+    }
+);
 
 
 function escaparHTML(
@@ -811,6 +1004,8 @@ async function enviarMensaje(
         campoMensaje.value =
             "";
 
+        detenerEstadoEscrituraLocal();
+
         ajustarAlturaMensaje();
     } catch (error) {
         console.error(
@@ -840,6 +1035,249 @@ async function enviarMensaje(
 }
 
 
+function asegurarIndicadorEscribiendo() {
+    if (chatEscribiendo) {
+        return chatEscribiendo;
+    }
+
+    const formulario =
+        document.querySelector(
+            "#chat-formulario"
+        );
+
+    if (!formulario) {
+        return null;
+    }
+
+    chatEscribiendo =
+        document.createElement(
+            "div"
+        );
+
+    chatEscribiendo.id =
+        "chat-escribiendo";
+
+    chatEscribiendo.className =
+        "chat-suralia__estado-escritura oculto";
+
+    chatEscribiendo.setAttribute(
+        "aria-live",
+        "polite"
+    );
+
+    chatEscribiendo.innerHTML = `
+        <span></span>
+        <span></span>
+        <span></span>
+
+        <strong>
+            Escribiendo...
+        </strong>
+    `;
+
+    formulario.before(
+        chatEscribiendo
+    );
+
+    return chatEscribiendo;
+}
+
+
+function mostrarEstadoEscribiendo(
+    visible
+) {
+    const indicador =
+        asegurarIndicadorEscribiendo();
+
+    indicador?.classList.toggle(
+        "oculto",
+        !visible
+    );
+}
+
+
+async function establecerEstadoEscritura(
+    escribiendo
+) {
+    const cliente =
+        window.clienteSupabase;
+
+    if (
+        !cliente ||
+        !conversacionActualId
+    ) {
+        return;
+    }
+
+    try {
+        const {
+            error
+        } = await cliente.rpc(
+            "establecer_estado_escritura",
+            {
+                conversacion_buscada:
+                    conversacionActualId,
+
+                estado_escribiendo:
+                    Boolean(
+                        escribiendo
+                    )
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+    } catch (error) {
+        console.error(
+            "No se pudo actualizar el estado Escribiendo:",
+            error
+        );
+    }
+}
+
+
+function gestionarEscrituraLocal() {
+    if (!campoMensaje) {
+        return;
+    }
+
+    const tieneTexto =
+        campoMensaje.value
+            .trim()
+            .length > 0;
+
+    window.clearTimeout(
+        temporizadorEscrituraLocal
+    );
+
+    window.clearInterval(
+        intervaloEscrituraLocal
+    );
+
+    intervaloEscrituraLocal =
+        null;
+
+    if (!tieneTexto) {
+        usuarioEstaEscribiendo =
+            false;
+
+        establecerEstadoEscritura(
+            false
+        );
+
+        return;
+    }
+
+    usuarioEstaEscribiendo =
+        true;
+
+    establecerEstadoEscritura(
+        true
+    );
+
+    intervaloEscrituraLocal =
+        window.setInterval(
+            () => {
+                establecerEstadoEscritura(
+                    true
+                );
+            },
+            1000
+        );
+
+    temporizadorEscrituraLocal =
+        window.setTimeout(
+            detenerEstadoEscrituraLocal,
+            2200
+        );
+}
+
+
+function detenerEstadoEscrituraLocal() {
+    window.clearTimeout(
+        temporizadorEscrituraLocal
+    );
+
+    window.clearInterval(
+        intervaloEscrituraLocal
+    );
+
+    temporizadorEscrituraLocal =
+        null;
+
+    intervaloEscrituraLocal =
+        null;
+
+    if (usuarioEstaEscribiendo) {
+        usuarioEstaEscribiendo =
+            false;
+
+        establecerEstadoEscritura(
+            false
+        );
+    }
+}
+
+
+async function consultarEstadoEscrituraRemota() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (
+        !cliente ||
+        !conversacionActualId
+    ) {
+        return;
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente.rpc(
+            "obtener_estado_escritura_otro",
+            {
+                conversacion_buscada:
+                    conversacionActualId
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        mostrarEstadoEscribiendo(
+            data === true
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo consultar el estado Escribiendo:",
+            error
+        );
+
+        mostrarEstadoEscribiendo(
+            false
+        );
+    }
+}
+
+
+function iniciarConsultaEstadoEscritura() {
+    consultarEstadoEscrituraRemota();
+
+    window.clearInterval(
+        canalEscrituraTabla
+    );
+
+    canalEscrituraTabla =
+        window.setInterval(
+            consultarEstadoEscrituraRemota,
+            1000
+        );
+}
+
+
 function suscribirseAMensajes() {
     const cliente =
         window.clienteSupabase;
@@ -857,10 +1295,21 @@ function suscribirseAMensajes() {
         );
     }
 
+    canalMensajesListo =
+        false;
+
     canalMensajes =
         cliente
             .channel(
-                `chat-${conversacionActualId}`
+                `chat-${conversacionActualId}`,
+                {
+                    config: {
+                        broadcast: {
+                            self:
+                                false
+                        }
+                    }
+                }
             )
             .on(
                 "postgres_changes",
@@ -891,6 +1340,8 @@ function suscribirseAMensajes() {
                         mensaje.remitente_id !==
                         usuarioSesionActual?.id
                     ) {
+                        await reproducirSonidoChat();
+
                         await marcarMensajesComoLeidos();
                     }
                 }
@@ -922,12 +1373,31 @@ function suscribirseAMensajes() {
                 (
                     estado
                 ) => {
+                    canalMensajesListo =
+                        estado ===
+                        "SUBSCRIBED";
+
+                    if (
+                        canalMensajesListo &&
+                        campoMensaje?.value
+                            ?.trim()
+                    ) {
+                        gestionarEscrituraLocal();
+                    }
+
                     if (
                         estado ===
-                        "CHANNEL_ERROR"
+                        "CHANNEL_ERROR" ||
+                        estado ===
+                        "TIMED_OUT"
                     ) {
                         console.error(
-                            "No se pudo activar el chat en tiempo real."
+                            "No se pudo activar el chat en tiempo real:",
+                            estado
+                        );
+
+                        mostrarEstadoEscribiendo(
+                            false
                         );
                     }
                 }
@@ -1028,7 +1498,8 @@ async function cargarConversacion() {
             .select(
                 `
                     nombre_visible,
-                    foto_principal_url
+                    foto_principal_url,
+                    perfil_publico_id
                 `
             )
             .eq(
@@ -1063,11 +1534,30 @@ async function cargarConversacion() {
             perfil
         );
 
+        if (
+            chatVerPerfil &&
+            perfil?.perfil_publico_id
+        ) {
+            chatVerPerfil.href =
+                `perfil-publico.html?id=${encodeURIComponent(
+                    perfil.perfil_publico_id
+                )}`;
+
+            chatVerPerfil.classList.remove(
+                "oculto"
+            );
+        } else {
+            chatVerPerfil?.classList.add(
+                "oculto"
+            );
+        }
+
         await cargarMensajesGuardados();
 
         await marcarMensajesComoLeidos();
 
         suscribirseAMensajes();
+        iniciarConsultaEstadoEscritura();
 
         cargaMensajes?.classList.add(
             "oculto"
@@ -1081,6 +1571,7 @@ async function cargarConversacion() {
             "oculto"
         );
 
+        asegurarIndicadorEscribiendo();
         activarFormularioChat();
     } catch (error) {
         console.error(
@@ -1103,7 +1594,10 @@ formularioChat?.addEventListener(
 
 campoMensaje?.addEventListener(
     "input",
-    ajustarAlturaMensaje
+    () => {
+        ajustarAlturaMensaje();
+        gestionarEscrituraLocal();
+    }
 );
 
 
@@ -1127,6 +1621,19 @@ campoMensaje?.addEventListener(
 window.addEventListener(
     "beforeunload",
     () => {
+        detenerEstadoEscrituraLocal();
+
+        establecerEstadoEscritura(
+            false
+        );
+
+        canalMensajesListo =
+            false;
+
+        mostrarEstadoEscribiendo(
+            false
+        );
+
         if (
             canalMensajes &&
             window.clienteSupabase
@@ -1136,7 +1643,20 @@ window.addEventListener(
                     canalMensajes
                 );
         }
+
+        window.clearInterval(
+            canalEscrituraTabla
+        );
+
+        canalEscrituraTabla =
+            null;
     }
+);
+
+
+campoMensaje?.addEventListener(
+    "blur",
+    detenerEstadoEscrituraLocal
 );
 
 
