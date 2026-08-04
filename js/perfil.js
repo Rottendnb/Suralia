@@ -493,6 +493,7 @@ function cargarSeccionDesdeURL() {
         "reservas",
         "favoritos",
         "afinidades",
+        "conexiones",
         "publicados",
         "datos"
     ];
@@ -613,6 +614,17 @@ function escaparAtributoHTML(
 }
 
 
+/*
+   Sustituye tu función reducirFotoPerfil() completa por esta versión.
+
+   Esta función:
+   1. Lee la imagen.
+   2. Detecta bandas negras uniformes en los bordes.
+   3. Recorta esas bandas.
+   4. Reduce la imagen a un máximo de 1200 px.
+   5. La convierte a JPG optimizado.
+*/
+
 function reducirFotoPerfil(
     archivo,
     maximo = 1200,
@@ -644,48 +656,27 @@ function reducirFotoPerfil(
                 };
 
                 imagen.onload = () => {
-                    const escala =
-                        Math.min(
-                            1,
-                            maximo /
-                                Math.max(
-                                    imagen.width,
-                                    imagen.height
-                                )
-                        );
-
-                    const ancho =
-                        Math.max(
-                            1,
-                            Math.round(
-                                imagen.width *
-                                    escala
-                            )
-                        );
-
-                    const alto =
-                        Math.max(
-                            1,
-                            Math.round(
-                                imagen.height *
-                                    escala
-                            )
-                        );
-
-                    const lienzo =
+                    const lienzoOriginal =
                         document.createElement(
                             "canvas"
                         );
 
-                    lienzo.width = ancho;
-                    lienzo.height = alto;
+                    lienzoOriginal.width =
+                        imagen.width;
 
-                    const contexto =
-                        lienzo.getContext(
-                            "2d"
+                    lienzoOriginal.height =
+                        imagen.height;
+
+                    const contextoOriginal =
+                        lienzoOriginal.getContext(
+                            "2d",
+                            {
+                                willReadFrequently:
+                                    true
+                            }
                         );
 
-                    if (!contexto) {
+                    if (!contextoOriginal) {
                         reject(
                             new Error(
                                 "No se pudo procesar la fotografía."
@@ -695,15 +686,335 @@ function reducirFotoPerfil(
                         return;
                     }
 
-                    contexto.drawImage(
+                    contextoOriginal.drawImage(
                         imagen,
                         0,
-                        0,
-                        ancho,
-                        alto
+                        0
                     );
 
-                    lienzo.toBlob(
+                    let recorteX = 0;
+                    let recorteY = 0;
+                    let recorteAncho =
+                        imagen.width;
+                    let recorteAlto =
+                        imagen.height;
+
+                    try {
+                        const datosImagen =
+                            contextoOriginal.getImageData(
+                                0,
+                                0,
+                                imagen.width,
+                                imagen.height
+                            );
+
+                        const pixeles =
+                            datosImagen.data;
+
+                        /*
+                           Umbral conservador:
+                           solo considera negro un píxel
+                           cuando sus tres canales son muy oscuros.
+                        */
+                        const UMBRAL_NEGRO = 24;
+
+                        /*
+                           Una fila o columna se considera banda negra
+                           cuando al menos el 97 % de sus píxeles
+                           son prácticamente negros.
+                        */
+                        const PORCENTAJE_MINIMO_NEGRO =
+                            0.97;
+
+                        /*
+                           Límite de seguridad:
+                           nunca recorta más del 25 % por cada lado.
+                        */
+                        const maximoRecorteVertical =
+                            Math.floor(
+                                imagen.height *
+                                0.25
+                            );
+
+                        const maximoRecorteHorizontal =
+                            Math.floor(
+                                imagen.width *
+                                0.25
+                            );
+
+                        function pixelEsNegro(
+                            x,
+                            y
+                        ) {
+                            const indice =
+                                (
+                                    y *
+                                    imagen.width +
+                                    x
+                                ) * 4;
+
+                            return (
+                                pixeles[indice] <=
+                                    UMBRAL_NEGRO &&
+                                pixeles[indice + 1] <=
+                                    UMBRAL_NEGRO &&
+                                pixeles[indice + 2] <=
+                                    UMBRAL_NEGRO
+                            );
+                        }
+
+                        function filaEsNegra(
+                            y
+                        ) {
+                            let negros = 0;
+
+                            /*
+                               Se muestrea cada dos píxeles
+                               para mejorar el rendimiento.
+                            */
+                            let muestras = 0;
+
+                            for (
+                                let x = 0;
+                                x < imagen.width;
+                                x += 2
+                            ) {
+                                muestras += 1;
+
+                                if (
+                                    pixelEsNegro(
+                                        x,
+                                        y
+                                    )
+                                ) {
+                                    negros += 1;
+                                }
+                            }
+
+                            return (
+                                negros /
+                                muestras >=
+                                PORCENTAJE_MINIMO_NEGRO
+                            );
+                        }
+
+                        function columnaEsNegra(
+                            x
+                        ) {
+                            let negros = 0;
+                            let muestras = 0;
+
+                            for (
+                                let y = 0;
+                                y < imagen.height;
+                                y += 2
+                            ) {
+                                muestras += 1;
+
+                                if (
+                                    pixelEsNegro(
+                                        x,
+                                        y
+                                    )
+                                ) {
+                                    negros += 1;
+                                }
+                            }
+
+                            return (
+                                negros /
+                                muestras >=
+                                PORCENTAJE_MINIMO_NEGRO
+                            );
+                        }
+
+                        let bordeSuperior = 0;
+
+                        while (
+                            bordeSuperior <
+                                maximoRecorteVertical &&
+                            filaEsNegra(
+                                bordeSuperior
+                            )
+                        ) {
+                            bordeSuperior += 1;
+                        }
+
+                        let bordeInferior =
+                            imagen.height - 1;
+
+                        while (
+                            imagen.height -
+                                1 -
+                                bordeInferior <
+                                maximoRecorteVertical &&
+                            filaEsNegra(
+                                bordeInferior
+                            )
+                        ) {
+                            bordeInferior -= 1;
+                        }
+
+                        let bordeIzquierdo = 0;
+
+                        while (
+                            bordeIzquierdo <
+                                maximoRecorteHorizontal &&
+                            columnaEsNegra(
+                                bordeIzquierdo
+                            )
+                        ) {
+                            bordeIzquierdo += 1;
+                        }
+
+                        let bordeDerecho =
+                            imagen.width - 1;
+
+                        while (
+                            imagen.width -
+                                1 -
+                                bordeDerecho <
+                                maximoRecorteHorizontal &&
+                            columnaEsNegra(
+                                bordeDerecho
+                            )
+                        ) {
+                            bordeDerecho -= 1;
+                        }
+
+                        const anchoDetectado =
+                            bordeDerecho -
+                            bordeIzquierdo +
+                            1;
+
+                        const altoDetectado =
+                            bordeInferior -
+                            bordeSuperior +
+                            1;
+
+                        /*
+                           Solo aplica el recorte cuando se ha
+                           detectado una banda real de al menos 4 px.
+                        */
+                        const hayRecorteReal =
+                            bordeSuperior >= 4 ||
+                            imagen.height -
+                                1 -
+                                bordeInferior >= 4 ||
+                            bordeIzquierdo >= 4 ||
+                            imagen.width -
+                                1 -
+                                bordeDerecho >= 4;
+
+                        if (
+                            hayRecorteReal &&
+                            anchoDetectado > 0 &&
+                            altoDetectado > 0
+                        ) {
+                            recorteX =
+                                bordeIzquierdo;
+
+                            recorteY =
+                                bordeSuperior;
+
+                            recorteAncho =
+                                anchoDetectado;
+
+                            recorteAlto =
+                                altoDetectado;
+                        }
+                    } catch (error) {
+                        /*
+                           Si la detección falla, la fotografía
+                           se procesa sin recorte automático.
+                        */
+                        console.warn(
+                            "No se pudieron detectar los bordes negros:",
+                            error
+                        );
+                    }
+
+                    const escala =
+                        Math.min(
+                            1,
+                            maximo /
+                                Math.max(
+                                    recorteAncho,
+                                    recorteAlto
+                                )
+                        );
+
+                    const anchoFinal =
+                        Math.max(
+                            1,
+                            Math.round(
+                                recorteAncho *
+                                    escala
+                            )
+                        );
+
+                    const altoFinal =
+                        Math.max(
+                            1,
+                            Math.round(
+                                recorteAlto *
+                                    escala
+                            )
+                        );
+
+                    const lienzoFinal =
+                        document.createElement(
+                            "canvas"
+                        );
+
+                    lienzoFinal.width =
+                        anchoFinal;
+
+                    lienzoFinal.height =
+                        altoFinal;
+
+                    const contextoFinal =
+                        lienzoFinal.getContext(
+                            "2d"
+                        );
+
+                    if (!contextoFinal) {
+                        reject(
+                            new Error(
+                                "No se pudo crear la fotografía optimizada."
+                            )
+                        );
+
+                        return;
+                    }
+
+                    /*
+                       Fondo blanco para evitar transparencias negras
+                       al convertir imágenes PNG a JPG.
+                    */
+                    contextoFinal.fillStyle =
+                        "#ffffff";
+
+                    contextoFinal.fillRect(
+                        0,
+                        0,
+                        anchoFinal,
+                        altoFinal
+                    );
+
+                    contextoFinal.drawImage(
+                        imagen,
+                        recorteX,
+                        recorteY,
+                        recorteAncho,
+                        recorteAlto,
+                        0,
+                        0,
+                        anchoFinal,
+                        altoFinal
+                    );
+
+                    lienzoFinal.toBlob(
                         (blob) => {
                             if (!blob) {
                                 reject(
@@ -4237,6 +4548,17 @@ function crearAfinidadHTML(afinidad) {
 
                     <button
                         type="button"
+                        class="boton-ver-personas-afinidad"
+                        data-ver-personas-afinidad="${planId}"
+                        aria-expanded="false"
+                        aria-controls="personas-afinidad-${planId}"
+                    >
+                        <i class="fa-solid fa-people-group"></i>
+                        Ver personas interesadas
+                    </button>
+
+                    <button
+                        type="button"
                         class="boton-desactivar-afinidad"
                         data-desactivar-afinidad="${planId}"
                     >
@@ -4245,6 +4567,13 @@ function crearAfinidadHTML(afinidad) {
                     </button>
 
                 </div>
+
+                <div
+                    class="personas-afinidad oculto"
+                    id="personas-afinidad-${planId}"
+                    data-lista-personas-afinidad="${planId}"
+                    aria-live="polite"
+                ></div>
 
             </div>
 
@@ -4295,6 +4624,7 @@ function mostrarAfinidadesPerfil() {
             .join("");
 
     activarBotonesDesactivarAfinidad();
+    activarBotonesVerPersonasAfinidad();
 }
 
 
@@ -4534,6 +4864,344 @@ async function desactivarAfinidadPerfil(
 }
 
 
+function textoInteresesComunes(
+    cantidad
+) {
+    const total =
+        Number(cantidad || 0);
+
+    if (total === 0) {
+        return "Sin intereses en común todavía";
+    }
+
+    if (total === 1) {
+        return "1 interés en común";
+    }
+
+    return `${total} intereses en común`;
+}
+
+
+function crearPersonaAfinidadHTML(
+    persona
+) {
+    const perfilId =
+        escaparHTML(
+            persona.perfil_id || ""
+        );
+
+    const nombre =
+        escaparHTML(
+            persona.nombre ||
+            "Usuario de Suralia"
+        );
+
+    const localidad =
+        escaparHTML(
+            persona.localidad ||
+            "Localidad no indicada"
+        );
+
+    const ocupacion =
+        escaparHTML(
+            persona.ocupacion ||
+            ""
+        );
+
+    const foto =
+        escaparHTML(
+            persona.foto_principal ||
+            ""
+        );
+
+    const edad =
+        Number(persona.edad || 0);
+
+    const verificado =
+        Boolean(
+            persona.verificado
+        );
+
+    const interesesComunes =
+        textoInteresesComunes(
+            persona.intereses_comunes
+        );
+
+    return `
+        <article class="persona-afinidad">
+
+            <div class="persona-afinidad__foto">
+
+                ${
+                    foto
+                        ? `
+                            <img
+                                src="${foto}"
+                                alt="Fotografía de ${nombre}"
+                                loading="lazy"
+                            >
+                        `
+                        : `
+                            <i
+                                class="fa-regular fa-user"
+                                aria-hidden="true"
+                            ></i>
+                        `
+                }
+
+            </div>
+
+            <div class="persona-afinidad__contenido">
+
+                <div class="persona-afinidad__superior">
+
+                    <div>
+
+                        <h4>
+                            ${nombre}
+                            ${
+                                edad > 0
+                                    ? `, ${edad}`
+                                    : ""
+                            }
+                        </h4>
+
+                        ${
+                            verificado
+                                ? `
+                                    <span class="persona-afinidad__verificado">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        Perfil verificado
+                                    </span>
+                                `
+                                : ""
+                        }
+
+                    </div>
+
+                </div>
+
+                <div class="persona-afinidad__datos">
+
+                    <span>
+                        <i class="fa-solid fa-location-dot"></i>
+                        ${localidad}
+                    </span>
+
+                    ${
+                        ocupacion
+                            ? `
+                                <span>
+                                    <i class="fa-solid fa-briefcase"></i>
+                                    ${ocupacion}
+                                </span>
+                            `
+                            : ""
+                    }
+
+                </div>
+
+                <span class="persona-afinidad__coincidencias">
+                    <i class="fa-solid fa-link"></i>
+                    ${escaparHTML(interesesComunes)}
+                </span>
+
+                <a
+                    href="perfil-publico.html?id=${encodeURIComponent(
+                        perfilId
+                    )}"
+                    class="boton-principal-pequeno"
+                >
+                    Ver perfil
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+            </div>
+
+        </article>
+    `;
+}
+
+
+async function cargarPersonasAfinidad(
+    planId,
+    contenedor,
+    boton
+) {
+    const cliente =
+        obtenerClienteAfinidades();
+
+    if (
+        !cliente ||
+        !contenedor
+    ) {
+        return;
+    }
+
+    contenedor.classList.remove(
+        "oculto"
+    );
+
+    contenedor.innerHTML = `
+        <div class="personas-afinidad__cargando">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Cargando personas interesadas...
+        </div>
+    `;
+
+    boton.disabled =
+        true;
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente.rpc(
+            "obtener_personas_afinidad",
+            {
+                plan_buscado:
+                    planId
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        const personas =
+            Array.isArray(data)
+                ? data
+                : [];
+
+        if (personas.length === 0) {
+            contenedor.innerHTML = `
+                <div class="personas-afinidad__vacio">
+
+                    <span>
+                        <i class="fa-regular fa-user"></i>
+                    </span>
+
+                    <div>
+                        <h4>
+                            Todavía no hay otras personas visibles
+                        </h4>
+
+                        <p>
+                            Cuando alguien active esta afinidad y tenga
+                            el perfil social visible, aparecerá aquí.
+                        </p>
+                    </div>
+
+                </div>
+            `;
+
+            return;
+        }
+
+        contenedor.innerHTML = `
+            <div class="personas-afinidad__cabecera">
+
+                <div>
+                    <span class="subtitulo">
+                        Personas interesadas
+                    </span>
+
+                    <h4>
+                        ${
+                            personas.length === 1
+                                ? "1 perfil disponible"
+                                : `${personas.length} perfiles disponibles`
+                        }
+                    </h4>
+                </div>
+
+            </div>
+
+            <div class="personas-afinidad__grid">
+                ${personas
+                    .map(
+                        crearPersonaAfinidadHTML
+                    )
+                    .join("")}
+            </div>
+        `;
+    } catch (error) {
+        console.error(
+            "No se pudieron cargar las personas interesadas:",
+            error
+        );
+
+        contenedor.innerHTML = `
+            <div class="personas-afinidad__error">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                No se han podido cargar las personas interesadas.
+            </div>
+        `;
+    } finally {
+        boton.disabled =
+            false;
+    }
+}
+
+
+function activarBotonesVerPersonasAfinidad() {
+    document
+        .querySelectorAll(
+            "[data-ver-personas-afinidad]"
+        )
+        .forEach(
+            (boton) => {
+                boton.addEventListener(
+                    "click",
+                    async () => {
+                        const planId =
+                            boton.dataset
+                                .verPersonasAfinidad;
+
+                        const contenedor =
+                            document.querySelector(
+                                `[data-lista-personas-afinidad="${planId}"]`
+                            );
+
+                        if (!contenedor) {
+                            return;
+                        }
+
+                        const estaAbierto =
+                            !contenedor.classList.contains(
+                                "oculto"
+                            );
+
+                        if (estaAbierto) {
+                            contenedor.classList.add(
+                                "oculto"
+                            );
+
+                            boton.setAttribute(
+                                "aria-expanded",
+                                "false"
+                            );
+
+                            return;
+                        }
+
+                        boton.setAttribute(
+                            "aria-expanded",
+                            "true"
+                        );
+
+                        await cargarPersonasAfinidad(
+                            planId,
+                            contenedor,
+                            boton
+                        );
+                    }
+                );
+            }
+        );
+}
+
+
 function activarBotonesDesactivarAfinidad() {
     document
         .querySelectorAll(
@@ -4551,6 +5219,783 @@ function activarBotonesDesactivarAfinidad() {
                 }
             );
         });
+}
+
+
+
+/* =========================================
+   CONEXIONES - CARGA DESDE SUPABASE
+========================================= */
+
+const listaSolicitudesRecibidas = document.querySelector(
+    "#lista-solicitudes-recibidas"
+);
+
+const listaSolicitudesEnviadas = document.querySelector(
+    "#lista-solicitudes-enviadas"
+);
+
+const listaConexionesAceptadas = document.querySelector(
+    "#lista-conexiones-aceptadas"
+);
+
+const estadoVacioSolicitudesRecibidas = document.querySelector(
+    "#estado-vacio-solicitudes-recibidas"
+);
+
+const estadoVacioSolicitudesEnviadas = document.querySelector(
+    "#estado-vacio-solicitudes-enviadas"
+);
+
+const estadoVacioConexionesAceptadas = document.querySelector(
+    "#estado-vacio-conexiones-aceptadas"
+);
+
+const contadorSolicitudesRecibidas = document.querySelector(
+    "#contador-solicitudes-recibidas"
+);
+
+const contadorSolicitudesEnviadas = document.querySelector(
+    "#contador-solicitudes-enviadas"
+);
+
+const contadorConexionesAceptadas = document.querySelector(
+    "#contador-conexiones-aceptadas"
+);
+
+function formatearFechaConexion(fechaIso) {
+    if (!fechaIso) {
+        return "Fecha no disponible";
+    }
+
+    const fecha = new Date(fechaIso);
+
+    if (Number.isNaN(fecha.getTime())) {
+        return "Fecha no disponible";
+    }
+
+    return new Intl.DateTimeFormat(
+        "es-ES",
+        {
+            day: "numeric",
+            month: "short",
+            year: "numeric"
+        }
+    ).format(fecha);
+}
+
+function obtenerInicialesConexion(nombre = "Usuario") {
+    return String(nombre)
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((parte) => parte.charAt(0))
+        .join("")
+        .toUpperCase() || "SU";
+}
+
+function crearAvatarConexionHTML(perfil) {
+    const nombre = escaparHTML(
+        perfil?.nombre_visible || "Usuario de Suralia"
+    );
+
+    const foto = escaparHTML(
+        perfil?.foto_principal_url || ""
+    );
+
+    if (foto) {
+        return `
+            <span class="conexion-item__avatar">
+                <img
+                    src="${foto}"
+                    alt="Foto de ${nombre}"
+                    loading="lazy"
+                    onerror="
+                        this.onerror=null;
+                        this.parentElement.textContent='${obtenerInicialesConexion(nombre)}';
+                    "
+                >
+            </span>
+        `;
+    }
+
+    return `
+        <span class="conexion-item__avatar" aria-hidden="true">
+            ${obtenerInicialesConexion(nombre)}
+        </span>
+    `;
+}
+
+function crearSolicitudRecibidaHTML(solicitud) {
+    const perfil = solicitud.perfil || {};
+    const nombre = escaparHTML(
+        perfil.nombre_visible || "Usuario de Suralia"
+    );
+    const localidad = escaparHTML(
+        perfil.localidad || "Localidad no indicada"
+    );
+    const perfilPublicoId = escaparHTML(
+        perfil.perfil_publico_id || ""
+    );
+    const fecha = escaparHTML(
+        formatearFechaConexion(solicitud.creado_en)
+    );
+
+    return `
+        <article class="conexion-item" data-solicitud-id="${escaparHTML(solicitud.id)}">
+            ${crearAvatarConexionHTML(perfil)}
+
+            <div class="conexion-item__contenido">
+                <div class="conexion-item__superior">
+                    <h4>${nombre}</h4>
+                    <span class="conexion-item__estado conexion-item__estado--pendiente">
+                        <i class="fa-regular fa-clock"></i>
+                        Pendiente
+                    </span>
+                </div>
+
+                <p>
+                    <i class="fa-solid fa-location-dot"></i>
+                    ${localidad}
+                </p>
+
+                <span class="conexion-item__fecha">
+                    Recibida el ${fecha}
+                </span>
+            </div>
+
+            <div class="conexion-item__acciones">
+                ${
+                    perfilPublicoId
+                        ? `
+                            <a
+                                href="perfil-publico.html?id=${encodeURIComponent(perfilPublicoId)}"
+                                class="boton-conexion boton-conexion--principal"
+                                data-ver-perfil-conexion
+                            >
+                                <i class="fa-regular fa-user"></i>
+                                Ver perfil antes de decidir
+                            </a>
+                        `
+                        : ""
+                }
+
+                <button
+                    type="button"
+                    class="boton-conexion boton-conexion--secundario"
+                    data-aceptar-solicitud="${escaparHTML(solicitud.id)}"
+                >
+                    <i class="fa-solid fa-check"></i>
+                    Aceptar
+                </button>
+
+                <button
+                    type="button"
+                    class="boton-conexion boton-conexion--peligro"
+                    data-rechazar-solicitud="${escaparHTML(solicitud.id)}"
+                >
+                    <i class="fa-solid fa-xmark"></i>
+                    Rechazar
+                </button>
+            </div>
+        </article>
+    `;
+}
+
+function obtenerClaseEstadoSolicitud(estado) {
+    const clases = {
+        pendiente: "conexion-item__estado--pendiente",
+        aceptada: "conexion-item__estado--aceptada",
+        rechazada: "conexion-item__estado--rechazada"
+    };
+
+    return clases[estado] || clases.pendiente;
+}
+
+function obtenerTextoEstadoSolicitud(estado) {
+    const textos = {
+        pendiente: "Pendiente",
+        aceptada: "Aceptada",
+        rechazada: "Rechazada"
+    };
+
+    return textos[estado] || "Pendiente";
+}
+
+function crearSolicitudEnviadaHTML(solicitud) {
+    const perfil = solicitud.perfil || {};
+    const nombre = escaparHTML(
+        perfil.nombre_visible || "Usuario de Suralia"
+    );
+    const localidad = escaparHTML(
+        perfil.localidad || "Localidad no indicada"
+    );
+    const perfilPublicoId = escaparHTML(
+        perfil.perfil_publico_id || ""
+    );
+    const estado = String(solicitud.estado || "pendiente").toLowerCase();
+    const textoEstado = obtenerTextoEstadoSolicitud(estado);
+    const claseEstado = obtenerClaseEstadoSolicitud(estado);
+    const fecha = escaparHTML(
+        formatearFechaConexion(solicitud.creado_en)
+    );
+
+    return `
+        <article class="conexion-item" data-solicitud-id="${escaparHTML(solicitud.id)}">
+            ${crearAvatarConexionHTML(perfil)}
+
+            <div class="conexion-item__contenido">
+                <div class="conexion-item__superior">
+                    <h4>${nombre}</h4>
+                    <span class="conexion-item__estado ${claseEstado}">
+                        ${textoEstado}
+                    </span>
+                </div>
+
+                <p>
+                    <i class="fa-solid fa-location-dot"></i>
+                    ${localidad}
+                </p>
+
+                <span class="conexion-item__fecha">
+                    Enviada el ${fecha}
+                </span>
+            </div>
+
+            <div class="conexion-item__acciones">
+                ${
+                    perfilPublicoId
+                        ? `
+                            <a
+                                href="perfil-publico.html?id=${encodeURIComponent(perfilPublicoId)}"
+                                class="boton-conexion boton-conexion--secundario"
+                            >
+                                <i class="fa-regular fa-user"></i>
+                                Ver perfil
+                            </a>
+                        `
+                        : ""
+                }
+
+                ${
+                    estado === "pendiente"
+                        ? `
+                            <button
+                                type="button"
+                                class="boton-conexion boton-conexion--peligro"
+                                data-cancelar-solicitud="${escaparHTML(solicitud.id)}"
+                            >
+                                <i class="fa-solid fa-ban"></i>
+                                Cancelar solicitud
+                            </button>
+                        `
+                        : ""
+                }
+            </div>
+        </article>
+    `;
+}
+
+function crearConexionAceptadaHTML(conexion) {
+    const perfil = conexion.perfil || {};
+    const nombre = escaparHTML(
+        perfil.nombre_visible || "Usuario de Suralia"
+    );
+    const localidad = escaparHTML(
+        perfil.localidad || "Localidad no indicada"
+    );
+    const perfilPublicoId = escaparHTML(
+        perfil.perfil_publico_id || ""
+    );
+    const fecha = escaparHTML(
+        formatearFechaConexion(
+            conexion.actualizado_en || conexion.creado_en
+        )
+    );
+
+    return `
+        <article class="conexion-item" data-conexion-id="${escaparHTML(conexion.id)}">
+            ${crearAvatarConexionHTML(perfil)}
+
+            <div class="conexion-item__contenido">
+                <div class="conexion-item__superior">
+                    <h4>${nombre}</h4>
+                    <span class="conexion-item__estado conexion-item__estado--aceptada">
+                        <i class="fa-solid fa-user-check"></i>
+                        Conexión
+                    </span>
+                </div>
+
+                <p>
+                    <i class="fa-solid fa-location-dot"></i>
+                    ${localidad}
+                </p>
+
+                <span class="conexion-item__fecha">
+                    Conectados desde el ${fecha}
+                </span>
+            </div>
+
+            <div class="conexion-item__acciones">
+                ${
+                    perfilPublicoId
+                        ? `
+                            <a
+                                href="perfil-publico.html?id=${encodeURIComponent(perfilPublicoId)}"
+                                class="boton-conexion boton-conexion--principal"
+                            >
+                                <i class="fa-regular fa-user"></i>
+                                Ver perfil
+                            </a>
+                        `
+                        : ""
+                }
+            </div>
+        </article>
+    `;
+}
+
+async function obtenerPerfilesConexion(usuarioIds = []) {
+    const cliente = window.clienteSupabase;
+
+    const idsUnicos = [...new Set(
+        usuarioIds.filter(Boolean)
+    )];
+
+    if (!cliente || idsUnicos.length === 0) {
+        return new Map();
+    }
+
+    const { data, error } = await cliente
+        .from("perfiles_sociales")
+        .select(`
+            usuario_id,
+            perfil_publico_id,
+            nombre_visible,
+            foto_principal_url,
+            localidad,
+            intereses,
+            perfil_visible
+        `)
+        .in("usuario_id", idsUnicos);
+
+    if (error) {
+        throw error;
+    }
+
+    return new Map(
+        (Array.isArray(data) ? data : []).map(
+            (perfil) => [perfil.usuario_id, perfil]
+        )
+    );
+}
+
+function actualizarBloqueConexiones(
+    lista,
+    estadoVacio,
+    elementos,
+    creadorHTML
+) {
+    if (!lista || !estadoVacio) {
+        return;
+    }
+
+    if (!Array.isArray(elementos) || elementos.length === 0) {
+        lista.innerHTML = "";
+        lista.classList.add("oculta");
+        estadoVacio.classList.remove("oculto");
+        return;
+    }
+
+    lista.classList.remove("oculta");
+    estadoVacio.classList.add("oculto");
+    lista.innerHTML = elementos.map(creadorHTML).join("");
+}
+
+
+async function actualizarEstadoSolicitudConexion(
+    solicitudId,
+    nuevoEstado,
+    boton
+) {
+    const cliente = window.clienteSupabase;
+
+    if (!cliente) {
+        mostrarNotificacion(
+            "No se ha podido conectar con Supabase."
+        );
+        return;
+    }
+
+    const idSeguro = String(solicitudId || "").trim();
+
+    if (!idSeguro) {
+        return;
+    }
+
+    const textoOriginal = boton?.innerHTML || "";
+
+    if (boton) {
+        boton.disabled = true;
+        boton.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Procesando
+        `;
+    }
+
+    try {
+        const usuario = await obtenerUsuarioPerfilSocial();
+
+        if (!usuario) {
+            throw new Error(
+                "No existe una sesión válida."
+            );
+        }
+
+        const { data, error } = await cliente
+            .from("solicitudes_conexion")
+            .update({
+                estado: nuevoEstado,
+                actualizado_en: new Date().toISOString()
+            })
+            .eq("id", idSeguro)
+            .eq("receptor_id", usuario.id)
+            .eq("estado", "pendiente")
+            .select("id")
+            .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data) {
+            throw new Error(
+                "La solicitud ya no está pendiente o no tienes permiso para modificarla."
+            );
+        }
+
+        mostrarNotificacion(
+            nuevoEstado === "aceptada"
+                ? "La solicitud se ha aceptado."
+                : "La solicitud se ha rechazado."
+        );
+
+        await cargarConexionesPerfil();
+    } catch (error) {
+        console.error(
+            "No se pudo actualizar la solicitud de conexión:",
+            error
+        );
+
+        mostrarNotificacion(
+            error?.message ||
+            "No se ha podido actualizar la solicitud."
+        );
+
+        if (boton) {
+            boton.disabled = false;
+            boton.innerHTML = textoOriginal;
+        }
+    }
+}
+
+async function cancelarSolicitudConexion(
+    solicitudId,
+    boton
+) {
+    const cliente = window.clienteSupabase;
+
+    if (!cliente) {
+        mostrarNotificacion(
+            "No se ha podido conectar con Supabase."
+        );
+        return;
+    }
+
+    const idSeguro = String(solicitudId || "").trim();
+
+    if (!idSeguro) {
+        return;
+    }
+
+    const textoOriginal = boton?.innerHTML || "";
+
+    if (boton) {
+        boton.disabled = true;
+        boton.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Cancelando
+        `;
+    }
+
+    try {
+        const usuario = await obtenerUsuarioPerfilSocial();
+
+        if (!usuario) {
+            throw new Error(
+                "No existe una sesión válida."
+            );
+        }
+
+        const { data, error } = await cliente
+            .from("solicitudes_conexion")
+            .delete()
+            .eq("id", idSeguro)
+            .eq("solicitante_id", usuario.id)
+            .eq("estado", "pendiente")
+            .select("id")
+            .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data) {
+            throw new Error(
+                "La solicitud ya no está pendiente o no tienes permiso para cancelarla."
+            );
+        }
+
+        mostrarNotificacion(
+            "La solicitud se ha cancelado."
+        );
+
+        await cargarConexionesPerfil();
+    } catch (error) {
+        console.error(
+            "No se pudo cancelar la solicitud de conexión:",
+            error
+        );
+
+        mostrarNotificacion(
+            error?.message ||
+            "No se ha podido cancelar la solicitud."
+        );
+
+        if (boton) {
+            boton.disabled = false;
+            boton.innerHTML = textoOriginal;
+        }
+    }
+}
+
+function activarEnlacesPerfilConexion() {
+    document
+        .querySelectorAll("[data-ver-perfil-conexion]")
+        .forEach((enlace) => {
+            enlace.addEventListener("click", () => {
+                sessionStorage.setItem(
+                    "volverPerfilPublicoSuralia",
+                    "perfil.html#conexiones"
+                );
+            });
+        });
+}
+
+
+function activarAccionesSolicitudesConexion() {
+    document
+        .querySelectorAll("[data-aceptar-solicitud]")
+        .forEach((boton) => {
+            boton.addEventListener("click", () => {
+                actualizarEstadoSolicitudConexion(
+                    boton.dataset.aceptarSolicitud,
+                    "aceptada",
+                    boton
+                );
+            });
+        });
+
+    document
+        .querySelectorAll("[data-rechazar-solicitud]")
+        .forEach((boton) => {
+            boton.addEventListener("click", () => {
+                actualizarEstadoSolicitudConexion(
+                    boton.dataset.rechazarSolicitud,
+                    "rechazada",
+                    boton
+                );
+            });
+        });
+
+    document
+        .querySelectorAll("[data-cancelar-solicitud]")
+        .forEach((boton) => {
+            boton.addEventListener("click", () => {
+                cancelarSolicitudConexion(
+                    boton.dataset.cancelarSolicitud,
+                    boton
+                );
+            });
+        });
+}
+
+function mostrarErrorCargaConexiones() {
+    const mensaje = `
+        <div class="estado-vacio estado-vacio--pequeno">
+            <span class="estado-vacio__icono">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </span>
+            <h3>No se pudieron cargar las conexiones</h3>
+            <p>Recarga la página para volver a intentarlo.</p>
+        </div>
+    `;
+
+    [
+        listaSolicitudesRecibidas,
+        listaSolicitudesEnviadas,
+        listaConexionesAceptadas
+    ].forEach((lista) => {
+        if (lista) {
+            lista.classList.remove("oculta");
+            lista.innerHTML = mensaje;
+        }
+    });
+
+    [
+        estadoVacioSolicitudesRecibidas,
+        estadoVacioSolicitudesEnviadas,
+        estadoVacioConexionesAceptadas
+    ].forEach((estado) => estado?.classList.add("oculto"));
+}
+
+async function cargarConexionesPerfil() {
+    const cliente = window.clienteSupabase;
+
+    if (!cliente) {
+        console.error(
+            "No se ha encontrado el cliente de Supabase para cargar las conexiones."
+        );
+        return;
+    }
+
+    try {
+        const usuario = await obtenerUsuarioPerfilSocial();
+
+        if (!usuario) {
+            return;
+        }
+
+        const { data, error } = await cliente
+            .from("solicitudes_conexion")
+            .select(`
+                id,
+                solicitante_id,
+                receptor_id,
+                estado,
+                creado_en,
+                actualizado_en
+            `)
+            .or(
+                `solicitante_id.eq.${usuario.id},receptor_id.eq.${usuario.id}`
+            )
+            .order("creado_en", {
+                ascending: false
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        const solicitudes = Array.isArray(data) ? data : [];
+
+        const recibidas = solicitudes.filter(
+            (solicitud) =>
+                solicitud.receptor_id === usuario.id &&
+                solicitud.estado === "pendiente"
+        );
+
+        const enviadas = solicitudes.filter(
+            (solicitud) =>
+                solicitud.solicitante_id === usuario.id
+        );
+
+        const aceptadas = solicitudes.filter(
+            (solicitud) =>
+                solicitud.estado === "aceptada" &&
+                (
+                    solicitud.solicitante_id === usuario.id ||
+                    solicitud.receptor_id === usuario.id
+                )
+        );
+
+        const otrosUsuarios = solicitudes.map(
+            (solicitud) =>
+                solicitud.solicitante_id === usuario.id
+                    ? solicitud.receptor_id
+                    : solicitud.solicitante_id
+        );
+
+        const perfilesPorUsuario = await obtenerPerfilesConexion(
+            otrosUsuarios
+        );
+
+        const conPerfil = (solicitud) => {
+            const otroUsuarioId =
+                solicitud.solicitante_id === usuario.id
+                    ? solicitud.receptor_id
+                    : solicitud.solicitante_id;
+
+            return {
+                ...solicitud,
+                perfil: perfilesPorUsuario.get(otroUsuarioId) || null
+            };
+        };
+
+        const recibidasConPerfil = recibidas.map(conPerfil);
+        const enviadasConPerfil = enviadas.map(conPerfil);
+        const aceptadasConPerfil = aceptadas.map(conPerfil);
+
+        if (contadorSolicitudesRecibidas) {
+            contadorSolicitudesRecibidas.textContent =
+                String(recibidasConPerfil.length);
+        }
+
+        if (contadorSolicitudesEnviadas) {
+            contadorSolicitudesEnviadas.textContent =
+                String(enviadasConPerfil.length);
+        }
+
+        if (contadorConexionesAceptadas) {
+            contadorConexionesAceptadas.textContent =
+                String(aceptadasConPerfil.length);
+        }
+
+        actualizarBloqueConexiones(
+            listaSolicitudesRecibidas,
+            estadoVacioSolicitudesRecibidas,
+            recibidasConPerfil,
+            crearSolicitudRecibidaHTML
+        );
+
+        actualizarBloqueConexiones(
+            listaSolicitudesEnviadas,
+            estadoVacioSolicitudesEnviadas,
+            enviadasConPerfil,
+            crearSolicitudEnviadaHTML
+        );
+
+        actualizarBloqueConexiones(
+            listaConexionesAceptadas,
+            estadoVacioConexionesAceptadas,
+            aceptadasConPerfil,
+            crearConexionAceptadaHTML
+        );
+
+        activarEnlacesPerfilConexion();
+    activarAccionesSolicitudesConexion();
+    } catch (error) {
+        console.error(
+            "No se pudieron cargar las conexiones:",
+            error
+        );
+
+        mostrarErrorCargaConexiones();
+        mostrarNotificacion(
+            "No se han podido cargar tus conexiones."
+        );
+    }
 }
 
 
@@ -5082,6 +6527,7 @@ function iniciarPerfil() {
     mostrarReservasPerfil();
     mostrarFavoritosPerfil();
     cargarAfinidadesPerfil();
+    cargarConexionesPerfil();
     mostrarPublicaciones();
     cargarSeccionDesdeURL();
 }

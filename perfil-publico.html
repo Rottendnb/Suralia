@@ -11,10 +11,10 @@
 
     <meta
         name="description"
-        content="Gestiona tu perfil, reservas y planes favoritos en Suralia."
+        content="Consulta un perfil público de Suralia y descubre personas con intereses parecidos."
     >
 
-    <title>Mi perfil | Suralia</title>
+    <title>Perfil público | Suralia</title>
 
     <link
         rel="icon"
@@ -91,7 +91,11 @@
                     href="publicar-plan.html"
                     class="enlace-publicar"
                 >
-                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                    <i
+                        class="fa-solid fa-plus"
+                        aria-hidden="true"
+                    ></i>
+
                     Publicar un plan
                 </a>
 
@@ -102,7 +106,6 @@
                 <a
                     href="perfil.html"
                     class="usuario-header"
-                    aria-current="page"
                     aria-label="Abrir mi perfil"
                 >
 
@@ -110,11 +113,11 @@
                         class="usuario-header__avatar"
                         id="avatar-header"
                     >
-                        FG
+                        SU
                     </span>
 
                     <span id="nombre-header">
-                        Fernando
+                        Mi perfil
                     </span>
 
                 </a>
@@ -127,7 +130,10 @@
                     aria-expanded="false"
                     aria-controls="navegacion"
                 >
-                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                    <i
+                        class="fa-solid fa-bars"
+                        aria-hidden="true"
+                    ></i>
                 </button>
 
             </div>
@@ -136,1688 +142,511 @@
 
     </header>
 
-    <main>
-
-        <!-- =================================================
-             CABECERA DEL PERFIL
-        ================================================== -->
+    <main class="perfil-publico-pagina">
 
         <section
-            class="cabecera-perfil"
-            aria-labelledby="nombre-perfil"
+            class="perfil-publico-carga"
+            id="perfil-publico-carga"
+            aria-live="polite"
+        >
+            <span class="perfil-publico-carga__icono">
+                <i
+                    class="fa-solid fa-spinner fa-spin"
+                    aria-hidden="true"
+                ></i>
+            </span>
+
+            <p>
+                Cargando perfil...
+            </p>
+        </section>
+
+        <section
+            class="perfil-publico-error oculto"
+            id="perfil-publico-error"
+            role="alert"
+        >
+            <span>
+                <i
+                    class="fa-regular fa-circle-xmark"
+                    aria-hidden="true"
+                ></i>
+            </span>
+
+            <h1>
+                No se ha podido mostrar este perfil
+            </h1>
+
+            <p id="perfil-publico-error-texto">
+                El perfil no existe, está oculto o el enlace no es válido.
+            </p>
+
+            <a
+                href="planes.html"
+                class="boton-auth"
+            >
+                Explorar planes
+            </a>
+        </section>
+
+        <div
+            class="perfil-publico oculto"
+            id="perfil-publico"
         >
 
-            <div class="contenedor cabecera-perfil__contenido">
+            <section class="perfil-publico-hero">
 
-                <div class="perfil-identidad">
+                <div class="contenedor perfil-publico-hero__contenido">
 
-                    <div
-                        class="perfil-identidad__avatar"
-                        id="avatar-perfil"
+                    <button
+                        type="button"
+                        class="perfil-publico-volver"
+                        id="boton-volver-perfil-publico"
                     >
-                        FG
-                    </div>
+                        <i
+                            class="fa-solid fa-arrow-left"
+                            aria-hidden="true"
+                        ></i>
 
-                    <div>
+                        Volver
+                    </button>
 
-                        <span class="subtitulo">
-                            Mi cuenta
-                        </span>
+                    <div class="perfil-publico-identidad">
 
-                        <h1 id="nombre-perfil">
-                            Fernando Graciani
-                        </h1>
+                        <div
+                            class="perfil-publico-identidad__foto"
+                            id="perfil-publico-foto-principal"
+                        >
+                            <i
+                                class="fa-regular fa-user"
+                                aria-hidden="true"
+                            ></i>
+                        </div>
 
-                        <p id="email-perfil">
-                            fernando@correo.com
-                        </p>
+                        <div class="perfil-publico-identidad__datos">
+
+                            <span class="subtitulo">
+                                Perfil de Suralia
+                            </span>
+
+                            <div class="perfil-publico-identidad__nombre">
+
+                                <h1 id="perfil-publico-nombre">
+                                    Usuario
+                                </h1>
+
+                                <span
+                                    class="perfil-publico-verificado oculto"
+                                    id="perfil-publico-verificado"
+                                    title="Perfil verificado"
+                                >
+                                    <i
+                                        class="fa-solid fa-circle-check"
+                                        aria-hidden="true"
+                                    ></i>
+
+                                    Verificado
+                                </span>
+
+                            </div>
+
+                            <div class="perfil-publico-identidad__meta">
+
+                                <span
+                                    id="perfil-publico-edad"
+                                    class="oculto"
+                                >
+                                    <i
+                                        class="fa-regular fa-calendar"
+                                        aria-hidden="true"
+                                    ></i>
+
+                                    <span></span>
+                                </span>
+
+                                <span
+                                    id="perfil-publico-localidad"
+                                    class="oculto"
+                                >
+                                    <i
+                                        class="fa-solid fa-location-dot"
+                                        aria-hidden="true"
+                                    ></i>
+
+                                    <span></span>
+                                </span>
+
+                                <span
+                                    id="perfil-publico-ocupacion"
+                                    class="oculto"
+                                >
+                                    <i
+                                        class="fa-solid fa-briefcase"
+                                        aria-hidden="true"
+                                    ></i>
+
+                                    <span></span>
+                                </span>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
                 </div>
 
-                <button
-                    type="button"
-                    class="boton-cerrar-sesion"
-                    id="boton-cerrar-sesion"
-                >
-                    <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
-                    Cerrar sesión
-                </button>
+            </section>
 
-            </div>
+            <section class="perfil-publico-contenido">
 
-        </section>
+                <div class="contenedor perfil-publico-grid">
 
-        <!-- =================================================
-             CONTENIDO DEL PERFIL
-        ================================================== -->
+                    <div class="perfil-publico-columna-principal">
 
-        <section class="perfil">
+                        <article class="perfil-publico-tarjeta">
 
-            <div class="contenedor perfil__grid">
-
-                <!-- MENÚ LATERAL -->
-
-                <aside
-                    class="perfil-menu"
-                    aria-label="Secciones del perfil"
-                    role="tablist"
-                    aria-orientation="vertical"
-                >
-
-                    <button
-                        type="button"
-                        class="perfil-menu__enlace activo"
-                        data-seccion="resumen"
-                        role="tab"
-                        aria-controls="seccion-resumen"
-                        aria-selected="true"
-                        tabindex="0"
-                    >
-                        <i class="fa-solid fa-house" aria-hidden="true"></i>
-                        Resumen
-                    </button>
-
-                    <button
-                        type="button"
-                        class="perfil-menu__enlace"
-                        data-seccion="reservas"
-                        role="tab"
-                        aria-controls="seccion-reservas"
-                        aria-selected="false"
-                        tabindex="-1"
-                    >
-                        <i class="fa-solid fa-ticket" aria-hidden="true"></i>
-                        Mis reservas
-                    </button>
-
-                    <button
-                        type="button"
-                        class="perfil-menu__enlace"
-                        data-seccion="favoritos"
-                        role="tab"
-                        aria-controls="seccion-favoritos"
-                        aria-selected="false"
-                        tabindex="-1"
-                    >
-                        <i class="fa-regular fa-heart" aria-hidden="true"></i>
-                        Favoritos
-                    </button>
-
-                    <button
-                        type="button"
-                        class="perfil-menu__enlace"
-                        data-seccion="afinidades"
-                        role="tab"
-                        aria-controls="seccion-afinidades"
-                        aria-selected="false"
-                        tabindex="-1"
-                    >
-                        <i class="fa-solid fa-user-group" aria-hidden="true"></i>
-                        Afinidades
-                    </button>
-
-                    <button
-                        type="button"
-                        class="perfil-menu__enlace"
-                        data-seccion="publicados"
-                        role="tab"
-                        aria-controls="seccion-publicados"
-                        aria-selected="false"
-                        tabindex="-1"
-                    >
-                        <i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>
-                        Planes publicados
-                    </button>
-
-                    <button
-                        type="button"
-                        class="perfil-menu__enlace"
-                        data-seccion="datos"
-                        role="tab"
-                        aria-controls="seccion-datos"
-                        aria-selected="false"
-                        tabindex="-1"
-                    >
-                        <i class="fa-regular fa-user" aria-hidden="true"></i>
-                        Datos personales
-                    </button>
-
-                </aside>
-
-                <!-- CONTENIDO CENTRAL -->
-
-                <div class="perfil-contenido">
-
-                    <!-- =================================================
-                         RESUMEN
-                    ================================================== -->
-
-                    <section
-                        class="perfil-seccion activa"
-                        id="seccion-resumen"
-                        role="tabpanel"
-                        tabindex="0"
-                        aria-hidden="false"
-                    >
-
-                        <div class="perfil-seccion__cabecera">
-
-                            <div>
-
-                                <span class="subtitulo">
-                                    Panel personal
-                                </span>
-
-                                <h2>
-                                    Hola,
-                                    <span id="saludo-usuario">
-                                        Fernando
-                                    </span>
-                                </h2>
-
-                                <p>
-                                    Aquí puedes consultar tu actividad reciente
-                                    en Suralia.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                        <div class="perfil-estadisticas">
-
-                            <article>
-
-                                <span class="perfil-estadisticas__icono">
-                                    <i class="fa-solid fa-ticket" aria-hidden="true"></i>
-                                </span>
-
-                                <div>
-                                    <strong id="contador-reservas-perfil" aria-live="polite">
-                                        0
-                                    </strong>
-
-                                    <span>
-                                        Reservas activas
-                                    </span>
-                                </div>
-
-                            </article>
-
-                            <article>
-
-                                <span class="perfil-estadisticas__icono">
-                                    <i class="fa-solid fa-heart" aria-hidden="true"></i>
-                                </span>
-
-                                <div>
-                                    <strong id="contador-favoritos-perfil" aria-live="polite">
-                                        0
-                                    </strong>
-
-                                    <span>
-                                        Planes favoritos
-                                    </span>
-                                </div>
-
-                            </article>
-
-                            <article>
-
-                                <span class="perfil-estadisticas__icono">
-                                    <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
-                                </span>
-
-                                <div>
-                                    <strong id="contador-planes-realizados" aria-live="polite">
-                                        0
-                                    </strong>
-
-                                    <span>
-                                        Planes realizados
-                                    </span>
-                                </div>
-
-                            </article>
-
-                            <article>
-
-                                <span class="perfil-estadisticas__icono">
-                                    <i class="fa-solid fa-user-group" aria-hidden="true"></i>
-                                </span>
-
-                                <div>
-                                    <strong id="contador-afinidades-perfil" aria-live="polite">
-                                        0
-                                    </strong>
-
-                                    <span>
-                                        Afinidades activas
-                                    </span>
-                                </div>
-
-                            </article>
-
-                        </div>
-
-                        <div class="perfil-bloque">
-
-                            <div class="perfil-bloque__cabecera">
-
-                                <div>
-                                    <h3>
-                                        Próxima reserva
-                                    </h3>
-
-                                    <p>
-                                        Tu siguiente experiencia en Suralia.
-                                    </p>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    class="enlace-ver-seccion"
-                                    data-ir-seccion="reservas"
-                                >
-                                    Ver reservas
-                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                </button>
-
-                            </div>
-
-                            <div id="proxima-reserva-perfil" aria-live="polite" aria-atomic="false"></div>
-
-                        </div>
-
-                    </section>
-
-                    <!-- =================================================
-                         RESERVAS
-                    ================================================== -->
-
-                    <section
-                        class="perfil-seccion"
-                        id="seccion-reservas"
-                        role="tabpanel"
-                        tabindex="0"
-                        aria-hidden="true"
-                    >
-
-                        <div class="perfil-seccion__cabecera">
-
-                            <div>
-
-                                <span class="subtitulo">
-                                    Mis actividades
-                                </span>
-
-                                <h2>
-                                    Mis reservas
-                                </h2>
-
-                                <p>
-                                    Consulta y gestiona tus próximas actividades.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                        <div
-                            class="lista-reservas"
-                            id="lista-reservas-perfil" aria-live="polite" aria-atomic="false"
-                        ></div>
-
-                        <div
-                            class="estado-vacio"
-                            id="estado-vacio-reservas" role="status" aria-live="polite" aria-atomic="true"
-                        >
-
-                            <span class="estado-vacio__icono">
-                                <i class="fa-regular fa-calendar-xmark" aria-hidden="true"></i>
+                            <span class="subtitulo">
+                                Presentación
                             </span>
 
-                            <h3>
-                                No tienes reservas activas
-                            </h3>
+                            <h2>
+                                Sobre mí
+                            </h2>
 
-                            <p>
-                                Explora las actividades disponibles y reserva
-                                tu próximo plan.
+                            <p
+                                class="perfil-publico-descripcion"
+                                id="perfil-publico-descripcion"
+                            >
+                                Este usuario todavía no ha añadido una descripción.
                             </p>
 
-                            <a
-                                href="planes.html"
-                                class="boton-auth"
-                            >
-                                Explorar planes
-                            </a>
+                        </article>
 
-                        </div>
-
-                    </section>
-
-                    <!-- =================================================
-                         FAVORITOS
-                    ================================================== -->
-
-                    <section
-                        class="perfil-seccion"
-                        id="seccion-favoritos"
-                        role="tabpanel"
-                        tabindex="0"
-                        aria-hidden="true"
-                    >
-
-                        <div class="perfil-seccion__cabecera">
-
-                            <div>
-
-                                <span class="subtitulo">
-                                    Guardados
-                                </span>
-
-                                <h2>
-                                    Planes favoritos
-                                </h2>
-
-                                <p>
-                                    Actividades que has guardado para más adelante.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                        <div
-                            class="planes__grid perfil-favoritos"
-                            id="lista-favoritos-perfil" aria-live="polite" aria-atomic="false"
-                        ></div>
-
-                        <div
-                            class="estado-vacio"
-                            id="estado-vacio-favoritos" role="status" aria-live="polite" aria-atomic="true"
+                        <article
+                            class="perfil-publico-tarjeta"
+                            id="bloque-galeria-publica"
                         >
 
-                            <span class="estado-vacio__icono">
-                                <i class="fa-regular fa-heart" aria-hidden="true"></i>
-                            </span>
-
-                            <h3>
-                                No tienes planes favoritos
-                            </h3>
-
-                            <p>
-                                Guarda las actividades que más te interesen para
-                                encontrarlas fácilmente.
-                            </p>
-
-                            <a
-                                href="planes.html"
-                                class="boton-auth"
-                            >
-                                Explorar planes
-                            </a>
-
-                        </div>
-
-                    </section>
-
-                    <!-- =================================================
-                         AFINIDADES
-                    ================================================== -->
-
-                    <section
-                        class="perfil-seccion"
-                        id="seccion-afinidades"
-                        role="tabpanel"
-                        tabindex="0"
-                        aria-hidden="true"
-                    >
-
-                        <div class="perfil-seccion__cabecera">
-
-                            <div>
-
-                                <span class="subtitulo">
-                                    Conecta con otras personas
-                                </span>
-
-                                <h2>
-                                    Mis afinidades
-                                </h2>
-
-                                <p>
-                                    Planes en los que has indicado que te gustaría
-                                    conocer a otras personas con intereses parecidos.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                        <div
-                            class="lista-afinidades"
-                            id="lista-afinidades-perfil"
-                            aria-live="polite"
-                            aria-atomic="false"
-                        ></div>
-
-                        <div
-                            class="estado-vacio"
-                            id="estado-vacio-afinidades"
-                            role="status"
-                            aria-live="polite"
-                            aria-atomic="true"
-                        >
-
-                            <span class="estado-vacio__icono">
-                                <i class="fa-solid fa-user-group" aria-hidden="true"></i>
-                            </span>
-
-                            <h3>
-                                No tienes afinidades activas
-                            </h3>
-
-                            <p>
-                                Activa la opción “Quiero conocer gente” dentro
-                                de un plan para que aparezca aquí.
-                            </p>
-
-                            <a
-                                href="planes.html"
-                                class="boton-auth"
-                            >
-                                Explorar planes
-                            </a>
-
-                        </div>
-
-                    </section>
-
-                    <!-- =================================================
-                         PLANES PUBLICADOS
-                    ================================================== -->
-
-                    <section
-                        class="perfil-seccion"
-                        id="seccion-publicados"
-                        role="tabpanel"
-                        tabindex="0"
-                        aria-hidden="true"
-                    >
-
-                        <div class="perfil-seccion__cabecera">
-
-                            <div>
-
-                                <span class="subtitulo">
-                                    Organizador
-                                </span>
-
-                                <h2>
-                                    Planes publicados
-                                </h2>
-
-                                <p>
-                                    Gestiona tus actividades, publicaciones
-                                    pendientes y borradores.
-                                </p>
-
-                            </div>
-
-                            <a
-                                href="publicar-plan.html"
-                                class="boton-principal-pequeno"
-                            >
-                                <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                                Publicar un plan
-                            </a>
-
-                        </div>
-
-                        <div class="filtros-publicaciones">
-
-                            <button
-                                type="button"
-                                class="filtro-publicacion activo"
-                                data-filtro-publicacion="todos" aria-pressed="true"
-                            >
-                                Todos
-                                <span id="contador-publicaciones" aria-live="polite">
-                                    0
-                                </span>
-                            </button>
-
-                            <button
-                                type="button"
-                                class="filtro-publicacion"
-                                data-filtro-publicacion="pendiente" aria-pressed="false"
-                            >
-                                Pendientes
-                                <span id="contador-pendientes" aria-live="polite">
-                                    0
-                                </span>
-                            </button>
-
-                            <button
-                                type="button"
-                                class="filtro-publicacion"
-                                data-filtro-publicacion="borrador" aria-pressed="false"
-                            >
-                                Borradores
-                                <span id="contador-borradores" aria-live="polite">
-                                    0
-                                </span>
-                            </button>
-
-                        </div>
-
-                        <div
-                            class="lista-publicaciones"
-                            id="lista-publicaciones" aria-live="polite" aria-atomic="false"
-                        ></div>
-
-                        <div
-                            class="estado-vacio"
-                            id="estado-vacio-publicaciones" role="status" aria-live="polite" aria-atomic="true"
-                        >
-
-                            <span class="estado-vacio__icono">
-                                <i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>
-                            </span>
-
-                            <h3>
-                                Todavía no has publicado ningún plan
-                            </h3>
-
-                            <p>
-                                Comparte una actividad y conecta con personas
-                                interesadas en nuevas experiencias.
-                            </p>
-
-                            <a
-                                href="publicar-plan.html"
-                                class="boton-auth"
-                            >
-                                Publicar mi primer plan
-                            </a>
-
-                        </div>
-
-                    </section>
-
-                    <!-- =================================================
-                         DATOS PERSONALES
-                    ================================================== -->
-
-                    <section
-                        class="perfil-seccion"
-                        id="seccion-datos"
-                        role="tabpanel"
-                        tabindex="0"
-                        aria-hidden="true"
-                    >
-
-                        <div class="perfil-seccion__cabecera">
-
-                            <div>
-
-                                <span class="subtitulo">
-                                    Configuración
-                                </span>
-
-                                <h2>
-                                    Datos personales
-                                </h2>
-
-                                <p>
-                                    Actualiza la información asociada a tu cuenta.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                        <!-- GALERÍA DE FOTOS -->
-
-                        <section
-                            class="galeria-perfil"
-                            aria-labelledby="titulo-galeria-perfil"
-                        >
-
-                            <div class="galeria-perfil__cabecera">
+                            <div class="perfil-publico-tarjeta__cabecera">
 
                                 <div>
 
                                     <span class="subtitulo">
-                                        Tus fotografías
+                                        Fotografías
                                     </span>
 
-                                    <h3 id="titulo-galeria-perfil">
-                                        Galería del perfil
-                                    </h3>
-
-                                    <p>
-                                        Añade hasta seis fotografías. La principal
-                                        será la que aparezca en tu perfil y en las
-                                        coincidencias con otras personas.
-                                    </p>
-
-                                </div>
-
-                                <label
-                                    for="input-fotos-perfil"
-                                    class="boton-subir-avatar"
-                                    id="boton-anadir-fotos"
-                                >
-                                    <i
-                                        class="fa-solid fa-camera"
-                                        aria-hidden="true"
-                                    ></i>
-
-                                    Añadir fotos
-                                </label>
-
-                                <input
-                                    type="file"
-                                    id="input-fotos-perfil"
-                                    name="fotos-perfil"
-                                    accept="image/jpeg,image/png,image/webp"
-                                    multiple
-                                    hidden
-                                >
-
-                            </div>
-
-                            <div
-                                class="galeria-perfil__contador"
-                                aria-live="polite"
-                            >
-                                <strong id="contador-fotos-perfil">
-                                    0
-                                </strong>
-                                de 6 fotografías
-                            </div>
-
-                            <div
-                                class="galeria-perfil__grid"
-                                id="galeria-fotos-perfil"
-                                aria-live="polite"
-                                aria-atomic="false"
-                            ></div>
-
-                            <div
-                                class="estado-vacio galeria-perfil__vacia"
-                                id="estado-vacio-galeria"
-                            >
-
-                                <span class="estado-vacio__icono">
-                                    <i
-                                        class="fa-regular fa-images"
-                                        aria-hidden="true"
-                                    ></i>
-                                </span>
-
-                                <h4>
-                                    Todavía no has añadido fotografías
-                                </h4>
-
-                                <p>
-                                    Sube una foto clara para que otras personas
-                                    puedan reconocerte.
-                                </p>
-
-                            </div>
-
-                            <small
-                                class="mensaje-error"
-                                id="error-fotos-perfil"
-                                aria-live="polite"
-                            ></small>
-
-                            <p class="selector-foto-perfil__aviso">
-                                Formatos admitidos: JPG, PNG o WEBP.
-                                Máximo 5 MB por fotografía.
-                            </p>
-
-                        </section>
-
-                        <!-- VERIFICACIÓN DEL PERFIL -->
-
-                        <section
-                            class="verificacion-perfil"
-                            aria-labelledby="titulo-verificacion-perfil"
-                        >
-
-                            <div class="verificacion-perfil__cabecera">
-
-                                <span class="verificacion-perfil__icono">
-                                    <i
-                                        class="fa-solid fa-shield-halved"
-                                        aria-hidden="true"
-                                    ></i>
-                                </span>
-
-                                <div>
-
-                                    <span class="subtitulo">
-                                        Seguridad y confianza
-                                    </span>
-
-                                    <h3 id="titulo-verificacion-perfil">
-                                        Verificación del perfil
-                                    </h3>
-
-                                    <p>
-                                        Confirma que eres la persona que aparece
-                                        en las fotografías de tu perfil.
-                                    </p>
+                                    <h2>
+                                        Galería
+                                    </h2>
 
                                 </div>
 
                                 <span
-                                    class="verificacion-perfil__estado verificacion-perfil__estado--sin-verificar"
-                                    id="estado-verificacion-perfil"
-                                    aria-live="polite"
+                                    class="perfil-publico-galeria__contador"
+                                    id="perfil-publico-total-fotos"
                                 >
-                                    Sin verificar
+                                    0 fotos
                                 </span>
 
                             </div>
 
                             <div
-                                class="verificacion-perfil__contenido"
-                                id="contenido-verificacion-perfil"
-                            >
-
-                                <div class="verificacion-perfil__instrucciones">
-
-                                    <h4>
-                                        Cómo verificar tu perfil
-                                    </h4>
-
-                                    <ol>
-                                        <li>
-                                            Escribe el código mostrado en un papel.
-                                        </li>
-
-                                        <li>
-                                            Hazte una selfie sujetando el papel.
-                                        </li>
-
-                                        <li>
-                                            Sube la fotografía para que pueda revisarse.
-                                        </li>
-                                    </ol>
-
-                                    <div class="verificacion-perfil__codigo">
-
-                                        <span>
-                                            Tu código
-                                        </span>
-
-                                        <strong id="codigo-verificacion-perfil">
-                                            Cargando...
-                                        </strong>
-
-                                    </div>
-
-                                    <p class="verificacion-perfil__privacidad">
-                                        <i
-                                            class="fa-solid fa-lock"
-                                            aria-hidden="true"
-                                        ></i>
-
-                                        La selfie es privada y no aparecerá
-                                        en tu perfil público.
-                                    </p>
-
-                                </div>
-
-                                <div class="verificacion-perfil__selfie">
-
-                                    <div
-                                        class="verificacion-perfil__preview"
-                                        id="preview-selfie-verificacion"
-                                    >
-                                        <i
-                                            class="fa-regular fa-face-smile"
-                                            aria-hidden="true"
-                                        ></i>
-
-                                        <span>
-                                            Vista previa de la selfie
-                                        </span>
-                                    </div>
-
-                                    <label
-                                        for="input-selfie-verificacion"
-                                        class="boton-subir-avatar"
-                                    >
-                                        <i
-                                            class="fa-solid fa-camera"
-                                            aria-hidden="true"
-                                        ></i>
-
-                                        Seleccionar selfie
-                                    </label>
-
-                                    <input
-                                        type="file"
-                                        id="input-selfie-verificacion"
-                                        name="selfie-verificacion"
-                                        accept="image/jpeg,image/png,image/webp"
-                                        capture="user"
-                                        hidden
-                                    >
-
-                                    <button
-                                        type="button"
-                                        class="boton-auth verificacion-perfil__enviar"
-                                        id="boton-enviar-verificacion"
-                                        disabled
-                                    >
-                                        Enviar para revisión
-                                        <i
-                                            class="fa-solid fa-paper-plane"
-                                            aria-hidden="true"
-                                        ></i>
-                                    </button>
-
-                                </div>
-
-                            </div>
-
-                            <div
-                                class="verificacion-perfil__resultado oculto"
-                                id="resultado-verificacion-perfil"
-                                aria-live="polite"
+                                class="perfil-publico-galeria"
+                                id="perfil-publico-galeria"
                             ></div>
 
+                        </article>
+
+                    </div>
+
+                    <aside class="perfil-publico-columna-lateral">
+
+                        <article
+                            class="perfil-publico-tarjeta"
+                            id="bloque-busca-publico"
+                        >
+
+                            <span class="subtitulo">
+                                En Suralia
+                            </span>
+
+                            <h2>
+                                Qué busca
+                            </h2>
+
+                            <div
+                                class="perfil-publico-etiquetas"
+                                id="perfil-publico-busca"
+                            ></div>
+
+                        </article>
+
+                        <article
+                            class="perfil-publico-tarjeta"
+                            id="bloque-intereses-publico"
+                        >
+
+                            <span class="subtitulo">
+                                Gustos y aficiones
+                            </span>
+
+                            <h2>
+                                Intereses
+                            </h2>
+
+                            <div
+                                class="perfil-publico-etiquetas"
+                                id="perfil-publico-intereses"
+                            ></div>
+
+                        </article>
+
+                        <article
+                            class="perfil-publico-tarjeta"
+                            id="bloque-disponibilidad-publica"
+                        >
+
+                            <span class="subtitulo">
+                                Cuándo suele apuntarse
+                            </span>
+
+                            <h2>
+                                Disponibilidad
+                            </h2>
+
+                            <div
+                                class="perfil-publico-etiquetas"
+                                id="perfil-publico-disponibilidad"
+                            ></div>
+
+                        </article>
+
+                        <article
+                            class="perfil-publico-tarjeta perfil-publico-conexion"
+                            id="bloque-conexion-perfil"
+                        >
+
+                            <span class="perfil-publico-conexion__icono">
+                                <i
+                                    class="fa-solid fa-user-group"
+                                    aria-hidden="true"
+                                ></i>
+                            </span>
+
+                            <h2 id="titulo-conexion-perfil">
+                                ¿Tenéis intereses parecidos?
+                            </h2>
+
+                            <p id="texto-conexion-perfil">
+                                Envía una solicitud para conectar y organizar
+                                planes con esta persona.
+                            </p>
+
+                            <button
+                                type="button"
+                                class="boton-auth"
+                                id="boton-solicitar-conexion"
+                            >
+                                <i
+                                    class="fa-solid fa-user-plus"
+                                    aria-hidden="true"
+                                ></i>
+
+                                Solicitar conexión
+                            </button>
+
                             <small
-                                class="mensaje-error"
-                                id="error-verificacion-perfil"
+                                class="perfil-publico-conexion__mensaje"
+                                id="mensaje-conexion-perfil"
+                                role="status"
                                 aria-live="polite"
                             ></small>
 
-                        </section>
+                        </article>
 
-                        <!-- FORMULARIO DE DATOS -->
+                    </aside>
 
-                        <form
-                            class="formulario-perfil"
-                            id="formulario-perfil"
-                            aria-label="Editar datos personales"
-                            novalidate
-                        >
+                </div>
 
-                            <div class="formulario-doble">
+            </section>
 
-                                <div class="campo-formulario">
+        </div>
 
-                                    <label for="perfil-nombre">
-                                        Nombre
-                                    </label>
+    </main>
 
-                                    <div class="campo-formulario__control">
+    <footer class="footer">
 
-                                        <i class="fa-regular fa-user" aria-hidden="true"></i>
+        <div class="contenedor footer__grid">
 
-                                        <input
-                                            type="text"
-                                            id="perfil-nombre"
-                                            name="nombre"
-                                            aria-describedby="error-perfil-nombre"
-                                            autocomplete="given-name"
-                                        >
+            <div class="footer__marca">
 
-                                    </div>
+                <a
+                    href="index.html"
+                    class="logo logo--footer"
+                    aria-label="Página de inicio de Suralia"
+                >
+                    <img
+                        src="img/suralia-logo.png"
+                        alt="Suralia"
+                        class="logo__imagen logo__imagen--footer"
+                        width="1138"
+                        height="392"
+                    >
+                </a>
 
-                                    <small
-                                        class="mensaje-error"
-                                        id="error-perfil-nombre" aria-live="polite"
-                                    ></small>
+                <p>
+                    Descubre planes, lugares y experiencias diferentes
+                    para disfrutar Sevilla y sus alrededores.
+                </p>
 
-                                </div>
+                <span class="footer__eslogan">
+                    Descubre el sur a tu manera.
+                </span>
 
-                                <div class="campo-formulario">
+            </div>
 
-                                    <label for="perfil-apellidos">
-                                        Apellidos
-                                    </label>
+            <div class="footer__columna">
 
-                                    <div class="campo-formulario__control">
+                <h3>
+                    Descubre
+                </h3>
 
-                                        <i class="fa-regular fa-user" aria-hidden="true"></i>
+                <a href="planes.html">
+                    Todos los planes
+                </a>
 
-                                        <input
-                                            type="text"
-                                            id="perfil-apellidos"
-                                            name="apellidos"
-                                            aria-describedby="error-perfil-apellidos"
-                                            autocomplete="family-name"
-                                        >
+                <a href="planes.html">
+                    Este fin de semana
+                </a>
 
-                                    </div>
+                <a href="planes.html">
+                    Planes gratuitos
+                </a>
 
-                                    <small
-                                        class="mensaje-error"
-                                        id="error-perfil-apellidos" aria-live="polite"
-                                    ></small>
+                <a href="planes.html">
+                    Nuevas actividades
+                </a>
 
-                                </div>
+            </div>
 
-                            </div>
+            <div class="footer__columna">
 
-                            <div class="campo-formulario">
+                <h3>
+                    Información
+                </h3>
 
-                                <label for="perfil-email">
-                                    Correo electrónico
-                                </label>
+                <a href="sobre-suralia.html">
+                    Sobre Suralia
+                </a>
 
-                                <div class="campo-formulario__control">
+                <a href="como-funciona.html">
+                    Cómo funciona
+                </a>
 
-                                    <i class="fa-regular fa-envelope" aria-hidden="true"></i>
+                <a href="preguntas-frecuentes.html">
+                    Preguntas frecuentes
+                </a>
 
-                                    <input
-                                        type="email"
-                                        id="perfil-email"
-                                        autocomplete="email"
-                                    >
+                <a href="contacto.html">
+                    Contacto
+                </a>
 
-                                </div>
+            </div>
 
-                                <small
-                                    class="mensaje-error"
-                                    id="error-perfil-email" aria-live="polite"
-                                ></small>
+            <div class="footer__columna">
 
-                            </div>
+                <h3>
+                    Síguenos
+                </h3>
 
-                            <div class="campo-formulario">
+                <div class="redes">
 
-                                <label for="perfil-telefono">
-                                    Teléfono
-                                </label>
-
-                                <div class="campo-formulario__control">
-
-                                    <i class="fa-solid fa-phone" aria-hidden="true"></i>
-
-                                    <input
-                                        type="tel"
-                                        id="perfil-telefono"
-                                        placeholder="600 000 000"
-                                        autocomplete="tel"
-                                        inputmode="numeric"
-                                        maxlength="11"
-                                    >
-
-                                </div>
-
-                                <small
-                                    class="mensaje-error"
-                                    id="error-perfil-telefono" aria-live="polite"
-                                ></small>
-
-                            </div>
-
-                            <div class="perfil-social-separador">
-
-                                <div>
-
-                                    <span class="subtitulo">
-                                        Perfil social
-                                    </span>
-
-                                    <h3>
-                                        Información para conectar con otras personas
-                                    </h3>
-
-                                    <p>
-                                        Estos datos ayudarán a encontrar personas
-                                        con intereses y planes parecidos.
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                            <div class="formulario-doble">
-
-                                <div class="campo-formulario">
-
-                                    <label for="perfil-fecha-nacimiento">
-                                        Fecha de nacimiento
-                                    </label>
-
-                                    <div class="campo-formulario__control">
-
-                                        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
-
-                                        <input
-                                            type="date"
-                                            id="perfil-fecha-nacimiento"
-                                            name="fecha-nacimiento"
-                                            autocomplete="bday"
-                                        >
-
-                                    </div>
-
-                                    <small class="campo-ayuda">
-                                        Solo se mostrará tu edad si lo autorizas.
-                                    </small>
-
-                                </div>
-
-                                <div class="campo-formulario">
-
-                                    <label for="perfil-localidad">
-                                        Localidad
-                                    </label>
-
-                                    <div class="campo-formulario__control">
-
-                                        <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-
-                                        <input
-                                            type="text"
-                                            id="perfil-localidad"
-                                            name="localidad"
-                                            placeholder="Por ejemplo: Sevilla"
-                                            maxlength="80"
-                                            autocomplete="address-level2"
-                                        >
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <div class="campo-formulario">
-
-                                <label for="perfil-ocupacion">
-                                    Ocupación
-                                </label>
-
-                                <div class="campo-formulario__control">
-
-                                    <i class="fa-solid fa-briefcase" aria-hidden="true"></i>
-
-                                    <input
-                                        type="text"
-                                        id="perfil-ocupacion"
-                                        name="ocupacion"
-                                        placeholder="Por ejemplo: Desarrollador web"
-                                        maxlength="100"
-                                    >
-
-                                </div>
-
-                            </div>
-
-                            <div class="campo-formulario">
-
-                                <div class="campo-formulario__cabecera">
-
-                                    <label for="perfil-descripcion">
-                                        Sobre mí
-                                    </label>
-
-                                    <span id="contador-descripcion-perfil">
-                                        0/500
-                                    </span>
-
-                                </div>
-
-                                <textarea
-                                    id="perfil-descripcion"
-                                    name="descripcion"
-                                    rows="6"
-                                    maxlength="500"
-                                    placeholder="Cuéntanos qué te gusta hacer, qué tipo de planes buscas y cómo eres."
-                                ></textarea>
-
-                                <small
-                                    class="mensaje-error"
-                                    id="error-perfil-descripcion"
-                                    aria-live="polite"
-                                ></small>
-
-                            </div>
-
-                            <fieldset class="grupo-seleccion-social">
-
-                                <legend>
-                                    ¿Qué buscas en Suralia?
-                                </legend>
-
-                                <p>
-                                    Puedes seleccionar varias opciones.
-                                </p>
-
-                                <div class="opciones-sociales">
-
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            name="busca"
-                                            value="amistades"
-                                        >
-                                        <span>
-                                            <i class="fa-solid fa-user-group"></i>
-                                            Hacer nuevas amistades
-                                        </span>
-                                    </label>
-
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            name="busca"
-                                            value="companeros-actividades"
-                                        >
-                                        <span>
-                                            <i class="fa-solid fa-person-hiking"></i>
-                                            Compañeros para actividades
-                                        </span>
-                                    </label>
-
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            name="busca"
-                                            value="salir-en-grupo"
-                                        >
-                                        <span>
-                                            <i class="fa-solid fa-people-group"></i>
-                                            Salir en grupo
-                                        </span>
-                                    </label>
-
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            name="busca"
-                                            value="compartir-transporte"
-                                        >
-                                        <span>
-                                            <i class="fa-solid fa-car-side"></i>
-                                            Compartir transporte
-                                        </span>
-                                    </label>
-
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            name="busca"
-                                            value="conocer-alguien-especial"
-                                        >
-                                        <span>
-                                            <i class="fa-regular fa-heart"></i>
-                                            Conocer a alguien especial
-                                        </span>
-                                    </label>
-
-                                </div>
-
-                            </fieldset>
-
-                            <fieldset class="grupo-seleccion-social">
-
-                                <legend>
-                                    Mis intereses
-                                </legend>
-
-                                <p>
-                                    Se utilizarán para calcular afinidades.
-                                </p>
-
-                                <div class="opciones-sociales opciones-sociales--intereses">
-
-                                    <label><input type="checkbox" name="intereses" value="senderismo"><span>🥾 Senderismo</span></label>
-                                    <label><input type="checkbox" name="intereses" value="musica"><span>🎵 Música</span></label>
-                                    <label><input type="checkbox" name="intereses" value="gastronomia"><span>🍽️ Gastronomía</span></label>
-                                    <label><input type="checkbox" name="intereses" value="deporte"><span>⚽ Deporte</span></label>
-                                    <label><input type="checkbox" name="intereses" value="viajes"><span>✈️ Viajes</span></label>
-                                    <label><input type="checkbox" name="intereses" value="cultura"><span>🏛️ Cultura</span></label>
-                                    <label><input type="checkbox" name="intereses" value="cine"><span>🎬 Cine</span></label>
-                                    <label><input type="checkbox" name="intereses" value="fotografia"><span>📷 Fotografía</span></label>
-                                    <label><input type="checkbox" name="intereses" value="naturaleza"><span>🌿 Naturaleza</span></label>
-                                    <label><input type="checkbox" name="intereses" value="fiestas"><span>🎉 Fiestas</span></label>
-
-                                </div>
-
-                            </fieldset>
-
-                            <fieldset class="grupo-seleccion-social">
-
-                                <legend>
-                                    Disponibilidad habitual
-                                </legend>
-
-                                <div class="opciones-sociales">
-
-                                    <label><input type="checkbox" name="disponibilidad" value="entre-semana"><span>Entre semana</span></label>
-                                    <label><input type="checkbox" name="disponibilidad" value="fines-de-semana"><span>Fines de semana</span></label>
-                                    <label><input type="checkbox" name="disponibilidad" value="manana"><span>Mañana</span></label>
-                                    <label><input type="checkbox" name="disponibilidad" value="tarde"><span>Tarde</span></label>
-                                    <label><input type="checkbox" name="disponibilidad" value="noche"><span>Noche</span></label>
-
-                                </div>
-
-                            </fieldset>
-
-                            <div class="preferencias-privacidad-social">
-
-                                <label class="interruptor-social">
-
-                                    <input
-                                        type="checkbox"
-                                        id="perfil-visible"
-                                        checked
-                                    >
-
-                                    <span class="interruptor-social__control"></span>
-
-                                    <span>
-                                        <strong>
-                                            Perfil social visible
-                                        </strong>
-
-                                        <small>
-                                            Permite que otras personas te encuentren
-                                            mediante afinidades.
-                                        </small>
-                                    </span>
-
-                                </label>
-
-                                <label class="interruptor-social">
-
-                                    <input
-                                        type="checkbox"
-                                        id="mostrar-edad"
-                                        checked
-                                    >
-
-                                    <span class="interruptor-social__control"></span>
-
-                                    <span>
-                                        <strong>
-                                            Mostrar mi edad
-                                        </strong>
-
-                                        <small>
-                                            Se mostrará únicamente la edad, nunca
-                                            la fecha de nacimiento completa.
-                                        </small>
-                                    </span>
-
-                                </label>
-
-                            </div>
-
-                            <button
-                                type="submit"
-                                class="boton-auth boton-guardar-perfil"
-                            >
-                                Guardar cambios
-                                <i class="fa-solid fa-check" aria-hidden="true"></i>
-                            </button>
-
-                        </form>
-
-                    </section>
+                    <a
+                        href="#"
+                        aria-label="Instagram de Suralia"
+                    >
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+
+                    <a
+                        href="#"
+                        aria-label="TikTok de Suralia"
+                    >
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+
+                    <a
+                        href="#"
+                        aria-label="Facebook de Suralia"
+                    >
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
 
                 </div>
 
             </div>
 
-        </section>
+        </div>
 
-    </main>
-
-    <!-- =================================================
-         FOOTER
-    ================================================== -->
-
-    <footer class="footer">
-
-    <div class="contenedor footer__grid">
-
-        <div class="footer__marca">
-
-            <a
-                href="index.html"
-                class="logo logo--footer"
-                aria-label="Página de inicio de Suralia"
-            >
-                <img
-                    src="img/suralia-logo.png"
-                    alt="Suralia"
-                    class="logo__imagen logo__imagen--footer"
-                    width="1138"
-                    height="392"
-                >
-            </a>
+        <div class="contenedor footer__inferior">
 
             <p>
-                Descubre planes, lugares y experiencias diferentes
-                para disfrutar Sevilla y sus alrededores.
+                © 2026 Suralia. Proyecto desarrollado por Fernando.
             </p>
 
-            <span class="footer__eslogan">
-                Descubre el sur a tu manera.
-            </span>
-
-        </div>
-
-        <div class="footer__columna">
-
-            <h3>
-                Descubre
-            </h3>
-
-            <a href="planes.html">
-                Todos los planes
-            </a>
-
-            <a href="planes.html">
-                Este fin de semana
-            </a>
-
-            <a href="planes.html">
-                Planes gratuitos
-            </a>
-
-            <a href="planes.html">
-                Nuevas actividades
-            </a>
-
-        </div>
-
-        <div class="footer__columna">
-
-            <h3>
-                Información
-            </h3>
-
-            <a href="sobre-suralia.html">
-                Sobre Suralia
-            </a>
-
-            <a href="como-funciona.html">
-                Cómo funciona
-            </a>
-
-            <a href="preguntas-frecuentes.html">
-                Preguntas frecuentes
-            </a>
-
-            <a href="contacto.html">
-                Contacto
-            </a>
-
-        </div>
-
-        <div class="footer__columna">
-
-            <h3>
-                Síguenos
-            </h3>
-
-            <div class="redes">
-
-                <a
-                    href="#"
-                    aria-label="Instagram de Suralia"
-                >
-                    <i class="fa-brands fa-instagram"></i>
+            <div>
+                <a href="privacidad.html">
+                    Privacidad
                 </a>
 
-                <a
-                    href="#"
-                    aria-label="TikTok de Suralia"
-                >
-                    <i class="fa-brands fa-tiktok"></i>
+                <a href="cookies.html">
+                    Cookies
                 </a>
 
-                <a
-                    href="#"
-                    aria-label="Facebook de Suralia"
-                >
-                    <i class="fa-brands fa-facebook-f"></i>
+                <a href="aviso-legal.html">
+                    Aviso legal
                 </a>
-
             </div>
 
         </div>
-
-    </div>
-
-    <div class="contenedor footer__inferior">
-
-        <p>
-            © 2026 Suralia. Proyecto desarrollado por Fernando.
-        </p>
-
-        <div>
-            <a href="privacidad.html">
-                Privacidad
-            </a>
-
-            <a href="cookies.html">
-                Cookies
-            </a>
-
-            <a href="aviso-legal.html">
-                Aviso legal
-            </a>
-        </div>
-
-    </div>
 
     </footer>
 
-    <!-- =================================================
-         NOTIFICACIÓN
-    ================================================== -->
-
     <div
-        class="notificacion"
-        id="notificacion-perfil"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-    >
-        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-        <span></span>
-    </div>
-
-    <!-- =================================================
-         MODAL DE CANCELACIÓN DE RESERVA
-    ================================================== -->
-
-    <div
-        class="modal-confirmacion"
-        id="modal-cancelacion"
+        class="modal-foto-publica"
+        id="modal-foto-publica"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="titulo-modal-cancelacion"
-        aria-describedby="descripcion-modal-cancelacion"
+        aria-label="Fotografía ampliada"
         aria-hidden="true"
     >
 
-        <div class="modal-confirmacion__contenido">
+        <button
+            type="button"
+            class="modal-foto-publica__cerrar"
+            id="cerrar-modal-foto-publica"
+            aria-label="Cerrar fotografía"
+        >
+            <i
+                class="fa-solid fa-xmark"
+                aria-hidden="true"
+            ></i>
+        </button>
 
-            <span class="modal-confirmacion__icono">
-                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-            </span>
-
-            <h2 id="titulo-modal-cancelacion">
-                ¿Cancelar la reserva?
-            </h2>
-
-            <p id="descripcion-modal-cancelacion">
-                Esta acción eliminará la reserva de tu perfil.
-            </p>
-
-            <div class="modal-confirmacion__acciones">
-
-                <button
-                    type="button"
-                    class="boton-secundario"
-                    id="mantener-reserva"
-                >
-                    Mantener reserva
-                </button>
-
-                <button
-                    type="button"
-                    class="boton-confirmar-cancelacion"
-                    id="confirmar-cancelacion"
-                >
-                    Cancelar reserva
-                </button>
-
-            </div>
-
-        </div>
+        <img
+            src=""
+            alt="Fotografía ampliada del perfil"
+            id="imagen-modal-foto-publica"
+        >
 
     </div>
 
-    <!-- =================================================
-         MODAL DE ELIMINACIÓN DE PLAN
-    ================================================== -->
-
-    <div
-        class="modal-confirmacion"
-        id="modal-eliminar-plan"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="titulo-modal-eliminar-plan"
-        aria-describedby="descripcion-modal-eliminar-plan"
-        aria-hidden="true"
-    >
-
-        <div class="modal-confirmacion__contenido">
-
-            <span class="modal-confirmacion__icono">
-                <i class="fa-solid fa-trash" aria-hidden="true"></i>
-            </span>
-
-            <h2 id="titulo-modal-eliminar-plan">
-                ¿Eliminar este plan?
-            </h2>
-
-            <p id="descripcion-modal-eliminar-plan">
-                Esta acción eliminará el plan de tu perfil.
-            </p>
-
-            <div class="modal-confirmacion__acciones">
-
-                <button
-                    type="button"
-                    class="boton-secundario"
-                    id="cancelar-eliminar-plan"
-                >
-                    Volver
-                </button>
-
-                <button
-                    type="button"
-                    class="boton-confirmar-cancelacion"
-                    id="confirmar-eliminar-plan"
-                >
-                    Eliminar plan
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-       <!-- =================================================
-     BANNER DE COOKIES
-================================================== -->
-
-<section
-    class="banner-cookies oculto"
-    id="banner-cookies"
-    role="region"
-    aria-labelledby="titulo-banner-cookies"
->
-    <div class="banner-cookies__contenido">
-
-        <div class="banner-cookies__texto">
-
-            <span class="banner-cookies__icono">
-                <i class="fa-solid fa-cookie-bite" aria-hidden="true"></i>
-            </span>
-
-            <div>
-
-                <h2 id="titulo-banner-cookies">
-                    Tu privacidad es importante
-                </h2>
-
-                <p>
-                    Utilizamos tecnologías necesarias para que la web
-                    funcione y, con tu permiso, cookies opcionales para
-                    preferencias y analítica.
-
-                    <a href="cookies.html">
-                        Más información
-                    </a>
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="banner-cookies__acciones">
-
-            <button
-                type="button"
-                class="banner-cookies__rechazar"
-                id="rechazar-cookies"
-            >
-                Rechazar opcionales
-            </button>
-
-            <button
-                type="button"
-                class="banner-cookies__configurar"
-                id="configurar-cookies"
-            >
-                Configurar
-            </button>
-
-            <button
-                type="button"
-                class="banner-cookies__aceptar"
-                id="aceptar-cookies"
-            >
-                Aceptar todas
-            </button>
-
-        </div>
-
-    </div>
-</section>
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
-    <script src="js/datos-planes.js"></script>
     <script src="js/main.js"></script>
-    <script src="js/perfil.js"></script>
+    <script src="js/perfil-publico.js"></script>
     <script src="js/cookies.js"></script>
-    
 
 </body>
 

@@ -228,7 +228,7 @@ const sesionActual =
         null
     );
 
-const usuarioActual =
+let usuarioActual =
     leerLocalStorage(
         "usuarioSuralia",
         null
@@ -303,6 +303,96 @@ function escaparTextoHTML(valor = "") {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+
+
+async function sincronizarAvatarCabeceraDesdeSupabase() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente?.auth) {
+        return;
+    }
+
+    try {
+        const {
+            data: datosSesion,
+            error: errorSesion
+        } = await cliente.auth.getSession();
+
+        if (errorSesion) {
+            throw errorSesion;
+        }
+
+        const usuarioSupabase =
+            datosSesion.session?.user;
+
+        if (!usuarioSupabase) {
+            return;
+        }
+
+        const {
+            data: perfilSocial,
+            error: errorPerfil
+        } = await cliente
+            .from("perfiles_sociales")
+            .select(
+                `
+                    nombre_visible,
+                    foto_principal_url
+                `
+            )
+            .eq(
+                "usuario_id",
+                usuarioSupabase.id
+            )
+            .maybeSingle();
+
+        if (errorPerfil) {
+            throw errorPerfil;
+        }
+
+        const fotoPrincipal =
+            perfilSocial?.foto_principal_url ||
+            "";
+
+        const nombreVisible =
+            perfilSocial?.nombre_visible ||
+            usuarioActual?.nombre ||
+            sesionActual?.nombre ||
+            "";
+
+        usuarioActual = {
+            ...(usuarioActual || {}),
+            id:
+                usuarioActual?.id ||
+                usuarioSupabase.id,
+            nombre:
+                nombreVisible,
+            email:
+                usuarioActual?.email ||
+                usuarioSupabase.email ||
+                "",
+            avatarTipo:
+                fotoPrincipal
+                    ? "imagen"
+                    : usuarioActual?.avatarTipo || "",
+            avatarValor:
+                fotoPrincipal ||
+                usuarioActual?.avatarValor || ""
+        };
+
+        guardarLocalStorage(
+            "usuarioSuralia",
+            usuarioActual
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo sincronizar el avatar de la cabecera:",
+            error
+        );
+    }
 }
 
 
@@ -1513,7 +1603,7 @@ window.addEventListener(
    CARGA INICIAL
 ===================================================== */
 
-function iniciarPaginaPrincipal() {
+async function iniciarPaginaPrincipal() {
     if (
         typeof window.obtenerPlanSuralia !==
         "function"
@@ -1522,6 +1612,8 @@ function iniciarPaginaPrincipal() {
             "No se ha cargado js/datos-planes.js. Se usarán los datos del HTML."
         );
     }
+
+    await sincronizarAvatarCabeceraDesdeSupabase();
 
     actualizarCabeceraSesion();
     cargarFavoritosPortada();
@@ -1541,43 +1633,3 @@ if (
 } else {
     iniciarPaginaPrincipal();
 }
-
-/* =========================================
-   BOTÓN VOLVER ARRIBA
-========================================= */
-
-const botonVolverArriba =
-    document.querySelector(
-        "#boton-volver-arriba"
-    );
-
-function actualizarBotonVolverArriba() {
-    if (!botonVolverArriba) {
-        return;
-    }
-
-    botonVolverArriba.classList.toggle(
-        "visible",
-        window.scrollY > 350
-    );
-}
-
-botonVolverArriba?.addEventListener(
-    "click",
-    () => {
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-    }
-);
-
-window.addEventListener(
-    "scroll",
-    actualizarBotonVolverArriba,
-    {
-        passive: true
-    }
-);
-
-actualizarBotonVolverArriba();

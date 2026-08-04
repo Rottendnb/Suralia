@@ -261,6 +261,19 @@
                     <button
                         type="button"
                         class="perfil-menu__enlace"
+                        data-seccion="conexiones"
+                        role="tab"
+                        aria-controls="seccion-conexiones"
+                        aria-selected="false"
+                        tabindex="-1"
+                    >
+                        <i class="fa-solid fa-link" aria-hidden="true"></i>
+                        Conexiones
+                    </button>
+
+                    <button
+                        type="button"
+                        class="perfil-menu__enlace"
                         data-seccion="publicados"
                         role="tab"
                         aria-controls="seccion-publicados"
@@ -632,6 +645,230 @@
                             >
                                 Explorar planes
                             </a>
+
+                        </div>
+
+                    </section>
+
+                    <!-- =================================================
+                         CONEXIONES
+                    ================================================== -->
+
+                    <section
+                        class="perfil-seccion"
+                        id="seccion-conexiones"
+                        role="tabpanel"
+                        tabindex="0"
+                        aria-hidden="true"
+                    >
+
+                        <div class="perfil-seccion__cabecera">
+
+                            <div>
+
+                                <span class="subtitulo">
+                                    Tu red en Suralia
+                                </span>
+
+                                <h2>
+                                    Conexiones
+                                </h2>
+
+                                <p>
+                                    Gestiona tus solicitudes y las personas con las que has conectado.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="perfil-estadisticas">
+
+                            <article>
+
+                                <span class="perfil-estadisticas__icono">
+                                    <i class="fa-solid fa-user-clock" aria-hidden="true"></i>
+                                </span>
+
+                                <div>
+                                    <strong id="contador-solicitudes-recibidas" aria-live="polite">
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        Solicitudes pendientes
+                                    </span>
+                                </div>
+
+                            </article>
+
+                            <article>
+
+                                <span class="perfil-estadisticas__icono">
+                                    <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                                </span>
+
+                                <div>
+                                    <strong id="contador-solicitudes-enviadas" aria-live="polite">
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        Solicitudes enviadas
+                                    </span>
+                                </div>
+
+                            </article>
+
+                            <article>
+
+                                <span class="perfil-estadisticas__icono">
+                                    <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+                                </span>
+
+                                <div>
+                                    <strong id="contador-conexiones-aceptadas" aria-live="polite">
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        Conexiones aceptadas
+                                    </span>
+                                </div>
+
+                            </article>
+
+                        </div>
+
+                        <div class="perfil-bloque">
+
+                            <div class="perfil-bloque__cabecera">
+
+                                <div>
+                                    <h3>
+                                        Solicitudes recibidas
+                                    </h3>
+
+                                    <p>
+                                        Personas que quieren conectar contigo.
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <div
+                                id="lista-solicitudes-recibidas"
+                                aria-live="polite"
+                                aria-atomic="false"
+                            ></div>
+
+                            <div
+                                class="estado-vacio estado-vacio--pequeno"
+                                id="estado-vacio-solicitudes-recibidas"
+                                role="status"
+                            >
+
+                                <span class="estado-vacio__icono">
+                                    <i class="fa-regular fa-envelope-open" aria-hidden="true"></i>
+                                </span>
+
+                                <h3>
+                                    No tienes solicitudes pendientes
+                                </h3>
+
+                                <p>
+                                    Cuando alguien quiera conectar contigo, su solicitud aparecerá aquí.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="perfil-bloque">
+
+                            <div class="perfil-bloque__cabecera">
+
+                                <div>
+                                    <h3>
+                                        Solicitudes enviadas
+                                    </h3>
+
+                                    <p>
+                                        Consulta el estado de las solicitudes que has enviado.
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <div
+                                id="lista-solicitudes-enviadas"
+                                aria-live="polite"
+                                aria-atomic="false"
+                            ></div>
+
+                            <div
+                                class="estado-vacio estado-vacio--pequeno"
+                                id="estado-vacio-solicitudes-enviadas"
+                                role="status"
+                            >
+
+                                <span class="estado-vacio__icono">
+                                    <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
+                                </span>
+
+                                <h3>
+                                    No has enviado solicitudes
+                                </h3>
+
+                                <p>
+                                    Puedes enviar una solicitud desde el perfil público de otra persona.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="perfil-bloque">
+
+                            <div class="perfil-bloque__cabecera">
+
+                                <div>
+                                    <h3>
+                                        Mis conexiones
+                                    </h3>
+
+                                    <p>
+                                        Personas con las que ya has conectado en Suralia.
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <div
+                                id="lista-conexiones-aceptadas"
+                                aria-live="polite"
+                                aria-atomic="false"
+                            ></div>
+
+                            <div
+                                class="estado-vacio estado-vacio--pequeno"
+                                id="estado-vacio-conexiones-aceptadas"
+                                role="status"
+                            >
+
+                                <span class="estado-vacio__icono">
+                                    <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+                                </span>
+
+                                <h3>
+                                    Todavía no tienes conexiones
+                                </h3>
+
+                                <p>
+                                    Las solicitudes aceptadas aparecerán en esta sección.
+                                </p>
+
+                            </div>
 
                         </div>
 
