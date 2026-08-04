@@ -268,8 +268,30 @@
                         tabindex="-1"
                     >
                         <i class="fa-solid fa-link" aria-hidden="true"></i>
-                        Conexiones
+
+                        <span class="perfil-menu__texto">
+                            Conexiones
+                        </span>
                     </button>
+
+                    <a
+                        class="perfil-menu__enlace"
+                        href="conversaciones.html"
+                    >
+                        <i class="fa-regular fa-comments" aria-hidden="true"></i>
+
+                        <span class="perfil-menu__texto">
+                            Mensajes
+                        </span>
+
+                        <span
+                            class="perfil-menu__contador oculto"
+                            id="contador-mensajes-pendientes"
+                            aria-label="0 mensajes pendientes"
+                        >
+                            0
+                        </span>
+                    </a>
 
                     <button
                         type="button"
@@ -341,7 +363,13 @@
 
                         <div class="perfil-estadisticas">
 
-                            <article>
+                            <article
+                                class="perfil-estadistica-enlace"
+                                data-ir-seccion="reservas"
+                                role="button"
+                                tabindex="0"
+                                aria-label="Abrir mis reservas"
+                            >
 
                                 <span class="perfil-estadisticas__icono">
                                     <i class="fa-solid fa-ticket" aria-hidden="true"></i>
@@ -359,7 +387,13 @@
 
                             </article>
 
-                            <article>
+                            <article
+                                class="perfil-estadistica-enlace"
+                                data-ir-seccion="favoritos"
+                                role="button"
+                                tabindex="0"
+                                aria-label="Abrir mis planes favoritos"
+                            >
 
                                 <span class="perfil-estadisticas__icono">
                                     <i class="fa-solid fa-heart" aria-hidden="true"></i>
@@ -377,7 +411,13 @@
 
                             </article>
 
-                            <article>
+                            <article
+                                class="perfil-estadistica-enlace"
+                                data-ir-seccion="reservas"
+                                role="button"
+                                tabindex="0"
+                                aria-label="Abrir mis reservas y planes realizados"
+                            >
 
                                 <span class="perfil-estadisticas__icono">
                                     <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
@@ -395,7 +435,13 @@
 
                             </article>
 
-                            <article>
+                            <article
+                                class="perfil-estadistica-enlace"
+                                data-ir-seccion="afinidades"
+                                role="button"
+                                tabindex="0"
+                                aria-label="Abrir mis afinidades"
+                            >
 
                                 <span class="perfil-estadisticas__icono">
                                     <i class="fa-solid fa-user-group" aria-hidden="true"></i>
@@ -1919,6 +1965,59 @@
                     id="confirmar-cancelacion"
                 >
                     Cancelar reserva
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         MODAL DE ELIMINACIÓN DE CONEXIÓN
+    ================================================== -->
+
+    <div
+        class="modal-confirmacion"
+        id="modal-eliminar-conexion"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-modal-eliminar-conexion"
+        aria-describedby="descripcion-modal-eliminar-conexion"
+        aria-hidden="true"
+    >
+
+        <div class="modal-confirmacion__contenido">
+
+            <span class="modal-confirmacion__icono">
+                <i class="fa-solid fa-user-xmark" aria-hidden="true"></i>
+            </span>
+
+            <h2 id="titulo-modal-eliminar-conexion">
+                ¿Eliminar esta conexión?
+            </h2>
+
+            <p id="descripcion-modal-eliminar-conexion">
+                Esta persona dejará de aparecer en tus conexiones.
+            </p>
+
+            <div class="modal-confirmacion__acciones">
+
+                <button
+                    type="button"
+                    class="boton-secundario"
+                    id="cancelar-eliminar-conexion"
+                >
+                    Mantener conexión
+                </button>
+
+                <button
+                    type="button"
+                    class="boton-confirmar-cancelacion"
+                    id="confirmar-eliminar-conexion"
+                >
+                    Eliminar conexión
                 </button>
 
             </div>

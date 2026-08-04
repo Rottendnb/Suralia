@@ -45,7 +45,7 @@ if (
 ========================================= */
 
 const botonesMenuPerfil = document.querySelectorAll(
-    ".perfil-menu__enlace"
+    ".perfil-menu__enlace[data-seccion]"
 );
 
 const seccionesPerfil = document.querySelectorAll(
@@ -123,6 +123,31 @@ const confirmarCancelacion = document.querySelector(
 
 let reservaPendienteCancelar = null;
 let elementoQueAbrioModalCancelacion = null;
+
+/* =========================================
+   MODAL DE ELIMINACIÓN DE CONEXIÓN
+========================================= */
+
+const modalEliminarConexion = document.querySelector(
+    "#modal-eliminar-conexion"
+);
+
+const cancelarEliminarConexion = document.querySelector(
+    "#cancelar-eliminar-conexion"
+);
+
+const confirmarEliminarConexion = document.querySelector(
+    "#confirmar-eliminar-conexion"
+);
+
+const descripcionModalEliminarConexion = document.querySelector(
+    "#descripcion-modal-eliminar-conexion"
+);
+
+let conexionPendienteEliminar = null;
+let nombreConexionPendienteEliminar = "";
+let botonConexionPendienteEliminar = null;
+let elementoQueAbrioModalEliminarConexion = null;
 
 /* =========================================
    FUNCIONES GENERALES
@@ -468,15 +493,31 @@ botonesMenuPerfil.forEach(
 );
 
 enlacesSeccion.forEach((boton) => {
+    function abrirSeccionEnlazada(evento) {
+        evento.preventDefault();
+
+        cambiarSeccion(
+            boton.dataset.irSeccion,
+            true
+        );
+    }
+
     boton.addEventListener(
         "click",
-        (evento) => {
-            evento.preventDefault();
+        abrirSeccionEnlazada
+    );
 
-            cambiarSeccion(
-                boton.dataset.irSeccion,
-                true
-            );
+    boton.addEventListener(
+        "keydown",
+        (evento) => {
+            if (
+                evento.key !== "Enter" &&
+                evento.key !== " "
+            ) {
+                return;
+            }
+
+            abrirSeccionEnlazada(evento);
         }
     );
 });
@@ -5223,9 +5264,537 @@ function activarBotonesDesactivarAfinidad() {
 
 
 
+
+/* =========================================
+   SONIDO DE NOTIFICACIÓN DE MENSAJES
+========================================= */
+
+let contextoAudioNotificaciones =
+    null;
+
+let sonidoNotificacionesPreparado =
+    false;
+
+
+function prepararSonidoNotificaciones() {
+    if (sonidoNotificacionesPreparado) {
+        return;
+    }
+
+    const AudioContexto =
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+    if (!AudioContexto) {
+        return;
+    }
+
+    try {
+        contextoAudioNotificaciones =
+            contextoAudioNotificaciones ||
+            new AudioContexto();
+
+        if (
+            contextoAudioNotificaciones.state ===
+            "suspended"
+        ) {
+            contextoAudioNotificaciones.resume();
+        }
+
+        sonidoNotificacionesPreparado =
+            true;
+    } catch (error) {
+        console.error(
+            "No se pudo preparar el sonido de notificación:",
+            error
+        );
+    }
+}
+
+
+function reproducirSonidoNotificacion() {
+    if (
+        !contextoAudioNotificaciones ||
+        contextoAudioNotificaciones.state !==
+            "running"
+    ) {
+        return;
+    }
+
+    try {
+        const ahora =
+            contextoAudioNotificaciones.currentTime;
+
+        const ganancia =
+            contextoAudioNotificaciones.createGain();
+
+        const osciladorUno =
+            contextoAudioNotificaciones.createOscillator();
+
+        const osciladorDos =
+            contextoAudioNotificaciones.createOscillator();
+
+        ganancia.gain.setValueAtTime(
+            0.0001,
+            ahora
+        );
+
+        ganancia.gain.exponentialRampToValueAtTime(
+            0.12,
+            ahora + 0.015
+        );
+
+        ganancia.gain.exponentialRampToValueAtTime(
+            0.0001,
+            ahora + 0.32
+        );
+
+        osciladorUno.type =
+            "sine";
+
+        osciladorUno.frequency.setValueAtTime(
+            740,
+            ahora
+        );
+
+        osciladorDos.type =
+            "sine";
+
+        osciladorDos.frequency.setValueAtTime(
+            980,
+            ahora + 0.08
+        );
+
+        osciladorUno.connect(
+            ganancia
+        );
+
+        osciladorDos.connect(
+            ganancia
+        );
+
+        ganancia.connect(
+            contextoAudioNotificaciones.destination
+        );
+
+        osciladorUno.start(
+            ahora
+        );
+
+        osciladorUno.stop(
+            ahora + 0.18
+        );
+
+        osciladorDos.start(
+            ahora + 0.08
+        );
+
+        osciladorDos.stop(
+            ahora + 0.3
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo reproducir el sonido de notificación:",
+            error
+        );
+    }
+}
+
+
+[
+    "click",
+    "keydown",
+    "touchstart"
+].forEach(
+    (
+        tipoEvento
+    ) => {
+        document.addEventListener(
+            tipoEvento,
+            prepararSonidoNotificaciones,
+            {
+                once:
+                    true,
+                passive:
+                    true
+            }
+        );
+    }
+);
+
+
+
+/* =========================================
+   NOTIFICACIONES DEL NAVEGADOR
+========================================= */
+
+function notificacionesNavegadorDisponibles() {
+    return (
+        "Notification" in window
+    );
+}
+
+
+function notificacionesNavegadorActivas() {
+    return (
+        notificacionesNavegadorDisponibles() &&
+        Notification.permission ===
+            "granted"
+    );
+}
+
+
+function mostrarNotificacionNavegador(
+    titulo,
+    cuerpo
+) {
+    if (
+        !notificacionesNavegadorActivas() ||
+        document.visibilityState ===
+            "visible"
+    ) {
+        return;
+    }
+
+    try {
+        const notificacion =
+            new Notification(
+                titulo,
+                {
+                    body:
+                        cuerpo,
+
+                    icon:
+                        "img/suralia-favicon.png?v=10",
+
+                    badge:
+                        "img/suralia-favicon.png?v=10",
+
+                    tag:
+                        "nuevo-mensaje-suralia"
+                }
+            );
+
+        notificacion.onclick =
+            () => {
+                window.focus();
+
+                notificacion.close();
+            };
+    } catch (error) {
+        console.error(
+            "No se pudo mostrar la notificación del navegador:",
+            error
+        );
+    }
+}
+
+
+/* =========================================
+   NOTIFICACIONES DE MENSAJES PENDIENTES
+========================================= */
+
+function actualizarContadorMensajesPendientes(
+    total
+) {
+    totalMensajesPendientes =
+        Math.max(
+            0,
+            Number(total) ||
+            0
+        );
+
+    if (!contadorMensajesPendientes) {
+        return;
+    }
+
+    contadorMensajesPendientes.textContent =
+        totalMensajesPendientes > 99
+            ? "99+"
+            : String(
+                totalMensajesPendientes
+            );
+
+    contadorMensajesPendientes.classList.toggle(
+        "oculto",
+        totalMensajesPendientes === 0
+    );
+
+    contadorMensajesPendientes.setAttribute(
+        "aria-label",
+        `${totalMensajesPendientes} ${
+            totalMensajesPendientes === 1
+                ? "mensaje pendiente"
+                : "mensajes pendientes"
+        }`
+    );
+}
+
+
+async function cargarMensajesPendientes() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente?.auth) {
+        return;
+    }
+
+    try {
+        const {
+            data: datosSesion,
+            error: errorSesion
+        } = await cliente.auth.getSession();
+
+        if (errorSesion) {
+            throw errorSesion;
+        }
+
+        const usuarioId =
+            datosSesion.session?.user?.id;
+
+        if (!usuarioId) {
+            actualizarContadorMensajesPendientes(
+                0
+            );
+
+            return;
+        }
+
+        const {
+            count,
+            error
+        } = await cliente
+            .from("mensajes")
+            .select(
+                "id",
+                {
+                    count:
+                        "exact",
+
+                    head:
+                        true
+                }
+            )
+            .eq(
+                "leido",
+                false
+            )
+            .neq(
+                "remitente_id",
+                usuarioId
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        actualizarContadorMensajesPendientes(
+            count ||
+            0
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo cargar el contador de mensajes pendientes:",
+            error
+        );
+    }
+}
+
+
+async function obtenerNombreRemitenteMensaje(
+    remitenteId
+) {
+    const cliente =
+        window.clienteSupabase;
+
+    if (
+        !cliente ||
+        !remitenteId
+    ) {
+        return "";
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente
+            .from("perfiles_sociales")
+            .select(
+                "nombre_visible"
+            )
+            .eq(
+                "usuario_id",
+                remitenteId
+            )
+            .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+
+        return data?.nombre_visible ||
+            "";
+    } catch (error) {
+        console.error(
+            "No se pudo identificar al remitente del mensaje:",
+            error
+        );
+
+        return "";
+    }
+}
+
+
+async function suscribirseANotificacionesMensajes() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente?.auth) {
+        return;
+    }
+
+    const {
+        data: datosSesion,
+        error: errorSesion
+    } = await cliente.auth.getSession();
+
+    if (errorSesion) {
+        console.error(
+            "No se pudo iniciar la suscripción de mensajes:",
+            errorSesion
+        );
+
+        return;
+    }
+
+    const usuarioId =
+        datosSesion.session?.user?.id;
+
+    if (!usuarioId) {
+        return;
+    }
+
+    if (canalNotificacionesMensajes) {
+        cliente.removeChannel(
+            canalNotificacionesMensajes
+        );
+    }
+
+    canalNotificacionesMensajes =
+        cliente
+            .channel(
+                `notificaciones-mensajes-${usuarioId}`
+            )
+            .on(
+                "postgres_changes",
+                {
+                    event:
+                        "INSERT",
+
+                    schema:
+                        "public",
+
+                    table:
+                        "mensajes"
+                },
+                async (
+                    cambio
+                ) => {
+                    const mensaje =
+                        cambio.new;
+
+                    if (
+                        !mensaje ||
+                        mensaje.remitente_id ===
+                            usuarioId
+                    ) {
+                        return;
+                    }
+
+                    await cargarMensajesPendientes();
+
+                    const nombre =
+                        await obtenerNombreRemitenteMensaje(
+                            mensaje.remitente_id
+                        );
+
+                    reproducirSonidoNotificacion();
+
+                    mostrarNotificacionNavegador(
+                        nombre
+                            ? `Nuevo mensaje de ${nombre}`
+                            : "Nuevo mensaje en Suralia",
+                        "Abre Suralia para leerlo."
+                    );
+
+                    mostrarNotificacion(
+                        nombre
+                            ? `Nuevo mensaje de ${nombre}.`
+                            : "Tienes un nuevo mensaje."
+                    );
+                }
+            )
+            .subscribe(
+                (
+                    estado
+                ) => {
+                    if (
+                        estado ===
+                        "CHANNEL_ERROR"
+                    ) {
+                        console.error(
+                            "No se pudo activar la notificación de mensajes en tiempo real."
+                        );
+                    }
+                }
+            );
+}
+
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+        if (
+            document.visibilityState ===
+            "visible"
+        ) {
+            cargarMensajesPendientes();
+        }
+    }
+);
+
+
+window.addEventListener(
+    "beforeunload",
+    () => {
+        if (
+            canalNotificacionesMensajes &&
+            window.clienteSupabase
+        ) {
+            window.clienteSupabase
+                .removeChannel(
+                    canalNotificacionesMensajes
+                );
+        }
+    }
+);
+
+
 /* =========================================
    CONEXIONES - CARGA DESDE SUPABASE
 ========================================= */
+
+const contadorMensajesPendientes = document.querySelector(
+    "#contador-mensajes-pendientes"
+);
+
+let canalNotificacionesMensajes =
+    null;
+
+let totalMensajesPendientes =
+    0;
+
 
 const listaSolicitudesRecibidas = document.querySelector(
     "#lista-solicitudes-recibidas"
@@ -5544,6 +6113,7 @@ function crearConexionAceptadaHTML(conexion) {
                             <a
                                 href="perfil-publico.html?id=${encodeURIComponent(perfilPublicoId)}"
                                 class="boton-conexion boton-conexion--principal"
+                                data-ver-perfil-conexion
                             >
                                 <i class="fa-regular fa-user"></i>
                                 Ver perfil
@@ -5551,6 +6121,28 @@ function crearConexionAceptadaHTML(conexion) {
                         `
                         : ""
                 }
+
+                <button
+                    type="button"
+                    class="boton-conexion boton-conexion--mensaje"
+                    data-iniciar-conversacion="${escaparHTML(
+                        conexion.otro_usuario_id || ""
+                    )}"
+                    data-nombre-conversacion="${nombre}"
+                >
+                    <i class="fa-regular fa-comments"></i>
+                    Enviar mensaje
+                </button>
+
+                <button
+                    type="button"
+                    class="boton-conexion boton-conexion--peligro"
+                    data-eliminar-conexion="${escaparHTML(conexion.id)}"
+                    data-nombre-conexion="${nombre}"
+                >
+                    <i class="fa-solid fa-user-minus"></i>
+                    Eliminar conexión
+                </button>
             </div>
         </article>
     `;
@@ -5780,6 +6372,166 @@ async function cancelarSolicitudConexion(
     }
 }
 
+function abrirConfirmacionEliminarConexion(
+    conexionId,
+    nombrePersona,
+    boton
+) {
+    const idSeguro = String(
+        conexionId || ""
+    ).trim();
+
+    if (!idSeguro || !modalEliminarConexion) {
+        return;
+    }
+
+    conexionPendienteEliminar = idSeguro;
+    nombreConexionPendienteEliminar = String(
+        nombrePersona || "esta persona"
+    ).trim();
+    botonConexionPendienteEliminar = boton || null;
+
+    if (descripcionModalEliminarConexion) {
+        descripcionModalEliminarConexion.textContent =
+            `¿Seguro que quieres eliminar tu conexión con ${nombreConexionPendienteEliminar}? Esta acción no se puede deshacer.`;
+    }
+
+    elementoQueAbrioModalEliminarConexion =
+        abrirModalAccesible(
+            modalEliminarConexion,
+            cancelarEliminarConexion,
+            boton
+        );
+}
+
+
+function cerrarConfirmacionEliminarConexion() {
+    cerrarModalAccesible(
+        modalEliminarConexion,
+        elementoQueAbrioModalEliminarConexion
+    );
+
+    conexionPendienteEliminar = null;
+    nombreConexionPendienteEliminar = "";
+    botonConexionPendienteEliminar = null;
+    elementoQueAbrioModalEliminarConexion = null;
+}
+
+
+async function eliminarConexionAceptada() {
+    const cliente = window.clienteSupabase;
+
+    if (!cliente) {
+        mostrarNotificacion(
+            "No se ha podido conectar con Supabase."
+        );
+        return;
+    }
+
+    if (!conexionPendienteEliminar) {
+        return;
+    }
+
+    const idSeguro = conexionPendienteEliminar;
+    const boton = botonConexionPendienteEliminar;
+    const textoOriginal = boton?.innerHTML || "";
+
+    if (confirmarEliminarConexion) {
+        confirmarEliminarConexion.disabled = true;
+        confirmarEliminarConexion.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Eliminando
+        `;
+    }
+
+    if (boton) {
+        boton.disabled = true;
+    }
+
+    try {
+        const usuario = await obtenerUsuarioPerfilSocial();
+
+        if (!usuario) {
+            throw new Error(
+                "No existe una sesión válida."
+            );
+        }
+
+        const { data, error } = await cliente
+            .from("solicitudes_conexion")
+            .delete()
+            .eq("id", idSeguro)
+            .eq("estado", "aceptada")
+            .or(
+                `solicitante_id.eq.${usuario.id},receptor_id.eq.${usuario.id}`
+            )
+            .select("id")
+            .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data) {
+            throw new Error(
+                "La conexión ya no existe o no tienes permiso para eliminarla."
+            );
+        }
+
+        cerrarConfirmacionEliminarConexion();
+
+        mostrarNotificacion(
+            "La conexión se ha eliminado."
+        );
+
+        await cargarConexionesPerfil();
+    } catch (error) {
+        console.error(
+            "No se pudo eliminar la conexión:",
+            error
+        );
+
+        mostrarNotificacion(
+            error?.message ||
+            "No se ha podido eliminar la conexión."
+        );
+
+        if (boton) {
+            boton.disabled = false;
+            boton.innerHTML = textoOriginal;
+        }
+    } finally {
+        if (confirmarEliminarConexion) {
+            confirmarEliminarConexion.disabled = false;
+            confirmarEliminarConexion.innerHTML =
+                "Eliminar conexión";
+        }
+    }
+}
+
+
+cancelarEliminarConexion?.addEventListener(
+    "click",
+    cerrarConfirmacionEliminarConexion
+);
+
+
+confirmarEliminarConexion?.addEventListener(
+    "click",
+    eliminarConexionAceptada
+);
+
+
+modalEliminarConexion?.addEventListener(
+    "click",
+    (evento) => {
+        if (evento.target === modalEliminarConexion) {
+            cerrarConfirmacionEliminarConexion();
+        }
+    }
+);
+
+
 function activarEnlacesPerfilConexion() {
     document
         .querySelectorAll("[data-ver-perfil-conexion]")
@@ -5791,6 +6543,89 @@ function activarEnlacesPerfilConexion() {
                 );
             });
         });
+}
+
+
+async function iniciarConversacionConexion(
+    otroUsuarioId,
+    nombre,
+    boton
+) {
+    const cliente =
+        window.clienteSupabase;
+
+    if (
+        !cliente ||
+        !otroUsuarioId ||
+        !boton
+    ) {
+        mostrarNotificacion(
+            "No se ha podido abrir la conversación."
+        );
+
+        return;
+    }
+
+    const contenidoOriginal =
+        boton.innerHTML;
+
+    boton.disabled =
+        true;
+
+    boton.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Abriendo chat
+    `;
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente.rpc(
+            "obtener_o_crear_conversacion",
+            {
+                otro_usuario:
+                    otroUsuarioId
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data) {
+            throw new Error(
+                "No se ha podido identificar la conversación."
+            );
+        }
+
+        sessionStorage.setItem(
+            "nombreConversacionSuralia",
+            nombre ||
+            "Usuario de Suralia"
+        );
+
+        window.location.href =
+            `mensajes.html?id=${encodeURIComponent(
+                data
+            )}`;
+    } catch (error) {
+        console.error(
+            "No se pudo iniciar la conversación:",
+            error
+        );
+
+        mostrarNotificacion(
+            error?.message ||
+            "No se ha podido abrir el chat."
+        );
+
+        boton.disabled =
+            false;
+
+        boton.innerHTML =
+            contenidoOriginal;
+    }
 }
 
 
@@ -5825,6 +6660,35 @@ function activarAccionesSolicitudesConexion() {
             boton.addEventListener("click", () => {
                 cancelarSolicitudConexion(
                     boton.dataset.cancelarSolicitud,
+                    boton
+                );
+            });
+        });
+
+    document
+        .querySelectorAll("[data-iniciar-conversacion]")
+        .forEach((boton) => {
+            boton.addEventListener(
+                "click",
+                () => {
+                    iniciarConversacionConexion(
+                        boton.dataset
+                            .iniciarConversacion,
+                        boton.dataset
+                            .nombreConversacion,
+                        boton
+                    );
+                }
+            );
+        });
+
+    document
+        .querySelectorAll("[data-eliminar-conexion]")
+        .forEach((boton) => {
+            boton.addEventListener("click", () => {
+                abrirConfirmacionEliminarConexion(
+                    boton.dataset.eliminarConexion,
+                    boton.dataset.nombreConexion,
                     boton
                 );
             });
@@ -5939,7 +6803,11 @@ async function cargarConexionesPerfil() {
 
             return {
                 ...solicitud,
-                perfil: perfilesPorUsuario.get(otroUsuarioId) || null
+                otro_usuario_id:
+                    otroUsuarioId,
+                perfil:
+                    perfilesPorUsuario.get(otroUsuarioId) ||
+                    null
             };
         };
 
@@ -6463,6 +7331,11 @@ document.addEventListener(
             modalEliminarPlan
         );
 
+        mantenerFocoDentroModal(
+            evento,
+            modalEliminarConexion
+        );
+
         if (evento.key !== "Escape") {
             return;
         }
@@ -6501,6 +7374,16 @@ document.addEventListener(
 
             elementoQueAbrioModalEliminar =
                 null;
+
+            return;
+        }
+
+        if (
+            modalEliminarConexion?.classList.contains(
+                "visible"
+            )
+        ) {
+            cerrarConfirmacionEliminarConexion();
         }
     }
 );
@@ -6528,6 +7411,8 @@ function iniciarPerfil() {
     mostrarFavoritosPerfil();
     cargarAfinidadesPerfil();
     cargarConexionesPerfil();
+    cargarMensajesPendientes();
+    suscribirseANotificacionesMensajes();
     mostrarPublicaciones();
     cargarSeccionDesdeURL();
 }

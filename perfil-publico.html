@@ -465,6 +465,62 @@
 
                         </article>
 
+                        <article
+                            class="perfil-publico-tarjeta perfil-publico-seguridad"
+                            id="bloque-seguridad-perfil"
+                        >
+                            <span class="subtitulo">
+                                Seguridad
+                            </span>
+
+                            <h2>
+                                Gestionar este perfil
+                            </h2>
+
+                            <p>
+                                Puedes bloquear a esta persona o informar a
+                                Suralia si consideras que incumple las normas.
+                            </p>
+
+                            <div class="perfil-publico-seguridad__acciones">
+
+                                <button
+                                    type="button"
+                                    class="perfil-publico-seguridad__boton"
+                                    id="boton-bloquear-usuario"
+                                >
+                                    <i
+                                        class="fa-solid fa-user-slash"
+                                        aria-hidden="true"
+                                    ></i>
+
+                                    Bloquear usuario
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="perfil-publico-seguridad__boton perfil-publico-seguridad__boton--peligro"
+                                    id="boton-denunciar-usuario"
+                                >
+                                    <i
+                                        class="fa-solid fa-triangle-exclamation"
+                                        aria-hidden="true"
+                                    ></i>
+
+                                    Denunciar perfil
+                                </button>
+
+                            </div>
+
+                            <small
+                                class="perfil-publico-seguridad__mensaje"
+                                id="mensaje-seguridad-perfil"
+                                role="status"
+                                aria-live="polite"
+                            ></small>
+
+                        </article>
+
                     </aside>
 
                 </div>
@@ -612,6 +668,228 @@
         </div>
 
     </footer>
+
+    <div
+        class="modal-seguridad-perfil"
+        id="modal-bloquear-usuario"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-modal-bloquear"
+        aria-describedby="texto-modal-bloquear"
+        aria-hidden="true"
+    >
+        <div class="modal-seguridad-perfil__panel">
+
+            <button
+                type="button"
+                class="modal-seguridad-perfil__cerrar"
+                id="cerrar-modal-bloquear"
+                aria-label="Cerrar"
+            >
+                <i
+                    class="fa-solid fa-xmark"
+                    aria-hidden="true"
+                ></i>
+            </button>
+
+            <span class="modal-seguridad-perfil__icono">
+                <i
+                    class="fa-solid fa-user-slash"
+                    aria-hidden="true"
+                ></i>
+            </span>
+
+            <h2 id="titulo-modal-bloquear">
+                ¿Bloquear a este usuario?
+            </h2>
+
+            <p id="texto-modal-bloquear">
+                No podréis enviaros solicitudes ni mantener la conexión.
+                La solicitud o conexión existente se eliminará.
+            </p>
+
+            <div class="modal-seguridad-perfil__acciones">
+
+                <button
+                    type="button"
+                    class="modal-seguridad-perfil__boton-secundario"
+                    id="cancelar-bloqueo-usuario"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="modal-seguridad-perfil__boton-peligro"
+                    id="confirmar-bloqueo-usuario"
+                >
+                    <i
+                        class="fa-solid fa-user-slash"
+                        aria-hidden="true"
+                    ></i>
+
+                    Bloquear usuario
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div
+        class="modal-seguridad-perfil"
+        id="modal-denunciar-usuario"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-modal-denunciar"
+        aria-describedby="texto-modal-denunciar"
+        aria-hidden="true"
+    >
+        <div class="modal-seguridad-perfil__panel modal-seguridad-perfil__panel--formulario">
+
+            <button
+                type="button"
+                class="modal-seguridad-perfil__cerrar"
+                id="cerrar-modal-denunciar"
+                aria-label="Cerrar"
+            >
+                <i
+                    class="fa-solid fa-xmark"
+                    aria-hidden="true"
+                ></i>
+            </button>
+
+            <span class="modal-seguridad-perfil__icono modal-seguridad-perfil__icono--alerta">
+                <i
+                    class="fa-solid fa-triangle-exclamation"
+                    aria-hidden="true"
+                ></i>
+            </span>
+
+            <h2 id="titulo-modal-denunciar">
+                Denunciar perfil
+            </h2>
+
+            <p id="texto-modal-denunciar">
+                La denuncia será enviada a Suralia para su revisión.
+            </p>
+
+            <div class="modal-seguridad-perfil__aviso">
+                <i
+                    class="fa-solid fa-shield-halved"
+                    aria-hidden="true"
+                ></i>
+
+                <p>
+                    <strong>Importante:</strong>
+                    al enviar la denuncia también bloquearás a este usuario
+                    y se eliminará cualquier solicitud o conexión existente.
+                </p>
+            </div>
+
+            <form id="formulario-denunciar-usuario">
+
+                <label for="motivo-denuncia-usuario">
+                    Motivo de la denuncia
+                </label>
+
+                <select
+                    id="motivo-denuncia-usuario"
+                    required
+                >
+                    <option value="">
+                        Selecciona un motivo
+                    </option>
+
+                    <option value="perfil-falso">
+                        Perfil falso
+                    </option>
+
+                    <option value="acoso">
+                        Acoso o comportamiento intimidatorio
+                    </option>
+
+                    <option value="contenido-inapropiado">
+                        Contenido inapropiado
+                    </option>
+
+                    <option value="spam">
+                        Spam o publicidad no deseada
+                    </option>
+
+                    <option value="suplantacion">
+                        Suplantación de identidad
+                    </option>
+
+                    <option value="otro">
+                        Otro motivo
+                    </option>
+                </select>
+
+                <label for="descripcion-denuncia-usuario">
+                    Explica lo ocurrido
+                    <span>(opcional)</span>
+                </label>
+
+                <textarea
+                    id="descripcion-denuncia-usuario"
+                    maxlength="1000"
+                    rows="5"
+                    placeholder="Añade información que pueda ayudar a revisar la denuncia."
+                ></textarea>
+
+                <div class="modal-seguridad-perfil__contador">
+                    <span id="contador-denuncia-usuario">0</span>/1000
+                </div>
+
+                <label class="modal-seguridad-perfil__confirmacion">
+                    <input
+                        type="checkbox"
+                        id="confirmar-efecto-denuncia"
+                        required
+                    >
+
+                    <span>
+                        Entiendo que al denunciar también bloquearé a este
+                        usuario y perderemos la conexión.
+                    </span>
+                </label>
+
+                <small
+                    class="modal-seguridad-perfil__error"
+                    id="error-denuncia-usuario"
+                    role="alert"
+                ></small>
+
+                <div class="modal-seguridad-perfil__acciones">
+
+                    <button
+                        type="button"
+                        class="modal-seguridad-perfil__boton-secundario"
+                        id="cancelar-denuncia-usuario"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="modal-seguridad-perfil__boton-peligro"
+                        id="confirmar-denuncia-usuario"
+                    >
+                        <i
+                            class="fa-solid fa-triangle-exclamation"
+                            aria-hidden="true"
+                        ></i>
+
+                        Denunciar y bloquear
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
 
     <div
         class="modal-foto-publica"

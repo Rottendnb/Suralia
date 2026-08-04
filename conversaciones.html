@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Consulta tus conversaciones privadas en Suralia.">
+    <title>Mensajes | Suralia</title>
+    <link rel="icon" type="image/png" href="img/suralia-favicon.png?v=10">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="contenedor header__contenido">
+            <a href="index.html" class="logo" aria-label="Página de inicio de Suralia">
+                <img src="img/suralia-logo.png" alt="Suralia" class="logo__imagen" width="1138" height="392">
+            </a>
+
+            <nav class="navegacion" id="navegacion" aria-label="Navegación principal">
+                <a href="planes.html">Explorar planes</a>
+                <a href="perfil.html#conexiones">Mis conexiones</a>
+                <a href="publicar-plan.html" class="enlace-publicar">
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                    Publicar un plan
+                </a>
+            </nav>
+
+            <div class="header__acciones">
+                <a href="perfil.html" class="usuario-header" aria-label="Abrir mi perfil">
+                    <span class="usuario-header__avatar" id="avatar-header">SU</span>
+                    <span id="nombre-header">Mi perfil</span>
+                </a>
+
+                <button class="boton-menu" id="boton-menu" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="navegacion">
+                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="conversaciones-pagina">
+        <div class="contenedor">
+            <div class="conversaciones-cabecera">
+                <div>
+                    <span class="subtitulo">Comunicación</span>
+                    <h1>Mensajes</h1>
+                    <p>Consulta tus conversaciones y continúa organizando planes con tus conexiones.</p>
+                </div>
+
+                <div class="conversaciones-cabecera__acciones">
+
+                    <button
+                        type="button"
+                        class="conversaciones-cabecera__enlace"
+                        id="boton-notificaciones-navegador"
+                    >
+                        <i
+                            class="fa-regular fa-bell"
+                            aria-hidden="true"
+                        ></i>
+
+                        Activar avisos
+                    </button>
+
+                    <a href="perfil.html#conexiones" class="conversaciones-cabecera__enlace">
+                        <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+                        Ver conexiones
+                    </a>
+
+                </div>
+            </div>
+
+            <section class="conversaciones-carga" id="conversaciones-carga" aria-live="polite">
+                <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                <p>Cargando conversaciones...</p>
+            </section>
+
+            <section class="conversaciones-error oculto" id="conversaciones-error" role="alert">
+                <i class="fa-regular fa-circle-xmark" aria-hidden="true"></i>
+                <h2>No se han podido cargar los mensajes</h2>
+                <p id="conversaciones-error-texto">Inténtalo de nuevo más tarde.</p>
+            </section>
+
+            <section class="conversaciones-vacio oculto" id="conversaciones-vacio">
+                <i class="fa-regular fa-comments" aria-hidden="true"></i>
+                <h2>Todavía no tienes conversaciones</h2>
+                <p>Abre una conexión aceptada y pulsa <strong>Enviar mensaje</strong>.</p>
+                <a href="perfil.html#conexiones" class="boton-auth">Ir a mis conexiones</a>
+            </section>
+
+            <section class="conversaciones-lista oculto" id="conversaciones-lista" aria-label="Lista de conversaciones"></section>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/conversaciones.js"></script>
+    <script src="js/cookies.js"></script>
+</body>
+</html>

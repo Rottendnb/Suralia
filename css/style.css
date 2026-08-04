@@ -12433,3 +12433,1018 @@ html {
         width: 100%;
     }
 }
+
+/* =====================================================
+   TARJETAS DEL RESUMEN CLICABLES
+   Añadir al FINAL de css/style.css
+===================================================== */
+
+.perfil-estadisticas article.perfil-estadistica-enlace {
+    cursor: pointer;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.perfil-estadisticas article.perfil-estadistica-enlace:hover {
+    border-color: rgba(232, 93, 50, 0.35);
+    background-color: rgba(232, 93, 50, 0.025);
+    box-shadow: 0 12px 28px rgba(23, 61, 54, 0.09);
+    transform: translateY(-3px);
+}
+
+.perfil-estadisticas article.perfil-estadistica-enlace:focus-visible {
+    outline: 3px solid rgba(232, 93, 50, 0.28);
+    outline-offset: 3px;
+    border-color: var(--color-principal);
+}
+
+.perfil-estadisticas article.perfil-estadistica-enlace:active {
+    transform: translateY(-1px);
+}
+
+/* =====================================================
+   PERFIL PÚBLICO: BLOQUEAR Y DENUNCIAR USUARIO
+   Añadir al FINAL de css/style.css
+===================================================== */
+
+.perfil-publico-seguridad > p {
+    margin: 0 0 1rem;
+    color: var(--color-texto-secundario, #66736f);
+    line-height: 1.65;
+}
+
+.perfil-publico-seguridad__acciones {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.perfil-publico-seguridad__boton {
+    width: 100%;
+    min-height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid rgba(23, 61, 54, 0.18);
+    border-radius: 12px;
+    background: #fff;
+    color: #173d36;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.perfil-publico-seguridad__boton:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: rgba(23, 61, 54, 0.38);
+    background: rgba(23, 61, 54, 0.035);
+    box-shadow: 0 8px 20px rgba(23, 61, 54, 0.08);
+}
+
+.perfil-publico-seguridad__boton--peligro {
+    border-color: rgba(184, 43, 43, 0.24);
+    color: #a32323;
+}
+
+.perfil-publico-seguridad__boton--peligro:hover:not(:disabled) {
+    border-color: rgba(184, 43, 43, 0.5);
+    background: rgba(184, 43, 43, 0.05);
+}
+
+.perfil-publico-seguridad__boton:focus-visible {
+    outline: 3px solid rgba(232, 93, 50, 0.25);
+    outline-offset: 2px;
+}
+
+.perfil-publico-seguridad__boton:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.perfil-publico-seguridad__mensaje {
+    display: block;
+    min-height: 1.2rem;
+    margin-top: 0.85rem;
+    color: #173d36;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.perfil-publico-seguridad--bloqueado {
+    border-color: rgba(184, 43, 43, 0.18);
+    background: rgba(184, 43, 43, 0.025);
+}
+
+
+/* MODALES */
+
+.modal-seguridad-perfil {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(8, 25, 22, 0.7);
+    backdrop-filter: blur(5px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+}
+
+.modal-seguridad-perfil.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.modal-seguridad-perfil__panel {
+    position: relative;
+    width: min(100%, 500px);
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    padding: 2rem;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 24px 70px rgba(8, 25, 22, 0.28);
+    transform: translateY(16px) scale(0.98);
+    transition: transform 0.2s ease;
+}
+
+.modal-seguridad-perfil.visible
+.modal-seguridad-perfil__panel {
+    transform: translateY(0) scale(1);
+}
+
+.modal-seguridad-perfil__panel--formulario {
+    width: min(100%, 590px);
+}
+
+.modal-seguridad-perfil__cerrar {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: #f1f4f3;
+    color: #173d36;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.modal-seguridad-perfil__cerrar:hover {
+    background: #e5ece9;
+}
+
+.modal-seguridad-perfil__icono {
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 1rem;
+    border-radius: 18px;
+    background: rgba(184, 43, 43, 0.1);
+    color: #a32323;
+    font-size: 1.35rem;
+}
+
+.modal-seguridad-perfil__icono--alerta {
+    background: rgba(232, 93, 50, 0.12);
+    color: #c34822;
+}
+
+.modal-seguridad-perfil h2 {
+    margin: 0 2.5rem 0.65rem 0;
+    color: #173d36;
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+}
+
+.modal-seguridad-perfil__panel > p {
+    margin: 0;
+    color: #66736f;
+    line-height: 1.65;
+}
+
+.modal-seguridad-perfil__aviso {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    margin: 1.25rem 0;
+    padding: 1rem;
+    border: 1px solid rgba(232, 93, 50, 0.22);
+    border-radius: 14px;
+    background: rgba(232, 93, 50, 0.06);
+    color: #71331f;
+}
+
+.modal-seguridad-perfil__aviso i {
+    margin-top: 0.2rem;
+}
+
+.modal-seguridad-perfil__aviso p {
+    margin: 0;
+    line-height: 1.55;
+}
+
+.modal-seguridad-perfil form {
+    display: grid;
+    gap: 0.65rem;
+    margin-top: 1.2rem;
+}
+
+.modal-seguridad-perfil form > label:not(.modal-seguridad-perfil__confirmacion) {
+    margin-top: 0.35rem;
+    color: #173d36;
+    font-weight: 700;
+}
+
+.modal-seguridad-perfil form > label span {
+    color: #7a8581;
+    font-size: 0.86rem;
+    font-weight: 500;
+}
+
+.modal-seguridad-perfil select,
+.modal-seguridad-perfil textarea {
+    width: 100%;
+    border: 1px solid rgba(23, 61, 54, 0.2);
+    border-radius: 12px;
+    background: #fff;
+    color: #173d36;
+    font: inherit;
+}
+
+.modal-seguridad-perfil select {
+    min-height: 48px;
+    padding: 0 0.9rem;
+}
+
+.modal-seguridad-perfil textarea {
+    min-height: 120px;
+    padding: 0.9rem;
+    resize: vertical;
+    line-height: 1.55;
+}
+
+.modal-seguridad-perfil select:focus,
+.modal-seguridad-perfil textarea:focus {
+    outline: 3px solid rgba(232, 93, 50, 0.18);
+    border-color: #e85d32;
+}
+
+.modal-seguridad-perfil__contador {
+    text-align: right;
+    color: #7a8581;
+    font-size: 0.8rem;
+}
+
+.modal-seguridad-perfil__confirmacion {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    margin-top: 0.55rem;
+    padding: 0.9rem;
+    border-radius: 12px;
+    background: #f5f7f6;
+    color: #384944;
+    cursor: pointer;
+    line-height: 1.5;
+}
+
+.modal-seguridad-perfil__confirmacion input {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin-top: 0.15rem;
+    accent-color: #e85d32;
+}
+
+.modal-seguridad-perfil__error {
+    min-height: 1.2rem;
+    color: #a32323;
+    font-weight: 700;
+    line-height: 1.45;
+}
+
+.modal-seguridad-perfil__acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.4rem;
+}
+
+.modal-seguridad-perfil__boton-secundario,
+.modal-seguridad-perfil__boton-peligro {
+    min-height: 45px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.modal-seguridad-perfil__boton-secundario {
+    border: 1px solid rgba(23, 61, 54, 0.18);
+    background: #fff;
+    color: #173d36;
+}
+
+.modal-seguridad-perfil__boton-peligro {
+    border: 1px solid #a32323;
+    background: #a32323;
+    color: #fff;
+}
+
+.modal-seguridad-perfil__boton-peligro:hover:not(:disabled) {
+    background: #861b1b;
+}
+
+.modal-seguridad-perfil__boton-secundario:hover {
+    background: #f1f4f3;
+}
+
+.modal-seguridad-perfil__boton-peligro:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}
+
+@media (max-width: 600px) {
+    .modal-seguridad-perfil {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .modal-seguridad-perfil__panel {
+        width: 100%;
+        max-height: 92vh;
+        padding: 1.5rem 1rem calc(1.25rem + env(safe-area-inset-bottom));
+        border-radius: 22px 22px 0 0;
+    }
+
+    .modal-seguridad-perfil__acciones {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .modal-seguridad-perfil__boton-peligro {
+        grid-row: 1;
+    }
+
+    .modal-seguridad-perfil__boton-secundario {
+        grid-row: 2;
+    }
+}
+
+/* =====================================================
+   PERFIL PÚBLICO: BOTÓN DESBLOQUEAR USUARIO
+   Añadir al FINAL de css/style.css
+===================================================== */
+
+.perfil-publico-seguridad__boton--desbloquear {
+    border-color: rgba(33, 119, 88, 0.3);
+    background: rgba(33, 119, 88, 0.06);
+    color: #176c4e;
+}
+
+.perfil-publico-seguridad__boton--desbloquear:hover:not(:disabled) {
+    border-color: rgba(33, 119, 88, 0.55);
+    background: rgba(33, 119, 88, 0.11);
+}
+
+/* =====================================================
+   SURALIA - CHAT: PASO 2
+   Añadir al FINAL de css/style.css
+===================================================== */
+
+.boton-conexion--mensaje {
+    border-color: rgba(23, 61, 54, 0.2);
+    background: rgba(23, 61, 54, 0.06);
+    color: #173d36;
+}
+
+.boton-conexion--mensaje:hover:not(:disabled) {
+    border-color: rgba(23, 61, 54, 0.42);
+    background: rgba(23, 61, 54, 0.11);
+}
+
+.mensajes-pagina {
+    min-height: calc(100vh - 90px);
+    padding: 2rem 0 4rem;
+    background: #f5f7f6;
+}
+
+.mensajes-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 1rem;
+    color: #173d36;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.mensajes-volver:hover {
+    color: #e85d32;
+}
+
+.mensajes-carga,
+.mensajes-error {
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    text-align: center;
+}
+
+.mensajes-carga > i,
+.mensajes-error > i {
+    font-size: 2rem;
+    color: #e85d32;
+}
+
+.mensajes-error h1,
+.mensajes-error p {
+    margin: 0;
+}
+
+.mensajes-error p {
+    max-width: 560px;
+    color: #66736f;
+}
+
+.chat-suralia {
+    width: min(100%, 900px);
+    min-height: 650px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    margin: 0 auto;
+    overflow: hidden;
+    border: 1px solid rgba(23, 61, 54, 0.1);
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 18px 50px rgba(23, 61, 54, 0.09);
+}
+
+.chat-suralia__cabecera {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(23, 61, 54, 0.1);
+}
+
+.chat-suralia__avatar {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 50%;
+    background: rgba(232, 93, 50, 0.1);
+    color: #e85d32;
+    font-weight: 800;
+}
+
+.chat-suralia__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.chat-suralia__cabecera span {
+    display: block;
+    margin-bottom: 0.12rem;
+    color: #77827e;
+    font-size: 0.78rem;
+}
+
+.chat-suralia__cabecera h1 {
+    margin: 0;
+    color: #173d36;
+    font-size: 1.05rem;
+}
+
+.chat-suralia__mensajes {
+    min-height: 480px;
+    padding: 1.25rem;
+    overflow-y: auto;
+    background:
+        linear-gradient(
+            rgba(245, 247, 246, 0.92),
+            rgba(245, 247, 246, 0.92)
+        );
+}
+
+.chat-suralia__vacio {
+    min-height: 430px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.chat-suralia__vacio i {
+    margin-bottom: 0.85rem;
+    color: #e85d32;
+    font-size: 2.2rem;
+}
+
+.chat-suralia__vacio h2 {
+    margin: 0 0 0.45rem;
+    color: #173d36;
+}
+
+.chat-suralia__vacio p {
+    max-width: 460px;
+    margin: 0;
+    color: #66736f;
+    line-height: 1.6;
+}
+
+.chat-suralia__formulario {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.7rem;
+    padding: 1rem;
+    border-top: 1px solid rgba(23, 61, 54, 0.1);
+}
+
+.chat-suralia__formulario textarea {
+    width: 100%;
+    min-height: 48px;
+    max-height: 140px;
+    padding: 0.8rem 0.95rem;
+    border: 1px solid rgba(23, 61, 54, 0.18);
+    border-radius: 14px;
+    background: #f5f7f6;
+    color: #173d36;
+    font: inherit;
+    resize: none;
+}
+
+.chat-suralia__formulario button {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 14px;
+    background: #e85d32;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.chat-suralia__formulario :disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+@media (max-width: 700px) {
+    .mensajes-pagina {
+        padding: 1rem 0 0;
+    }
+
+    .chat-suralia {
+        min-height: calc(100vh - 145px);
+        border-right: 0;
+        border-bottom: 0;
+        border-left: 0;
+        border-radius: 18px 18px 0 0;
+    }
+
+    .chat-suralia__mensajes {
+        min-height: 0;
+    }
+}
+
+/* =====================================================
+   SURALIA - CHAT: MENSAJES REALES
+   Añadir al FINAL de css/style.css
+===================================================== */
+
+.chat-suralia__mensajes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    scroll-behavior: smooth;
+}
+
+.chat-mensaje {
+    display: flex;
+    width: 100%;
+}
+
+.chat-mensaje--propio {
+    justify-content: flex-end;
+}
+
+.chat-mensaje--recibido {
+    justify-content: flex-start;
+}
+
+.chat-mensaje__burbuja {
+    max-width: min(76%, 620px);
+    padding: 0.72rem 0.9rem 0.48rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(23, 61, 54, 0.05);
+}
+
+.chat-mensaje--propio .chat-mensaje__burbuja {
+    border-bottom-right-radius: 5px;
+    background: #173d36;
+    color: #fff;
+}
+
+.chat-mensaje--recibido .chat-mensaje__burbuja {
+    border: 1px solid rgba(23, 61, 54, 0.09);
+    border-bottom-left-radius: 5px;
+    background: #fff;
+    color: #173d36;
+}
+
+.chat-mensaje__burbuja p {
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.5;
+}
+
+.chat-mensaje__burbuja time {
+    display: block;
+    margin-top: 0.28rem;
+    text-align: right;
+    font-size: 0.68rem;
+}
+
+.chat-mensaje--propio .chat-mensaje__burbuja time {
+    color: rgba(255, 255, 255, 0.68);
+}
+
+.chat-mensaje--recibido .chat-mensaje__burbuja time {
+    color: #7a8581;
+}
+
+.chat-suralia__formulario textarea:not(:disabled) {
+    background: #fff;
+}
+
+.chat-suralia__formulario textarea:focus {
+    outline: 3px solid rgba(232, 93, 50, 0.18);
+    border-color: #e85d32;
+}
+
+.chat-suralia__formulario button:not(:disabled) {
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.chat-suralia__formulario button:not(:disabled):hover {
+    transform: translateY(-2px);
+    background: #cf4d27;
+}
+
+.chat-suralia__formulario button:not(:disabled):active {
+    transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+    .chat-mensaje__burbuja {
+        max-width: 86%;
+    }
+
+    .chat-suralia__mensajes {
+        padding: 1rem 0.75rem;
+    }
+}
+
+/* =====================================================
+   PERFIL: CONTADOR DE MENSAJES PENDIENTES
+   Añadir al FINAL de css/style.css
+===================================================== */
+
+.perfil-menu__enlace {
+    position: relative;
+}
+
+.perfil-menu__texto {
+    min-width: 0;
+}
+
+.perfil-menu__contador {
+    min-width: 25px;
+    height: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    padding: 0 0.42rem;
+    border-radius: 999px;
+    background: #e85d32;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
+    box-shadow: 0 5px 12px rgba(232, 93, 50, 0.25);
+}
+
+.perfil-menu__enlace.activo
+.perfil-menu__contador {
+    background: #fff;
+    color: #c84620;
+}
+
+@media (max-width: 700px) {
+    .perfil-menu__contador {
+        min-width: 23px;
+        height: 23px;
+        font-size: 0.68rem;
+    }
+}
+
+/* =====================================================
+   SURALIA - BANDEJA GENERAL DE MENSAJES
+   Añadir al FINAL de css/style.css
+===================================================== */
+
+.conversaciones-pagina {
+    min-height: calc(100vh - 90px);
+    padding: 2.5rem 0 4rem;
+    background: #f5f7f6;
+}
+
+.conversaciones-cabecera {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.conversaciones-cabecera h1 {
+    margin: 0.25rem 0 0.55rem;
+    color: #173d36;
+    font-size: clamp(2rem, 5vw, 3.15rem);
+}
+
+.conversaciones-cabecera p {
+    max-width: 650px;
+    margin: 0;
+    color: #66736f;
+    line-height: 1.65;
+}
+
+.conversaciones-cabecera__enlace {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    min-height: 46px;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(23, 61, 54, 0.18);
+    border-radius: 12px;
+    background: #fff;
+    color: #173d36;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.conversaciones-carga,
+.conversaciones-error,
+.conversaciones-vacio {
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    padding: 2rem;
+    border: 1px solid rgba(23, 61, 54, 0.1);
+    border-radius: 22px;
+    background: #fff;
+    text-align: center;
+    box-shadow: 0 14px 38px rgba(23, 61, 54, 0.06);
+}
+
+.conversaciones-carga > i,
+.conversaciones-error > i,
+.conversaciones-vacio > i {
+    color: #e85d32;
+    font-size: 2.2rem;
+}
+
+.conversaciones-lista {
+    display: grid;
+    gap: 0.8rem;
+}
+
+.conversacion-tarjeta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+    padding: 1rem 1.1rem;
+    border: 1px solid rgba(23, 61, 54, 0.1);
+    border-radius: 18px;
+    background: #fff;
+    color: inherit;
+    text-decoration: none;
+    box-shadow: 0 8px 24px rgba(23, 61, 54, 0.055);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.conversacion-tarjeta:hover {
+    transform: translateY(-2px);
+    border-color: rgba(232, 93, 50, 0.28);
+    box-shadow: 0 12px 30px rgba(23, 61, 54, 0.085);
+}
+
+.conversacion-tarjeta__avatar {
+    width: 58px;
+    height: 58px;
+    flex: 0 0 58px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 50%;
+    background: rgba(232, 93, 50, 0.11);
+    color: #e85d32;
+    font-weight: 800;
+}
+
+.conversacion-tarjeta__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.conversacion-tarjeta__contenido {
+    min-width: 0;
+    flex: 1;
+    display: grid;
+    gap: 0.4rem;
+}
+
+.conversacion-tarjeta__superior,
+.conversacion-tarjeta__inferior {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 0;
+}
+
+.conversacion-tarjeta__superior strong,
+.conversacion-tarjeta__mensaje {
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.conversacion-tarjeta__superior strong {
+    color: #173d36;
+}
+
+.conversacion-tarjeta__superior time {
+    flex: 0 0 auto;
+    color: #7b8682;
+    font-size: 0.78rem;
+}
+
+.conversacion-tarjeta__mensaje {
+    color: #68746f;
+    font-size: 0.9rem;
+}
+
+.conversacion-tarjeta__contador {
+    min-width: 25px;
+    height: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.42rem;
+    border-radius: 999px;
+    background: #e85d32;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+@media (max-width: 700px) {
+    .conversaciones-pagina {
+        padding: 1.5rem 0 3rem;
+    }
+
+    .conversaciones-cabecera {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .conversaciones-cabecera__enlace {
+        width: 100%;
+    }
+
+    .conversacion-tarjeta {
+        gap: 0.8rem;
+        padding: 0.9rem;
+    }
+
+    .conversacion-tarjeta__avatar {
+        width: 50px;
+        height: 50px;
+        flex-basis: 50px;
+    }
+}
+
+/* =====================================================
+   SURALIA - ESTADO ENVIADO Y LEÍDO
+   Añadir al FINAL de css/style.css
+===================================================== */
+
+.chat-mensaje__meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    margin-top: 0.28rem;
+}
+
+.chat-mensaje__meta time {
+    margin-top: 0;
+}
+
+.chat-mensaje__estado {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 15px;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 0.68rem;
+    line-height: 1;
+}
+
+.chat-mensaje__estado--leido {
+    color: #70d7ff;
+}
+
+/* =====================================================
+   SURALIA - NOTIFICACIONES DEL NAVEGADOR
+   Añadir al FINAL de css/style.css
+===================================================== */
+
+.conversaciones-cabecera__acciones {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+button.conversaciones-cabecera__enlace {
+    font: inherit;
+    cursor: pointer;
+}
+
+button.conversaciones-cabecera__enlace:disabled {
+    cursor: default;
+    opacity: 0.72;
+}
+
+.conversaciones-cabecera__enlace--activo {
+    border-color: rgba(33, 119, 88, 0.28);
+    background: rgba(33, 119, 88, 0.07);
+    color: #176c4e;
+}
+
+@media (max-width: 700px) {
+    .conversaciones-cabecera__acciones {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+}

@@ -111,11 +111,110 @@ const mensajeConexionPerfil =
         "#mensaje-conexion-perfil"
     );
 
+const bloqueSeguridadPerfil =
+    document.querySelector(
+        "#bloque-seguridad-perfil"
+    );
+
+const botonBloquearUsuario =
+    document.querySelector(
+        "#boton-bloquear-usuario"
+    );
+
+const botonDenunciarUsuario =
+    document.querySelector(
+        "#boton-denunciar-usuario"
+    );
+
+const mensajeSeguridadPerfil =
+    document.querySelector(
+        "#mensaje-seguridad-perfil"
+    );
+
+const modalBloquearUsuario =
+    document.querySelector(
+        "#modal-bloquear-usuario"
+    );
+
+const cerrarModalBloquear =
+    document.querySelector(
+        "#cerrar-modal-bloquear"
+    );
+
+const cancelarBloqueoUsuario =
+    document.querySelector(
+        "#cancelar-bloqueo-usuario"
+    );
+
+const confirmarBloqueoUsuario =
+    document.querySelector(
+        "#confirmar-bloqueo-usuario"
+    );
+
+const modalDenunciarUsuario =
+    document.querySelector(
+        "#modal-denunciar-usuario"
+    );
+
+const cerrarModalDenunciar =
+    document.querySelector(
+        "#cerrar-modal-denunciar"
+    );
+
+const cancelarDenunciaUsuario =
+    document.querySelector(
+        "#cancelar-denuncia-usuario"
+    );
+
+const formularioDenunciarUsuario =
+    document.querySelector(
+        "#formulario-denunciar-usuario"
+    );
+
+const motivoDenunciaUsuario =
+    document.querySelector(
+        "#motivo-denuncia-usuario"
+    );
+
+const descripcionDenunciaUsuario =
+    document.querySelector(
+        "#descripcion-denuncia-usuario"
+    );
+
+const contadorDenunciaUsuario =
+    document.querySelector(
+        "#contador-denuncia-usuario"
+    );
+
+const confirmarEfectoDenuncia =
+    document.querySelector(
+        "#confirmar-efecto-denuncia"
+    );
+
+const errorDenunciaUsuario =
+    document.querySelector(
+        "#error-denuncia-usuario"
+    );
+
+const confirmarDenunciaUsuario =
+    document.querySelector(
+        "#confirmar-denuncia-usuario"
+    );
+
 let usuarioSesionActual =
     null;
 
 let receptorConexionId =
     "";
+
+let nombrePerfilPublico =
+    "este usuario";
+
+let usuarioEstaBloqueado =
+    false;
+
+let elementoFocoAnterior =
+    null;
 
 
 
@@ -737,8 +836,16 @@ function actualizarTarjetaConexion(
             "oculto"
         );
 
+        bloqueSeguridadPerfil?.classList.add(
+            "oculto"
+        );
+
         return;
     }
+
+    bloqueSeguridadPerfil?.classList.remove(
+        "oculto"
+    );
 
     bloqueConexionPerfil.classList.remove(
         "oculto"
@@ -1064,12 +1171,510 @@ async function enviarSolicitudConexion() {
 }
 
 
+
+/* =========================================
+   BLOQUEAR Y DENUNCIAR USUARIO
+========================================= */
+
+function abrirModalSeguridad(
+    modal
+) {
+    if (!modal) {
+        return;
+    }
+
+    elementoFocoAnterior =
+        document.activeElement;
+
+    modal.classList.add(
+        "visible"
+    );
+
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    document.body.style.overflow =
+        "hidden";
+
+    const primerControl =
+        modal.querySelector(
+            "button, select, textarea, input"
+        );
+
+    window.setTimeout(
+        () => {
+            primerControl?.focus();
+        },
+        50
+    );
+}
+
+
+function cerrarModalSeguridad(
+    modal
+) {
+    if (!modal) {
+        return;
+    }
+
+    modal.classList.remove(
+        "visible"
+    );
+
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+    document.body.style.overflow =
+        "";
+
+    elementoFocoAnterior?.focus?.();
+    elementoFocoAnterior =
+        null;
+}
+
+
+function actualizarPerfilBloqueado(
+    mensaje
+) {
+    usuarioEstaBloqueado =
+        true;
+
+    bloqueConexionPerfil?.classList.add(
+        "oculto"
+    );
+
+    if (botonBloquearUsuario) {
+        botonBloquearUsuario.disabled =
+            false;
+
+        botonBloquearUsuario.classList.add(
+            "perfil-publico-seguridad__boton--desbloquear"
+        );
+
+        botonBloquearUsuario.innerHTML = `
+            <i class="fa-solid fa-user-check"></i>
+            Desbloquear usuario
+        `;
+    }
+
+    if (botonDenunciarUsuario) {
+        botonDenunciarUsuario.disabled =
+            true;
+    }
+
+    if (mensajeSeguridadPerfil) {
+        mensajeSeguridadPerfil.textContent =
+            mensaje;
+    }
+
+    bloqueSeguridadPerfil?.classList.add(
+        "perfil-publico-seguridad--bloqueado"
+    );
+}
+
+
+function actualizarPerfilDesbloqueado(
+    mensaje
+) {
+    usuarioEstaBloqueado =
+        false;
+
+    bloqueSeguridadPerfil?.classList.remove(
+        "perfil-publico-seguridad--bloqueado"
+    );
+
+    if (botonBloquearUsuario) {
+        botonBloquearUsuario.disabled =
+            false;
+
+        botonBloquearUsuario.classList.remove(
+            "perfil-publico-seguridad__boton--desbloquear"
+        );
+
+        botonBloquearUsuario.innerHTML = `
+            <i class="fa-solid fa-user-slash"></i>
+            Bloquear usuario
+        `;
+    }
+
+    if (botonDenunciarUsuario) {
+        botonDenunciarUsuario.disabled =
+            false;
+    }
+
+    if (mensajeSeguridadPerfil) {
+        mensajeSeguridadPerfil.textContent =
+            mensaje;
+    }
+
+    actualizarTarjetaConexion(
+        "disponible"
+    );
+}
+
+
+async function consultarBloqueoActual() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (
+        !cliente ||
+        !usuarioSesionActual ||
+        !receptorConexionId ||
+        usuarioSesionActual.id ===
+            receptorConexionId
+    ) {
+        return false;
+    }
+
+    const {
+        data,
+        error
+    } = await cliente
+        .from("bloqueos_usuarios")
+        .select("bloqueado_id")
+        .eq(
+            "bloqueador_id",
+            usuarioSesionActual.id
+        )
+        .eq(
+            "bloqueado_id",
+            receptorConexionId
+        )
+        .maybeSingle();
+
+    if (error) {
+        throw error;
+    }
+
+    if (data) {
+        actualizarPerfilBloqueado(
+            "Has bloqueado a este usuario."
+        );
+
+        return true;
+    }
+
+    return false;
+}
+
+
+async function bloquearUsuarioActual() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (
+        !cliente ||
+        !usuarioSesionActual ||
+        !receptorConexionId ||
+        !confirmarBloqueoUsuario
+    ) {
+        return;
+    }
+
+    confirmarBloqueoUsuario.disabled =
+        true;
+
+    confirmarBloqueoUsuario.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Bloqueando...
+    `;
+
+    try {
+        const {
+            error
+        } = await cliente.rpc(
+            "bloquear_usuario",
+            {
+                usuario_bloqueado:
+                    receptorConexionId
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        cerrarModalSeguridad(
+            modalBloquearUsuario
+        );
+
+        actualizarPerfilBloqueado(
+            `${nombrePerfilPublico} ha sido bloqueado. La conexión o solicitud existente se ha eliminado.`
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo bloquear al usuario:",
+            error
+        );
+
+        if (mensajeSeguridadPerfil) {
+            mensajeSeguridadPerfil.textContent =
+                "No se ha podido bloquear al usuario. Inténtalo de nuevo.";
+        }
+    } finally {
+        confirmarBloqueoUsuario.disabled =
+            false;
+
+        confirmarBloqueoUsuario.innerHTML = `
+            <i class="fa-solid fa-user-slash"></i>
+            Bloquear usuario
+        `;
+    }
+}
+
+
+async function desbloquearUsuarioActual() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (
+        !cliente ||
+        !usuarioSesionActual ||
+        !receptorConexionId ||
+        !confirmarBloqueoUsuario
+    ) {
+        return;
+    }
+
+    confirmarBloqueoUsuario.disabled =
+        true;
+
+    confirmarBloqueoUsuario.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Desbloqueando...
+    `;
+
+    try {
+        const {
+            error
+        } = await cliente.rpc(
+            "desbloquear_usuario",
+            {
+                usuario_desbloqueado:
+                    receptorConexionId
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        cerrarModalSeguridad(
+            modalBloquearUsuario
+        );
+
+        actualizarPerfilDesbloqueado(
+            `${nombrePerfilPublico} ha sido desbloqueado. Ya puedes volver a enviarle una solicitud de conexión.`
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo desbloquear al usuario:",
+            error
+        );
+
+        if (mensajeSeguridadPerfil) {
+            mensajeSeguridadPerfil.textContent =
+                "No se ha podido desbloquear al usuario. Inténtalo de nuevo.";
+        }
+    } finally {
+        confirmarBloqueoUsuario.disabled =
+            false;
+
+        confirmarBloqueoUsuario.innerHTML = `
+            <i class="fa-solid fa-user-check"></i>
+            Desbloquear usuario
+        `;
+    }
+}
+
+
+function reiniciarFormularioDenuncia() {
+    formularioDenunciarUsuario?.reset();
+
+    if (contadorDenunciaUsuario) {
+        contadorDenunciaUsuario.textContent =
+            "0";
+    }
+
+    if (errorDenunciaUsuario) {
+        errorDenunciaUsuario.textContent =
+            "";
+    }
+}
+
+
+async function enviarDenunciaUsuario(
+    evento
+) {
+    evento.preventDefault();
+
+    const cliente =
+        window.clienteSupabase;
+
+    if (
+        !cliente ||
+        !usuarioSesionActual ||
+        !receptorConexionId ||
+        !motivoDenunciaUsuario ||
+        !confirmarEfectoDenuncia ||
+        !confirmarDenunciaUsuario
+    ) {
+        return;
+    }
+
+    if (!motivoDenunciaUsuario.value) {
+        errorDenunciaUsuario.textContent =
+            "Selecciona el motivo de la denuncia.";
+
+        motivoDenunciaUsuario.focus();
+        return;
+    }
+
+    if (!confirmarEfectoDenuncia.checked) {
+        errorDenunciaUsuario.textContent =
+            "Debes confirmar que entiendes que también se bloqueará al usuario.";
+
+        confirmarEfectoDenuncia.focus();
+        return;
+    }
+
+    errorDenunciaUsuario.textContent =
+        "";
+
+    confirmarDenunciaUsuario.disabled =
+        true;
+
+    confirmarDenunciaUsuario.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Enviando...
+    `;
+
+    try {
+        const {
+            error
+        } = await cliente.rpc(
+            "denunciar_y_bloquear_usuario",
+            {
+                usuario_denunciado:
+                    receptorConexionId,
+
+                motivo_denuncia:
+                    motivoDenunciaUsuario.value,
+
+                descripcion_denuncia:
+                    descripcionDenunciaUsuario?.value
+                        ?.trim() ||
+                    null
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        cerrarModalSeguridad(
+            modalDenunciarUsuario
+        );
+
+        reiniciarFormularioDenuncia();
+
+        actualizarPerfilBloqueado(
+            "La denuncia se ha enviado correctamente y el usuario ha sido bloqueado."
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo enviar la denuncia:",
+            error
+        );
+
+        errorDenunciaUsuario.textContent =
+            "No se ha podido enviar la denuncia. Inténtalo de nuevo.";
+    } finally {
+        confirmarDenunciaUsuario.disabled =
+            false;
+
+        confirmarDenunciaUsuario.innerHTML = `
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            Denunciar y bloquear
+        `;
+    }
+}
+
+
+function limitarFocoModal(
+    evento,
+    modal
+) {
+    if (
+        evento.key !== "Tab" ||
+        !modal?.classList.contains(
+            "visible"
+        )
+    ) {
+        return;
+    }
+
+    const controles =
+        Array.from(
+            modal.querySelectorAll(
+                `
+                    button:not([disabled]),
+                    select:not([disabled]),
+                    textarea:not([disabled]),
+                    input:not([disabled]),
+                    [tabindex]:not([tabindex="-1"])
+                `
+            )
+        ).filter(
+            (elemento) =>
+                elemento.offsetParent !==
+                null
+        );
+
+    if (controles.length === 0) {
+        return;
+    }
+
+    const primero =
+        controles[0];
+
+    const ultimo =
+        controles[
+            controles.length - 1
+        ];
+
+    if (
+        evento.shiftKey &&
+        document.activeElement ===
+            primero
+    ) {
+        evento.preventDefault();
+        ultimo.focus();
+    } else if (
+        !evento.shiftKey &&
+        document.activeElement ===
+            ultimo
+    ) {
+        evento.preventDefault();
+        primero.focus();
+    }
+}
+
+
 function mostrarPerfil(
     datos
 ) {
     const nombre =
         datos?.nombre ||
         "Usuario de Suralia";
+
+    nombrePerfilPublico =
+        nombre;
 
     document.title =
         `${nombre} | Suralia`;
@@ -1304,10 +1909,15 @@ async function cargarPerfilPublico() {
         );
 
         try {
-            await consultarEstadoConexion();
+            const usuarioBloqueado =
+                await consultarBloqueoActual();
+
+            if (!usuarioBloqueado) {
+                await consultarEstadoConexion();
+            }
         } catch (errorConexion) {
             console.error(
-                "No se pudo consultar el estado de conexión:",
+                "No se pudo consultar el estado de seguridad o conexión:",
                 errorConexion
             );
 
@@ -1345,6 +1955,200 @@ botonVolver?.addEventListener(
 );
 
 
+botonBloquearUsuario?.addEventListener(
+    "click",
+    () => {
+        const tituloModal =
+            document.querySelector(
+                "#titulo-modal-bloquear"
+            );
+
+        const textoModal =
+            document.querySelector(
+                "#texto-modal-bloquear"
+            );
+
+        const iconoModal =
+            modalBloquearUsuario
+                ?.querySelector(
+                    ".modal-seguridad-perfil__icono i"
+                );
+
+        if (usuarioEstaBloqueado) {
+            if (tituloModal) {
+                tituloModal.textContent =
+                    "¿Desbloquear a este usuario?";
+            }
+
+            if (textoModal) {
+                textoModal.textContent =
+                    `Al desbloquear a ${nombrePerfilPublico}, podréis volver a enviaros solicitudes de conexión. La conexión anterior no se recuperará automáticamente.`;
+            }
+
+            if (iconoModal) {
+                iconoModal.className =
+                    "fa-solid fa-user-check";
+            }
+
+            if (confirmarBloqueoUsuario) {
+                confirmarBloqueoUsuario.innerHTML = `
+                    <i class="fa-solid fa-user-check"></i>
+                    Desbloquear usuario
+                `;
+            }
+        } else {
+            if (tituloModal) {
+                tituloModal.textContent =
+                    "¿Bloquear a este usuario?";
+            }
+
+            if (textoModal) {
+                textoModal.textContent =
+                    `Al bloquear a ${nombrePerfilPublico}, se eliminará cualquier solicitud o conexión existente y no podréis volver a conectar mientras siga bloqueado.`;
+            }
+
+            if (iconoModal) {
+                iconoModal.className =
+                    "fa-solid fa-user-slash";
+            }
+
+            if (confirmarBloqueoUsuario) {
+                confirmarBloqueoUsuario.innerHTML = `
+                    <i class="fa-solid fa-user-slash"></i>
+                    Bloquear usuario
+                `;
+            }
+        }
+
+        abrirModalSeguridad(
+            modalBloquearUsuario
+        );
+    }
+);
+
+
+cerrarModalBloquear?.addEventListener(
+    "click",
+    () => {
+        cerrarModalSeguridad(
+            modalBloquearUsuario
+        );
+    }
+);
+
+
+cancelarBloqueoUsuario?.addEventListener(
+    "click",
+    () => {
+        cerrarModalSeguridad(
+            modalBloquearUsuario
+        );
+    }
+);
+
+
+confirmarBloqueoUsuario?.addEventListener(
+    "click",
+    () => {
+        if (usuarioEstaBloqueado) {
+            desbloquearUsuarioActual();
+            return;
+        }
+
+        bloquearUsuarioActual();
+    }
+);
+
+
+botonDenunciarUsuario?.addEventListener(
+    "click",
+    () => {
+        reiniciarFormularioDenuncia();
+
+        abrirModalSeguridad(
+            modalDenunciarUsuario
+        );
+    }
+);
+
+
+cerrarModalDenunciar?.addEventListener(
+    "click",
+    () => {
+        cerrarModalSeguridad(
+            modalDenunciarUsuario
+        );
+
+        reiniciarFormularioDenuncia();
+    }
+);
+
+
+cancelarDenunciaUsuario?.addEventListener(
+    "click",
+    () => {
+        cerrarModalSeguridad(
+            modalDenunciarUsuario
+        );
+
+        reiniciarFormularioDenuncia();
+    }
+);
+
+
+formularioDenunciarUsuario?.addEventListener(
+    "submit",
+    enviarDenunciaUsuario
+);
+
+
+descripcionDenunciaUsuario?.addEventListener(
+    "input",
+    () => {
+        if (contadorDenunciaUsuario) {
+            contadorDenunciaUsuario.textContent =
+                String(
+                    descripcionDenunciaUsuario
+                        .value
+                        .length
+                );
+        }
+    }
+);
+
+
+modalBloquearUsuario?.addEventListener(
+    "click",
+    (evento) => {
+        if (
+            evento.target ===
+            modalBloquearUsuario
+        ) {
+            cerrarModalSeguridad(
+                modalBloquearUsuario
+            );
+        }
+    }
+);
+
+
+modalDenunciarUsuario?.addEventListener(
+    "click",
+    (evento) => {
+        if (
+            evento.target ===
+            modalDenunciarUsuario
+        ) {
+            cerrarModalSeguridad(
+                modalDenunciarUsuario
+            );
+
+            reiniciarFormularioDenuncia();
+        }
+    }
+);
+
+
 cerrarModalFoto?.addEventListener(
     "click",
     cerrarFotoPublica
@@ -1369,13 +2173,54 @@ document.addEventListener(
     (evento) => {
         if (
             evento.key ===
-            "Escape" &&
+                "Escape" &&
+            modalBloquearUsuario?.classList.contains(
+                "visible"
+            )
+        ) {
+            cerrarModalSeguridad(
+                modalBloquearUsuario
+            );
+
+            return;
+        }
+
+        if (
+            evento.key ===
+                "Escape" &&
+            modalDenunciarUsuario?.classList.contains(
+                "visible"
+            )
+        ) {
+            cerrarModalSeguridad(
+                modalDenunciarUsuario
+            );
+
+            reiniciarFormularioDenuncia();
+
+            return;
+        }
+
+        if (
+            evento.key ===
+                "Escape" &&
             modalFoto?.classList.contains(
                 "visible"
             )
         ) {
             cerrarFotoPublica();
+            return;
         }
+
+        limitarFocoModal(
+            evento,
+            modalBloquearUsuario
+        );
+
+        limitarFocoModal(
+            evento,
+            modalDenunciarUsuario
+        );
     }
 );
 
