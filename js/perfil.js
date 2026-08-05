@@ -3550,6 +3550,146 @@ function migrarReservasAntiguas() {
 }
 
 
+
+async function sincronizarReservasDinamicasEliminadas() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente) {
+        return;
+    }
+
+    const reservas =
+        leerDatoLocal(
+            "reservasSuralia",
+            []
+        );
+
+    if (!Array.isArray(reservas)) {
+        return;
+    }
+
+    const reservasUsuario =
+        reservas.filter(
+            (
+                reserva
+            ) =>
+                reserva.usuarioEmail ===
+                usuarioGuardado.email
+        );
+
+    const idsDinamicos =
+        [
+            ...new Set(
+                reservasUsuario
+                    .map(
+                        obtenerIdPlanReserva
+                    )
+                    .filter(
+                        esIdUuidPerfil
+                    )
+            )
+        ];
+
+    if (
+        idsDinamicos.length ===
+        0
+    ) {
+        return;
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente
+            .from(
+                "planes"
+            )
+            .select(
+                "id"
+            )
+            .in(
+                "id",
+                idsDinamicos
+            )
+            .eq(
+                "estado",
+                "publicado"
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        const idsDisponibles =
+            new Set(
+                (
+                    Array.isArray(data)
+                        ? data
+                        : []
+                ).map(
+                    (
+                        plan
+                    ) => String(
+                        plan.id
+                    )
+                )
+            );
+
+        const reservasActualizadas =
+            reservas.filter(
+                (
+                    reserva
+                ) => {
+                    if (
+                        reserva.usuarioEmail !==
+                        usuarioGuardado.email
+                    ) {
+                        return true;
+                    }
+
+                    const planId =
+                        obtenerIdPlanReserva(
+                            reserva
+                        );
+
+                    if (
+                        !esIdUuidPerfil(
+                            planId
+                        )
+                    ) {
+                        return true;
+                    }
+
+                    return idsDisponibles.has(
+                        String(
+                            planId
+                        )
+                    );
+                }
+            );
+
+        if (
+            reservasActualizadas.length !==
+            reservas.length
+        ) {
+            guardarDatoLocal(
+                "reservasSuralia",
+                reservasActualizadas
+            );
+
+            mostrarReservasPerfil();
+        }
+    } catch (error) {
+        console.error(
+            "No se pudieron sincronizar las reservas con Supabase:",
+            error
+        );
+    }
+}
+
+
 function obtenerReservasUsuario() {
     const reservas =
         migrarReservasAntiguas();
@@ -4058,6 +4198,159 @@ function migrarFavoritosAntiguos() {
 
     return favoritosActualizados;
 }
+
+
+function esIdUuidPerfil(
+    valor
+) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+        .test(
+            String(
+                valor ||
+                ""
+            )
+        );
+}
+
+
+async function sincronizarFavoritosDinamicosEliminados() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente) {
+        return;
+    }
+
+    const favoritos =
+        leerDatoLocal(
+            "favoritosSuralia",
+            []
+        );
+
+    if (!Array.isArray(favoritos)) {
+        return;
+    }
+
+    const favoritosUsuario =
+        favoritos.filter(
+            (
+                favorito
+            ) =>
+                favorito.usuarioEmail ===
+                usuarioGuardado.email
+        );
+
+    const idsDinamicos =
+        [
+            ...new Set(
+                favoritosUsuario
+                    .map(
+                        obtenerIdPlanFavorito
+                    )
+                    .filter(
+                        esIdUuidPerfil
+                    )
+            )
+        ];
+
+    if (
+        idsDinamicos.length ===
+        0
+    ) {
+        return;
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente
+            .from(
+                "planes"
+            )
+            .select(
+                "id"
+            )
+            .in(
+                "id",
+                idsDinamicos
+            )
+            .eq(
+                "estado",
+                "publicado"
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        const idsDisponibles =
+            new Set(
+                (
+                    Array.isArray(data)
+                        ? data
+                        : []
+                ).map(
+                    (
+                        plan
+                    ) => String(
+                        plan.id
+                    )
+                )
+            );
+
+        const favoritosActualizados =
+            favoritos.filter(
+                (
+                    favorito
+                ) => {
+                    if (
+                        favorito.usuarioEmail !==
+                        usuarioGuardado.email
+                    ) {
+                        return true;
+                    }
+
+                    const planId =
+                        obtenerIdPlanFavorito(
+                            favorito
+                        );
+
+                    if (
+                        !esIdUuidPerfil(
+                            planId
+                        )
+                    ) {
+                        return true;
+                    }
+
+                    return idsDisponibles.has(
+                        String(
+                            planId
+                        )
+                    );
+                }
+            );
+
+        if (
+            favoritosActualizados.length !==
+            favoritos.length
+        ) {
+            guardarDatoLocal(
+                "favoritosSuralia",
+                favoritosActualizados
+            );
+
+            mostrarFavoritosPerfil();
+        }
+    } catch (error) {
+        console.error(
+            "No se pudieron sincronizar los favoritos con Supabase:",
+            error
+        );
+    }
+}
+
 
 function obtenerFavoritosUsuario() {
     const favoritos =
@@ -4727,6 +5020,138 @@ async function obtenerTotalPersonasAfinidad(
 }
 
 
+
+async function limpiarAfinidadesDePlanesEliminados(
+    usuarioId,
+    afinidades
+) {
+    const cliente =
+        obtenerClienteAfinidades();
+
+    if (
+        !cliente ||
+        !usuarioId ||
+        !Array.isArray(afinidades) ||
+        afinidades.length ===
+            0
+    ) {
+        return afinidades;
+    }
+
+    const idsPlanes =
+        [
+            ...new Set(
+                afinidades
+                    .map(
+                        (
+                            afinidad
+                        ) => String(
+                            afinidad.plan_id ||
+                            ""
+                        )
+                    )
+                    .filter(Boolean)
+            )
+        ];
+
+    if (
+        idsPlanes.length ===
+        0
+    ) {
+        return [];
+    }
+
+    const {
+        data,
+        error
+    } = await cliente
+        .from(
+            "planes"
+        )
+        .select(
+            "id"
+        )
+        .in(
+            "id",
+            idsPlanes
+        )
+        .eq(
+            "estado",
+            "publicado"
+        );
+
+    if (error) {
+        throw error;
+    }
+
+    const idsDisponibles =
+        new Set(
+            (
+                Array.isArray(data)
+                    ? data
+                    : []
+            ).map(
+                (
+                    plan
+                ) => String(
+                    plan.id
+                )
+            )
+        );
+
+    const idsEliminados =
+        idsPlanes.filter(
+            (
+                planId
+            ) =>
+                !idsDisponibles.has(
+                    String(
+                        planId
+                    )
+                )
+        );
+
+    if (
+        idsEliminados.length >
+        0
+    ) {
+        const {
+            error: errorLimpieza
+        } = await cliente
+            .from(
+                "afinidades_planes"
+            )
+            .delete()
+            .eq(
+                "usuario_id",
+                usuarioId
+            )
+            .in(
+                "plan_id",
+                idsEliminados
+            );
+
+        if (errorLimpieza) {
+            console.error(
+                "No se pudieron eliminar las afinidades huérfanas:",
+                errorLimpieza
+            );
+        }
+    }
+
+    return afinidades.filter(
+        (
+            afinidad
+        ) =>
+            idsDisponibles.has(
+                String(
+                    afinidad.plan_id
+                )
+            )
+    );
+}
+
+
 async function cargarAfinidadesPerfil() {
     const cliente =
         obtenerClienteAfinidades();
@@ -4791,9 +5216,15 @@ async function cargarAfinidadesPerfil() {
                 ? data
                 : [];
 
+        const afinidadesValidas =
+            await limpiarAfinidadesDePlanesEliminados(
+                usuario.id,
+                afinidadesRecibidas
+            );
+
         afinidadesPerfil =
             await Promise.all(
-                afinidadesRecibidas.map(
+                afinidadesValidas.map(
                     async (afinidad) => {
                         const totalPersonas =
                             await obtenerTotalPersonasAfinidad(
@@ -6907,91 +7338,496 @@ const confirmarEliminarPlan = document.querySelector(
     "#confirmar-eliminar-plan"
 );
 
+const BUCKET_IMAGENES_PLANES =
+    "imagenes-planes";
+
+let planesSupabaseUsuario = [];
 let planPendienteEliminar = null;
 let filtroPublicacionActual = "todos";
 let elementoQueAbrioModalEliminar = null;
 
+
+function obtenerBorradoresUsuario() {
+    const borradores =
+        leerDatoLocal(
+            "borradoresSuralia",
+            []
+        );
+
+    if (!Array.isArray(borradores)) {
+        return [];
+    }
+
+    return borradores
+        .filter(
+            (plan) =>
+                plan.creadoPor ===
+                usuarioGuardado.email
+        )
+        .map(
+            (plan) => ({
+                ...plan,
+                estado:
+                    "borrador",
+                almacenamiento:
+                    "borradoresSuralia"
+            })
+        );
+}
+
+
+function normalizarPlanSupabase(
+    plan
+) {
+    return {
+        id:
+            plan.id,
+
+        titulo:
+            plan.titulo ||
+            "Plan sin título",
+
+        categoria:
+            plan.categoria ||
+            "",
+
+        nombreCategoria:
+            plan.nombre_categoria ||
+            plan.categoria ||
+            "Sin categoría",
+
+        descripcion:
+            plan.descripcion ||
+            "",
+
+        fecha:
+            plan.fecha ||
+            "",
+
+        hora:
+            plan.hora
+                ? String(plan.hora).slice(0, 5)
+                : "",
+
+        duracion:
+            plan.duracion ||
+            "",
+
+        plazas:
+            Number(
+                plan.plazas ||
+                0
+            ),
+
+        ubicacion:
+            plan.ubicacion ||
+            "",
+
+        precio:
+            Number(
+                plan.precio ||
+                0
+            ),
+
+        dificultad:
+            plan.dificultad ||
+            "",
+
+        provincia:
+            plan.provincia ||
+            "",
+
+        imagen:
+            plan.imagen_url ||
+            "",
+
+        rutaStorage:
+            plan.ruta_storage ||
+            "",
+
+        estado:
+            plan.estado ||
+            "pendiente",
+
+        motivoRechazo:
+            plan.motivo_rechazo ||
+            "",
+
+        fechaCreacion:
+            plan.creado_en ||
+            "",
+
+        almacenamiento:
+            "supabase"
+    };
+}
+
+
 function obtenerPlanesUsuario() {
-    const publicados = JSON.parse(
-        localStorage.getItem("planesPublicadosSuralia")
-    ) || [];
-
-    const borradores = JSON.parse(
-        localStorage.getItem("borradoresSuralia")
-    ) || [];
-
-    const emailUsuario = usuarioGuardado.email;
-
-    const planesPublicadosUsuario = publicados
-        .filter((plan) => plan.creadoPor === emailUsuario)
-        .map((plan) => ({
-            ...plan,
-            almacenamiento: "planesPublicadosSuralia"
-        }));
-
-    const borradoresUsuario = borradores
-        .filter((plan) => plan.creadoPor === emailUsuario)
-        .map((plan) => ({
-            ...plan,
-            almacenamiento: "borradoresSuralia"
-        }));
+    const borradoresUsuario =
+        obtenerBorradoresUsuario();
 
     return [
-        ...planesPublicadosUsuario,
+        ...planesSupabaseUsuario,
         ...borradoresUsuario
-    ].sort((planA, planB) => {
-        return new Date(planB.fechaCreacion) -
-            new Date(planA.fechaCreacion);
-    });
+    ].sort(
+        (
+            planA,
+            planB
+        ) => {
+            return (
+                new Date(
+                    planB.fechaCreacion ||
+                    0
+                ) -
+                new Date(
+                    planA.fechaCreacion ||
+                    0
+                )
+            );
+        }
+    );
 }
+
+
+
+function limpiarPublicacionesLocalesEliminadas(
+    planesActuales
+) {
+    const publicacionesLocales =
+        leerDatoLocal(
+            "planesPublicadosSuralia",
+            []
+        );
+
+    if (
+        !Array.isArray(
+            publicacionesLocales
+        ) ||
+        publicacionesLocales.length ===
+            0
+    ) {
+        return;
+    }
+
+    const idsSupabase =
+        new Set(
+            (
+                Array.isArray(
+                    planesActuales
+                )
+                    ? planesActuales
+                    : []
+            ).map(
+                (
+                    plan
+                ) => String(
+                    plan.id ||
+                    ""
+                )
+            )
+        );
+
+    const publicacionesLimpias =
+        publicacionesLocales.filter(
+            (
+                plan
+            ) => {
+                const perteneceUsuario =
+                    plan.usuarioEmail ===
+                        usuarioGuardado.email ||
+                    plan.creadoPor ===
+                        usuarioGuardado.email;
+
+                if (!perteneceUsuario) {
+                    return true;
+                }
+
+                const idPlan =
+                    String(
+                        plan.id ||
+                        plan.planId ||
+                        ""
+                    );
+
+                return (
+                    idPlan &&
+                    idsSupabase.has(
+                        idPlan
+                    )
+                );
+            }
+        );
+
+    if (
+        publicacionesLimpias.length !==
+        publicacionesLocales.length
+    ) {
+        guardarDatoLocal(
+            "planesPublicadosSuralia",
+            publicacionesLimpias
+        );
+    }
+}
+
+
+async function cargarPlanesSupabaseUsuario() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente) {
+        planesSupabaseUsuario =
+            [];
+
+        mostrarPublicaciones();
+
+        return;
+    }
+
+    try {
+        const usuario =
+            await obtenerUsuarioPerfilSocial();
+
+        if (!usuario) {
+            planesSupabaseUsuario =
+                [];
+
+            mostrarPublicaciones();
+
+            return;
+        }
+
+        const {
+            data,
+            error
+        } = await cliente
+            .from(
+                "planes"
+            )
+            .select(
+                `
+                    id,
+                    titulo,
+                    categoria,
+                    nombre_categoria,
+                    descripcion,
+                    fecha,
+                    hora,
+                    duracion,
+                    plazas,
+                    ubicacion,
+                    precio,
+                    dificultad,
+                    provincia,
+                    imagen_url,
+                    ruta_storage,
+                    estado,
+                    motivo_rechazo,
+                    creado_en,
+                    actualizado_en
+                `
+            )
+            .eq(
+                "usuario_id",
+                usuario.id
+            )
+            .order(
+                "creado_en",
+                {
+                    ascending:
+                        false
+                }
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        planesSupabaseUsuario =
+            (
+                Array.isArray(data)
+                    ? data
+                    : []
+            ).map(
+                normalizarPlanSupabase
+            );
+
+        limpiarPublicacionesLocalesEliminadas(
+            planesSupabaseUsuario
+        );
+
+        mostrarPublicaciones();
+    } catch (error) {
+        console.error(
+            "No se pudieron cargar los planes publicados:",
+            error
+        );
+
+        planesSupabaseUsuario =
+            [];
+
+        mostrarPublicaciones();
+
+        mostrarNotificacion(
+            error?.message ||
+            "No se han podido cargar tus publicaciones."
+        );
+    }
+}
+
 
 function formatearFechaPlan(fecha) {
     if (!fecha) {
         return "Fecha pendiente";
     }
 
-    const fechaPlan = new Date(`${fecha}T00:00:00`);
+    const fechaPlan =
+        new Date(
+            `${fecha}T00:00:00`
+        );
 
-    return new Intl.DateTimeFormat("es-ES", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-    }).format(fechaPlan);
+    if (
+        Number.isNaN(
+            fechaPlan.getTime()
+        )
+    ) {
+        return fecha;
+    }
+
+    return new Intl.DateTimeFormat(
+        "es-ES",
+        {
+            day:
+                "numeric",
+            month:
+                "long",
+            year:
+                "numeric"
+        }
+    ).format(
+        fechaPlan
+    );
 }
 
-function obtenerTextoEstado(estado) {
+
+function obtenerTextoEstado(
+    estado
+) {
     const estados = {
-        pendiente: "Pendiente de revisión",
-        borrador: "Borrador",
-        publicado: "Publicado"
+        pendiente:
+            "Pendiente de revisión",
+
+        borrador:
+            "Borrador",
+
+        publicado:
+            "Publicado",
+
+        rechazado:
+            "Rechazado"
     };
 
-    return estados[estado] || estado;
+    return estados[estado] ||
+        estado;
 }
 
-function crearPublicacionHTML(plan) {
-    const precio = Number(plan.precio) === 0
-        ? "Gratis"
-        : `${Number(plan.precio).toFixed(2).replace(".00", "")} €`;
 
-    const imagenPlan = plan.imagen
-        ? `
-            <img
-                src="${plan.imagen}"
-                alt="${plan.titulo}"
-            >
-        `
-        : `
-            <div class="publicacion-item__sin-imagen">
-                <i class="fa-regular fa-image"></i>
-            </div>
-        `;
+function crearPublicacionHTML(
+    plan
+) {
+    const precio =
+        Number(plan.precio) === 0
+            ? "Gratis"
+            : `${Number(plan.precio)
+                .toFixed(2)
+                .replace(".00", "")
+                .replace(".", ",")} €`;
+
+    const titulo =
+        escaparHTML(
+            plan.titulo ||
+            "Plan sin título"
+        );
+
+    const descripcion =
+        escaparHTML(
+            plan.descripcion ||
+            "Este borrador todavía no tiene descripción."
+        );
+
+    const ubicacion =
+        escaparHTML(
+            plan.ubicacion ||
+            "Ubicación pendiente"
+        );
+
+    const hora =
+        escaparHTML(
+            plan.hora ||
+            "Hora pendiente"
+        );
+
+    const categoria =
+        escaparHTML(
+            plan.nombreCategoria ||
+            plan.categoria ||
+            "Sin categoría"
+        );
+
+    const estado =
+        escaparHTML(
+            plan.estado ||
+            "pendiente"
+        );
+
+    const idPlan =
+        escaparHTML(
+            plan.id ||
+            ""
+        );
+
+    const almacenamiento =
+        escaparHTML(
+            plan.almacenamiento ||
+            ""
+        );
+
+    const imagen =
+        escaparHTML(
+            plan.imagen ||
+            ""
+        );
+
+    const motivoRechazo =
+        escaparHTML(
+            plan.motivoRechazo ||
+            ""
+        );
+
+    const imagenPlan =
+        imagen
+            ? `
+                <img
+                    src="${imagen}"
+                    alt="${titulo}"
+                    loading="lazy"
+                    onerror="
+                        this.onerror=null;
+                        this.src='img/placeholder-plan.jpg';
+                    "
+                >
+            `
+            : `
+                <div class="publicacion-item__sin-imagen">
+                    <i class="fa-regular fa-image"></i>
+                </div>
+            `;
 
     return `
         <article
             class="publicacion-item"
-            data-plan-id="${plan.id}"
-            data-plan-estado="${plan.estado}"
+            data-plan-id="${idPlan}"
+            data-plan-estado="${estado}"
         >
 
             <div class="publicacion-item__imagen">
@@ -7004,12 +7840,12 @@ function crearPublicacionHTML(plan) {
 
                     <div>
                         <span
-                            class="estado-publicacion estado-publicacion--${plan.estado}"
+                            class="estado-publicacion estado-publicacion--${estado}"
                         >
                             ${obtenerTextoEstado(plan.estado)}
                         </span>
 
-                        <h3>${plan.titulo}</h3>
+                        <h3>${titulo}</h3>
                     </div>
 
                     <strong>${precio}</strong>
@@ -7017,11 +7853,28 @@ function crearPublicacionHTML(plan) {
                 </div>
 
                 <p class="publicacion-item__descripcion">
-                    ${
-                        plan.descripcion ||
-                        "Este borrador todavía no tiene descripción."
-                    }
+                    ${descripcion}
                 </p>
+
+                ${
+                    plan.estado === "rechazado"
+                        ? `
+                            <div class="publicacion-item__rechazo">
+                                <strong>
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+                                    Motivo del rechazo
+                                </strong>
+
+                                <p>
+                                    ${
+                                        motivoRechazo ||
+                                        "No se ha indicado un motivo."
+                                    }
+                                </p>
+                            </div>
+                        `
+                        : ""
+                }
 
                 <div class="publicacion-item__datos">
 
@@ -7032,17 +7885,17 @@ function crearPublicacionHTML(plan) {
 
                     <span>
                         <i class="fa-regular fa-clock"></i>
-                        ${plan.hora || "Hora pendiente"}
+                        ${hora}
                     </span>
 
                     <span>
                         <i class="fa-solid fa-location-dot"></i>
-                        ${plan.ubicacion || "Ubicación pendiente"}
+                        ${ubicacion}
                     </span>
 
                     <span>
                         <i class="fa-solid fa-user-group"></i>
-                        ${plan.plazas || 0} plazas
+                        ${Number(plan.plazas || 0)} plazas
                     </span>
 
                 </div>
@@ -7050,11 +7903,7 @@ function crearPublicacionHTML(plan) {
                 <div class="publicacion-item__pie">
 
                     <span class="publicacion-item__categoria">
-                        ${
-                            plan.nombreCategoria ||
-                            plan.categoria ||
-                            "Sin categoría"
-                        }
+                        ${categoria}
                     </span>
 
                     <div class="publicacion-item__acciones">
@@ -7065,7 +7914,7 @@ function crearPublicacionHTML(plan) {
                                     <button
                                         type="button"
                                         class="boton-publicacion boton-editar-plan"
-                                        data-plan-id="${plan.id}"
+                                        data-plan-id="${idPlan}"
                                     >
                                         <i class="fa-regular fa-pen-to-square"></i>
                                         Continuar
@@ -7075,7 +7924,7 @@ function crearPublicacionHTML(plan) {
                                     <button
                                         type="button"
                                         class="boton-publicacion boton-ver-plan"
-                                        data-plan-id="${plan.id}"
+                                        data-plan-id="${idPlan}"
                                     >
                                         <i class="fa-regular fa-eye"></i>
                                         Ver
@@ -7083,15 +7932,21 @@ function crearPublicacionHTML(plan) {
                                 `
                         }
 
-                        <button
-                            type="button"
-                            class="boton-publicacion boton-publicacion--eliminar boton-eliminar-plan"
-                            data-plan-id="${plan.id}"
-                            data-almacenamiento="${plan.almacenamiento}"
-                        >
-                            <i class="fa-regular fa-trash-can"></i>
-                            Eliminar
-                        </button>
+                        ${
+                            plan.estado !== "publicado"
+                                ? `
+                                    <button
+                                        type="button"
+                                        class="boton-publicacion boton-publicacion--eliminar boton-eliminar-plan"
+                                        data-plan-id="${idPlan}"
+                                        data-almacenamiento="${almacenamiento}"
+                                    >
+                                        <i class="fa-regular fa-trash-can"></i>
+                                        Eliminar
+                                    </button>
+                                `
+                                : ""
+                        }
 
                     </div>
 
@@ -7103,47 +7958,81 @@ function crearPublicacionHTML(plan) {
     `;
 }
 
-function actualizarContadoresPublicaciones(planes) {
+
+function actualizarContadoresPublicaciones(
+    planes
+) {
     if (contadorPublicaciones) {
-        contadorPublicaciones.textContent = planes.length;
+        contadorPublicaciones.textContent =
+            planes.length;
     }
 
     if (contadorPendientes) {
-        contadorPendientes.textContent = planes.filter(
-            (plan) => plan.estado === "pendiente"
-        ).length;
+        contadorPendientes.textContent =
+            planes.filter(
+                (plan) =>
+                    plan.estado ===
+                    "pendiente"
+            ).length;
     }
 
     if (contadorBorradores) {
-        contadorBorradores.textContent = planes.filter(
-            (plan) => plan.estado === "borrador"
-        ).length;
+        contadorBorradores.textContent =
+            planes.filter(
+                (plan) =>
+                    plan.estado ===
+                    "borrador"
+            ).length;
     }
 }
 
+
 function mostrarPublicaciones() {
-    if (!listaPublicaciones || !estadoVacioPublicaciones) {
+    if (
+        !listaPublicaciones ||
+        !estadoVacioPublicaciones
+    ) {
         return;
     }
 
-    const todosLosPlanes = obtenerPlanesUsuario();
+    const todosLosPlanes =
+        obtenerPlanesUsuario();
 
-    actualizarContadoresPublicaciones(todosLosPlanes);
+    actualizarContadoresPublicaciones(
+        todosLosPlanes
+    );
 
-    const planesFiltrados = todosLosPlanes.filter((plan) => {
-        if (filtroPublicacionActual === "todos") {
-            return true;
-        }
+    const planesFiltrados =
+        todosLosPlanes.filter(
+            (plan) => {
+                if (
+                    filtroPublicacionActual ===
+                    "todos"
+                ) {
+                    return true;
+                }
 
-        return plan.estado === filtroPublicacionActual;
-    });
+                return (
+                    plan.estado ===
+                    filtroPublicacionActual
+                );
+            }
+        );
 
-    listaPublicaciones.innerHTML = planesFiltrados
-        .map(crearPublicacionHTML)
-        .join("");
+    listaPublicaciones.innerHTML =
+        planesFiltrados
+            .map(
+                crearPublicacionHTML
+            )
+            .join("");
 
-    const noHayPlanesTotales = todosLosPlanes.length === 0;
-    const noHayResultados = planesFiltrados.length === 0;
+    const noHayPlanesTotales =
+        todosLosPlanes.length ===
+        0;
+
+    const noHayResultados =
+        planesFiltrados.length ===
+        0;
 
     estadoVacioPublicaciones.classList.toggle(
         "oculto",
@@ -7155,14 +8044,19 @@ function mostrarPublicaciones() {
         noHayPlanesTotales
     );
 
-    if (!noHayPlanesTotales && noHayResultados) {
+    if (
+        !noHayPlanesTotales &&
+        noHayResultados
+    ) {
         listaPublicaciones.innerHTML = `
             <div class="estado-vacio">
                 <span class="estado-vacio__icono">
                     <i class="fa-solid fa-filter"></i>
                 </span>
 
-                <h3>No hay planes en esta categoría</h3>
+                <h3>
+                    No hay planes en esta categoría
+                </h3>
 
                 <p>
                     Cambia el filtro para consultar otras publicaciones.
@@ -7174,114 +8068,233 @@ function mostrarPublicaciones() {
     activarEventosPublicaciones();
 }
 
+
 function activarEventosPublicaciones() {
     document
-        .querySelectorAll(".boton-eliminar-plan")
-        .forEach((boton) => {
-            boton.addEventListener("click", () => {
-                planPendienteEliminar = {
-                    id: Number(boton.dataset.planId),
-                    almacenamiento: boton.dataset.almacenamiento
-                };
+        .querySelectorAll(
+            ".boton-eliminar-plan"
+        )
+        .forEach(
+            (boton) => {
+                boton.addEventListener(
+                    "click",
+                    () => {
+                        planPendienteEliminar = {
+                            id:
+                                boton.dataset
+                                    .planId,
 
-                elementoQueAbrioModalEliminar =
-                    abrirModalAccesible(
-                        modalEliminarPlan,
-                        cancelarEliminarPlan,
-                        boton
-                    );
-            });
-        });
+                            almacenamiento:
+                                boton.dataset
+                                    .almacenamiento
+                        };
+
+                        elementoQueAbrioModalEliminar =
+                            abrirModalAccesible(
+                                modalEliminarPlan,
+                                cancelarEliminarPlan,
+                                boton
+                            );
+                    }
+                );
+            }
+        );
 
     document
-        .querySelectorAll(".boton-editar-plan")
-        .forEach((boton) => {
-            boton.addEventListener("click", () => {
-                const idPlan = Number(boton.dataset.planId);
+        .querySelectorAll(
+            ".boton-editar-plan"
+        )
+        .forEach(
+            (boton) => {
+                boton.addEventListener(
+                    "click",
+                    () => {
+                        const idPlan =
+                            Number(
+                                boton.dataset
+                                    .planId
+                            );
 
-                localStorage.setItem(
-                    "borradorEditarSuralia",
-                    String(idPlan)
+                        localStorage.setItem(
+                            "borradorEditarSuralia",
+                            String(
+                                idPlan
+                            )
+                        );
+
+                        window.location.href =
+                            "publicar-plan.html";
+                    }
                 );
-
-                window.location.href = "publicar-plan.html";
-            });
-        });
+            }
+        );
 
     document
-        .querySelectorAll(".boton-ver-plan")
-        .forEach((boton) => {
-            boton.addEventListener("click", () => {
-                mostrarNotificacion(
-                    "La vista individual de este plan se añadirá más adelante."
+        .querySelectorAll(
+            ".boton-ver-plan"
+        )
+        .forEach(
+            (boton) => {
+                boton.addEventListener(
+                    "click",
+                    () => {
+                        mostrarNotificacion(
+                            "La vista individual de este plan se añadirá más adelante."
+                        );
+                    }
                 );
-            });
-        });
+            }
+        );
 }
 
-function eliminarPlanGuardado() {
+
+async function eliminarPlanSupabase(
+    planId
+) {
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente) {
+        throw new Error(
+            "No se ha podido conectar con Supabase."
+        );
+    }
+
+    const plan =
+        planesSupabaseUsuario.find(
+            (elemento) =>
+                String(elemento.id) ===
+                String(planId)
+        );
+
+    if (!plan) {
+        throw new Error(
+            "No se ha encontrado el plan."
+        );
+    }
+
+    const {
+        data,
+        error
+    } = await cliente
+        .from(
+            "planes"
+        )
+        .delete()
+        .eq(
+            "id",
+            planId
+        )
+        .in(
+            "estado",
+            [
+                "pendiente",
+                "rechazado"
+            ]
+        )
+        .select(
+            "id"
+        )
+        .maybeSingle();
+
+    if (error) {
+        throw error;
+    }
+
+    if (!data) {
+        throw new Error(
+            "El plan ya no puede eliminarse."
+        );
+    }
+
+    if (plan.rutaStorage) {
+        const {
+            error: errorStorage
+        } = await cliente
+            .storage
+            .from(
+                BUCKET_IMAGENES_PLANES
+            )
+            .remove(
+                [
+                    plan.rutaStorage
+                ]
+            );
+
+        if (errorStorage) {
+            console.error(
+                "El plan se eliminó, pero su imagen no pudo borrarse:",
+                errorStorage
+            );
+        }
+    }
+
+    planesSupabaseUsuario =
+        planesSupabaseUsuario.filter(
+            (elemento) =>
+                String(elemento.id) !==
+                String(planId)
+        );
+}
+
+
+function eliminarBorradorLocal(
+    planId
+) {
+    const borradores =
+        leerDatoLocal(
+            "borradoresSuralia",
+            []
+        );
+
+    const borradoresActualizados =
+        (
+            Array.isArray(borradores)
+                ? borradores
+                : []
+        ).filter(
+            (plan) =>
+                Number(plan.id) !==
+                Number(planId)
+        );
+
+    guardarDatoLocal(
+        "borradoresSuralia",
+        borradoresActualizados
+    );
+}
+
+
+async function eliminarPlanGuardado() {
     if (!planPendienteEliminar) {
         return;
     }
 
-    const clave = planPendienteEliminar.almacenamiento;
+    if (confirmarEliminarPlan) {
+        confirmarEliminarPlan.disabled =
+            true;
 
-    const planes = JSON.parse(
-        localStorage.getItem(clave)
-    ) || [];
+        confirmarEliminarPlan.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Eliminando
+        `;
+    }
 
-    const planesActualizados = planes.filter(
-        (plan) => Number(plan.id) !== planPendienteEliminar.id
-    );
-
-    localStorage.setItem(
-        clave,
-        JSON.stringify(planesActualizados)
-    );
-
-    cerrarModalAccesible(
-        modalEliminarPlan,
-        elementoQueAbrioModalEliminar
-    );
-
-    elementoQueAbrioModalEliminar =
-        null;
-
-    mostrarNotificacion(
-        "El plan se ha eliminado correctamente."
-    );
-
-    planPendienteEliminar = null;
-
-    mostrarPublicaciones();
-}
-
-filtrosPublicaciones.forEach((boton) => {
-    boton.addEventListener("click", () => {
-        filtroPublicacionActual =
-            boton.dataset.filtroPublicacion;
-
-        filtrosPublicaciones.forEach((filtro) => {
-            const esActivo =
-                filtro === boton;
-
-            filtro.classList.toggle(
-                "activo",
-                esActivo
+    try {
+        if (
+            planPendienteEliminar
+                .almacenamiento ===
+            "supabase"
+        ) {
+            await eliminarPlanSupabase(
+                planPendienteEliminar.id
             );
-
-            filtro.setAttribute(
-                "aria-pressed",
-                String(esActivo)
+        } else {
+            eliminarBorradorLocal(
+                planPendienteEliminar.id
             );
-        });
+        }
 
-        mostrarPublicaciones();
-    });
-});
-
-if (cancelarEliminarPlan) {
-    cancelarEliminarPlan.addEventListener("click", () => {
         cerrarModalAccesible(
             modalEliminarPlan,
             elementoQueAbrioModalEliminar
@@ -7290,20 +8303,76 @@ if (cancelarEliminarPlan) {
         elementoQueAbrioModalEliminar =
             null;
 
-        planPendienteEliminar = null;
-    });
+        planPendienteEliminar =
+            null;
+
+        mostrarPublicaciones();
+
+        mostrarNotificacion(
+            "El plan se ha eliminado correctamente."
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo eliminar el plan:",
+            error
+        );
+
+        mostrarNotificacion(
+            error?.message ||
+            "No se ha podido eliminar el plan."
+        );
+    } finally {
+        if (confirmarEliminarPlan) {
+            confirmarEliminarPlan.disabled =
+                false;
+
+            confirmarEliminarPlan.innerHTML =
+                "Eliminar plan";
+        }
+    }
 }
 
-if (confirmarEliminarPlan) {
-    confirmarEliminarPlan.addEventListener(
+
+filtrosPublicaciones.forEach(
+    (boton) => {
+        boton.addEventListener(
+            "click",
+            () => {
+                filtroPublicacionActual =
+                    boton.dataset
+                        .filtroPublicacion;
+
+                filtrosPublicaciones.forEach(
+                    (filtro) => {
+                        const esActivo =
+                            filtro ===
+                            boton;
+
+                        filtro.classList.toggle(
+                            "activo",
+                            esActivo
+                        );
+
+                        filtro.setAttribute(
+                            "aria-pressed",
+                            String(
+                                esActivo
+                            )
+                        );
+                    }
+                );
+
+                mostrarPublicaciones();
+            }
+        );
+    }
+);
+
+
+if (cancelarEliminarPlan) {
+    cancelarEliminarPlan.addEventListener(
         "click",
-        eliminarPlanGuardado
-    );
-}
-
-if (modalEliminarPlan) {
-    modalEliminarPlan.addEventListener("click", (evento) => {
-        if (evento.target === modalEliminarPlan) {
+        () => {
             cerrarModalAccesible(
                 modalEliminarPlan,
                 elementoQueAbrioModalEliminar
@@ -7315,8 +8384,41 @@ if (modalEliminarPlan) {
             planPendienteEliminar =
                 null;
         }
-    });
+    );
 }
+
+
+if (confirmarEliminarPlan) {
+    confirmarEliminarPlan.addEventListener(
+        "click",
+        eliminarPlanGuardado
+    );
+}
+
+
+if (modalEliminarPlan) {
+    modalEliminarPlan.addEventListener(
+        "click",
+        (evento) => {
+            if (
+                evento.target ===
+                modalEliminarPlan
+            ) {
+                cerrarModalAccesible(
+                    modalEliminarPlan,
+                    elementoQueAbrioModalEliminar
+                );
+
+                elementoQueAbrioModalEliminar =
+                    null;
+
+                planPendienteEliminar =
+                    null;
+            }
+        }
+    );
+}
+
 
 document.addEventListener(
     "keydown",
@@ -7389,6 +8491,27 @@ document.addEventListener(
 );
 
 
+
+/* =========================================
+   SINCRONIZAR PUBLICACIONES AL VOLVER
+========================================= */
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+        if (
+            document.visibilityState ===
+            "visible"
+        ) {
+            cargarPlanesSupabaseUsuario();
+            sincronizarReservasDinamicasEliminadas();
+            sincronizarFavoritosDinamicosEliminados();
+            cargarAfinidadesPerfil();
+        }
+    }
+);
+
+
 /* =========================================
    CARGA INICIAL
 ========================================= */
@@ -7408,12 +8531,15 @@ function iniciarPerfil() {
     cargarGaleriaPerfil();
     cargarEstadoVerificacion();
     mostrarReservasPerfil();
+    sincronizarReservasDinamicasEliminadas();
     mostrarFavoritosPerfil();
+    sincronizarFavoritosDinamicosEliminados();
     cargarAfinidadesPerfil();
     cargarConexionesPerfil();
     cargarMensajesPendientes();
     suscribirseANotificacionesMensajes();
     mostrarPublicaciones();
+    cargarPlanesSupabaseUsuario();
     cargarSeccionDesdeURL();
 }
 

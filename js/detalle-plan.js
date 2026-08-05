@@ -323,11 +323,331 @@ function combinarConCatalogo(
 }
 
 
-const planActual =
+let planActual =
     combinarConCatalogo(
         PLANES_DETALLE[planIdUrl] ||
-        PLANES_DETALLE.italica
+        null
     );
+
+
+/* =====================================================
+   PLANES PUBLICADOS DESDE SUPABASE
+===================================================== */
+
+function esUuidPlan(valor) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+        .test(String(valor || ""));
+}
+
+function obtenerInicialesOrganizador(nombre = "") {
+    const partes = String(nombre)
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+
+    return (
+        partes
+            .slice(0, 2)
+            .map((parte) => parte.charAt(0))
+            .join("")
+            .toUpperCase() ||
+        "SU"
+    );
+}
+
+function formatearFechaDetalleSupabase(fechaIso) {
+    if (!fechaIso) {
+        return "Fecha por confirmar";
+    }
+
+    const fecha = new Date(`${fechaIso}T00:00:00`);
+
+    if (Number.isNaN(fecha.getTime())) {
+        return fechaIso;
+    }
+
+    return new Intl.DateTimeFormat(
+        "es-ES",
+        {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }
+    ).format(fecha);
+}
+
+function crearPlanDetalleDesdeSupabase(plan, perfil) {
+    const nombreOrganizador =
+        perfil?.nombre_visible ||
+        "Usuario de Suralia";
+
+    const fechaTexto =
+        formatearFechaDetalleSupabase(plan.fecha);
+
+    const hora =
+        plan.hora
+            ? String(plan.hora).slice(0, 5)
+            : "Hora por confirmar";
+
+    const duracion =
+        plan.duracion ||
+        "Duración por confirmar";
+
+    const dificultad =
+        plan.dificultad ||
+        "No indicada";
+
+    const plazas =
+        Number(plan.plazas || 0);
+
+    const categoriaTexto =
+        plan.nombre_categoria ||
+        plan.categoria ||
+        "Actividad";
+
+    const iconos = {
+        cultura: "fa-solid fa-landmark",
+        naturaleza: "fa-solid fa-leaf",
+        musica: "fa-solid fa-music",
+        gastronomia: "fa-solid fa-utensils",
+        aventura: "fa-solid fa-person-hiking",
+        talleres: "fa-solid fa-screwdriver-wrench"
+    };
+
+    const descripcion = String(
+        plan.descripcion ||
+        "El organizador todavía no ha añadido una descripción detallada."
+    )
+        .split(/\n+/)
+        .map((parrafo) => parrafo.trim())
+        .filter(Boolean);
+
+    const imagen =
+        plan.imagen_url ||
+        "img/placeholder-plan.jpg";
+
+    const ubicacion =
+        plan.ubicacion ||
+        "Ubicación por confirmar";
+
+    return {
+        planId: plan.id,
+        titulo: plan.titulo || "Actividad de Suralia",
+        categoria: plan.categoria || "",
+        categoriaTexto,
+        categoriaIcono:
+            iconos[plan.categoria] ||
+            "fa-solid fa-compass",
+        precio: Number(plan.precio || 0),
+        valoracion: 0,
+        opiniones: 0,
+        fechaTexto,
+        fechaIso: plan.fecha || "",
+        fechaPrincipal: fechaTexto,
+        horario:
+            hora === "Hora por confirmar"
+                ? hora
+                : `Hora de inicio: ${hora}`,
+        hora,
+        ubicacion,
+        direccion: ubicacion,
+        personasApuntadas: "Actividad recién publicada",
+        tipoGrupo:
+            dificultad === "No indicada"
+                ? "Actividad abierta"
+                : `Dificultad: ${dificultad}`,
+        maxPersonas:
+            plazas > 0
+                ? `Máximo ${plazas} ${
+                    plazas === 1
+                        ? "persona"
+                        : "personas"
+                }`
+                : "Plazas por confirmar",
+        idioma: "Actividad en español",
+        organizador: nombreOrganizador,
+        organizadorIniciales:
+            obtenerInicialesOrganizador(
+                nombreOrganizador
+            ),
+        imagen,
+        imagenes: [
+            imagen,
+            plan.imagen_2_url || imagen,
+            plan.imagen_3_url ||
+                plan.imagen_2_url ||
+                imagen
+        ],
+        descripcion:
+            descripcion.length > 0
+                ? descripcion
+                : [
+                    "El organizador todavía no ha añadido una descripción detallada."
+                ],
+        descripcionAmpliada: [
+            `Duración: ${duracion}.`,
+            `Dificultad: ${dificultad}.`
+        ],
+        incluye: [
+            ["si", `Duración aproximada: ${duracion}`],
+            ["si", `Dificultad: ${dificultad}`],
+            [
+                "si",
+                plazas > 0
+                    ? `${plazas} plazas disponibles inicialmente`
+                    : "Plazas por confirmar"
+            ],
+            [
+                "si",
+                `Provincia: ${plan.provincia || "Sevilla"}`
+            ]
+        ],
+        fechasReserva:
+            plan.fecha
+                ? [[plan.fecha, fechaTexto]]
+                : [],
+        coordenadas: [37.3891, -5.9845],
+        zoom: 12,
+        mapaTitulo: ubicacion,
+        enlaceMapa:
+            `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                ubicacion
+            )}`,
+        enlace:
+            `detalle-plan.html?id=${encodeURIComponent(
+                plan.id
+            )}`,
+        esPlanSupabase: true,
+        fotoOrganizador:
+            perfil?.foto_principal_url || ""
+    };
+}
+
+async function cargarPlanSupabaseDetalle() {
+    if (!esUuidPlan(planIdUrl)) {
+        return null;
+    }
+
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente) {
+        throw new Error(
+            "Supabase no está disponible."
+        );
+    }
+
+    const {
+        data: plan,
+        error: errorPlan
+    } = await cliente
+        .from("planes")
+        .select(`
+            id,
+            usuario_id,
+            titulo,
+            categoria,
+            nombre_categoria,
+            descripcion,
+            fecha,
+            hora,
+            duracion,
+            plazas,
+            ubicacion,
+            precio,
+            dificultad,
+            provincia,
+            imagen_url,
+            imagen_2_url,
+            imagen_3_url,
+            estado
+        `)
+        .eq("id", planIdUrl)
+        .eq("estado", "publicado")
+        .maybeSingle();
+
+    if (errorPlan) {
+        throw errorPlan;
+    }
+
+    if (!plan) {
+        return null;
+    }
+
+    let perfil = null;
+
+    if (plan.usuario_id) {
+        const {
+            data: datosPerfil,
+            error: errorPerfil
+        } = await cliente
+            .from("perfiles_sociales")
+            .select(`
+                nombre_visible,
+                foto_principal_url
+            `)
+            .eq("usuario_id", plan.usuario_id)
+            .maybeSingle();
+
+        if (!errorPerfil) {
+            perfil = datosPerfil;
+        }
+    }
+
+    return crearPlanDetalleDesdeSupabase(
+        plan,
+        perfil
+    );
+}
+
+function mostrarPlanNoEncontrado() {
+    document.title =
+        "Plan no encontrado | Suralia";
+
+    cambiarTexto(
+        "#miga-plan",
+        "Plan no encontrado"
+    );
+
+    cambiarTexto(
+        "#detalle-titulo",
+        "Este plan no está disponible"
+    );
+
+    cambiarTexto(
+        "#detalle-ubicacion-cabecera",
+        "Puede haberse eliminado o no estar publicado."
+    );
+
+    const contenido =
+        seleccionar(".detalle-contenido");
+
+    if (contenido) {
+        contenido.innerHTML = `
+            <div class="contenedor">
+                <section class="bloque-detalle">
+                    <h2>No hemos encontrado este plan</h2>
+
+                    <p>
+                        El plan puede haber sido eliminado,
+                        rechazado o todavía no estar publicado.
+                    </p>
+
+                    <a
+                        href="planes.html"
+                        class="boton-principal"
+                    >
+                        Volver a explorar planes
+                    </a>
+                </section>
+            </div>
+        `;
+    }
+
+    seleccionar(".galeria-plan")?.remove();
+    seleccionar(".planes-relacionados")?.remove();
+}
 
 
 /* =====================================================
@@ -502,13 +822,16 @@ function cargarDatosBasicos() {
 
     cambiarTexto(
         "#detalle-valoracion",
-        String(planActual.valoracion)
-            .replace(".", ",")
+        Number(planActual.valoracion || 0) > 0
+            ? String(planActual.valoracion).replace(".", ",")
+            : "Nuevo"
     );
 
     cambiarTexto(
         "#detalle-opiniones-texto",
-        `${planActual.opiniones} opiniones`
+        Number(planActual.opiniones || 0) > 0
+            ? `${planActual.opiniones} opiniones`
+            : "Sin opiniones todavía"
     );
 
     cambiarTexto(
@@ -529,10 +852,25 @@ function cargarDatosBasicos() {
     const avatarOrganizador =
         seleccionar("#organizador-avatar");
 
-    avatarOrganizador?.setAttribute(
-        "aria-label",
-        `Avatar de ${planActual.organizador}`
-    );
+    if (avatarOrganizador) {
+        avatarOrganizador.setAttribute(
+            "aria-label",
+            `Avatar de ${planActual.organizador}`
+        );
+
+        if (planActual.fotoOrganizador) {
+            avatarOrganizador.textContent = "";
+            avatarOrganizador.style.backgroundImage =
+                `url('${planActual.fotoOrganizador}')`;
+            avatarOrganizador.style.backgroundSize =
+                "cover";
+            avatarOrganizador.style.backgroundPosition =
+                "center";
+        } else {
+            avatarOrganizador.style.backgroundImage =
+                "";
+        }
+    }
 
     cambiarTexto(
         "#organizador-nombre",
@@ -571,13 +909,16 @@ function cargarDatosBasicos() {
 
     cambiarTexto(
         "#opiniones-valoracion",
-        String(planActual.valoracion)
-            .replace(".", ",")
+        Number(planActual.valoracion || 0) > 0
+            ? String(planActual.valoracion).replace(".", ",")
+            : "Nuevo"
     );
 
     cambiarTexto(
         "#opiniones-total",
-        `${planActual.opiniones} valoraciones`
+        Number(planActual.opiniones || 0) > 0
+            ? `${planActual.opiniones} valoraciones`
+            : "Sin valoraciones todavía"
     );
 
     cambiarTexto(
@@ -589,8 +930,9 @@ function cargarDatosBasicos() {
 
     cambiarTexto(
         "#reserva-valoracion",
-        String(planActual.valoracion)
-            .replace(".", ",")
+        Number(planActual.valoracion || 0) > 0
+            ? String(planActual.valoracion).replace(".", ",")
+            : "Nuevo"
     );
 
     const precioTexto =
@@ -793,13 +1135,24 @@ function cargarFechasReserva() {
         return;
     }
 
+    const fechas =
+        Array.isArray(planActual.fechasReserva)
+            ? planActual.fechasReserva
+            : [];
+
     selectorFecha.innerHTML =
-        planActual.fechasReserva
-            .map(
-                ([valor, texto]) =>
-                    `<option value="${valor}">${texto}</option>`
-            )
-            .join("");
+        fechas.length > 0
+            ? fechas
+                .map(
+                    ([valor, texto]) =>
+                        `<option value="${valor}">${texto}</option>`
+                )
+                .join("")
+            : `
+                <option value="">
+                    Fecha por confirmar
+                </option>
+            `;
 }
 
 
@@ -1701,6 +2054,549 @@ if (formularioReserva) {
 
 
 /* =====================================================
+   OTROS PLANES CERCANOS DINÁMICOS
+===================================================== */
+
+const PLANES_FIJOS_RELACIONADOS = [
+    {
+        planId: "italica",
+        titulo: "Visita guiada por Itálica",
+        categoria: "cultura",
+        categoriaTexto: "Cultura",
+        precio: 0,
+        valoracion: 4.8,
+        fechaTexto: "25 de julio",
+        fechaIso: "2026-07-25",
+        ubicacion: "Santiponce, Sevilla",
+        imagen: "img/italica principal.jpg",
+        enlace: "detalle-plan.html?id=italica"
+    },
+    {
+        planId: "kayak-atardecer",
+        titulo: "Kayak al atardecer",
+        categoria: "aventura",
+        categoriaTexto: "Aventura",
+        precio: 18,
+        valoracion: 4.9,
+        fechaTexto: "27 de julio",
+        fechaIso: "2026-07-27",
+        ubicacion: "Río Guadalquivir, Sevilla",
+        imagen: "img/kayak principal.jpg",
+        enlace: "detalle-kayak.html"
+    },
+    {
+        planId: "cerro-hierro",
+        titulo: "Ruta por el Cerro del Hierro",
+        categoria: "naturaleza",
+        categoriaTexto: "Naturaleza",
+        precio: 8,
+        valoracion: 4.9,
+        fechaTexto: "2 de agosto",
+        fechaIso: "2026-08-02",
+        ubicacion: "San Nicolás del Puerto",
+        imagen: "img/cerro1.jpg",
+        enlace: "detalle-plan.html?id=cerro-hierro"
+    },
+    {
+        planId: "tapas-triana",
+        titulo: "Ruta de tapas por Triana",
+        categoria: "gastronomia",
+        categoriaTexto: "Gastronomía",
+        precio: 25,
+        valoracion: 4.6,
+        fechaTexto: "3 de agosto",
+        fechaIso: "2026-08-03",
+        ubicacion: "Triana, Sevilla",
+        imagen: "img/triana1.jpg",
+        enlace: "detalle-plan.html?id=tapas-triana"
+    },
+    {
+        planId: "sierra-norte",
+        titulo: "Ruta de senderismo por la Sierra Norte",
+        categoria: "naturaleza",
+        categoriaTexto: "Naturaleza",
+        precio: 12,
+        valoracion: 4.9,
+        fechaTexto: "8 de agosto de 2026",
+        fechaIso: "2026-08-08",
+        ubicacion: "Constantina, Sevilla",
+        imagen: "img/sierra-norte-principal.jpg",
+        enlace: "detalle-sierra-norte.html"
+    },
+    {
+        planId: "exposicion-contemporanea",
+        titulo: "Exposición de arte contemporáneo",
+        categoria: "cultura",
+        categoriaTexto: "Cultura",
+        precio: 0,
+        valoracion: 4.5,
+        fechaTexto: "Hasta el 10 de agosto",
+        fechaIso: "2026-08-10",
+        ubicacion: "Centro de Sevilla",
+        imagen: "img/andaluz1.jpg",
+        enlace: "detalle-plan.html?id=exposicion-contemporanea"
+    },
+    {
+        planId: "poncho-k-cartuja",
+        titulo: "PONCHO K - Cartuja Center CITE",
+        categoria: "musica",
+        categoriaTexto: "Música",
+        precio: 25,
+        valoracion: 4.8,
+        fechaTexto: "21 de noviembre de 2026",
+        fechaIso: "2026-11-21",
+        ubicacion: "Cartuja Center CITE, Sevilla",
+        imagen: "img/poncho-k.jpg",
+        enlace: "detalle-poncho-k.html"
+    }
+];
+
+
+function obtenerFechaLocalISODetalle() {
+    const ahora =
+        new Date();
+
+    const anio =
+        ahora.getFullYear();
+
+    const mes =
+        String(
+            ahora.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+    const dia =
+        String(
+            ahora.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+    return `${anio}-${mes}-${dia}`;
+}
+
+
+function planRelacionadoCaducado(
+    fechaIso
+) {
+    if (!fechaIso) {
+        return false;
+    }
+
+    const fechaSegura =
+        String(
+            fechaIso
+        ).slice(
+            0,
+            10
+        );
+
+    if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(
+            fechaSegura
+        )
+    ) {
+        return false;
+    }
+
+    return (
+        fechaSegura <
+        obtenerFechaLocalISODetalle()
+    );
+}
+
+
+function barajarPlanesRelacionados(
+    planes
+) {
+    const copia =
+        [...planes];
+
+    for (
+        let indice = copia.length - 1;
+        indice > 0;
+        indice -= 1
+    ) {
+        const posicionAleatoria =
+            Math.floor(
+                Math.random() *
+                (indice + 1)
+            );
+
+        [
+            copia[indice],
+            copia[posicionAleatoria]
+        ] = [
+            copia[posicionAleatoria],
+            copia[indice]
+        ];
+    }
+
+    return copia;
+}
+
+
+function formatearPrecioRelacionado(
+    precio
+) {
+    const cantidad =
+        Number(
+            precio ||
+            0
+        );
+
+    if (cantidad === 0) {
+        return "Gratis";
+    }
+
+    return `${cantidad
+        .toFixed(2)
+        .replace(".00", "")
+        .replace(".", ",")} €`;
+}
+
+
+function crearTarjetaPlanRelacionado(
+    plan
+) {
+    const titulo =
+        escaparTextoHTML(
+            plan.titulo ||
+            "Actividad de Suralia"
+        );
+
+    const imagen =
+        escaparAtributoHTML(
+            plan.imagen ||
+            "img/placeholder-plan.jpg"
+        );
+
+    const enlace =
+        escaparAtributoHTML(
+            plan.enlace ||
+            "planes.html"
+        );
+
+    const fechaTexto =
+        escaparTextoHTML(
+            plan.fechaTexto ||
+            "Fecha por confirmar"
+        );
+
+    const ubicacion =
+        escaparTextoHTML(
+            plan.ubicacion ||
+            "Ubicación por confirmar"
+        );
+
+    const categoriaTexto =
+        escaparTextoHTML(
+            plan.categoriaTexto ||
+            plan.categoria ||
+            "Actividad"
+        );
+
+    const valoracion =
+        Number(
+            plan.valoracion ||
+            0
+        );
+
+    return `
+        <article
+            class="tarjeta-plan"
+            data-plan-id="${escaparAtributoHTML(
+                plan.planId ||
+                ""
+            )}"
+        >
+
+            <a
+                href="${enlace}"
+                class="tarjeta-plan__enlace"
+                aria-label="Ver detalles de ${titulo}"
+            >
+
+                <div
+                    class="tarjeta-plan__imagen"
+                    style="background-image: url('${imagen}');"
+                >
+
+                    <span class="tarjeta-plan__precio">
+                        ${formatearPrecioRelacionado(
+                            plan.precio
+                        )}
+                    </span>
+
+                </div>
+
+                <div class="tarjeta-plan__contenido">
+
+                    <div class="tarjeta-plan__meta">
+
+                        <span>
+                            <i
+                                class="fa-regular fa-calendar"
+                                aria-hidden="true"
+                            ></i>
+
+                            ${fechaTexto}
+                        </span>
+
+                    </div>
+
+                    <h3>
+                        ${titulo}
+                    </h3>
+
+                    <p class="tarjeta-plan__ubicacion">
+                        <i
+                            class="fa-solid fa-location-dot"
+                            aria-hidden="true"
+                        ></i>
+
+                        ${ubicacion}
+                    </p>
+
+                    <div class="tarjeta-plan__pie">
+
+                        <span>
+                            ${categoriaTexto}
+                        </span>
+
+                        <strong>
+                            ${
+                                valoracion > 0
+                                    ? `${String(
+                                        valoracion
+                                    ).replace(
+                                        ".",
+                                        ","
+                                    )} <i class="fa-solid fa-star" aria-hidden="true"></i>`
+                                    : "Nuevo"
+                            }
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+        </article>
+    `;
+}
+
+
+async function cargarPlanesRelacionadosDinamicos() {
+    const grid =
+        seleccionar(
+            ".planes-relacionados .planes__grid"
+        );
+
+    if (
+        !grid ||
+        !planActual
+    ) {
+        return;
+    }
+
+    let planesSupabase =
+        [];
+
+    const cliente =
+        window.clienteSupabase;
+
+    if (cliente) {
+        try {
+            const {
+                data,
+                error
+            } = await cliente
+                .from(
+                    "planes"
+                )
+                .select(
+                    `
+                        id,
+                        titulo,
+                        categoria,
+                        nombre_categoria,
+                        fecha,
+                        ubicacion,
+                        precio,
+                        imagen_url
+                    `
+                )
+                .eq(
+                    "estado",
+                    "publicado"
+                )
+                .gte(
+                    "fecha",
+                    obtenerFechaLocalISODetalle()
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            planesSupabase =
+                (
+                    Array.isArray(data)
+                        ? data
+                        : []
+                ).map(
+                    (
+                        plan
+                    ) => ({
+                        planId:
+                            plan.id,
+
+                        titulo:
+                            plan.titulo ||
+                            "Actividad de Suralia",
+
+                        categoria:
+                            plan.categoria ||
+                            "",
+
+                        categoriaTexto:
+                            plan.nombre_categoria ||
+                            plan.categoria ||
+                            "Actividad",
+
+                        precio:
+                            Number(
+                                plan.precio ||
+                                0
+                            ),
+
+                        valoracion:
+                            0,
+
+                        fechaTexto:
+                            plan.fecha
+                                ? new Intl.DateTimeFormat(
+                                    "es-ES",
+                                    {
+                                        day:
+                                            "numeric",
+
+                                        month:
+                                            "long",
+
+                                        year:
+                                            "numeric"
+                                    }
+                                ).format(
+                                    new Date(
+                                        `${plan.fecha}T00:00:00`
+                                    )
+                                )
+                                : "Fecha por confirmar",
+
+                        fechaIso:
+                            plan.fecha ||
+                            "",
+
+                        ubicacion:
+                            plan.ubicacion ||
+                            "Ubicación por confirmar",
+
+                        imagen:
+                            plan.imagen_url ||
+                            "img/placeholder-plan.jpg",
+
+                        enlace:
+                            `detalle-plan.html?id=${encodeURIComponent(
+                                plan.id ||
+                                ""
+                            )}`
+                    })
+                );
+        } catch (error) {
+            console.error(
+                "No se pudieron cargar los planes relacionados desde Supabase:",
+                error
+            );
+        }
+    }
+
+    const idsIncluidos =
+        new Set();
+
+    const disponibles = [
+        ...PLANES_FIJOS_RELACIONADOS,
+        ...planesSupabase
+    ]
+        .filter(
+            (
+                plan
+            ) => {
+                const id =
+                    String(
+                        plan.planId ||
+                        ""
+                    );
+
+                if (
+                    !id ||
+                    id ===
+                    String(
+                        planActual.planId ||
+                        ""
+                    ) ||
+                    planRelacionadoCaducado(
+                        plan.fechaIso
+                    ) ||
+                    idsIncluidos.has(
+                        id
+                    )
+                ) {
+                    return false;
+                }
+
+                idsIncluidos.add(
+                    id
+                );
+
+                return true;
+            }
+        );
+
+    const relacionados =
+        barajarPlanesRelacionados(
+            disponibles
+        ).slice(
+            0,
+            3
+        );
+
+    if (
+        relacionados.length ===
+        0
+    ) {
+        seleccionar(
+            ".planes-relacionados"
+        )?.remove();
+
+        return;
+    }
+
+    grid.innerHTML =
+        relacionados
+            .map(
+                crearTarjetaPlanRelacionado
+            )
+            .join("");
+}
+
+
+/* =====================================================
    SINCRONIZACIÓN ENTRE PESTAÑAS
 ===================================================== */
 
@@ -1723,38 +2619,75 @@ window.addEventListener(
    INICIALIZACIÓN
 ===================================================== */
 
-if (
-    typeof window.obtenerPlanSuralia !==
-    "function"
-) {
-    console.warn(
-        "No se ha cargado js/datos-planes.js. Se usarán los datos internos del detalle."
-    );
+async function iniciarDetallePlan() {
+    if (
+        typeof window.obtenerPlanSuralia !==
+        "function"
+    ) {
+        console.warn(
+            "No se ha cargado js/datos-planes.js. Se usarán los datos internos del detalle."
+        );
+    }
+
+    try {
+        if (
+            !planActual &&
+            esUuidPlan(planIdUrl)
+        ) {
+            planActual =
+                await cargarPlanSupabaseDetalle();
+        }
+
+        if (!planActual) {
+            mostrarPlanNoEncontrado();
+            return;
+        }
+
+        cargarDatosBasicos();
+        cargarGaleria();
+        cargarDescripcion();
+        cargarIncluye();
+        cargarFechasReserva();
+        cargarMapa();
+        actualizarDesgloseReserva();
+        actualizarBotonFavoritoDetalle();
+        await cargarPlanesRelacionadosDinamicos();
+
+        descripcionAmpliada?.setAttribute(
+            "aria-hidden",
+            descripcionAmpliada.classList.contains(
+                "visible"
+            )
+                ? "false"
+                : "true"
+        );
+
+        modalImagen?.setAttribute(
+            "aria-hidden",
+            modalImagen.classList.contains(
+                "visible"
+            )
+                ? "false"
+                : "true"
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo cargar el detalle del plan:",
+            error
+        );
+
+        mostrarPlanNoEncontrado();
+    }
 }
 
-cargarDatosBasicos();
-cargarGaleria();
-cargarDescripcion();
-cargarIncluye();
-cargarFechasReserva();
-cargarMapa();
-actualizarDesgloseReserva();
-actualizarBotonFavoritoDetalle();
-
-descripcionAmpliada?.setAttribute(
-    "aria-hidden",
-    descripcionAmpliada.classList.contains(
-        "visible"
-    )
-        ? "false"
-        : "true"
-);
-
-modalImagen?.setAttribute(
-    "aria-hidden",
-    modalImagen.classList.contains(
-        "visible"
-    )
-        ? "false"
-        : "true"
-);
+if (
+    document.readyState ===
+    "loading"
+) {
+    document.addEventListener(
+        "DOMContentLoaded",
+        iniciarDetallePlan
+    );
+} else {
+    iniciarDetallePlan();
+}

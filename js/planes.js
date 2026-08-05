@@ -34,7 +34,7 @@ const listaPlanes = document.querySelector(
     "#lista-planes"
 );
 
-const planes = Array.from(
+let planes = Array.from(
     document.querySelectorAll(
         "#lista-planes .tarjeta-plan"
     )
@@ -250,6 +250,63 @@ function normalizarTexto(texto = "") {
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "");
+}
+
+
+function obtenerFechaLocalISO() {
+    const ahora =
+        new Date();
+
+    const anio =
+        ahora.getFullYear();
+
+    const mes =
+        String(
+            ahora.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+    const dia =
+        String(
+            ahora.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+    return `${anio}-${mes}-${dia}`;
+}
+
+
+function planHaCaducado(
+    fechaIso
+) {
+    if (!fechaIso) {
+        return false;
+    }
+
+    const fechaSegura =
+        String(
+            fechaIso
+        ).slice(
+            0,
+            10
+        );
+
+    if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(
+            fechaSegura
+        )
+    ) {
+        return false;
+    }
+
+    return (
+        fechaSegura <
+        obtenerFechaLocalISO()
+    );
 }
 
 
@@ -504,11 +561,17 @@ function aplicarFiltros() {
                 fechaIso ===
                     fechaBuscadaDesdePortada;
 
+            const sigueDisponible =
+                !planHaCaducado(
+                    fechaIso
+                );
+
             return (
                 coincideTexto &&
                 coincideCategoria &&
                 coincidePrecio &&
-                coincideFecha
+                coincideFecha &&
+                sigueDisponible
             );
         }
     );
@@ -654,10 +717,11 @@ if (botonVista) {
    FAVORITOS DESDE EL LISTADO
 ===================================================== */
 
-const botonesFavoritosPlanes =
-    document.querySelectorAll(
-        ".tarjeta-plan__favorito"
+function obtenerBotonesFavoritosPlanes() {
+    return document.querySelectorAll(
+        "#lista-planes .tarjeta-plan__favorito"
     );
+}
 
 
 function obtenerSesionPlanes() {
@@ -812,7 +876,7 @@ function cargarEstadoFavoritosTarjetas() {
     const sesion =
         obtenerSesionPlanes();
 
-    botonesFavoritosPlanes.forEach(
+    obtenerBotonesFavoritosPlanes().forEach(
         (boton) => {
             const tarjeta = boton.closest(
                 ".tarjeta-plan"
@@ -964,18 +1028,23 @@ function alternarFavoritoTarjeta(
 }
 
 
-botonesFavoritosPlanes.forEach(
-    (boton) => {
-        boton.addEventListener(
-            "click",
-            (evento) => {
-                evento.preventDefault();
-                evento.stopPropagation();
+listaPlanes?.addEventListener(
+    "click",
+    (evento) => {
+        const boton =
+            evento.target.closest(
+                ".tarjeta-plan__favorito"
+            );
 
-                alternarFavoritoTarjeta(
-                    boton
-                );
-            }
+        if (!boton) {
+            return;
+        }
+
+        evento.preventDefault();
+        evento.stopPropagation();
+
+        alternarFavoritoTarjeta(
+            boton
         );
     }
 );
@@ -993,6 +1062,357 @@ if (filtroTexto) {
             }
         }
     );
+}
+
+
+/* =====================================================
+   PLANES PUBLICADOS DESDE SUPABASE
+===================================================== */
+
+function escaparHTMLPlanes(
+    valor = ""
+) {
+    return String(valor)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+function formatearFechaPublicada(
+    fechaIso
+) {
+    if (!fechaIso) {
+        return "Fecha por confirmar";
+    }
+
+    const fecha =
+        new Date(
+            `${fechaIso}T00:00:00`
+        );
+
+    if (
+        Number.isNaN(
+            fecha.getTime()
+        )
+    ) {
+        return fechaIso;
+    }
+
+    return new Intl.DateTimeFormat(
+        "es-ES",
+        {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }
+    ).format(fecha);
+}
+
+
+function formatearPrecioPublicado(
+    precio
+) {
+    const cantidad =
+        Number(precio || 0);
+
+    if (cantidad === 0) {
+        return "Gratis";
+    }
+
+    return `${cantidad
+        .toFixed(2)
+        .replace(".00", "")
+        .replace(".", ",")} €`;
+}
+
+
+function asegurarCategoriaTalleres() {
+    if (
+        !filtroCategoria ||
+        filtroCategoria.querySelector(
+            'option[value="talleres"]'
+        )
+    ) {
+        return;
+    }
+
+    const opcion =
+        document.createElement("option");
+
+    opcion.value = "talleres";
+    opcion.textContent = "Talleres";
+
+    filtroCategoria.appendChild(opcion);
+}
+
+
+function crearTarjetaPlanSupabase(
+    plan
+) {
+    const planId =
+        escaparHTMLPlanes(plan.id || "");
+
+    const titulo =
+        escaparHTMLPlanes(
+            plan.titulo ||
+            "Actividad de Suralia"
+        );
+
+    const categoria =
+        escaparHTMLPlanes(
+            plan.categoria || ""
+        );
+
+    const categoriaTexto =
+        escaparHTMLPlanes(
+            plan.nombre_categoria ||
+            plan.categoria ||
+            "Actividad"
+        );
+
+    const descripcion =
+        escaparHTMLPlanes(
+            plan.descripcion || ""
+        );
+
+    const fechaIso =
+        escaparHTMLPlanes(
+            plan.fecha || ""
+        );
+
+    const fechaTexto =
+        escaparHTMLPlanes(
+            formatearFechaPublicada(
+                plan.fecha
+            )
+        );
+
+    const hora =
+        escaparHTMLPlanes(
+            plan.hora
+                ? String(plan.hora).slice(0, 5)
+                : "Hora por confirmar"
+        );
+
+    const ubicacion =
+        escaparHTMLPlanes(
+            plan.ubicacion ||
+            "Ubicación por confirmar"
+        );
+
+    const imagen =
+        escaparHTMLPlanes(
+            plan.imagen_url ||
+            "img/placeholder-plan.jpg"
+        );
+
+    const precioNumero =
+        Number(plan.precio || 0);
+
+    const precioTexto =
+        escaparHTMLPlanes(
+            formatearPrecioPublicado(
+                precioNumero
+            )
+        );
+
+    const enlace =
+        `detalle-plan.html?id=${encodeURIComponent(
+            plan.id || ""
+        )}`;
+
+    return `
+        <article
+            class="tarjeta-plan tarjeta-plan--publicada-usuario"
+            data-plan-id="${planId}"
+            data-nombre="${titulo}"
+            data-titulo="${titulo}"
+            data-categoria="${categoria}"
+            data-categoria-texto="${categoriaTexto}"
+            data-precio="${precioNumero}"
+            data-valoracion="0"
+            data-fecha="${fechaTexto}"
+            data-fecha-iso="${fechaIso}"
+            data-ubicacion="${ubicacion}"
+            data-imagen="${imagen}"
+            data-enlace="${enlace}"
+        >
+
+            <a
+                href="${enlace}"
+                class="tarjeta-plan__enlace"
+                aria-label="Ver detalles de ${titulo}"
+            >
+
+                <div
+                    class="tarjeta-plan__imagen"
+                    style="background-image: url('${imagen}');"
+                >
+
+                    <span class="tarjeta-plan__precio">
+                        ${precioTexto}
+                    </span>
+
+                    <button
+                        class="tarjeta-plan__favorito"
+                        type="button"
+                        aria-label="Añadir ${titulo} a favoritos"
+                        aria-pressed="false"
+                    >
+                        <i
+                            class="fa-regular fa-heart"
+                            aria-hidden="true"
+                        ></i>
+                    </button>
+
+                </div>
+
+                <div class="tarjeta-plan__contenido">
+
+                    <div class="tarjeta-plan__meta">
+
+                        <span>
+                            <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                            ${fechaTexto}
+                        </span>
+
+                        <span>
+                            <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                            ${hora}
+                        </span>
+
+                    </div>
+
+                    <h3>${titulo}</h3>
+
+                    <p class="tarjeta-plan__descripcion">
+                        ${descripcion}
+                    </p>
+
+                    <p class="tarjeta-plan__ubicacion">
+                        <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                        ${ubicacion}
+                    </p>
+
+                    <div class="tarjeta-plan__pie">
+
+                        <span>${categoriaTexto}</span>
+
+                        <strong>Nuevo</strong>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+        </article>
+    `;
+}
+
+
+async function cargarPlanesPublicadosSupabase() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente || !listaPlanes) {
+        return;
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente
+            .from("planes")
+            .select(
+                `
+                    id,
+                    titulo,
+                    categoria,
+                    nombre_categoria,
+                    descripcion,
+                    fecha,
+                    hora,
+                    ubicacion,
+                    precio,
+                    imagen_url,
+                    creado_en
+                `
+            )
+            .eq("estado", "publicado")
+            .order(
+                "creado_en",
+                {
+                    ascending: false
+                }
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        const idsExistentes =
+            new Set(
+                Array.from(
+                    listaPlanes.querySelectorAll(
+                        ".tarjeta-plan"
+                    )
+                ).map(
+                    (tarjeta) =>
+                        String(
+                            tarjeta.dataset.planId ||
+                            ""
+                        )
+                )
+            );
+
+        const planesNuevos =
+            (
+                Array.isArray(data)
+                    ? data
+                    : []
+            ).filter(
+                (plan) =>
+                    plan.id &&
+                    !idsExistentes.has(
+                        String(plan.id)
+                    )
+            );
+
+        if (planesNuevos.length > 0) {
+            listaPlanes.insertAdjacentHTML(
+                "beforeend",
+                planesNuevos
+                    .map(
+                        crearTarjetaPlanSupabase
+                    )
+                    .join("")
+            );
+        }
+
+        planes =
+            Array.from(
+                document.querySelectorAll(
+                    "#lista-planes .tarjeta-plan"
+                )
+            );
+
+        aplicarFiltros();
+        cargarEstadoFavoritosTarjetas();
+    } catch (error) {
+        console.error(
+            "No se pudieron cargar los planes publicados desde Supabase:",
+            error
+        );
+
+        mostrarNotificacion(
+            "No se han podido cargar las nuevas actividades."
+        );
+    }
 }
 
 
@@ -1029,5 +1449,7 @@ if (
 
 aplicarParametrosIniciales();
 actualizarBotonVista();
+asegurarCategoriaTalleres();
 aplicarFiltros();
 cargarEstadoFavoritosTarjetas();
+cargarPlanesPublicadosSupabase();

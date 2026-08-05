@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Panel privado de administración de Suralia."
+    >
+
+    <meta
+        name="robots"
+        content="noindex, nofollow"
+    >
+
+    <title>Administración | Suralia</title>
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="img/suralia-favicon.png?v=10"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+</head>
+
+<body class="pagina-admin pagina-admin--comprobando">
+
+    <!-- =================================================
+         HEADER
+    ================================================== -->
+
+    <header class="header">
+
+        <div class="contenedor header__contenido">
+
+            <a
+                href="index.html"
+                class="logo"
+                aria-label="Página de inicio de Suralia"
+            >
+                <img
+                    src="img/suralia-logo.png"
+                    alt="Suralia"
+                    class="logo__imagen"
+                    width="1138"
+                    height="392"
+                >
+            </a>
+
+            <nav
+                class="navegacion"
+                id="navegacion"
+                aria-label="Navegación principal"
+            >
+
+                <a href="planes.html">
+                    Explorar planes
+                </a>
+
+                <a href="index.html#categorias">
+                    Categorías
+                </a>
+
+                <a href="como-funciona.html">
+                    Cómo funciona
+                </a>
+
+                <a
+                    href="login.html"
+                    class="enlace-publicar"
+                >
+                    <i
+                        class="fa-solid fa-plus"
+                        aria-hidden="true"
+                    ></i>
+
+                    Publicar un plan
+                </a>
+
+                <a
+                    href="login.html"
+                    class="login-movil"
+                >
+                    <i
+                        class="fa-regular fa-user"
+                        aria-hidden="true"
+                    ></i>
+
+                    <span>
+                        Iniciar sesión
+                    </span>
+                </a>
+
+                <a
+                    href="perfil.html#reservas"
+                    class="opcion-usuario-movil"
+                >
+                    <i
+                        class="fa-regular fa-calendar-check"
+                        aria-hidden="true"
+                    ></i>
+
+                    Mis reservas
+                </a>
+
+                <a
+                    href="perfil.html#favoritos"
+                    class="opcion-usuario-movil"
+                >
+                    <i
+                        class="fa-regular fa-heart"
+                        aria-hidden="true"
+                    ></i>
+
+                    Favoritos
+                </a>
+
+                <button
+                    type="button"
+                    class="opcion-usuario-movil cerrar-sesion-movil"
+                    id="cerrar-sesion-movil"
+                >
+                    <i
+                        class="fa-solid fa-arrow-right-from-bracket"
+                        aria-hidden="true"
+                    ></i>
+
+                    Cerrar sesión
+                </button>
+
+            </nav>
+
+            <div class="header__acciones">
+
+                <div
+                    class="menu-usuario"
+                    id="menu-usuario"
+                >
+
+                    <a
+                        href="login.html"
+                        class="boton-login"
+                        id="boton-usuario"
+                        aria-expanded="false"
+                        aria-haspopup="true"
+                        aria-controls="menu-usuario-desplegable"
+                    >
+                        Iniciar sesión
+                    </a>
+
+                    <div
+                        class="menu-usuario__desplegable"
+                        id="menu-usuario-desplegable"
+                    >
+
+                        <a href="perfil.html">
+                            <i
+                                class="fa-regular fa-user"
+                                aria-hidden="true"
+                            ></i>
+
+                            Mi perfil
+                        </a>
+
+                        <a href="perfil.html#reservas">
+                            <i
+                                class="fa-regular fa-calendar-check"
+                                aria-hidden="true"
+                            ></i>
+
+                            Mis reservas
+                        </a>
+
+                        <a href="perfil.html#favoritos">
+                            <i
+                                class="fa-regular fa-heart"
+                                aria-hidden="true"
+                            ></i>
+
+                            Favoritos
+                        </a>
+
+                        <a href="publicar-plan.html">
+                            <i
+                                class="fa-solid fa-plus"
+                                aria-hidden="true"
+                            ></i>
+
+                            Publicar un plan
+                        </a>
+
+                        <span class="menu-usuario__separador"></span>
+
+                        <button
+                            type="button"
+                            id="cerrar-sesion"
+                            class="menu-usuario__cerrar"
+                        >
+                            <i
+                                class="fa-solid fa-arrow-right-from-bracket"
+                                aria-hidden="true"
+                            ></i>
+
+                            Cerrar sesión
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <button
+                    class="boton-menu"
+                    id="boton-menu"
+                    type="button"
+                    aria-label="Abrir menú"
+                    aria-expanded="false"
+                    aria-controls="navegacion"
+                >
+                    <i
+                        class="fa-solid fa-bars"
+                        aria-hidden="true"
+                    ></i>
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <!-- =================================================
+         COMPROBACIÓN DE ACCESO
+    ================================================== -->
+
+    <div
+        class="admin-comprobacion"
+        id="admin-comprobacion"
+        role="status"
+        aria-live="polite"
+    >
+        <span class="admin-comprobacion__icono">
+            <i
+                class="fa-solid fa-spinner fa-spin"
+                aria-hidden="true"
+            ></i>
+        </span>
+
+        <div>
+            <strong>
+                Comprobando acceso
+            </strong>
+
+            <p>
+                Estamos verificando tus permisos de administración.
+            </p>
+        </div>
+    </div>
+
+    <!-- =================================================
+         PANEL DE ADMINISTRACIÓN
+    ================================================== -->
+
+    <main
+        class="admin-principal"
+        id="admin-principal"
+        hidden
+    >
+
+        <section class="admin-cabecera">
+
+            <div class="contenedor admin-cabecera__contenido">
+
+                <div>
+
+                    <span class="admin-etiqueta">
+                        <i
+                            class="fa-solid fa-shield-halved"
+                            aria-hidden="true"
+                        ></i>
+
+                        Área privada
+                    </span>
+
+                    <h1>
+                        Panel de administración
+                    </h1>
+
+                    <p>
+                        Gestiona el contenido y los usuarios de Suralia
+                        desde un único lugar.
+                    </p>
+
+                </div>
+
+                <a
+                    href="index.html"
+                    class="admin-volver"
+                >
+                    <i
+                        class="fa-solid fa-arrow-left"
+                        aria-hidden="true"
+                    ></i>
+
+                    Volver a Suralia
+                </a>
+
+            </div>
+
+        </section>
+
+        <section
+            class="seccion admin-resumen"
+            aria-labelledby="titulo-admin-resumen"
+        >
+
+            <div class="contenedor">
+
+                <div class="encabezado-seccion">
+
+                    <div>
+
+                        <span class="subtitulo">
+                            Vista general
+                        </span>
+
+                        <h2 id="titulo-admin-resumen">
+                            Herramientas de administración
+                        </h2>
+
+                    </div>
+
+                </div>
+
+                <div class="admin-grid">
+
+                    <a
+                        href="#planes-pendientes"
+                        class="admin-tarjeta admin-tarjeta--activa"
+                    >
+
+                        <span class="admin-tarjeta__icono">
+                            <i
+                                class="fa-regular fa-calendar-check"
+                                aria-hidden="true"
+                            ></i>
+                        </span>
+
+                        <div>
+
+                            <span class="admin-tarjeta__estado admin-tarjeta__estado--activo">
+                                Disponible
+                            </span>
+
+                            <h3>
+                                Planes pendientes
+                            </h3>
+
+                            <p>
+                                Revisa, aprueba o rechaza los planes
+                                publicados por los usuarios.
+                            </p>
+
+                        </div>
+
+                    </a>
+
+                    <a
+                        href="#planes-publicados"
+                        class="admin-tarjeta admin-tarjeta--activa"
+                    >
+
+                        <span class="admin-tarjeta__icono">
+                            <i
+                                class="fa-solid fa-map-location-dot"
+                                aria-hidden="true"
+                            ></i>
+                        </span>
+
+                        <div>
+
+                            <span class="admin-tarjeta__estado admin-tarjeta__estado--activo">
+                                Disponible
+                            </span>
+
+                            <h3>
+                                Planes publicados
+                            </h3>
+
+                            <p>
+                                Consulta las actividades aprobadas, abre
+                                su detalle o elimínalas del catálogo.
+                            </p>
+
+                        </div>
+
+                    </a>
+
+                    <a
+                        href="#usuarios-y-roles"
+                        class="admin-tarjeta admin-tarjeta--activa"
+                    >
+
+                        <span class="admin-tarjeta__icono">
+                            <i
+                                class="fa-solid fa-users-gear"
+                                aria-hidden="true"
+                            ></i>
+                        </span>
+
+                        <div>
+
+                            <span class="admin-tarjeta__estado admin-tarjeta__estado--activo">
+                                Disponible
+                            </span>
+
+                            <h3>
+                                Usuarios y roles
+                            </h3>
+
+                            <p>
+                                Consulta usuarios y asigna permisos de
+                                moderador o administrador.
+                            </p>
+
+                        </div>
+
+                    </a>
+
+                    <a
+                        href="#verificaciones-pendientes"
+                        class="admin-tarjeta admin-tarjeta--activa"
+                    >
+
+                        <span class="admin-tarjeta__icono">
+                            <i
+                                class="fa-solid fa-user-check"
+                                aria-hidden="true"
+                            ></i>
+                        </span>
+
+                        <div>
+
+                            <span class="admin-tarjeta__estado admin-tarjeta__estado--activo">
+                                Disponible
+                            </span>
+
+                            <h3>
+                                Verificaciones
+                            </h3>
+
+                            <p>
+                                Revisa, aprueba o rechaza las solicitudes
+                                pendientes de verificación de perfiles.
+                            </p>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+                <section
+                    class="admin-planes"
+                    id="planes-pendientes"
+                    aria-labelledby="titulo-planes-pendientes"
+                >
+
+                    <div class="admin-planes__cabecera">
+
+                        <div>
+
+                            <span class="subtitulo">
+                                Moderación de actividades
+                            </span>
+
+                            <h2 id="titulo-planes-pendientes">
+                                Planes pendientes
+                            </h2>
+
+                            <p>
+                                Revisa la información, la imagen, la fecha,
+                                las plazas y el precio antes de publicar
+                                la actividad.
+                            </p>
+
+                        </div>
+
+                        <span
+                            class="admin-contador"
+                            id="contador-planes-pendientes"
+                            aria-live="polite"
+                        >
+                            0 pendientes
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="admin-planes__estado"
+                        id="estado-planes-pendientes"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        <i
+                            class="fa-solid fa-spinner fa-spin"
+                            aria-hidden="true"
+                        ></i>
+
+                        Cargando planes...
+                    </div>
+
+                    <div
+                        class="admin-planes__lista"
+                        id="lista-planes-pendientes"
+                    ></div>
+
+                </section>
+
+                <section
+                    class="admin-planes admin-planes--publicados"
+                    id="planes-publicados"
+                    aria-labelledby="titulo-planes-publicados"
+                >
+
+                    <div class="admin-planes__cabecera">
+
+                        <div>
+
+                            <span class="subtitulo">
+                                Catálogo activo
+                            </span>
+
+                            <h2 id="titulo-planes-publicados">
+                                Planes publicados
+                            </h2>
+
+                            <p>
+                                Consulta los planes aprobados. Al eliminar uno
+                                también se borrarán sus imágenes del almacenamiento.
+                            </p>
+
+                        </div>
+
+                        <span
+                            class="admin-contador"
+                            id="contador-planes-publicados"
+                            aria-live="polite"
+                        >
+                            0 publicados
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="admin-planes__estado"
+                        id="estado-planes-publicados"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        <i
+                            class="fa-solid fa-spinner fa-spin"
+                            aria-hidden="true"
+                        ></i>
+
+                        Cargando planes publicados...
+                    </div>
+
+                    <div
+                        class="admin-planes__lista"
+                        id="lista-planes-publicados"
+                    ></div>
+
+                </section>
+
+                <section
+                    class="admin-usuarios"
+                    id="usuarios-y-roles"
+                    aria-labelledby="titulo-usuarios-roles"
+                >
+
+                    <div class="admin-usuarios__cabecera">
+
+                        <div>
+
+                            <span class="subtitulo">
+                                Gestión de acceso
+                            </span>
+
+                            <h2 id="titulo-usuarios-roles">
+                                Usuarios y roles
+                            </h2>
+
+                            <p>
+                                Consulta los perfiles registrados y asigna
+                                el nivel de acceso adecuado a cada persona.
+                            </p>
+
+                        </div>
+
+                        <span
+                            class="admin-contador"
+                            id="contador-usuarios"
+                            aria-live="polite"
+                        >
+                            0 usuarios
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="admin-usuarios__estado"
+                        id="estado-usuarios"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        <i
+                            class="fa-solid fa-spinner fa-spin"
+                            aria-hidden="true"
+                        ></i>
+
+                        Cargando usuarios...
+                    </div>
+
+                    <div
+                        class="admin-usuarios__lista"
+                        id="lista-usuarios"
+                    ></div>
+
+                </section>
+
+                <section
+                    class="admin-verificaciones"
+                    id="verificaciones-pendientes"
+                    aria-labelledby="titulo-verificaciones-pendientes"
+                >
+
+                    <div class="admin-verificaciones__cabecera">
+
+                        <div>
+
+                            <span class="subtitulo">
+                                Revisión de perfiles
+                            </span>
+
+                            <h2 id="titulo-verificaciones-pendientes">
+                                Verificaciones pendientes
+                            </h2>
+
+                            <p>
+                                Comprueba que la selfie coincide con la
+                                fotografía del perfil y que muestra el
+                                código solicitado.
+                            </p>
+
+                        </div>
+
+                        <span
+                            class="admin-contador"
+                            id="contador-verificaciones"
+                            aria-live="polite"
+                        >
+                            0 pendientes
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="admin-verificaciones__estado"
+                        id="estado-verificaciones"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        <i
+                            class="fa-solid fa-spinner fa-spin"
+                            aria-hidden="true"
+                        ></i>
+
+                        Cargando verificaciones...
+                    </div>
+
+                    <div
+                        class="admin-verificaciones__lista"
+                        id="lista-verificaciones"
+                    ></div>
+
+                </section>
+
+                <div class="admin-aviso">
+
+                    <i
+                        class="fa-solid fa-circle-info"
+                        aria-hidden="true"
+                    ></i>
+
+                    <div>
+
+                        <h3>
+                            Acciones protegidas por Supabase
+                        </h3>
+
+                        <p>
+                            La lista y las decisiones se realizan mediante
+                            funciones que comprueban el rol de administrador.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- =================================================
+         FOOTER
+    ================================================== -->
+
+    <footer
+        class="footer"
+        id="admin-footer"
+        hidden
+    >
+
+        <div class="contenedor footer__inferior">
+
+            <p>
+                © 2026 Suralia. Proyecto desarrollado por Fernando.
+            </p>
+
+            <div>
+
+                <a href="privacidad.html">
+                    Privacidad
+                </a>
+
+                <a href="cookies.html">
+                    Cookies
+                </a>
+
+                <a href="aviso-legal.html">
+                    Aviso legal
+                </a>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- =================================================
+         MODAL PARA RECHAZAR UN PLAN
+    ================================================== -->
+
+    <div
+        class="admin-modal"
+        id="modal-rechazar-plan"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-modal-rechazar-plan"
+        aria-hidden="true"
+    >
+
+        <div class="admin-modal__contenido">
+
+            <button
+                type="button"
+                class="admin-modal__cerrar"
+                id="cerrar-modal-rechazar-plan"
+                aria-label="Cerrar"
+            >
+                <i
+                    class="fa-solid fa-xmark"
+                    aria-hidden="true"
+                ></i>
+            </button>
+
+            <span class="admin-modal__icono">
+                <i
+                    class="fa-solid fa-calendar-xmark"
+                    aria-hidden="true"
+                ></i>
+            </span>
+
+            <h2 id="titulo-modal-rechazar-plan">
+                Rechazar plan
+            </h2>
+
+            <p>
+                Explica qué debe corregir el usuario antes de volver
+                a enviar la actividad.
+            </p>
+
+            <label for="motivo-rechazo-plan">
+                Motivo del rechazo
+            </label>
+
+            <textarea
+                id="motivo-rechazo-plan"
+                rows="5"
+                maxlength="500"
+                placeholder="Por ejemplo: falta concretar el punto de encuentro."
+            ></textarea>
+
+            <span
+                class="admin-modal__error"
+                id="error-motivo-rechazo-plan"
+                role="alert"
+            ></span>
+
+            <div class="admin-modal__acciones">
+
+                <button
+                    type="button"
+                    class="admin-boton admin-boton--secundario"
+                    id="cancelar-rechazo-plan"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="admin-boton admin-boton--peligro"
+                    id="confirmar-rechazo-plan"
+                >
+                    Rechazar plan
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         MODAL PARA RECHAZAR UNA VERIFICACIÓN
+    ================================================== -->
+
+    <div
+        class="admin-modal"
+        id="modal-rechazar-verificacion"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-modal-rechazo"
+        aria-hidden="true"
+    >
+
+        <div class="admin-modal__contenido">
+
+            <button
+                type="button"
+                class="admin-modal__cerrar"
+                id="cerrar-modal-rechazo"
+                aria-label="Cerrar"
+            >
+                <i
+                    class="fa-solid fa-xmark"
+                    aria-hidden="true"
+                ></i>
+            </button>
+
+            <span class="admin-modal__icono">
+                <i
+                    class="fa-solid fa-user-xmark"
+                    aria-hidden="true"
+                ></i>
+            </span>
+
+            <h2 id="titulo-modal-rechazo">
+                Rechazar verificación
+            </h2>
+
+            <p>
+                Indica qué debe corregir el usuario para poder enviar
+                una nueva solicitud.
+            </p>
+
+            <label for="motivo-rechazo-verificacion">
+                Motivo del rechazo
+            </label>
+
+            <textarea
+                id="motivo-rechazo-verificacion"
+                rows="5"
+                maxlength="400"
+                placeholder="Por ejemplo: el código no se ve con claridad."
+            ></textarea>
+
+            <span
+                class="admin-modal__error"
+                id="error-motivo-rechazo"
+                role="alert"
+            ></span>
+
+            <div class="admin-modal__acciones">
+
+                <button
+                    type="button"
+                    class="admin-boton admin-boton--secundario"
+                    id="cancelar-rechazo-verificacion"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="admin-boton admin-boton--peligro"
+                    id="confirmar-rechazo-verificacion"
+                >
+                    Rechazar solicitud
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/cookies.js"></script>
+
+</body>
+
+</html>

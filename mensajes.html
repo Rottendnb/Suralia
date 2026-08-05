@@ -136,25 +136,80 @@
 
     <main class="mensajes-pagina">
 
-        <div class="contenedor">
+        <div class="contenedor mensajes-layout">
 
-            <a
-                href="perfil.html#conexiones"
-                class="mensajes-volver"
+            <aside
+                class="perfil-menu mensajes-menu-lateral"
+                aria-label="Navegación de mensajes"
             >
-                <i
-                    class="fa-solid fa-arrow-left"
-                    aria-hidden="true"
-                ></i>
+                <a
+                    href="conversaciones.html"
+                    class="perfil-menu__enlace activo"
+                >
+                    <i
+                        class="fa-regular fa-comments"
+                        aria-hidden="true"
+                    ></i>
 
-                Volver a conexiones
-            </a>
+                    Conversaciones
+                </a>
 
-            <section
-                class="mensajes-carga"
-                id="mensajes-carga"
-                aria-live="polite"
-            >
+                <a
+                    href="perfil.html#conexiones"
+                    class="perfil-menu__enlace"
+                >
+                    <i
+                        class="fa-solid fa-user-group"
+                        aria-hidden="true"
+                    ></i>
+
+                    Mis conexiones
+                </a>
+
+                <a
+                    href="perfil.html"
+                    class="perfil-menu__enlace"
+                >
+                    <i
+                        class="fa-regular fa-user"
+                        aria-hidden="true"
+                    ></i>
+
+                    Mi perfil
+                </a>
+
+                <a
+                    href="planes.html"
+                    class="perfil-menu__enlace"
+                >
+                    <i
+                        class="fa-solid fa-compass"
+                        aria-hidden="true"
+                    ></i>
+
+                    Explorar planes
+                </a>
+            </aside>
+
+            <div class="mensajes-contenido">
+
+                <a
+                    href="conversaciones.html"
+                    class="mensajes-volver"
+                >
+                    <i
+                        class="fa-solid fa-arrow-left"
+                        aria-hidden="true"
+                    ></i>
+
+                    Volver a conversaciones
+                </a>
+
+                <section
+                    class="mensajes-carga"
+                    id="mensajes-carga"
+                    aria-live="polite"
+                >
                 <i
                     class="fa-solid fa-spinner fa-spin"
                     aria-hidden="true"
@@ -426,7 +481,9 @@
                     </div>
                 </form>
 
-            </section>
+                </section>
+
+            </div>
 
         </div>
 

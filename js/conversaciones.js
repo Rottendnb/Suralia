@@ -489,43 +489,39 @@ function filtrarConversaciones() {
                     busqueda
                 );
 
+            const fijada =
+                tarjetaConversacion.dataset
+                    .fijada ===
+                "true";
+
             let coincideFiltro =
-                true;
+                false;
 
-            if (
-                filtroConversacionesActivo ===
-                "todas"
+            switch (
+                filtroConversacionesActivo
             ) {
-                coincideFiltro =
-                    !archivada;
-            }
+                case "no-leidas":
+                    coincideFiltro =
+                        !archivada &&
+                        pendientes > 0;
+                    break;
 
-            if (
-                filtroConversacionesActivo ===
-                "no-leidas"
-            ) {
-                coincideFiltro =
-                    !archivada &&
-                    pendientes > 0;
-            }
+                case "fijadas":
+                    coincideFiltro =
+                        !archivada &&
+                        fijada;
+                    break;
 
-            if (
-                filtroConversacionesActivo ===
-                "fijadas"
-            ) {
-                coincideFiltro =
-                    !archivada &&
-                    tarjetaConversacion.dataset
-                        .fijada ===
-                    "true";
-            }
+                case "archivadas":
+                    coincideFiltro =
+                        archivada;
+                    break;
 
-            if (
-                filtroConversacionesActivo ===
-                "archivadas"
-            ) {
-                coincideFiltro =
-                    archivada;
+                case "todas":
+                default:
+                    coincideFiltro =
+                        !archivada;
+                    break;
             }
 
             const mostrar =
@@ -537,9 +533,27 @@ function filtrarConversaciones() {
                 !mostrar
             );
 
+            /*
+               Algunas reglas responsive de las tarjetas usan
+               display con prioridad. Por eso reforzamos el filtro
+               también desde el atributo hidden y el estilo inline.
+            */
+            tarjetaConversacion.hidden =
+                !mostrar;
+
             if (mostrar) {
+                tarjetaConversacion.style.removeProperty(
+                    "display"
+                );
+
                 visibles +=
                     1;
+            } else {
+                tarjetaConversacion.style.setProperty(
+                    "display",
+                    "none",
+                    "important"
+                );
             }
         }
     );

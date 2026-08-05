@@ -694,12 +694,12 @@
 
                             <div>
                                 <h2 id="titulo-bloque-imagen">
-                                    Imagen del plan
+                                    Imágenes del plan
                                 </h2>
 
                                 <p>
-                                    Añade una imagen atractiva que represente la
-                                    actividad.
+                                    Añade hasta tres imágenes. La primera será
+                                    la imagen principal de la actividad.
                                 </p>
                             </div>
 
@@ -707,9 +707,18 @@
 
                         <div class="subida-imagen">
 
+                            <h3>
+                                Imagen principal
+                            </h3>
+
+                            <p class="campo-ayuda">
+                                Obligatoria. Se utilizará en las tarjetas,
+                                la portada y la primera posición de la galería.
+                            </p>
+
                             <input
                                 type="file"
-                                id="plan-imagen" aria-describedby="error-plan-imagen"
+                                id="plan-imagen"
                                 name="imagen"
                                 accept="image/png, image/jpeg, image/webp"
                                 aria-describedby="error-plan-imagen"
@@ -730,7 +739,7 @@
                                 </span>
 
                                 <strong>
-                                    Selecciona una imagen
+                                    Selecciona la imagen principal
                                 </strong>
 
                                 <p>
@@ -752,7 +761,7 @@
 
                                 <img
                                     src=""
-                                    alt="Vista previa de la imagen seleccionada"
+                                    alt="Vista previa de la imagen principal"
                                     id="imagen-seleccionada"
                                 >
 
@@ -772,7 +781,170 @@
 
                             <small
                                 class="mensaje-error"
-                                id="error-plan-imagen" aria-live="polite"
+                                id="error-plan-imagen"
+                                aria-live="polite"
+                            ></small>
+
+                        </div>
+
+                        <div class="subida-imagen">
+
+                            <h3>
+                                Segunda imagen
+                            </h3>
+
+                            <p class="campo-ayuda">
+                                Opcional. Aparecerá en la galería del plan.
+                            </p>
+
+                            <input
+                                type="file"
+                                id="plan-imagen-2"
+                                name="imagen_2"
+                                accept="image/png, image/jpeg, image/webp"
+                                aria-describedby="error-plan-imagen-2"
+                                hidden
+                            >
+
+                            <label
+                                for="plan-imagen-2"
+                                class="subida-imagen__zona"
+                                id="zona-subida-imagen-2"
+                                role="button"
+                                tabindex="0"
+                                aria-controls="plan-imagen-2"
+                            >
+
+                                <span class="subida-imagen__icono">
+                                    <i class="fa-regular fa-images" aria-hidden="true"></i>
+                                </span>
+
+                                <strong>
+                                    Selecciona una segunda imagen
+                                </strong>
+
+                                <p>
+                                    Formatos JPG, PNG o WEBP. Máximo 2 MB.
+                                </p>
+
+                                <span class="subida-imagen__boton">
+                                    Buscar archivo
+                                </span>
+
+                            </label>
+
+                            <div
+                                class="subida-imagen__resultado"
+                                id="resultado-imagen-2"
+                                aria-live="polite"
+                                aria-atomic="true"
+                            >
+
+                                <img
+                                    src=""
+                                    alt="Vista previa de la segunda imagen"
+                                    id="imagen-seleccionada-2"
+                                >
+
+                                <div>
+                                    <strong id="nombre-imagen-2"></strong>
+
+                                    <button
+                                        type="button"
+                                        id="eliminar-imagen-2"
+                                    >
+                                        <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                        Eliminar
+                                    </button>
+                                </div>
+
+                            </div>
+
+                            <small
+                                class="mensaje-error"
+                                id="error-plan-imagen-2"
+                                aria-live="polite"
+                            ></small>
+
+                        </div>
+
+                        <div class="subida-imagen">
+
+                            <h3>
+                                Tercera imagen
+                            </h3>
+
+                            <p class="campo-ayuda">
+                                Opcional. Aparecerá en la galería del plan.
+                            </p>
+
+                            <input
+                                type="file"
+                                id="plan-imagen-3"
+                                name="imagen_3"
+                                accept="image/png, image/jpeg, image/webp"
+                                aria-describedby="error-plan-imagen-3"
+                                hidden
+                            >
+
+                            <label
+                                for="plan-imagen-3"
+                                class="subida-imagen__zona"
+                                id="zona-subida-imagen-3"
+                                role="button"
+                                tabindex="0"
+                                aria-controls="plan-imagen-3"
+                            >
+
+                                <span class="subida-imagen__icono">
+                                    <i class="fa-regular fa-images" aria-hidden="true"></i>
+                                </span>
+
+                                <strong>
+                                    Selecciona una tercera imagen
+                                </strong>
+
+                                <p>
+                                    Formatos JPG, PNG o WEBP. Máximo 2 MB.
+                                </p>
+
+                                <span class="subida-imagen__boton">
+                                    Buscar archivo
+                                </span>
+
+                            </label>
+
+                            <div
+                                class="subida-imagen__resultado"
+                                id="resultado-imagen-3"
+                                aria-live="polite"
+                                aria-atomic="true"
+                            >
+
+                                <img
+                                    src=""
+                                    alt="Vista previa de la tercera imagen"
+                                    id="imagen-seleccionada-3"
+                                >
+
+                                <div>
+                                    <strong id="nombre-imagen-3"></strong>
+
+                                    <button
+                                        type="button"
+                                        id="eliminar-imagen-3"
+                                    >
+                                        <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                        Eliminar
+                                    </button>
+                                </div>
+
+                            </div>
+
+                            <small
+                                class="mensaje-error"
+                                id="error-plan-imagen-3"
+                                aria-live="polite"
                             ></small>
 
                         </div>

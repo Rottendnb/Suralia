@@ -10,6 +10,14 @@ const formularioPublicar = document.querySelector(
     "#formulario-publicar"
 );
 
+const botonPublicarActividad =
+    formularioPublicar?.querySelector(
+        'button[type="submit"]'
+    );
+
+const BUCKET_IMAGENES_PLANES =
+    "imagenes-planes";
+
 const titulo = document.querySelector("#plan-titulo");
 const categoria = document.querySelector("#plan-categoria");
 const descripcion = document.querySelector("#plan-descripcion");
@@ -21,6 +29,8 @@ const ubicacion = document.querySelector("#plan-ubicacion");
 const precio = document.querySelector("#plan-precio");
 const dificultad = document.querySelector("#plan-dificultad");
 const imagen = document.querySelector("#plan-imagen");
+const imagen2 = document.querySelector("#plan-imagen-2");
+const imagen3 = document.querySelector("#plan-imagen-3");
 const confirmarPlan = document.querySelector("#confirmar-plan");
 
 const zonaSubida = document.querySelector("#zona-subida-imagen");
@@ -28,6 +38,18 @@ const resultadoImagen = document.querySelector("#resultado-imagen");
 const imagenSeleccionada = document.querySelector("#imagen-seleccionada");
 const nombreImagen = document.querySelector("#nombre-imagen");
 const eliminarImagen = document.querySelector("#eliminar-imagen");
+
+const zonaSubida2 = document.querySelector("#zona-subida-imagen-2");
+const resultadoImagen2 = document.querySelector("#resultado-imagen-2");
+const imagenSeleccionada2 = document.querySelector("#imagen-seleccionada-2");
+const nombreImagen2 = document.querySelector("#nombre-imagen-2");
+const eliminarImagen2 = document.querySelector("#eliminar-imagen-2");
+
+const zonaSubida3 = document.querySelector("#zona-subida-imagen-3");
+const resultadoImagen3 = document.querySelector("#resultado-imagen-3");
+const imagenSeleccionada3 = document.querySelector("#imagen-seleccionada-3");
+const nombreImagen3 = document.querySelector("#nombre-imagen-3");
+const eliminarImagen3 = document.querySelector("#eliminar-imagen-3");
 
 const contadorTitulo = document.querySelector("#contador-titulo");
 const contadorDescripcion = document.querySelector(
@@ -55,16 +77,22 @@ const notificacionPublicar = document.querySelector(
 );
 
 let imagenBase64 = "";
+let imagen2Base64 = "";
+let imagen3Base64 = "";
 let temporizadorNotificacion;
 
-resultadoImagen?.setAttribute(
-    "aria-hidden",
-    resultadoImagen.classList.contains(
-        "visible"
-    )
-        ? "false"
-        : "true"
-);
+[
+    resultadoImagen,
+    resultadoImagen2,
+    resultadoImagen3
+].forEach((resultado) => {
+    resultado?.setAttribute(
+        "aria-hidden",
+        resultado.classList.contains("visible")
+            ? "false"
+            : "true"
+    );
+});
 
 const fechaActual = new Date();
 const fechaMinima = fechaActual.toISOString().split("T")[0];
@@ -193,23 +221,86 @@ function actualizarContadores() {
         `${descripcion.value.length}/600`;
 }
 
-function procesarImagen(archivo) {
+function obtenerConfiguracionImagen(indice) {
+    const configuraciones = {
+        1: {
+            input: imagen,
+            zona: zonaSubida,
+            resultado: resultadoImagen,
+            vista: imagenSeleccionada,
+            nombre: nombreImagen,
+            eliminar: eliminarImagen,
+            errorId: "error-plan-imagen",
+            obtenerBase64: () => imagenBase64,
+            guardarBase64: (valor) => {
+                imagenBase64 = valor;
+            },
+            esPrincipal: true
+        },
+        2: {
+            input: imagen2,
+            zona: zonaSubida2,
+            resultado: resultadoImagen2,
+            vista: imagenSeleccionada2,
+            nombre: nombreImagen2,
+            eliminar: eliminarImagen2,
+            errorId: "error-plan-imagen-2",
+            obtenerBase64: () => imagen2Base64,
+            guardarBase64: (valor) => {
+                imagen2Base64 = valor;
+            },
+            esPrincipal: false
+        },
+        3: {
+            input: imagen3,
+            zona: zonaSubida3,
+            resultado: resultadoImagen3,
+            vista: imagenSeleccionada3,
+            nombre: nombreImagen3,
+            eliminar: eliminarImagen3,
+            errorId: "error-plan-imagen-3",
+            obtenerBase64: () => imagen3Base64,
+            guardarBase64: (valor) => {
+                imagen3Base64 = valor;
+            },
+            esPrincipal: false
+        }
+    };
+
+    return configuraciones[indice];
+}
+
+
+function procesarImagen(
+    archivo,
+    indice = 1
+) {
+    const configuracion =
+        obtenerConfiguracionImagen(indice);
+
+    if (!configuracion) {
+        return;
+    }
+
     const tiposPermitidos = [
         "image/jpeg",
         "image/png",
         "image/webp"
     ];
 
-    const tamanoMaximo = 2 * 1024 * 1024;
+    const tamanoMaximo =
+        2 * 1024 * 1024;
 
     const errorImagen =
-        document.querySelector("#error-plan-imagen");
+        document.querySelector(
+            `#${configuracion.errorId}`
+        );
 
     if (errorImagen) {
         errorImagen.textContent = "";
     }
 
-    imagen?.setAttribute(
+    configuracion.input?.setAttribute(
         "aria-invalid",
         "false"
     );
@@ -220,7 +311,7 @@ function procesarImagen(archivo) {
                 "Selecciona una imagen JPG, PNG o WEBP.";
         }
 
-        imagen?.setAttribute(
+        configuracion.input?.setAttribute(
             "aria-invalid",
             "true"
         );
@@ -234,7 +325,7 @@ function procesarImagen(archivo) {
                 "La imagen no puede superar los 2 MB.";
         }
 
-        imagen?.setAttribute(
+        configuracion.input?.setAttribute(
             "aria-invalid",
             "true"
         );
@@ -244,120 +335,203 @@ function procesarImagen(archivo) {
 
     const lector = new FileReader();
 
-    lector.addEventListener("load", () => {
-        imagenBase64 = lector.result;
+    lector.addEventListener(
+        "load",
+        () => {
+            configuracion.guardarBase64(
+                lector.result
+            );
 
-        imagenSeleccionada.src = imagenBase64;
-        nombreImagen.textContent = archivo.name;
+            configuracion.vista.src =
+                lector.result;
 
-        resultadoImagen.classList.add("visible");
-        resultadoImagen.setAttribute(
-            "aria-hidden",
-            "false"
-        );
+            configuracion.nombre.textContent =
+                archivo.name;
 
-        zonaSubida.style.display = "none";
-        zonaSubida.setAttribute(
-            "aria-hidden",
-            "true"
-        );
+            configuracion.resultado.classList.add(
+                "visible"
+            );
 
-        vistaImagen.style.backgroundImage =
-            `url("${imagenBase64}")`;
+            configuracion.resultado.setAttribute(
+                "aria-hidden",
+                "false"
+            );
 
-        vistaImagen.classList.add("tiene-imagen");
-    });
+            configuracion.zona.style.display =
+                "none";
+
+            configuracion.zona.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            if (configuracion.esPrincipal) {
+                vistaImagen.style.backgroundImage =
+                    `url("${lector.result}")`;
+
+                vistaImagen.classList.add(
+                    "tiene-imagen"
+                );
+            }
+        }
+    );
 
     lector.readAsDataURL(archivo);
 }
 
-imagen.addEventListener("change", () => {
-    const archivo = imagen.files[0];
 
-    if (archivo) {
-        procesarImagen(archivo);
+function eliminarImagenSeleccionada(
+    indice = 1
+) {
+    const configuracion =
+        obtenerConfiguracionImagen(indice);
+
+    if (!configuracion) {
+        return;
     }
-});
 
-zonaSubida?.addEventListener(
-    "keydown",
-    (evento) => {
-        if (
-            evento.key === "Enter" ||
-            evento.key === " "
-        ) {
-            evento.preventDefault();
-            imagen?.click();
-        }
-    }
-);
+    configuracion.input.value = "";
+    configuracion.guardarBase64("");
 
-zonaSubida.addEventListener("dragover", (evento) => {
-    evento.preventDefault();
-    zonaSubida.classList.add("arrastrando");
-    zonaSubida.setAttribute(
-        "aria-label",
-        "Suelta la imagen para seleccionarla"
-    );
-});
+    configuracion.vista.src = "";
+    configuracion.nombre.textContent = "";
 
-zonaSubida.addEventListener("dragleave", () => {
-    zonaSubida.classList.remove("arrastrando");
-    zonaSubida.removeAttribute(
-        "aria-label"
-    );
-});
-
-zonaSubida.addEventListener("drop", (evento) => {
-    evento.preventDefault();
-    zonaSubida.classList.remove("arrastrando");
-    zonaSubida.removeAttribute(
-        "aria-label"
+    configuracion.resultado.classList.remove(
+        "visible"
     );
 
-    const archivo = evento.dataTransfer.files[0];
-
-    if (archivo) {
-        procesarImagen(archivo);
-    }
-});
-
-eliminarImagen.addEventListener("click", () => {
-    imagen.value = "";
-    imagenBase64 = "";
-
-    imagenSeleccionada.src = "";
-    nombreImagen.textContent = "";
-
-    resultadoImagen.classList.remove("visible");
-    resultadoImagen.setAttribute(
+    configuracion.resultado.setAttribute(
         "aria-hidden",
         "true"
     );
 
-    zonaSubida.style.display = "flex";
-    zonaSubida.setAttribute(
+    configuracion.zona.style.display =
+        "flex";
+
+    configuracion.zona.setAttribute(
         "aria-hidden",
         "false"
     );
 
-    imagen?.setAttribute(
+    configuracion.input.setAttribute(
         "aria-invalid",
         "false"
     );
 
     const errorImagen =
         document.querySelector(
-            "#error-plan-imagen"
+            `#${configuracion.errorId}`
         );
 
     if (errorImagen) {
         errorImagen.textContent = "";
     }
 
-    vistaImagen.style.backgroundImage = "";
-    vistaImagen.classList.remove("tiene-imagen");
-});
+    if (configuracion.esPrincipal) {
+        vistaImagen.style.backgroundImage =
+            "";
+
+        vistaImagen.classList.remove(
+            "tiene-imagen"
+        );
+    }
+}
+
+
+function activarZonaImagen(
+    indice
+) {
+    const configuracion =
+        obtenerConfiguracionImagen(indice);
+
+    if (!configuracion) {
+        return;
+    }
+
+    configuracion.input?.addEventListener(
+        "change",
+        () => {
+            const archivo =
+                configuracion.input.files?.[0];
+
+            if (archivo) {
+                procesarImagen(
+                    archivo,
+                    indice
+                );
+            }
+        }
+    );
+
+    configuracion.zona?.addEventListener(
+        "keydown",
+        (evento) => {
+            if (
+                evento.key === "Enter" ||
+                evento.key === " "
+            ) {
+                evento.preventDefault();
+                configuracion.input?.click();
+            }
+        }
+    );
+
+    configuracion.zona?.addEventListener(
+        "dragover",
+        (evento) => {
+            evento.preventDefault();
+
+            configuracion.zona.classList.add(
+                "arrastrando"
+            );
+        }
+    );
+
+    configuracion.zona?.addEventListener(
+        "dragleave",
+        () => {
+            configuracion.zona.classList.remove(
+                "arrastrando"
+            );
+        }
+    );
+
+    configuracion.zona?.addEventListener(
+        "drop",
+        (evento) => {
+            evento.preventDefault();
+
+            configuracion.zona.classList.remove(
+                "arrastrando"
+            );
+
+            const archivo =
+                evento.dataTransfer.files?.[0];
+
+            if (archivo) {
+                procesarImagen(
+                    archivo,
+                    indice
+                );
+            }
+        }
+    );
+
+    configuracion.eliminar?.addEventListener(
+        "click",
+        () => {
+            eliminarImagenSeleccionada(
+                indice
+            );
+        }
+    );
+}
+
+
+[1, 2, 3].forEach(
+    activarZonaImagen
+);
+
 
 const camposVistaPrevia = [
     titulo,
@@ -390,6 +564,373 @@ camposVistaPrevia.forEach((campo) => {
 titulo.addEventListener("input", actualizarContadores);
 descripcion.addEventListener("input", actualizarContadores);
 
+async function obtenerUsuarioSupabase() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente) {
+        throw new Error(
+            "No se ha podido conectar con Supabase."
+        );
+    }
+
+    const {
+        data,
+        error
+    } = await cliente.auth.getUser();
+
+    if (error) {
+        throw error;
+    }
+
+    if (!data?.user) {
+        throw new Error(
+            "No existe una sesión válida."
+        );
+    }
+
+    return data.user;
+}
+
+
+function obtenerExtensionImagen(
+    tipo = ""
+) {
+    const extensiones = {
+        "image/jpeg": "jpg",
+        "image/png": "png",
+        "image/webp": "webp"
+    };
+
+    return extensiones[tipo] ||
+        "jpg";
+}
+
+
+async function convertirBase64EnArchivo(
+    contenidoBase64,
+    nombreArchivo
+) {
+    const respuesta =
+        await fetch(
+            contenidoBase64
+        );
+
+    if (!respuesta.ok) {
+        throw new Error(
+            "No se ha podido preparar la imagen."
+        );
+    }
+
+    const blob =
+        await respuesta.blob();
+
+    return new File(
+        [
+            blob
+        ],
+        nombreArchivo,
+        {
+            type:
+                blob.type ||
+                "image/jpeg"
+        }
+    );
+}
+
+
+async function subirImagenPlan(
+    cliente,
+    usuarioId,
+    input,
+    contenidoBase64,
+    sufijo
+) {
+    if (
+        !input?.files?.[0] &&
+        !contenidoBase64
+    ) {
+        return {
+            url: "",
+            ruta: ""
+        };
+    }
+
+    const tipoImagen =
+        input?.files?.[0]?.type ||
+        contenidoBase64.match(
+            /^data:([^;]+);/
+        )?.[1] ||
+        "image/jpeg";
+
+    const extension =
+        obtenerExtensionImagen(
+            tipoImagen
+        );
+
+    const identificador =
+        crypto.randomUUID();
+
+    const ruta =
+        `${usuarioId}/${identificador}-${sufijo}.${extension}`;
+
+    const archivo =
+        input?.files?.[0] ||
+        await convertirBase64EnArchivo(
+            contenidoBase64,
+            `imagen-${sufijo}.${extension}`
+        );
+
+    const {
+        error: errorSubida
+    } = await cliente
+        .storage
+        .from(
+            BUCKET_IMAGENES_PLANES
+        )
+        .upload(
+            ruta,
+            archivo,
+            {
+                cacheControl: "3600",
+                contentType: archivo.type,
+                upsert: false
+            }
+        );
+
+    if (errorSubida) {
+        throw errorSubida;
+    }
+
+    const {
+        data: datosUrl
+    } = cliente
+        .storage
+        .from(
+            BUCKET_IMAGENES_PLANES
+        )
+        .getPublicUrl(
+            ruta
+        );
+
+    const url =
+        datosUrl?.publicUrl ||
+        "";
+
+    if (!url) {
+        throw new Error(
+            "No se ha podido obtener la URL de una imagen."
+        );
+    }
+
+    return {
+        url,
+        ruta
+    };
+}
+
+
+async function publicarPlanEnSupabase(
+    datos
+) {
+    const cliente =
+        window.clienteSupabase;
+
+    const usuario =
+        await obtenerUsuarioSupabase();
+
+    const rutasSubidas =
+        [];
+
+    try {
+        const imagenPrincipal =
+            await subirImagenPlan(
+                cliente,
+                usuario.id,
+                imagen,
+                imagenBase64,
+                "principal"
+            );
+
+        rutasSubidas.push(
+            imagenPrincipal.ruta
+        );
+
+        const segundaImagen =
+            await subirImagenPlan(
+                cliente,
+                usuario.id,
+                imagen2,
+                imagen2Base64,
+                "galeria-2"
+            );
+
+        if (segundaImagen.ruta) {
+            rutasSubidas.push(
+                segundaImagen.ruta
+            );
+        }
+
+        const terceraImagen =
+            await subirImagenPlan(
+                cliente,
+                usuario.id,
+                imagen3,
+                imagen3Base64,
+                "galeria-3"
+            );
+
+        if (terceraImagen.ruta) {
+            rutasSubidas.push(
+                terceraImagen.ruta
+            );
+        }
+
+        const {
+            error: errorInsercion
+        } = await cliente
+            .from(
+                "planes"
+            )
+            .insert(
+                {
+                    usuario_id:
+                        usuario.id,
+
+                    titulo:
+                        datos.titulo,
+
+                    categoria:
+                        datos.categoria,
+
+                    nombre_categoria:
+                        datos.nombreCategoria,
+
+                    descripcion:
+                        datos.descripcion,
+
+                    fecha:
+                        datos.fecha,
+
+                    hora:
+                        datos.hora,
+
+                    duracion:
+                        datos.duracion,
+
+                    plazas:
+                        datos.plazas,
+
+                    ubicacion:
+                        datos.ubicacion,
+
+                    precio:
+                        datos.precio,
+
+                    dificultad:
+                        datos.dificultad,
+
+                    provincia:
+                        datos.provincia,
+
+                    imagen_url:
+                        imagenPrincipal.url,
+
+                    ruta_storage:
+                        imagenPrincipal.ruta,
+
+                    imagen_2_url:
+                        segundaImagen.url ||
+                        null,
+
+                    ruta_storage_2:
+                        segundaImagen.ruta ||
+                        null,
+
+                    imagen_3_url:
+                        terceraImagen.url ||
+                        null,
+
+                    ruta_storage_3:
+                        terceraImagen.ruta ||
+                        null,
+
+                    estado:
+                        "pendiente"
+                }
+            );
+
+        if (errorInsercion) {
+            throw errorInsercion;
+        }
+    } catch (error) {
+        const rutasValidas =
+            rutasSubidas.filter(Boolean);
+
+        if (rutasValidas.length > 0) {
+            await cliente
+                .storage
+                .from(
+                    BUCKET_IMAGENES_PLANES
+                )
+                .remove(
+                    rutasValidas
+                );
+        }
+
+        throw error;
+    }
+}
+
+
+function eliminarBorradorPublicado() {
+    const idBorradorActual =
+        Number(
+            localStorage.getItem(
+                "borradorActualSuralia"
+            )
+        );
+
+    if (!idBorradorActual) {
+        return;
+    }
+
+    const borradores =
+        JSON.parse(
+            localStorage.getItem(
+                "borradoresSuralia"
+            )
+        ) ||
+        [];
+
+    const borradoresActualizados =
+        borradores.filter(
+            (
+                plan
+            ) =>
+                Number(
+                    plan.id
+                ) !==
+                idBorradorActual
+        );
+
+    localStorage.setItem(
+        "borradoresSuralia",
+        JSON.stringify(
+            borradoresActualizados
+        )
+    );
+
+    localStorage.removeItem(
+        "borradorActualSuralia"
+    );
+
+    localStorage.removeItem(
+        "borradorEditarSuralia"
+    );
+}
+
+
 function obtenerDatosFormulario() {
     const idBorradorActual = Number(
         localStorage.getItem("borradorActualSuralia")
@@ -411,6 +952,8 @@ function obtenerDatosFormulario() {
         dificultad: dificultad.value,
         provincia: "Sevilla",
         imagen: imagenBase64,
+        imagen2: imagen2Base64,
+        imagen3: imagen3Base64,
         estado: "pendiente",
         creadoPor: sesionPublicar.email,
         fechaCreacion: new Date().toISOString()
@@ -491,7 +1034,7 @@ mostrarNotificacion(
 );
 });
 
-formularioPublicar.addEventListener("submit", (evento) => {
+formularioPublicar.addEventListener("submit", async (evento) => {
     evento.preventDefault();
 
     let formularioValido = true;
@@ -682,42 +1225,69 @@ formularioPublicar.addEventListener("submit", (evento) => {
         return;
     }
 
-    const nuevoPlan = obtenerDatosFormulario();
+    const nuevoPlan =
+        obtenerDatosFormulario();
 
-    guardarPlan(nuevoPlan, "planesPublicadosSuralia");
+    const textoBotonOriginal =
+        botonPublicarActividad?.innerHTML ||
+        "";
 
+    if (botonPublicarActividad) {
+        botonPublicarActividad.disabled =
+            true;
 
-    const idBorradorActual = Number(
-    localStorage.getItem("borradorActualSuralia")
-);
+        botonPublicarActividad.innerHTML = `
+            <i
+                class="fa-solid fa-spinner fa-spin"
+                aria-hidden="true"
+            ></i>
+            Enviando actividad
+        `;
+    }
 
-if (idBorradorActual) {
-    const borradores = JSON.parse(
-        localStorage.getItem("borradoresSuralia")
-    ) || [];
+    guardarBorrador.disabled =
+        true;
 
-    const borradoresActualizados = borradores.filter(
-        (plan) => Number(plan.id) !== idBorradorActual
-    );
+    try {
+        await publicarPlanEnSupabase(
+            nuevoPlan
+        );
 
-    localStorage.setItem(
-        "borradoresSuralia",
-        JSON.stringify(borradoresActualizados)
-    );
+        eliminarBorradorPublicado();
 
-    localStorage.removeItem("borradorActualSuralia");
-    localStorage.removeItem("borradorEditarSuralia");
-}
+        mostrarNotificacion(
+            "La actividad se ha enviado para su revisión."
+        );
 
+        setTimeout(
+            () => {
+                window.location.href =
+                    "perfil.html#publicados";
+            },
+            1500
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo publicar el plan:",
+            error
+        );
 
-    mostrarNotificacion(
-        "La actividad se ha enviado para su revisión."
-    );
+        mostrarNotificacion(
+            error?.message ||
+            "No se ha podido enviar la actividad."
+        );
 
-    setTimeout(() => {
-    window.location.href =
-        "perfil.html#publicados";
-}, 1500);
+        if (botonPublicarActividad) {
+            botonPublicarActividad.disabled =
+                false;
+
+            botonPublicarActividad.innerHTML =
+                textoBotonOriginal;
+        }
+
+        guardarBorrador.disabled =
+            false;
+    }
 });
 
 confirmarPlan.addEventListener("change", () => {
@@ -795,6 +1365,27 @@ function cargarBorradorParaEditar() {
         vistaImagen.classList.add("tiene-imagen");
     }
 
+
+    if (borrador.imagen2) {
+        imagen2Base64 = borrador.imagen2;
+        imagenSeleccionada2.src = borrador.imagen2;
+        nombreImagen2.textContent = "Segunda imagen del borrador";
+        resultadoImagen2.classList.add("visible");
+        resultadoImagen2.setAttribute("aria-hidden", "false");
+        zonaSubida2.style.display = "none";
+        zonaSubida2.setAttribute("aria-hidden", "true");
+    }
+
+    if (borrador.imagen3) {
+        imagen3Base64 = borrador.imagen3;
+        imagenSeleccionada3.src = borrador.imagen3;
+        nombreImagen3.textContent = "Tercera imagen del borrador";
+        resultadoImagen3.classList.add("visible");
+        resultadoImagen3.setAttribute("aria-hidden", "false");
+        zonaSubida3.style.display = "none";
+        zonaSubida3.setAttribute("aria-hidden", "true");
+    }
+
     localStorage.setItem(
         "borradorActualSuralia",
         String(idBorrador)
@@ -819,6 +1410,8 @@ function cargarBorradorParaEditar() {
     ubicacion,
     precio,
     imagen,
+    imagen2,
+    imagen3,
     confirmarPlan
 ].forEach((campo) => {
     campo?.setAttribute(
