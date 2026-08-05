@@ -24,7 +24,8 @@ function notificacionesNavegadorActivas() {
 
 function mostrarNotificacionNavegador(
     titulo,
-    cuerpo
+    cuerpo,
+    conversacionId = ""
 ) {
     if (
         !notificacionesNavegadorActivas() ||
@@ -58,6 +59,13 @@ function mostrarNotificacionNavegador(
                 window.focus();
 
                 notificacion.close();
+
+                if (conversacionId) {
+                    window.location.href =
+                        `mensajes.html?id=${encodeURIComponent(
+                            conversacionId
+                        )}`;
+                }
             };
     } catch (error) {
         console.error(
@@ -285,6 +293,21 @@ let focoAnteriorModal =
     null;
 let canalConversaciones = null;
 
+let intervaloPresenciasConversaciones =
+    null;
+
+let buscadorConversaciones =
+    null;
+
+let mensajeSinResultados =
+    null;
+
+let filtrosConversaciones =
+    null;
+
+let filtroConversacionesActivo =
+    "todas";
+
 function escaparHTML(valor = "") {
     return String(valor)
         .replace(/&/g, "&amp;")
@@ -372,6 +395,20 @@ async function cargarHeader() {
     }
 }
 
+function actualizarTituloNoLeidos(
+    totalPendientes = 0
+) {
+    const total =
+        Number(totalPendientes) ||
+        0;
+
+    document.title =
+        total > 0
+            ? `(${total > 99 ? "99+" : total}) Mensajes | Suralia`
+            : "Mensajes | Suralia";
+}
+
+
 function mostrarError(mensaje) {
     carga?.classList.add("oculto");
     vacio?.classList.add("oculto");
@@ -388,14 +425,470 @@ function avatarPerfil(perfil) {
     return escaparHTML((perfil?.nombre_visible || "S").charAt(0).toUpperCase());
 }
 
+function normalizarTextoConversacion(
+    texto = ""
+) {
+    return String(texto)
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+        .toLowerCase()
+        .trim();
+}
+
+
+function filtrarConversaciones() {
+    if (!lista) {
+        return;
+    }
+
+    const busqueda =
+        normalizarTextoConversacion(
+            buscadorConversaciones?.value ||
+            ""
+        );
+
+    const tarjetas =
+        [
+            ...lista.querySelectorAll(
+                ".conversacion-tarjeta"
+            )
+        ];
+
+    let visibles =
+        0;
+
+    tarjetas.forEach(
+        (
+            tarjetaConversacion
+        ) => {
+            const nombre =
+                normalizarTextoConversacion(
+                    tarjetaConversacion.dataset
+                        .nombreConversacion ||
+                    ""
+                );
+
+            const archivada =
+                tarjetaConversacion.dataset
+                    .archivada ===
+                "true";
+
+            const pendientes =
+                Number(
+                    tarjetaConversacion.dataset
+                        .pendientes ||
+                    0
+                );
+
+            const coincideNombre =
+                !busqueda ||
+                nombre.includes(
+                    busqueda
+                );
+
+            let coincideFiltro =
+                true;
+
+            if (
+                filtroConversacionesActivo ===
+                "todas"
+            ) {
+                coincideFiltro =
+                    !archivada;
+            }
+
+            if (
+                filtroConversacionesActivo ===
+                "no-leidas"
+            ) {
+                coincideFiltro =
+                    !archivada &&
+                    pendientes > 0;
+            }
+
+            if (
+                filtroConversacionesActivo ===
+                "fijadas"
+            ) {
+                coincideFiltro =
+                    !archivada &&
+                    tarjetaConversacion.dataset
+                        .fijada ===
+                    "true";
+            }
+
+            if (
+                filtroConversacionesActivo ===
+                "archivadas"
+            ) {
+                coincideFiltro =
+                    archivada;
+            }
+
+            const mostrar =
+                coincideNombre &&
+                coincideFiltro;
+
+            tarjetaConversacion.classList.toggle(
+                "oculto",
+                !mostrar
+            );
+
+            if (mostrar) {
+                visibles +=
+                    1;
+            }
+        }
+    );
+
+    if (mensajeSinResultados) {
+        let texto =
+            "No hay conversaciones que coincidan con la búsqueda.";
+
+        if (
+            !busqueda &&
+            filtroConversacionesActivo ===
+                "no-leidas"
+        ) {
+            texto =
+                "No tienes conversaciones con mensajes pendientes.";
+        }
+
+        if (
+            !busqueda &&
+            filtroConversacionesActivo ===
+                "fijadas"
+        ) {
+            texto =
+                "No tienes conversaciones fijadas.";
+        }
+
+        if (
+            !busqueda &&
+            filtroConversacionesActivo ===
+                "archivadas"
+        ) {
+            texto =
+                "No tienes conversaciones archivadas.";
+        }
+
+        const parrafo =
+            mensajeSinResultados.querySelector(
+                "p"
+            );
+
+        if (parrafo) {
+            parrafo.textContent =
+                texto;
+        }
+
+        mensajeSinResultados.classList.toggle(
+            "oculto",
+            visibles > 0
+        );
+    }
+}
+
+
+function crearFiltrosConversaciones() {
+    if (
+        filtrosConversaciones ||
+        !lista
+    ) {
+        return;
+    }
+
+    filtrosConversaciones =
+        document.createElement(
+            "div"
+        );
+
+    filtrosConversaciones.className =
+        "conversaciones-filtros";
+
+    filtrosConversaciones.setAttribute(
+        "role",
+        "tablist"
+    );
+
+    filtrosConversaciones.setAttribute(
+        "aria-label",
+        "Filtrar conversaciones"
+    );
+
+    filtrosConversaciones.innerHTML = `
+        <button
+            type="button"
+            class="conversaciones-filtros__boton activo"
+            data-filtro-conversaciones="todas"
+            role="tab"
+            aria-selected="true"
+        >
+            Todas
+        </button>
+
+        <button
+            type="button"
+            class="conversaciones-filtros__boton"
+            data-filtro-conversaciones="no-leidas"
+            role="tab"
+            aria-selected="false"
+        >
+            No leídas
+        </button>
+
+        <button
+            type="button"
+            class="conversaciones-filtros__boton"
+            data-filtro-conversaciones="fijadas"
+            role="tab"
+            aria-selected="false"
+        >
+            Fijadas
+        </button>
+
+        <button
+            type="button"
+            class="conversaciones-filtros__boton"
+            data-filtro-conversaciones="archivadas"
+            role="tab"
+            aria-selected="false"
+        >
+            Archivadas
+        </button>
+    `;
+
+    const buscador =
+        lista.parentElement?.querySelector(
+            ".conversaciones-buscador"
+        );
+
+    if (buscador) {
+        buscador.insertAdjacentElement(
+            "afterend",
+            filtrosConversaciones
+        );
+    } else {
+        lista.parentElement?.insertBefore(
+            filtrosConversaciones,
+            lista
+        );
+    }
+
+    filtrosConversaciones.addEventListener(
+        "click",
+        (
+            evento
+        ) => {
+            const boton =
+                evento.target.closest(
+                    "[data-filtro-conversaciones]"
+                );
+
+            if (!boton) {
+                return;
+            }
+
+            filtroConversacionesActivo =
+                boton.dataset
+                    .filtroConversaciones ||
+                "todas";
+
+            filtrosConversaciones
+                .querySelectorAll(
+                    "[data-filtro-conversaciones]"
+                )
+                .forEach(
+                    (
+                        opcion
+                    ) => {
+                        const activa =
+                            opcion ===
+                            boton;
+
+                        opcion.classList.toggle(
+                            "activo",
+                            activa
+                        );
+
+                        opcion.setAttribute(
+                            "aria-selected",
+                            String(
+                                activa
+                            )
+                        );
+                    }
+                );
+
+            filtrarConversaciones();
+        }
+    );
+}
+
+
+function crearBuscadorConversaciones() {
+    if (
+        buscadorConversaciones ||
+        !lista
+    ) {
+        return;
+    }
+
+    const contenedor =
+        document.createElement(
+            "div"
+        );
+
+    contenedor.className =
+        "conversaciones-buscador";
+
+    contenedor.innerHTML = `
+        <label
+            class="conversaciones-buscador__campo"
+            for="buscar-conversaciones"
+        >
+            <i
+                class="fa-solid fa-magnifying-glass"
+                aria-hidden="true"
+            ></i>
+
+            <input
+                type="search"
+                id="buscar-conversaciones"
+                placeholder="Buscar conversación..."
+                autocomplete="off"
+                aria-label="Buscar conversación por nombre"
+            >
+
+            <button
+                type="button"
+                class="conversaciones-buscador__limpiar oculto"
+                aria-label="Borrar búsqueda"
+            >
+                <i
+                    class="fa-solid fa-xmark"
+                    aria-hidden="true"
+                ></i>
+            </button>
+        </label>
+    `;
+
+    lista.parentElement?.insertBefore(
+        contenedor,
+        lista
+    );
+
+    buscadorConversaciones =
+        contenedor.querySelector(
+            "#buscar-conversaciones"
+        );
+
+    const botonLimpiar =
+        contenedor.querySelector(
+            ".conversaciones-buscador__limpiar"
+        );
+
+    mensajeSinResultados =
+        document.createElement(
+            "div"
+        );
+
+    mensajeSinResultados.className =
+        "conversaciones-sin-resultados oculto";
+
+    mensajeSinResultados.innerHTML = `
+        <i
+            class="fa-regular fa-comments"
+            aria-hidden="true"
+        ></i>
+
+        <p>
+            No hay conversaciones que coincidan con la búsqueda.
+        </p>
+    `;
+
+    lista.insertAdjacentElement(
+        "afterend",
+        mensajeSinResultados
+    );
+
+    buscadorConversaciones?.addEventListener(
+        "input",
+        () => {
+            botonLimpiar?.classList.toggle(
+                "oculto",
+                !buscadorConversaciones.value
+            );
+
+            filtrarConversaciones();
+        }
+    );
+
+    botonLimpiar?.addEventListener(
+        "click",
+        () => {
+            buscadorConversaciones.value =
+                "";
+
+            botonLimpiar.classList.add(
+                "oculto"
+            );
+
+            filtrarConversaciones();
+            buscadorConversaciones.focus();
+        }
+    );
+}
+
+
 function tarjeta(conversacion) {
     const perfil = conversacion.perfil || {};
     const nombre = perfil.nombre_visible || "Usuario de Suralia";
     const ultimo = conversacion.ultimo;
     const pendientes = conversacion.pendientes || 0;
 
+    let textoUltimoMensaje =
+        "Conversación iniciada";
+
+    if (ultimo) {
+        const textoBase =
+            ultimo.tipo ===
+                "imagen"
+                ? "📷 Foto"
+                : ultimo.contenido;
+
+        if (ultimo.eliminado === true) {
+            textoUltimoMensaje =
+                "Mensaje eliminado";
+        } else if (
+            ultimo.remitente_id ===
+            usuarioActual?.id
+        ) {
+            textoUltimoMensaje =
+                `Tú: ${textoBase}`;
+        } else {
+            textoUltimoMensaje =
+                textoBase;
+        }
+    }
+
     return `
-        <article class="conversacion-tarjeta">
+        <article
+            class="conversacion-tarjeta"
+            data-usuario-presencia="${escaparHTML(
+                conversacion.otroUsuarioId ||
+                ""
+            )}"
+            data-nombre-conversacion="${escaparHTML(
+                nombre
+            )}"
+            data-archivada="${conversacion.archivada === true}"
+            data-fijada="${conversacion.fijada === true}"
+            data-pendientes="${pendientes}"
+        >
 
             <a
                 class="conversacion-tarjeta__enlace"
@@ -409,7 +902,17 @@ function tarjeta(conversacion) {
 
                 <span class="conversacion-tarjeta__contenido">
                     <span class="conversacion-tarjeta__superior">
-                        <strong>${escaparHTML(nombre)}</strong>
+                        <span class="conversacion-tarjeta__nombre-estado">
+                            <strong>${escaparHTML(nombre)}</strong>
+
+                            <span
+                                class="conversacion-tarjeta__en-linea oculto"
+                                data-indicador-presencia
+                            >
+                                <span aria-hidden="true"></span>
+                                En línea
+                            </span>
+                        </span>
 
                         <time>
                             ${escaparHTML(
@@ -424,42 +927,100 @@ function tarjeta(conversacion) {
                     <span class="conversacion-tarjeta__inferior">
                         <span class="conversacion-tarjeta__mensaje">
                             ${escaparHTML(
-                                ultimo?.contenido ||
-                                "Conversación iniciada"
+                                textoUltimoMensaje
                             )}
                         </span>
-
-                        ${pendientes > 0 ? `
-                            <span
-                                class="conversacion-tarjeta__contador"
-                                aria-label="${pendientes} mensajes pendientes"
-                            >
-                                ${pendientes > 99 ? "99+" : pendientes}
-                            </span>
-                        ` : ""}
                     </span>
                 </span>
             </a>
 
-            <button
-                type="button"
-                class="conversacion-tarjeta__eliminar"
-                data-eliminar-conversacion="${escaparHTML(
-                    conversacion.id
-                )}"
-                data-nombre-conversacion="${escaparHTML(
-                    nombre
-                )}"
-                aria-label="Eliminar conversación con ${escaparHTML(
-                    nombre
-                )}"
-                title="Eliminar conversación"
-            >
-                <i
-                    class="fa-regular fa-trash-can"
+            ${pendientes > 0 ? `
+                <span
+                    class="conversacion-tarjeta__contador"
+                    aria-label="${pendientes} mensajes pendientes"
+                >
+                    ${pendientes > 99 ? "99+" : pendientes}
+                </span>
+            ` : `
+                <span
+                    class="conversacion-tarjeta__contador-espacio"
                     aria-hidden="true"
-                ></i>
-            </button>
+                ></span>
+            `}
+
+            <div class="conversacion-tarjeta__acciones">
+                <button
+                    type="button"
+                    class="conversacion-tarjeta__fijar"
+                    data-fijar-conversacion="${escaparHTML(
+                        conversacion.id
+                    )}"
+                    data-fijada="${conversacion.fijada === true}"
+                    aria-label="${
+                        conversacion.fijada === true
+                            ? `Desfijar conversación con ${escaparHTML(nombre)}`
+                            : `Fijar conversación con ${escaparHTML(nombre)}`
+                    }"
+                    title="${
+                        conversacion.fijada === true
+                            ? "Desfijar conversación"
+                            : "Fijar conversación"
+                    }"
+                >
+                    <i
+                        class="fa-solid fa-thumbtack"
+                        aria-hidden="true"
+                    ></i>
+                </button>
+
+                <button
+                    type="button"
+                    class="conversacion-tarjeta__archivar"
+                    data-archivar-conversacion="${escaparHTML(
+                        conversacion.id
+                    )}"
+                    data-archivada="${conversacion.archivada === true}"
+                    aria-label="${
+                        conversacion.archivada === true
+                            ? `Restaurar conversación con ${escaparHTML(nombre)}`
+                            : `Archivar conversación con ${escaparHTML(nombre)}`
+                    }"
+                    title="${
+                        conversacion.archivada === true
+                            ? "Restaurar conversación"
+                            : "Archivar conversación"
+                    }"
+                >
+                    <i
+                        class="fa-solid ${
+                            conversacion.archivada === true
+                                ? "fa-folder-open"
+                                : "fa-folder-plus"
+                        }"
+                        aria-hidden="true"
+                    ></i>
+                </button>
+
+                <button
+                    type="button"
+                    class="conversacion-tarjeta__eliminar"
+                    data-eliminar-conversacion="${escaparHTML(
+                        conversacion.id
+                    )}"
+                    data-nombre-conversacion="${escaparHTML(
+                        nombre
+                    )}"
+                    aria-label="Eliminar conversación con ${escaparHTML(
+                        nombre
+                    )}"
+                    title="Eliminar conversación"
+                >
+                    <i
+                        class="fa-regular fa-trash-can"
+                        aria-hidden="true"
+                    ></i>
+                </button>
+            </div>
 
         </article>
     `;
@@ -581,7 +1142,9 @@ async function cargarConversaciones() {
 
         const [
             conversacionesResultado,
-            ocultasResultado
+            ocultasResultado,
+            archivadasResultado,
+            fijadasResultado
         ] = await Promise.all([
             cliente
                 .from("conversaciones")
@@ -602,6 +1165,22 @@ async function cargarConversaciones() {
                 .eq(
                     "usuario_id",
                     usuarioActual.id
+                ),
+
+            cliente
+                .from("conversaciones_archivadas")
+                .select("conversacion_id")
+                .eq(
+                    "usuario_id",
+                    usuarioActual.id
+                ),
+
+            cliente
+                .from("conversaciones_fijadas")
+                .select("conversacion_id")
+                .eq(
+                    "usuario_id",
+                    usuarioActual.id
                 )
         ]);
 
@@ -612,6 +1191,40 @@ async function cargarConversaciones() {
         if (ocultasResultado.error) {
             throw ocultasResultado.error;
         }
+
+        if (archivadasResultado.error) {
+            throw archivadasResultado.error;
+        }
+
+        if (fijadasResultado.error) {
+            throw fijadasResultado.error;
+        }
+
+        const idsFijadas =
+            new Set(
+                (
+                    fijadasResultado.data ||
+                    []
+                ).map(
+                    (
+                        fila
+                    ) =>
+                        fila.conversacion_id
+                )
+            );
+
+        const idsArchivadas =
+            new Set(
+                (
+                    archivadasResultado.data ||
+                    []
+                ).map(
+                    (
+                        fila
+                    ) =>
+                        fila.conversacion_id
+                )
+            );
 
         const idsOcultas =
             new Set(
@@ -640,6 +1253,10 @@ async function cargarConversaciones() {
             );
 
         if (!conversaciones.length) {
+            actualizarTituloNoLeidos(
+                0
+            );
+
             carga?.classList.add("oculto");
             errorBloque?.classList.add("oculto");
             lista?.classList.add("oculto");
@@ -663,7 +1280,7 @@ async function cargarConversaciones() {
 
             cliente
                 .from("mensajes")
-                .select("id,conversacion_id,remitente_id,contenido,leido,creado_en")
+                .select("id,conversacion_id,remitente_id,contenido,eliminado,eliminado_en,leido,creado_en")
                 .in("conversacion_id", conversacionIds)
                 .order("creado_en", { ascending: false })
         ]);
@@ -684,22 +1301,116 @@ async function cargarConversaciones() {
             mensajes.get(m.conversacion_id).push(m);
         });
 
-        const preparadas = conversaciones.map(c => {
-            const otroId = c.usuario_uno_id === usuarioActual.id
-                ? c.usuario_dos_id
-                : c.usuario_uno_id;
+        const preparadas = conversaciones
+            .map(
+                (
+                    conversacion
+                ) => {
+                    const otroId =
+                        conversacion.usuario_uno_id ===
+                        usuarioActual.id
+                            ? conversacion.usuario_dos_id
+                            : conversacion.usuario_uno_id;
 
-            const listaMensajes = mensajes.get(c.id) || [];
+                    const listaMensajes =
+                        mensajes.get(
+                            conversacion.id
+                        ) ||
+                        [];
 
-            return {
-                ...c,
-                perfil: perfiles.get(otroId) || null,
-                ultimo: listaMensajes[0] || null,
-                pendientes: listaMensajes.filter(m =>
-                    !m.leido && m.remitente_id !== usuarioActual.id
-                ).length
-            };
-        });
+                    return {
+                        ...conversacion,
+
+                        perfil:
+                            perfiles.get(
+                                otroId
+                            ) ||
+                            null,
+
+                        otroUsuarioId:
+                            otroId,
+
+                        ultimo:
+                            listaMensajes[0] ||
+                            null,
+
+                        archivada:
+                            idsArchivadas.has(
+                                conversacion.id
+                            ),
+
+                        fijada:
+                            idsFijadas.has(
+                                conversacion.id
+                            ),
+
+                        pendientes:
+                            listaMensajes.filter(
+                                (
+                                    mensaje
+                                ) =>
+                                    mensaje.leido !==
+                                        true &&
+                                    mensaje.remitente_id !==
+                                        usuarioActual.id &&
+                                    mensaje.eliminado !==
+                                        true
+                            ).length
+                    };
+                }
+            )
+            .sort(
+                (
+                    primera,
+                    segunda
+                ) => {
+                    if (
+                        primera.fijada !==
+                        segunda.fijada
+                    ) {
+                        return primera.fijada
+                            ? -1
+                            : 1;
+                    }
+
+                    const fechaPrimera =
+                        primera.ultimo?.creado_en ||
+                        primera.actualizado_en ||
+                        "";
+
+                    const fechaSegunda =
+                        segunda.ultimo?.creado_en ||
+                        segunda.actualizado_en ||
+                        "";
+
+                    return (
+                        new Date(
+                            fechaSegunda
+                        ).getTime() -
+                        new Date(
+                            fechaPrimera
+                        ).getTime()
+                    );
+                }
+            );
+
+        const totalPendientes =
+            preparadas.reduce(
+                (
+                    total,
+                    conversacion
+                ) =>
+                    total +
+                    (
+                        conversacion.pendientes ||
+                        0
+                    ),
+                0
+            );
+
+        actualizarTituloNoLeidos(
+            totalPendientes
+        );
 
         lista.innerHTML =
             preparadas
@@ -708,7 +1419,13 @@ async function cargarConversaciones() {
                 )
                 .join("");
 
+        crearBuscadorConversaciones();
+        crearFiltrosConversaciones();
+        filtrarConversaciones();
+        activarBotonesFijarConversacion();
+        activarBotonesArchivarConversacion();
         activarBotonesEliminarConversacion();
+        iniciarPresenciasConversaciones();
 
         carga?.classList.add("oculto");
         errorBloque?.classList.add("oculto");
@@ -856,6 +1573,202 @@ async function eliminarConversacionDeMiBandeja() {
 }
 
 
+async function cambiarFijadoConversacion(
+    conversacionId,
+    estaFijada,
+    boton
+) {
+    const cliente =
+        window.clienteSupabase;
+
+    if (
+        !cliente ||
+        !conversacionId ||
+        !boton
+    ) {
+        return;
+    }
+
+    const contenidoAnterior =
+        boton.innerHTML;
+
+    boton.disabled =
+        true;
+
+    boton.innerHTML = `
+        <i
+            class="fa-solid fa-spinner fa-spin"
+            aria-hidden="true"
+        ></i>
+    `;
+
+    try {
+        const funcion =
+            estaFijada
+                ? "desfijar_conversacion"
+                : "fijar_conversacion";
+
+        const {
+            error
+        } = await cliente.rpc(
+            funcion,
+            {
+                conversacion_buscada:
+                    conversacionId
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        await cargarConversaciones();
+    } catch (error) {
+        console.error(
+            "No se pudo cambiar el fijado de la conversación:",
+            error
+        );
+
+        boton.disabled =
+            false;
+
+        boton.innerHTML =
+            contenidoAnterior;
+
+        window.alert(
+            estaFijada
+                ? "No se ha podido desfijar la conversación."
+                : "No se ha podido fijar la conversación."
+        );
+    }
+}
+
+
+function activarBotonesFijarConversacion() {
+    document
+        .querySelectorAll(
+            "[data-fijar-conversacion]"
+        )
+        .forEach(
+            (
+                boton
+            ) => {
+                boton.addEventListener(
+                    "click",
+                    () => {
+                        cambiarFijadoConversacion(
+                            boton.dataset
+                                .fijarConversacion,
+                            boton.dataset
+                                .fijada ===
+                                "true",
+                            boton
+                        );
+                    }
+                );
+            }
+        );
+}
+
+
+async function cambiarArchivadoConversacion(
+    conversacionId,
+    estaArchivada,
+    boton
+) {
+    const cliente =
+        window.clienteSupabase;
+
+    if (
+        !cliente ||
+        !conversacionId ||
+        !boton
+    ) {
+        return;
+    }
+
+    const contenidoAnterior =
+        boton.innerHTML;
+
+    boton.disabled =
+        true;
+
+    boton.innerHTML = `
+        <i
+            class="fa-solid fa-spinner fa-spin"
+            aria-hidden="true"
+        ></i>
+    `;
+
+    try {
+        const funcion =
+            estaArchivada
+                ? "desarchivar_conversacion"
+                : "archivar_conversacion";
+
+        const {
+            error
+        } = await cliente.rpc(
+            funcion,
+            {
+                conversacion_buscada:
+                    conversacionId
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        await cargarConversaciones();
+    } catch (error) {
+        console.error(
+            "No se pudo cambiar el archivado de la conversación:",
+            error
+        );
+
+        boton.disabled =
+            false;
+
+        boton.innerHTML =
+            contenidoAnterior;
+
+        window.alert(
+            estaArchivada
+                ? "No se ha podido restaurar la conversación."
+                : "No se ha podido archivar la conversación."
+        );
+    }
+}
+
+
+function activarBotonesArchivarConversacion() {
+    document
+        .querySelectorAll(
+            "[data-archivar-conversacion]"
+        )
+        .forEach(
+            (
+                boton
+            ) => {
+                boton.addEventListener(
+                    "click",
+                    () => {
+                        cambiarArchivadoConversacion(
+                            boton.dataset
+                                .archivarConversacion,
+                            boton.dataset
+                                .archivada ===
+                                "true",
+                            boton
+                        );
+                    }
+                );
+            }
+        );
+}
+
+
 function activarBotonesEliminarConversacion() {
     document
         .querySelectorAll(
@@ -878,6 +1791,102 @@ function activarBotonesEliminarConversacion() {
                     }
                 );
             }
+        );
+}
+
+
+async function consultarPresenciaConversacion(
+    tarjeta
+) {
+    const cliente =
+        window.clienteSupabase;
+
+    const usuarioId =
+        tarjeta?.dataset
+            ?.usuarioPresencia ||
+        "";
+
+    const indicador =
+        tarjeta?.querySelector(
+            "[data-indicador-presencia]"
+        );
+
+    if (
+        !cliente ||
+        !usuarioId ||
+        !indicador
+    ) {
+        return;
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente.rpc(
+            "obtener_presencia_usuario",
+            {
+                usuario_buscado:
+                    usuarioId
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        const presencia =
+            Array.isArray(
+                data
+            )
+                ? data[0]
+                : data;
+
+        indicador.classList.toggle(
+            "oculto",
+            presencia?.en_linea !==
+                true
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo consultar la presencia en conversaciones:",
+            error
+        );
+
+        indicador.classList.add(
+            "oculto"
+        );
+    }
+}
+
+
+async function actualizarPresenciasConversaciones() {
+    const tarjetas =
+        [
+            ...document.querySelectorAll(
+                "[data-usuario-presencia]"
+            )
+        ];
+
+    await Promise.all(
+        tarjetas.map(
+            consultarPresenciaConversacion
+        )
+    );
+}
+
+
+function iniciarPresenciasConversaciones() {
+    window.clearInterval(
+        intervaloPresenciasConversaciones
+    );
+
+    actualizarPresenciasConversaciones();
+
+    intervaloPresenciasConversaciones =
+        window.setInterval(
+            actualizarPresenciasConversaciones,
+            4000
         );
 }
 
@@ -913,17 +1922,53 @@ function activarTiempoReal() {
 
                     mostrarNotificacionNavegador(
                         "Nuevo mensaje en Suralia",
-                        "Abre la bandeja para leerlo."
+                        "Pulsa para abrir la conversación.",
+                        cambio.new.conversacion_id
                     );
                 }
 
                 cargarConversaciones();
             }
         )
+        .on(
+            "postgres_changes",
+            {
+                event:
+                    "*",
+
+                schema:
+                    "public",
+
+                table:
+                    "conversaciones_archivadas"
+            },
+            cargarConversaciones
+        )
+        .on(
+            "postgres_changes",
+            {
+                event:
+                    "*",
+
+                schema:
+                    "public",
+
+                table:
+                    "conversaciones_fijadas"
+            },
+            cargarConversaciones
+        )
         .subscribe();
 }
 
 window.addEventListener("beforeunload", () => {
+    window.clearInterval(
+        intervaloPresenciasConversaciones
+    );
+
+    intervaloPresenciasConversaciones =
+        null;
+
     if (canalConversaciones && window.clienteSupabase) {
         window.clienteSupabase.removeChannel(canalConversaciones);
     }

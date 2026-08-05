@@ -212,9 +212,20 @@
                             Conversación con
                         </span>
 
-                        <h1 id="chat-nombre">
-                            Usuario de Suralia
-                        </h1>
+                        <div class="chat-suralia__titulo-estado">
+                            <h1 id="chat-nombre">
+                                Usuario de Suralia
+                            </h1>
+
+                            <div
+                                class="chat-suralia__en-linea oculto"
+                                id="chat-en-linea"
+                                aria-live="polite"
+                            >
+                                <span aria-hidden="true"></span>
+                                En línea
+                            </div>
+                        </div>
 
                     </div>
 
@@ -272,6 +283,99 @@
                     class="chat-suralia__formulario"
                     id="chat-formulario"
                 >
+                    <div
+                        class="chat-suralia__vista-previa-imagen oculto"
+                        id="chat-vista-previa-imagen"
+                    >
+                        <img
+                            src=""
+                            alt="Vista previa de la imagen seleccionada"
+                            id="chat-imagen-previa"
+                        >
+
+                        <button
+                            type="button"
+                            class="chat-suralia__cancelar-imagen"
+                            id="chat-cancelar-imagen"
+                            aria-label="Quitar imagen seleccionada"
+                            title="Quitar imagen"
+                        >
+                            <i
+                                class="fa-solid fa-xmark"
+                                aria-hidden="true"
+                            ></i>
+                        </button>
+                    </div>
+
+                    <input
+                        type="file"
+                        id="chat-archivo-imagen"
+                        class="sr-only"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                    >
+
+                    <input
+                        type="file"
+                        id="chat-camara-imagen"
+                        class="sr-only"
+                        accept="image/*"
+                        capture="environment"
+                    >
+
+                    <button
+                        type="button"
+                        class="chat-suralia__adjuntar-imagen"
+                        id="chat-adjuntar-imagen"
+                        aria-label="Adjuntar una imagen"
+                        title="Adjuntar imagen"
+                        disabled
+                    >
+                        <i
+                            class="fa-regular fa-image"
+                            aria-hidden="true"
+                        ></i>
+                    </button>
+
+                    <div
+                        class="chat-suralia__menu-imagen oculto"
+                        id="chat-menu-imagen"
+                        role="menu"
+                    >
+                        <button
+                            type="button"
+                            id="chat-hacer-foto"
+                            role="menuitem"
+                        >
+                            <i
+                                class="fa-solid fa-camera"
+                                aria-hidden="true"
+                            ></i>
+
+                            Hacer una foto
+                        </button>
+
+                        <button
+                            type="button"
+                            id="chat-elegir-galeria"
+                            role="menuitem"
+                        >
+                            <i
+                                class="fa-regular fa-images"
+                                aria-hidden="true"
+                            ></i>
+
+                            Elegir de la galería
+                        </button>
+
+                        <button
+                            type="button"
+                            id="chat-cancelar-menu-imagen"
+                            role="menuitem"
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+
                     <label
                         for="chat-mensaje"
                         class="sr-only"
@@ -297,6 +401,29 @@
                             aria-hidden="true"
                         ></i>
                     </button>
+
+                    <div
+                        class="chat-suralia__subida oculto"
+                        id="chat-estado-subida"
+                        aria-live="polite"
+                    >
+                        <div class="chat-suralia__subida-texto">
+                            <span id="chat-texto-subida">
+                                Preparando imagen...
+                            </span>
+
+                            <strong id="chat-porcentaje-subida">
+                                0%
+                            </strong>
+                        </div>
+
+                        <div
+                            class="chat-suralia__subida-barra"
+                            aria-hidden="true"
+                        >
+                            <span id="chat-barra-subida"></span>
+                        </div>
+                    </div>
                 </form>
 
             </section>
@@ -304,6 +431,99 @@
         </div>
 
     </main>
+
+
+    <div
+        class="modal-chat oculto"
+        id="modal-eliminar-mensaje"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-eliminar-mensaje-titulo"
+    >
+        <div
+            class="modal-chat__fondo"
+            data-cerrar-modal-eliminar
+        ></div>
+
+        <div class="modal-chat__contenido">
+            <div class="modal-chat__icono">
+                <i
+                    class="fa-regular fa-trash-can"
+                    aria-hidden="true"
+                ></i>
+            </div>
+
+            <h2 id="modal-eliminar-mensaje-titulo">
+                ¿Eliminar mensaje?
+            </h2>
+
+            <p>
+                Este mensaje desaparecerá para las dos personas.
+                Esta acción no se puede deshacer.
+            </p>
+
+            <div class="modal-chat__acciones">
+                <button
+                    type="button"
+                    class="modal-chat__boton modal-chat__boton--secundario"
+                    id="cancelar-eliminar-mensaje"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="modal-chat__boton modal-chat__boton--peligro"
+                    id="confirmar-eliminar-mensaje"
+                >
+                    <i
+                        class="fa-regular fa-trash-can"
+                        aria-hidden="true"
+                    ></i>
+
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div
+        class="modal-imagen-chat oculto"
+        id="modal-imagen-chat"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Imagen ampliada del chat"
+    >
+        <button
+            type="button"
+            class="modal-imagen-chat__fondo"
+            id="cerrar-modal-imagen-fondo"
+            aria-label="Cerrar imagen ampliada"
+        ></button>
+
+        <div class="modal-imagen-chat__contenido">
+            <button
+                type="button"
+                class="modal-imagen-chat__cerrar"
+                id="cerrar-modal-imagen-chat"
+                aria-label="Cerrar imagen"
+                title="Cerrar"
+            >
+                <i
+                    class="fa-solid fa-xmark"
+                    aria-hidden="true"
+                ></i>
+            </button>
+
+            <img
+                src=""
+                alt="Imagen ampliada del chat"
+                id="modal-imagen-chat-img"
+            >
+        </div>
+    </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>

@@ -49,6 +49,491 @@ function guardarLocalStorage(
 
 
 /* =====================================================
+   CONTADOR GLOBAL DE MENSAJES NO LEÍDOS
+===================================================== */
+
+let canalMensajesHeader =
+    null;
+
+let enlaceMensajesHeader =
+    null;
+
+let contadorMensajesHeader =
+    null;
+
+let enlaceMensajesMenuUsuario =
+    null;
+
+let contadorMensajesMenuUsuario =
+    null;
+
+let enlaceMensajesMovil =
+    null;
+
+let contadorMensajesMovil =
+    null;
+
+
+function crearEnlaceMensajesHeader() {
+    if (!navegacion) {
+        return null;
+    }
+
+    const enlaceExistente =
+        navegacion.querySelector(
+            'a[href="conversaciones.html"]'
+        );
+
+    if (enlaceExistente) {
+        enlaceMensajesHeader =
+            enlaceExistente;
+    } else {
+        enlaceMensajesHeader =
+            document.createElement(
+                "a"
+            );
+
+        enlaceMensajesHeader.href =
+            "conversaciones.html";
+
+        enlaceMensajesHeader.className =
+            "enlace-mensajes-header";
+
+        enlaceMensajesHeader.innerHTML = `
+            <i
+                class="fa-regular fa-comments"
+                aria-hidden="true"
+            ></i>
+
+            <span>
+                Mis mensajes
+            </span>
+        `;
+
+        const enlacePublicar =
+            navegacion.querySelector(
+                ".enlace-publicar"
+            );
+
+        if (enlacePublicar) {
+            navegacion.insertBefore(
+                enlaceMensajesHeader,
+                enlacePublicar
+            );
+        } else {
+            navegacion.appendChild(
+                enlaceMensajesHeader
+            );
+        }
+    }
+
+    enlaceMensajesHeader.classList.add(
+        "enlace-mensajes-header"
+    );
+
+    contadorMensajesHeader =
+        enlaceMensajesHeader.querySelector(
+            ".enlace-mensajes-header__contador"
+        );
+
+    if (!contadorMensajesHeader) {
+        contadorMensajesHeader =
+            document.createElement(
+                "span"
+            );
+
+        contadorMensajesHeader.className =
+            "enlace-mensajes-header__contador oculto";
+
+        contadorMensajesHeader.setAttribute(
+            "aria-live",
+            "polite"
+        );
+
+        enlaceMensajesHeader.appendChild(
+            contadorMensajesHeader
+        );
+    }
+
+    return enlaceMensajesHeader;
+}
+
+
+function crearEnlaceMensajesMovil() {
+    if (!navegacion) {
+        return null;
+    }
+
+    enlaceMensajesMovil =
+        navegacion.querySelector(
+            ".opcion-mensajes-movil"
+        );
+
+    if (!enlaceMensajesMovil) {
+        enlaceMensajesMovil =
+            document.createElement(
+                "a"
+            );
+
+        enlaceMensajesMovil.href =
+            "conversaciones.html";
+
+        enlaceMensajesMovil.className =
+            "opcion-usuario-movil opcion-mensajes-movil";
+
+        enlaceMensajesMovil.innerHTML = `
+            <span class="opcion-mensajes-movil__contenido">
+                <i
+                    class="fa-regular fa-comments"
+                    aria-hidden="true"
+                ></i>
+
+                <span>
+                    Mis mensajes
+                </span>
+            </span>
+
+            <span
+                class="opcion-mensajes-movil__contador oculto"
+                aria-live="polite"
+            ></span>
+        `;
+
+        const botonCerrarMovil =
+            navegacion.querySelector(
+                "#cerrar-sesion-movil"
+            );
+
+        if (botonCerrarMovil) {
+            navegacion.insertBefore(
+                enlaceMensajesMovil,
+                botonCerrarMovil
+            );
+        } else {
+            navegacion.appendChild(
+                enlaceMensajesMovil
+            );
+        }
+    }
+
+    contadorMensajesMovil =
+        enlaceMensajesMovil.querySelector(
+            ".opcion-mensajes-movil__contador"
+        );
+
+    return enlaceMensajesMovil;
+}
+
+
+function crearEnlaceMensajesMenuUsuario() {
+    const desplegable =
+        document.querySelector(
+            "#menu-usuario-desplegable"
+        );
+
+    if (!desplegable) {
+        return null;
+    }
+
+    enlaceMensajesMenuUsuario =
+        desplegable.querySelector(
+            ".menu-usuario__mensajes"
+        );
+
+    if (!enlaceMensajesMenuUsuario) {
+        enlaceMensajesMenuUsuario =
+            document.createElement(
+                "a"
+            );
+
+        enlaceMensajesMenuUsuario.href =
+            "conversaciones.html";
+
+        enlaceMensajesMenuUsuario.className =
+            "menu-usuario__mensajes";
+
+        enlaceMensajesMenuUsuario.innerHTML = `
+            <span class="menu-usuario__mensajes-contenido">
+                <i
+                    class="fa-regular fa-comments"
+                    aria-hidden="true"
+                ></i>
+
+                <span>
+                    Mis mensajes
+                </span>
+            </span>
+
+            <span
+                class="menu-usuario__mensajes-contador oculto"
+                aria-live="polite"
+            ></span>
+        `;
+
+        const separador =
+            desplegable.querySelector(
+                ".menu-usuario__separador"
+            );
+
+        if (separador) {
+            desplegable.insertBefore(
+                enlaceMensajesMenuUsuario,
+                separador
+            );
+        } else {
+            desplegable.appendChild(
+                enlaceMensajesMenuUsuario
+            );
+        }
+    }
+
+    contadorMensajesMenuUsuario =
+        enlaceMensajesMenuUsuario.querySelector(
+            ".menu-usuario__mensajes-contador"
+        );
+
+    return enlaceMensajesMenuUsuario;
+}
+
+
+function actualizarContadorMensajesHeader(
+    total = 0
+) {
+    if (!contadorMensajesHeader) {
+        return;
+    }
+
+    const cantidad =
+        Number(total) ||
+        0;
+
+    const textoContador =
+        cantidad > 99
+            ? "99+"
+            : String(cantidad);
+
+    contadorMensajesHeader.textContent =
+        textoContador;
+
+    contadorMensajesHeader.classList.toggle(
+        "oculto",
+        cantidad === 0
+    );
+
+    enlaceMensajesHeader?.classList.toggle(
+        "enlace-mensajes-header--pendientes",
+        cantidad > 0
+    );
+
+    enlaceMensajesHeader?.setAttribute(
+        "aria-label",
+        cantidad > 0
+            ? `Mis mensajes: ${cantidad} sin leer`
+            : "Mis mensajes"
+    );
+
+    if (contadorMensajesMenuUsuario) {
+        contadorMensajesMenuUsuario.textContent =
+            textoContador;
+
+        contadorMensajesMenuUsuario.classList.toggle(
+            "oculto",
+            cantidad === 0
+        );
+    }
+
+    enlaceMensajesMenuUsuario?.classList.toggle(
+        "menu-usuario__mensajes--pendientes",
+        cantidad > 0
+    );
+
+    enlaceMensajesMenuUsuario?.setAttribute(
+        "aria-label",
+        cantidad > 0
+            ? `Mis mensajes: ${cantidad} sin leer`
+            : "Mis mensajes"
+    );
+
+    if (contadorMensajesMovil) {
+        contadorMensajesMovil.textContent =
+            textoContador;
+
+        contadorMensajesMovil.classList.toggle(
+            "oculto",
+            cantidad === 0
+        );
+    }
+
+    enlaceMensajesMovil?.classList.toggle(
+        "opcion-mensajes-movil--pendientes",
+        cantidad > 0
+    );
+
+    enlaceMensajesMovil?.setAttribute(
+        "aria-label",
+        cantidad > 0
+            ? `Mis mensajes: ${cantidad} sin leer`
+            : "Mis mensajes"
+    );
+}
+
+
+async function consultarMensajesNoLeidosHeader() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (
+        !cliente?.auth ||
+        !enlaceMensajesHeader
+    ) {
+        return;
+    }
+
+    try {
+        const {
+            data: datosSesion,
+            error: errorSesion
+        } = await cliente.auth.getSession();
+
+        if (errorSesion) {
+            throw errorSesion;
+        }
+
+        const usuarioSupabase =
+            datosSesion.session?.user;
+
+        if (!usuarioSupabase) {
+            actualizarContadorMensajesHeader(
+                0
+            );
+
+            return;
+        }
+
+        const {
+            count,
+            error
+        } = await cliente
+            .from("mensajes")
+            .select(
+                "id",
+                {
+                    count:
+                        "exact",
+
+                    head:
+                        true
+                }
+            )
+            .neq(
+                "remitente_id",
+                usuarioSupabase.id
+            )
+            .eq(
+                "leido",
+                false
+            )
+            .eq(
+                "eliminado",
+                false
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        actualizarContadorMensajesHeader(
+            count ||
+            0
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo actualizar el contador global de mensajes:",
+            error
+        );
+    }
+}
+
+
+async function iniciarContadorMensajesHeader() {
+    if (
+        !sesionActual?.conectado ||
+        !navegacion
+    ) {
+        return;
+    }
+
+    crearEnlaceMensajesHeader();
+    crearEnlaceMensajesMenuUsuario();
+    crearEnlaceMensajesMovil();
+
+    await consultarMensajesNoLeidosHeader();
+
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente) {
+        return;
+    }
+
+    if (canalMensajesHeader) {
+        cliente.removeChannel(
+            canalMensajesHeader
+        );
+    }
+
+    canalMensajesHeader =
+        cliente
+            .channel(
+                "contador-global-mensajes-suralia"
+            )
+            .on(
+                "postgres_changes",
+                {
+                    event:
+                        "*",
+
+                    schema:
+                        "public",
+
+                    table:
+                        "mensajes"
+                },
+                consultarMensajesNoLeidosHeader
+            )
+            .subscribe();
+}
+
+
+window.addEventListener(
+    "beforeunload",
+    () => {
+        if (
+            canalMensajesHeader &&
+            window.clienteSupabase
+        ) {
+            window.clienteSupabase.removeChannel(
+                canalMensajesHeader
+            );
+        }
+    }
+);
+
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+        if (
+            document.visibilityState ===
+            "visible"
+        ) {
+            consultarMensajesNoLeidosHeader();
+        }
+    }
+);
+
+
+/* =====================================================
    MENÚ MÓVIL
 ===================================================== */
 
@@ -1616,6 +2101,7 @@ async function iniciarPaginaPrincipal() {
     await sincronizarAvatarCabeceraDesdeSupabase();
 
     actualizarCabeceraSesion();
+    await iniciarContadorMensajesHeader();
     cargarFavoritosPortada();
     actualizarFavoritoSierraNorte();
     actualizarContadorSierraNorte();
