@@ -34,6 +34,11 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     >
 
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -430,8 +435,8 @@
                                 </h2>
 
                                 <p>
-                                    Indica cuándo se realizará y cuántas plazas
-                                    estarán disponibles.
+                                    Indica cuándo se realizará. Si el plan tiene
+                                    varios días o pases, puedes añadir más fechas.
                                 </p>
                             </div>
 
@@ -442,7 +447,7 @@
                             <div class="campo-formulario">
 
                                 <label for="plan-fecha">
-                                    Fecha
+                                    Primera fecha
                                 </label>
 
                                 <div class="campo-formulario__control">
@@ -484,6 +489,49 @@
                                 ></small>
 
                             </div>
+
+                        </div>
+
+                        <div class="fechas-adicionales-publicar">
+
+                            <div class="fechas-adicionales-publicar__cabecera">
+
+                                <div>
+                                    <strong>
+                                        ¿El plan se realiza en más fechas?
+                                    </strong>
+
+                                    <small class="campo-ayuda">
+                                        Puedes añadir otros días o incluso otro pase
+                                        el mismo día con una hora diferente.
+                                    </small>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="boton-anadir-fecha"
+                                    id="anadir-fecha-plan"
+                                >
+                                    <i
+                                        class="fa-solid fa-plus"
+                                        aria-hidden="true"
+                                    ></i>
+                                    Añadir otra fecha
+                                </button>
+
+                            </div>
+
+                            <div
+                                class="fechas-adicionales-publicar__lista"
+                                id="lista-fechas-plan"
+                                aria-live="polite"
+                            ></div>
+
+                            <small
+                                class="mensaje-error"
+                                id="error-plan-fechas"
+                                aria-live="polite"
+                            ></small>
 
                         </div>
 
@@ -590,26 +638,116 @@
 
                         </div>
 
-                        <div class="campo-formulario">
+                        <div class="formulario-doble">
 
-                            <label for="plan-ubicacion">
-                                Dirección o lugar de encuentro
-                            </label>
+                            <div class="campo-formulario">
 
-                            <div class="campo-formulario__control">
-                                <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                                <label for="plan-municipio">
+                                    Municipio
+                                </label>
 
-                                <input
-                                    type="text"
-                                    id="plan-ubicacion" aria-describedby="error-plan-ubicacion"
-                                    name="ubicacion"
-                                    placeholder="Ejemplo: Alameda de Hércules, Sevilla"
-                                >
+                                <div class="campo-formulario__control">
+                                    <i class="fa-solid fa-city" aria-hidden="true"></i>
+
+                                    <input
+                                        type="text"
+                                        id="plan-municipio"
+                                        name="municipio"
+                                        maxlength="80"
+                                        autocomplete="address-level2"
+                                        aria-describedby="error-plan-municipio"
+                                        placeholder="Ejemplo: Guillena"
+                                    >
+                                </div>
+
+                                <small
+                                    class="mensaje-error"
+                                    id="error-plan-municipio"
+                                    aria-live="polite"
+                                ></small>
+
                             </div>
+
+                            <div class="campo-formulario">
+
+                                <label for="plan-ubicacion">
+                                    Lugar o dirección concreta
+                                </label>
+
+                                <div class="campo-formulario__control">
+                                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+
+                                    <input
+                                        type="text"
+                                        id="plan-ubicacion"
+                                        name="ubicacion"
+                                        maxlength="180"
+                                        autocomplete="street-address"
+                                        aria-describedby="error-plan-ubicacion"
+                                        placeholder="Ejemplo: Auditorio Municipal de Guillena"
+                                    >
+                                </div>
+
+                                <small
+                                    class="mensaje-error"
+                                    id="error-plan-ubicacion"
+                                    aria-live="polite"
+                                ></small>
+
+                            </div>
+
+                        </div>
+
+                        <p class="campo-ayuda">
+                            Indica el municipio y el lugar exacto. En el detalle del plan se mostrará, por ejemplo, “Guillena, Sevilla” y la dirección concreta debajo.
+                        </p>
+
+                        <div class="campo-formulario campo-formulario--mapa">
+
+                            <div class="mapa-publicar__cabecera">
+                                <div>
+                                    <label>
+                                        Marca el punto exacto en el mapa
+                                    </label>
+
+                                    <small class="campo-ayuda">
+                                        Pulsa sobre el mapa en el lugar exacto donde se realizará la actividad.
+                                        Puedes volver a pulsar para mover el marcador.
+                                    </small>
+                                </div>
+
+                                <span
+                                    class="mapa-publicar__estado"
+                                    id="mapa-publicar-estado"
+                                    aria-live="polite"
+                                >
+                                    Punto pendiente
+                                </span>
+                            </div>
+
+                            <div
+                                id="mapa-publicar-plan"
+                                class="mapa-publicar-plan"
+                                role="application"
+                                aria-label="Selecciona en el mapa la ubicación exacta del plan"
+                            ></div>
+
+                            <input
+                                type="hidden"
+                                id="plan-latitud"
+                                name="latitud"
+                            >
+
+                            <input
+                                type="hidden"
+                                id="plan-longitud"
+                                name="longitud"
+                            >
 
                             <small
                                 class="mensaje-error"
-                                id="error-plan-ubicacion" aria-live="polite"
+                                id="error-plan-coordenadas"
+                                aria-live="polite"
                             ></small>
 
                         </div>
@@ -676,6 +814,48 @@
                                 </div>
 
                             </div>
+
+                        </div>
+
+                        <div class="campo-formulario">
+
+                            <label for="plan-enlace-reserva">
+                                Enlace para entradas o reserva externa
+                                <span class="campo-opcional">(opcional)</span>
+                            </label>
+
+                            <div class="campo-formulario__control">
+                                <i
+                                    class="fa-solid fa-arrow-up-right-from-square"
+                                    aria-hidden="true"
+                                ></i>
+
+                                <input
+                                    type="url"
+                                    id="plan-enlace-reserva"
+                                    name="enlace_reserva"
+                                    maxlength="500"
+                                    inputmode="url"
+                                    autocomplete="url"
+                                    aria-describedby="error-plan-enlace-reserva ayuda-plan-enlace-reserva"
+                                    placeholder="https://www.ejemplo.com/entradas"
+                                >
+                            </div>
+
+                            <small
+                                class="campo-ayuda"
+                                id="ayuda-plan-enlace-reserva"
+                            >
+                                Déjalo vacío si la reserva se hará dentro de Suralia.
+                                Si añades una web externa, el usuario será dirigido allí
+                                para reservar o comprar sus entradas.
+                            </small>
+
+                            <small
+                                class="mensaje-error"
+                                id="error-plan-enlace-reserva"
+                                aria-live="polite"
+                            ></small>
 
                         </div>
 
@@ -1334,6 +1514,7 @@
 
     </div>
 </section>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/main.js"></script>

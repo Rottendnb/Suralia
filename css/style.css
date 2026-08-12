@@ -19499,3 +19499,181 @@ button.conversaciones-cabecera__enlace:disabled {
         margin-top: 0;
     }
 }
+
+/* =====================================================
+   MAPA PARA SELECCIONAR LA UBICACIÓN AL PUBLICAR
+===================================================== */
+
+.campo-formulario--mapa {
+    margin-top: 1rem;
+}
+
+.mapa-publicar__cabecera {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.mapa-publicar__cabecera label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 700;
+}
+
+.mapa-publicar__estado {
+    flex: 0 0 auto;
+    padding: 0.4rem 0.65rem;
+    border-radius: 999px;
+    background: #f3f4f6;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.mapa-publicar__estado--seleccionado {
+    background: #e9f8ef;
+}
+
+.mapa-publicar-plan {
+    width: 100%;
+    height: 340px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.09);
+    background: #f3f4f6;
+}
+
+.mapa-publicar-plan[aria-invalid="true"] {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+    .mapa-publicar__cabecera {
+        flex-direction: column;
+    }
+
+    .mapa-publicar__estado {
+        white-space: normal;
+    }
+
+    .mapa-publicar-plan {
+        height: 300px;
+        border-radius: 14px;
+    }
+}
+
+/* =====================================================
+   VARIAS FECHAS AL PUBLICAR UN PLAN
+===================================================== */
+
+.fechas-adicionales-publicar {
+    margin: 1rem 0 1.35rem;
+    padding: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.fechas-adicionales-publicar__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.fechas-adicionales-publicar__cabecera strong {
+    display: block;
+    margin-bottom: 0.15rem;
+}
+
+.boton-anadir-fecha {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 42px;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 12px;
+    background: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.boton-anadir-fecha:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.fechas-adicionales-publicar__lista {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.fecha-adicional-publicar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px;
+    align-items: end;
+    gap: 0.65rem;
+}
+
+.fecha-adicional-publicar .campo-formulario {
+    margin: 0;
+}
+
+.fecha-adicional-publicar__eliminar {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+}
+
+@media (max-width: 760px) {
+    .fechas-adicionales-publicar__cabecera {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .boton-anadir-fecha {
+        width: 100%;
+    }
+
+    .fecha-adicional-publicar {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 42px;
+        gap: 0.45rem;
+    }
+
+    .fecha-adicional-publicar__eliminar {
+        width: 42px;
+        height: 42px;
+    }
+}
+
+@media (max-width: 520px) {
+    .fecha-adicional-publicar {
+        grid-template-columns: 1fr 42px;
+    }
+
+    .fecha-adicional-publicar .campo-formulario:first-child {
+        grid-column: 1 / -1;
+    }
+
+    .fecha-adicional-publicar .campo-formulario:nth-child(2) {
+        grid-column: 1;
+    }
+
+    .fecha-adicional-publicar__eliminar {
+        grid-column: 2;
+    }
+}

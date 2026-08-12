@@ -40,10 +40,17 @@
     >
 
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        body[data-detalle-listo="false"] main {
+            visibility: hidden;
+        }
+    </style>
 </head>
 
 <body
     id="detalle-plan"
+    data-detalle-listo="false"
     data-plan-id="italica"
     data-titulo="Visita guiada por Itálica"
     data-categoria="cultura"

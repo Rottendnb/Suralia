@@ -23,11 +23,39 @@ const categoria = document.querySelector("#plan-categoria");
 const descripcion = document.querySelector("#plan-descripcion");
 const fecha = document.querySelector("#plan-fecha");
 const hora = document.querySelector("#plan-hora");
+
+const botonAnadirFecha =
+    document.querySelector("#anadir-fecha-plan");
+
+const listaFechasPlan =
+    document.querySelector("#lista-fechas-plan");
+
+const errorFechasPlan =
+    document.querySelector("#error-plan-fechas");
+
 const duracion = document.querySelector("#plan-duracion");
 const plazas = document.querySelector("#plan-plazas");
+const municipio = document.querySelector("#plan-municipio");
 const ubicacion = document.querySelector("#plan-ubicacion");
 const precio = document.querySelector("#plan-precio");
 const dificultad = document.querySelector("#plan-dificultad");
+const enlaceReserva = document.querySelector("#plan-enlace-reserva");
+
+const latitudPlan =
+    document.querySelector("#plan-latitud");
+
+const longitudPlan =
+    document.querySelector("#plan-longitud");
+
+const mapaPublicarPlan =
+    document.querySelector("#mapa-publicar-plan");
+
+const estadoMapaPublicar =
+    document.querySelector("#mapa-publicar-estado");
+
+const errorCoordenadas =
+    document.querySelector("#error-plan-coordenadas");
+
 const imagen = document.querySelector("#plan-imagen");
 const imagen2 = document.querySelector("#plan-imagen-2");
 const imagen3 = document.querySelector("#plan-imagen-3");
@@ -76,6 +104,13 @@ const notificacionPublicar = document.querySelector(
     "#notificacion-publicar"
 );
 
+let mapaUbicacionPublicar =
+    null;
+
+let marcadorUbicacionPublicar =
+    null;
+
+
 let imagenBase64 = "";
 let imagen2Base64 = "";
 let imagen3Base64 = "";
@@ -98,6 +133,500 @@ const fechaActual = new Date();
 const fechaMinima = fechaActual.toISOString().split("T")[0];
 
 fecha.min = fechaMinima;
+
+
+let contadorFechasAdicionales =
+    0;
+
+const MAX_FECHAS_PLAN =
+    20;
+
+
+function actualizarLimitesFechasAdicionales() {
+    if (!listaFechasPlan) {
+        return;
+    }
+
+    const fechaBase =
+        fecha?.value ||
+        fechaMinima;
+
+    listaFechasPlan
+        .querySelectorAll(
+            "[data-fecha-adicional]"
+        )
+        .forEach(
+            (
+                campoFecha
+            ) => {
+                campoFecha.min =
+                    fechaBase;
+            }
+        );
+}
+
+
+function actualizarBotonAnadirFecha() {
+    if (
+        !botonAnadirFecha ||
+        !listaFechasPlan
+    ) {
+        return;
+    }
+
+    const totalAdicionales =
+        listaFechasPlan.querySelectorAll(
+            "[data-fila-fecha]"
+        ).length;
+
+    const limiteAlcanzado =
+        totalAdicionales >=
+        MAX_FECHAS_PLAN - 1;
+
+    botonAnadirFecha.disabled =
+        limiteAlcanzado;
+
+    botonAnadirFecha.title =
+        limiteAlcanzado
+            ? `Puedes añadir hasta ${MAX_FECHAS_PLAN} fechas por plan.`
+            : "";
+}
+
+
+function crearFilaFechaAdicional(
+    fechaValor = "",
+    horaValor = ""
+) {
+    if (!listaFechasPlan) {
+        return null;
+    }
+
+    const totalAdicionales =
+        listaFechasPlan.querySelectorAll(
+            "[data-fila-fecha]"
+        ).length;
+
+    if (
+        totalAdicionales >=
+        MAX_FECHAS_PLAN - 1
+    ) {
+        return null;
+    }
+
+    contadorFechasAdicionales +=
+        1;
+
+    const identificador =
+        contadorFechasAdicionales;
+
+    const fila =
+        document.createElement(
+            "div"
+        );
+
+    fila.className =
+        "fecha-adicional-publicar";
+
+    fila.dataset.filaFecha =
+        String(
+            identificador
+        );
+
+    fila.innerHTML = `
+        <div class="campo-formulario">
+            <label
+                for="plan-fecha-adicional-${identificador}"
+                class="sr-only"
+            >
+                Fecha adicional
+            </label>
+
+            <div class="campo-formulario__control">
+                <i
+                    class="fa-regular fa-calendar"
+                    aria-hidden="true"
+                ></i>
+
+                <input
+                    type="date"
+                    id="plan-fecha-adicional-${identificador}"
+                    data-fecha-adicional
+                    aria-label="Fecha adicional"
+                    value="${fechaValor}"
+                >
+            </div>
+        </div>
+
+        <div class="campo-formulario">
+            <label
+                for="plan-hora-adicional-${identificador}"
+                class="sr-only"
+            >
+                Hora de esta fecha
+            </label>
+
+            <div class="campo-formulario__control">
+                <i
+                    class="fa-regular fa-clock"
+                    aria-hidden="true"
+                ></i>
+
+                <input
+                    type="time"
+                    id="plan-hora-adicional-${identificador}"
+                    data-hora-adicional
+                    aria-label="Hora de la fecha adicional"
+                    value="${horaValor}"
+                >
+            </div>
+        </div>
+
+        <button
+            type="button"
+            class="fecha-adicional-publicar__eliminar"
+            data-eliminar-fecha
+            aria-label="Eliminar esta fecha"
+            title="Eliminar fecha"
+        >
+            <i
+                class="fa-solid fa-trash"
+                aria-hidden="true"
+            ></i>
+        </button>
+    `;
+
+    listaFechasPlan.appendChild(
+        fila
+    );
+
+    actualizarLimitesFechasAdicionales();
+    actualizarBotonAnadirFecha();
+
+    return fila;
+}
+
+
+function obtenerFechasFormulario() {
+    const fechasSeleccionadas =
+        [];
+
+    if (
+        fecha?.value ||
+        hora?.value
+    ) {
+        fechasSeleccionadas.push({
+            fecha:
+                fecha?.value ||
+                "",
+            hora:
+                hora?.value ||
+                ""
+        });
+    }
+
+    listaFechasPlan
+        ?.querySelectorAll(
+            "[data-fila-fecha]"
+        )
+        .forEach(
+            (
+                fila
+            ) => {
+                const campoFecha =
+                    fila.querySelector(
+                        "[data-fecha-adicional]"
+                    );
+
+                const campoHora =
+                    fila.querySelector(
+                        "[data-hora-adicional]"
+                    );
+
+                const valorFecha =
+                    campoFecha?.value ||
+                    "";
+
+                const valorHora =
+                    campoHora?.value ||
+                    "";
+
+                if (
+                    valorFecha ||
+                    valorHora
+                ) {
+                    fechasSeleccionadas.push({
+                        fecha:
+                            valorFecha,
+                        hora:
+                            valorHora
+                    });
+                }
+            }
+        );
+
+    return fechasSeleccionadas;
+}
+
+
+function normalizarFechasBorrador(
+    fechasGuardadas
+) {
+    if (
+        !Array.isArray(
+            fechasGuardadas
+        )
+    ) {
+        return [];
+    }
+
+    return fechasGuardadas
+        .map(
+            (
+                item
+            ) => {
+                if (
+                    typeof item ===
+                    "string"
+                ) {
+                    return {
+                        fecha:
+                            item,
+                        hora:
+                            ""
+                    };
+                }
+
+                return {
+                    fecha:
+                        String(
+                            item?.fecha ||
+                            ""
+                        ),
+                    hora:
+                        String(
+                            item?.hora ||
+                            ""
+                        )
+                };
+            }
+        )
+        .filter(
+            (
+                item
+            ) =>
+                item.fecha ||
+                item.hora
+        );
+}
+
+
+function cargarFechasAdicionalesBorrador(
+    fechasGuardadas
+) {
+    if (!listaFechasPlan) {
+        return;
+    }
+
+    listaFechasPlan.innerHTML =
+        "";
+
+    const normalizadas =
+        normalizarFechasBorrador(
+            fechasGuardadas
+        );
+
+    let primeraOmitida =
+        false;
+
+    normalizadas.forEach(
+        (
+            item
+        ) => {
+            const coincidePrincipal =
+                !primeraOmitida &&
+                item.fecha ===
+                    (
+                        fecha?.value ||
+                        ""
+                    ) &&
+                (
+                    !item.hora ||
+                    item.hora ===
+                        (
+                            hora?.value ||
+                            ""
+                        )
+                );
+
+            if (coincidePrincipal) {
+                primeraOmitida =
+                    true;
+
+                return;
+            }
+
+            crearFilaFechaAdicional(
+                item.fecha,
+                item.hora
+            );
+        }
+    );
+
+    actualizarBotonAnadirFecha();
+}
+
+
+function validarFechasAdicionales() {
+    if (errorFechasPlan) {
+        errorFechasPlan.textContent =
+            "";
+    }
+
+    const fechasSeleccionadas =
+        obtenerFechasFormulario();
+
+    if (
+        fechasSeleccionadas.length ===
+        0
+    ) {
+        return true;
+    }
+
+    const claves =
+        new Set();
+
+    for (
+        const item
+        of fechasSeleccionadas
+    ) {
+        if (
+            !item.fecha ||
+            !item.hora
+        ) {
+            if (errorFechasPlan) {
+                errorFechasPlan.textContent =
+                    "Completa la fecha y la hora de todos los días o pases añadidos.";
+            }
+
+            return false;
+        }
+
+        if (
+            item.fecha <
+            fechaMinima
+        ) {
+            if (errorFechasPlan) {
+                errorFechasPlan.textContent =
+                    "Ninguna fecha puede estar en el pasado.";
+            }
+
+            return false;
+        }
+
+        if (
+            fecha?.value &&
+            item.fecha <
+                fecha.value
+        ) {
+            if (errorFechasPlan) {
+                errorFechasPlan.textContent =
+                    "Las fechas adicionales no pueden ser anteriores a la primera fecha.";
+            }
+
+            return false;
+        }
+
+        const clave =
+            `${item.fecha}|${item.hora}`;
+
+        if (
+            claves.has(
+                clave
+            )
+        ) {
+            if (errorFechasPlan) {
+                errorFechasPlan.textContent =
+                    "Hay una fecha y hora repetidas. Elimina el duplicado.";
+            }
+
+            return false;
+        }
+
+        claves.add(
+            clave
+        );
+    }
+
+    return true;
+}
+
+
+botonAnadirFecha?.addEventListener(
+    "click",
+    () => {
+        const fila =
+            crearFilaFechaAdicional(
+                "",
+                hora?.value ||
+                    ""
+            );
+
+        const campoFecha =
+            fila?.querySelector(
+                "[data-fecha-adicional]"
+            );
+
+        campoFecha?.focus();
+    }
+);
+
+
+listaFechasPlan?.addEventListener(
+    "click",
+    (
+        evento
+    ) => {
+        const botonEliminar =
+            evento.target.closest(
+                "[data-eliminar-fecha]"
+            );
+
+        if (!botonEliminar) {
+            return;
+        }
+
+        botonEliminar
+            .closest(
+                "[data-fila-fecha]"
+            )
+            ?.remove();
+
+        if (errorFechasPlan) {
+            errorFechasPlan.textContent =
+                "";
+        }
+
+        actualizarBotonAnadirFecha();
+    }
+);
+
+
+listaFechasPlan?.addEventListener(
+    "input",
+    () => {
+        if (errorFechasPlan) {
+            errorFechasPlan.textContent =
+                "";
+        }
+    }
+);
+
+
+fecha?.addEventListener(
+    "change",
+    actualizarLimitesFechasAdicionales
+);
+
 
 function mostrarNotificacion(mensaje) {
     if (!notificacionPublicar) {
@@ -199,12 +728,31 @@ function actualizarVistaPrevia() {
         ${hora.value || "Hora pendiente"}
     `;
 
+    const municipioTexto =
+        municipio?.value.trim() ||
+        "";
+
+    const direccionTexto =
+        ubicacion.value.trim();
+
+    const ubicacionVista =
+        municipioTexto
+            ? `${municipioTexto}, Sevilla${
+                direccionTexto
+                    ? ` · ${direccionTexto}`
+                    : ""
+            }`
+            : (
+                direccionTexto ||
+                "Ubicación pendiente"
+            );
+
     vistaUbicacion.innerHTML = `
         <i
             class="fa-solid fa-location-dot"
             aria-hidden="true"
         ></i>
-        ${ubicacion.value.trim() || "Ubicación pendiente"}
+        ${ubicacionVista}
     `;
 
     const valorPrecio = Number(precio.value);
@@ -533,12 +1081,218 @@ function activarZonaImagen(
 );
 
 
+function actualizarEstadoPuntoMapa(
+    latitud,
+    longitud
+) {
+    if (!estadoMapaPublicar) {
+        return;
+    }
+
+    if (
+        !Number.isFinite(latitud) ||
+        !Number.isFinite(longitud)
+    ) {
+        estadoMapaPublicar.textContent =
+            "Punto pendiente";
+
+        estadoMapaPublicar.classList.remove(
+            "mapa-publicar__estado--seleccionado"
+        );
+
+        return;
+    }
+
+    estadoMapaPublicar.textContent =
+        `Punto seleccionado: ${latitud.toFixed(5)}, ${longitud.toFixed(5)}`;
+
+    estadoMapaPublicar.classList.add(
+        "mapa-publicar__estado--seleccionado"
+    );
+}
+
+
+function guardarPuntoMapa(
+    latitud,
+    longitud,
+    centrar = false
+) {
+    const lat =
+        Number(latitud);
+
+    const lng =
+        Number(longitud);
+
+    if (
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lng)
+    ) {
+        return;
+    }
+
+    if (latitudPlan) {
+        latitudPlan.value =
+            lat.toFixed(7);
+    }
+
+    if (longitudPlan) {
+        longitudPlan.value =
+            lng.toFixed(7);
+    }
+
+    if (errorCoordenadas) {
+        errorCoordenadas.textContent =
+            "";
+    }
+
+    mapaPublicarPlan?.setAttribute(
+        "aria-invalid",
+        "false"
+    );
+
+    actualizarEstadoPuntoMapa(
+        lat,
+        lng
+    );
+
+    if (!mapaUbicacionPublicar) {
+        return;
+    }
+
+    if (!marcadorUbicacionPublicar) {
+        marcadorUbicacionPublicar =
+            L.marker(
+                [
+                    lat,
+                    lng
+                ]
+            ).addTo(
+                mapaUbicacionPublicar
+            );
+    } else {
+        marcadorUbicacionPublicar.setLatLng(
+            [
+                lat,
+                lng
+            ]
+        );
+    }
+
+    marcadorUbicacionPublicar.bindPopup(
+        "Ubicación exacta del plan"
+    );
+
+    if (centrar) {
+        mapaUbicacionPublicar.setView(
+            [
+                lat,
+                lng
+            ],
+            16
+        );
+
+        marcadorUbicacionPublicar.openPopup();
+    }
+}
+
+
+function inicializarMapaPublicar() {
+    if (
+        typeof L === "undefined" ||
+        !mapaPublicarPlan ||
+        mapaUbicacionPublicar
+    ) {
+        return;
+    }
+
+    mapaUbicacionPublicar =
+        L.map(
+            "mapa-publicar-plan",
+            {
+                scrollWheelZoom:
+                    false
+            }
+        ).setView(
+            [
+                37.3891,
+                -5.9845
+            ],
+            9
+        );
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            maxZoom:
+                19,
+
+            attribution:
+                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }
+    ).addTo(
+        mapaUbicacionPublicar
+    );
+
+    mapaUbicacionPublicar.on(
+        "click",
+        (
+            evento
+        ) => {
+            guardarPuntoMapa(
+                evento.latlng.lat,
+                evento.latlng.lng
+            );
+        }
+    );
+
+    const latitudGuardada =
+        Number(
+            latitudPlan?.value
+        );
+
+    const longitudGuardada =
+        Number(
+            longitudPlan?.value
+        );
+
+    if (
+        Number.isFinite(
+            latitudGuardada
+        ) &&
+        Number.isFinite(
+            longitudGuardada
+        ) &&
+        latitudPlan?.value &&
+        longitudPlan?.value
+    ) {
+        guardarPuntoMapa(
+            latitudGuardada,
+            longitudGuardada,
+            true
+        );
+    } else {
+        actualizarEstadoPuntoMapa(
+            NaN,
+            NaN
+        );
+    }
+
+    window.setTimeout(
+        () => {
+            mapaUbicacionPublicar?.invalidateSize();
+        },
+        120
+    );
+}
+
+
 const camposVistaPrevia = [
     titulo,
     categoria,
     descripcion,
     fecha,
     hora,
+    municipio,
     ubicacion,
     precio
 ];
@@ -815,6 +1569,9 @@ async function publicarPlanEnSupabase(
                     hora:
                         datos.hora,
 
+                    fechas:
+                        datos.fechas,
+
                     duracion:
                         datos.duracion,
 
@@ -824,11 +1581,26 @@ async function publicarPlanEnSupabase(
                     ubicacion:
                         datos.ubicacion,
 
+                    municipio:
+                        datos.municipio,
+
+                    direccion:
+                        datos.direccion,
+
+                    latitud:
+                        datos.latitud,
+
+                    longitud:
+                        datos.longitud,
+
                     precio:
                         datos.precio,
 
                     dificultad:
                         datos.dificultad,
+
+                    enlace_reserva:
+                        datos.enlace_reserva,
 
                     provincia:
                         datos.provincia,
@@ -945,11 +1717,50 @@ function obtenerDatosFormulario() {
         descripcion: descripcion.value.trim(),
         fecha: fecha.value,
         hora: hora.value,
+
+        fechas:
+            obtenerFechasFormulario(),
+
         duracion: duracion.value,
         plazas: Number(plazas.value),
-        ubicacion: ubicacion.value.trim(),
+
+        municipio:
+            municipio?.value.trim() ||
+            "",
+
+        direccion:
+            ubicacion.value.trim(),
+
+        latitud:
+            latitudPlan?.value
+                ? Number(
+                    latitudPlan.value
+                )
+                : null,
+
+        longitud:
+            longitudPlan?.value
+                ? Number(
+                    longitudPlan.value
+                )
+                : null,
+
+        ubicacion:
+            [
+                ubicacion.value.trim(),
+                municipio?.value.trim(),
+                "Sevilla"
+            ]
+                .filter(Boolean)
+                .join(", "),
+
         precio: Number(precio.value || 0),
         dificultad: dificultad.value,
+
+        enlace_reserva:
+            enlaceReserva?.value.trim() ||
+            null,
+
         provincia: "Sevilla",
         imagen: imagenBase64,
         imagen2: imagen2Base64,
@@ -1034,6 +1845,30 @@ mostrarNotificacion(
 );
 });
 
+function enlaceReservaEsValido(
+    valor = ""
+) {
+    const texto =
+        String(valor || "").trim();
+
+    if (!texto) {
+        return true;
+    }
+
+    try {
+        const url =
+            new URL(texto);
+
+        return (
+            url.protocol === "https:" ||
+            url.protocol === "http:"
+        );
+    } catch (error) {
+        return false;
+    }
+}
+
+
 formularioPublicar.addEventListener("submit", async (evento) => {
     evento.preventDefault();
 
@@ -1044,10 +1879,32 @@ formularioPublicar.addEventListener("submit", async (evento) => {
     limpiarError(descripcion, "error-plan-descripcion");
     limpiarError(fecha, "error-plan-fecha");
     limpiarError(hora, "error-plan-hora");
+
+    if (errorFechasPlan) {
+        errorFechasPlan.textContent =
+            "";
+    }
+
     limpiarError(duracion, "error-plan-duracion");
     limpiarError(plazas, "error-plan-plazas");
+    limpiarError(municipio, "error-plan-municipio");
     limpiarError(ubicacion, "error-plan-ubicacion");
+
+    if (errorCoordenadas) {
+        errorCoordenadas.textContent =
+            "";
+    }
+
+    mapaPublicarPlan?.setAttribute(
+        "aria-invalid",
+        "false"
+    );
+
     limpiarError(precio, "error-plan-precio");
+    limpiarError(
+        enlaceReserva,
+        "error-plan-enlace-reserva"
+    );
 
     const errorImagen =
         document.querySelector(
@@ -1135,6 +1992,13 @@ formularioPublicar.addEventListener("submit", async (evento) => {
         formularioValido = false;
     }
 
+    if (
+        !validarFechasAdicionales()
+    ) {
+        formularioValido =
+            false;
+    }
+
     if (!duracion.value) {
         mostrarError(
             duracion,
@@ -1159,14 +2023,61 @@ formularioPublicar.addEventListener("submit", async (evento) => {
         formularioValido = false;
     }
 
-    if (ubicacion.value.trim().length < 5) {
+    if (
+        !municipio ||
+        municipio.value.trim().length < 2
+    ) {
         mostrarError(
-            ubicacion,
-            "error-plan-ubicacion",
-            "Introduce una ubicación válida."
+            municipio,
+            "error-plan-municipio",
+            "Introduce el municipio donde se realiza la actividad."
         );
 
         formularioValido = false;
+    }
+
+    if (ubicacion.value.trim().length < 3) {
+        mostrarError(
+            ubicacion,
+            "error-plan-ubicacion",
+            "Introduce el lugar o la dirección concreta."
+        );
+
+        formularioValido = false;
+    }
+
+    const latitudSeleccionada =
+        Number(
+            latitudPlan?.value
+        );
+
+    const longitudSeleccionada =
+        Number(
+            longitudPlan?.value
+        );
+
+    if (
+        !latitudPlan?.value ||
+        !longitudPlan?.value ||
+        !Number.isFinite(
+            latitudSeleccionada
+        ) ||
+        !Number.isFinite(
+            longitudSeleccionada
+        )
+    ) {
+        if (errorCoordenadas) {
+            errorCoordenadas.textContent =
+                "Marca en el mapa el punto exacto donde se realizará la actividad.";
+        }
+
+        mapaPublicarPlan?.setAttribute(
+            "aria-invalid",
+            "true"
+        );
+
+        formularioValido =
+            false;
     }
 
     if (
@@ -1177,6 +2088,21 @@ formularioPublicar.addEventListener("submit", async (evento) => {
             precio,
             "error-plan-precio",
             "Introduce un precio válido. Usa 0 si es gratis."
+        );
+
+        formularioValido = false;
+    }
+
+    if (
+        enlaceReserva?.value.trim() &&
+        !enlaceReservaEsValido(
+            enlaceReserva.value
+        )
+    ) {
+        mostrarError(
+            enlaceReserva,
+            "error-plan-enlace-reserva",
+            "Introduce una dirección web válida que empiece por http:// o https://."
         );
 
         formularioValido = false;
@@ -1334,10 +2260,46 @@ function cargarBorradorParaEditar() {
     descripcion.value = borrador.descripcion || "";
     fecha.value = borrador.fecha || "";
     hora.value = borrador.hora || "";
+
+    cargarFechasAdicionalesBorrador(
+        borrador.fechas ||
+        []
+    );
+
     duracion.value = borrador.duracion || "";
     plazas.value = borrador.plazas || "";
-    ubicacion.value = borrador.ubicacion || "";
+
+    if (municipio) {
+        municipio.value =
+            borrador.municipio ||
+            "";
+    }
+
+    ubicacion.value =
+        borrador.direccion ||
+        borrador.ubicacion ||
+        "";
+
+    if (latitudPlan) {
+        latitudPlan.value =
+            borrador.latitud ??
+            "";
+    }
+
+    if (longitudPlan) {
+        longitudPlan.value =
+            borrador.longitud ??
+            "";
+    }
+
     precio.value = borrador.precio ?? "";
+
+    if (enlaceReserva) {
+        enlaceReserva.value =
+            borrador.enlace_reserva ||
+            "";
+    }
+
     dificultad.value =
         borrador.dificultad || "Todos los públicos";
 
@@ -1407,8 +2369,10 @@ function cargarBorradorParaEditar() {
     hora,
     duracion,
     plazas,
+    municipio,
     ubicacion,
     precio,
+    enlaceReserva,
     imagen,
     imagen2,
     imagen3,
@@ -1421,6 +2385,7 @@ function cargarBorradorParaEditar() {
 });
 
 cargarBorradorParaEditar();
+inicializarMapaPublicar();
 
 actualizarContadores();
 actualizarVistaPrevia();

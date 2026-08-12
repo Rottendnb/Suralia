@@ -427,9 +427,78 @@ function crearPlanDetalleDesdeSupabase(plan, perfil) {
         plan.imagen_url ||
         "img/placeholder-plan.jpg";
 
-    const ubicacion =
-        plan.ubicacion ||
-        "Ubicación por confirmar";
+    const municipio =
+        String(
+            plan.municipio ||
+            ""
+        ).trim();
+
+    const provincia =
+        String(
+            plan.provincia ||
+            "Sevilla"
+        ).trim();
+
+    const direccion =
+        String(
+            plan.direccion ||
+            ""
+        ).trim();
+
+    const ubicacionCabecera =
+        municipio
+            ? `${municipio}${
+                provincia
+                    ? `, ${provincia}`
+                    : ""
+            }`
+            : (
+                plan.ubicacion ||
+                direccion ||
+                "Ubicación por confirmar"
+            );
+
+    const ubicacionMapa =
+        direccion
+            ? [
+                direccion,
+                municipio,
+                provincia
+            ]
+                .filter(Boolean)
+                .join(", ")
+            : ubicacionCabecera;
+
+    const latitud =
+        Number(
+            plan.latitud
+        );
+
+    const longitud =
+        Number(
+            plan.longitud
+        );
+
+    const tieneCoordenadas =
+        Number.isFinite(
+            latitud
+        ) &&
+        Number.isFinite(
+            longitud
+        );
+
+    const coordenadas =
+        tieneCoordenadas
+            ? [
+                latitud,
+                longitud
+            ]
+            : null;
+
+    const destinoGoogleMaps =
+        tieneCoordenadas
+            ? `${latitud},${longitud}`
+            : ubicacionMapa;
 
     return {
         planId: plan.id,
@@ -450,8 +519,10 @@ function crearPlanDetalleDesdeSupabase(plan, perfil) {
                 ? hora
                 : `Hora de inicio: ${hora}`,
         hora,
-        ubicacion,
-        direccion: ubicacion,
+        ubicacion: ubicacionCabecera,
+        direccion:
+            direccion ||
+            ubicacionCabecera,
         personasApuntadas: "Actividad recién publicada",
         tipoGrupo:
             dificultad === "No indicada"
@@ -507,17 +578,29 @@ function crearPlanDetalleDesdeSupabase(plan, perfil) {
             plan.fecha
                 ? [[plan.fecha, fechaTexto]]
                 : [],
-        coordenadas: [37.3891, -5.9845],
-        zoom: 12,
-        mapaTitulo: ubicacion,
+        coordenadas,
+        zoom:
+            tieneCoordenadas
+                ? 16
+                : 12,
+        mapaTitulo:
+            direccion ||
+            ubicacionCabecera,
         enlaceMapa:
-            `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                ubicacion
+            `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+                destinoGoogleMaps
             )}`,
         enlace:
             `detalle-plan.html?id=${encodeURIComponent(
                 plan.id
             )}`,
+
+        enlaceReserva:
+            String(
+                plan.enlace_reserva ||
+                ""
+            ).trim(),
+
         esPlanSupabase: true,
         fotoOrganizador:
             perfil?.foto_principal_url || ""
@@ -555,9 +638,14 @@ async function cargarPlanSupabaseDetalle() {
             duracion,
             plazas,
             ubicacion,
+            municipio,
+            direccion,
+            latitud,
+            longitud,
             precio,
             dificultad,
             provincia,
+            enlace_reserva,
             imagen_url,
             imagen_2_url,
             imagen_3_url,
@@ -668,6 +756,17 @@ function cambiarTexto(selector, texto) {
 }
 
 
+function marcarDetalleComoListo() {
+    const body =
+        seleccionar("#detalle-plan");
+
+    if (body) {
+        body.dataset.detalleListo =
+            "true";
+    }
+}
+
+
 function formatearPrecio(precio) {
     return Number(precio) === 0
         ? "Gratis"
@@ -730,6 +829,11 @@ const descripcionAmpliada =
 
 const formularioReserva =
     seleccionar("#formulario-reserva");
+
+const botonReservarPlan =
+    formularioReserva?.querySelector(
+        ".boton-reservar"
+    );
 
 const notificacion =
     seleccionar("#notificacion");
@@ -960,6 +1064,14 @@ function cargarDatosBasicos() {
     if (enlaceMapa) {
         enlaceMapa.href =
             planActual.enlaceMapa;
+
+        enlaceMapa.innerHTML = `
+            <i
+                class="fa-solid fa-diamond-turn-right"
+                aria-hidden="true"
+            ></i>
+            Cómo llegar con Google Maps
+        `;
     }
 
     const body =
@@ -1170,6 +1282,24 @@ function cargarMapa() {
     ) {
         return;
     }
+
+    if (
+        !Array.isArray(
+            planActual.coordenadas
+        ) ||
+        planActual.coordenadas.length !==
+            2
+    ) {
+        contenedorMapa.classList.add(
+            "oculto"
+        );
+
+        return;
+    }
+
+    contenedorMapa.classList.remove(
+        "oculto"
+    );
 
     if (mapaPlan) {
         mapaPlan.remove();
@@ -1722,6 +1852,116 @@ if (botonFavoritoPlan) {
 }
 
 
+function planUsaReservaExterna() {
+    return Boolean(
+        String(
+            planActual?.enlaceReserva ||
+            ""
+        ).trim()
+    );
+}
+
+
+function configurarTipoReserva() {
+    if (
+        !formularioReserva ||
+        !botonReservarPlan
+    ) {
+        return;
+    }
+
+    const esExterna =
+        planUsaReservaExterna();
+
+    const camposReserva =
+        formularioReserva.querySelectorAll(
+            ".campo-reserva"
+        );
+
+    camposReserva.forEach(
+        (
+            campo
+        ) => {
+            campo.classList.toggle(
+                "oculto",
+                esExterna
+            );
+        }
+    );
+
+    const tarjetaReserva =
+        formularioReserva.closest(
+            ".reserva-plan__tarjeta"
+        );
+
+    const aviso =
+        tarjetaReserva?.querySelector(
+            ".reserva-plan__aviso"
+        );
+
+    const desglose =
+        tarjetaReserva?.querySelector(
+            ".reserva-plan__desglose"
+        );
+
+    const plazas =
+        tarjetaReserva?.querySelector(
+            ".reserva-plan__plazas"
+        );
+
+    if (esExterna) {
+        botonReservarPlan.innerHTML = `
+            Reservar en la web
+            <i
+                class="fa-solid fa-arrow-up-right-from-square"
+                aria-hidden="true"
+            ></i>
+        `;
+
+        botonReservarPlan.setAttribute(
+            "aria-label",
+            "Abrir la web externa de entradas o reservas"
+        );
+
+        if (aviso) {
+            aviso.textContent =
+                "La reserva o compra se completará en la web externa del organizador.";
+        }
+
+        desglose?.classList.add(
+            "oculto"
+        );
+
+        plazas?.classList.add(
+            "oculto"
+        );
+
+        return;
+    }
+
+    botonReservarPlan.innerHTML =
+        "Reservar plaza";
+
+    botonReservarPlan.setAttribute(
+        "aria-label",
+        "Reservar plaza en Suralia"
+    );
+
+    if (aviso) {
+        aviso.textContent =
+            "No se realizará ningún cobro.";
+    }
+
+    desglose?.classList.remove(
+        "oculto"
+    );
+
+    plazas?.classList.remove(
+        "oculto"
+    );
+}
+
+
 function actualizarDesgloseReserva() {
     const selectorPersonas =
         seleccionar(
@@ -1830,6 +2070,49 @@ if (formularioReserva) {
         "submit",
         (evento) => {
             evento.preventDefault();
+
+            if (
+                planUsaReservaExterna()
+            ) {
+                const urlReserva =
+                    String(
+                        planActual.enlaceReserva ||
+                        ""
+                    ).trim();
+
+                try {
+                    const url =
+                        new URL(
+                            urlReserva
+                        );
+
+                    if (
+                        url.protocol !== "https:" &&
+                        url.protocol !== "http:"
+                    ) {
+                        throw new Error(
+                            "Protocolo no permitido."
+                        );
+                    }
+
+                    window.open(
+                        url.href,
+                        "_blank",
+                        "noopener,noreferrer"
+                    );
+                } catch (error) {
+                    console.error(
+                        "El enlace externo de reserva no es válido:",
+                        error
+                    );
+
+                    mostrarNotificacion(
+                        "No se ha podido abrir la web de reservas."
+                    );
+                }
+
+                return;
+            }
 
             const sesionActual =
                 obtenerSesion();
@@ -2640,6 +2923,7 @@ async function iniciarDetallePlan() {
 
         if (!planActual) {
             mostrarPlanNoEncontrado();
+            marcarDetalleComoListo();
             return;
         }
 
@@ -2649,6 +2933,7 @@ async function iniciarDetallePlan() {
         cargarIncluye();
         cargarFechasReserva();
         cargarMapa();
+        configurarTipoReserva();
         actualizarDesgloseReserva();
         actualizarBotonFavoritoDetalle();
         await cargarPlanesRelacionadosDinamicos();
@@ -2670,6 +2955,8 @@ async function iniciarDetallePlan() {
                 ? "false"
                 : "true"
         );
+
+        marcarDetalleComoListo();
     } catch (error) {
         console.error(
             "No se pudo cargar el detalle del plan:",
@@ -2677,6 +2964,7 @@ async function iniciarDetallePlan() {
         );
 
         mostrarPlanNoEncontrado();
+        marcarDetalleComoListo();
     }
 }
 
