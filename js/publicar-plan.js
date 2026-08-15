@@ -195,7 +195,8 @@ function actualizarBotonAnadirFecha() {
 
 function crearFilaFechaAdicional(
     fechaValor = "",
-    horaValor = ""
+    horaValor = "",
+    plazasValor = ""
 ) {
     if (!listaFechasPlan) {
         return null;
@@ -281,6 +282,34 @@ function crearFilaFechaAdicional(
             </div>
         </div>
 
+        <div class="campo-formulario">
+            <label
+                for="plan-plazas-adicional-${identificador}"
+                class="sr-only"
+            >
+                Plazas de esta fecha
+            </label>
+
+            <div class="campo-formulario__control">
+                <i
+                    class="fa-solid fa-user-group"
+                    aria-hidden="true"
+                ></i>
+
+                <input
+                    type="number"
+                    id="plan-plazas-adicional-${identificador}"
+                    data-plazas-adicional
+                    aria-label="Plazas de la fecha adicional"
+                    min="1"
+                    max="500"
+                    inputmode="numeric"
+                    placeholder="Plazas"
+                    value="${plazasValor}"
+                >
+            </div>
+        </div>
+
         <button
             type="button"
             class="fecha-adicional-publicar__eliminar"
@@ -320,7 +349,13 @@ function obtenerFechasFormulario() {
                 "",
             hora:
                 hora?.value ||
-                ""
+                "",
+            plazas:
+                plazas?.value
+                    ? Number(
+                        plazas.value
+                    )
+                    : null
         });
     }
 
@@ -342,6 +377,11 @@ function obtenerFechasFormulario() {
                         "[data-hora-adicional]"
                     );
 
+                const campoPlazas =
+                    fila.querySelector(
+                        "[data-plazas-adicional]"
+                    );
+
                 const valorFecha =
                     campoFecha?.value ||
                     "";
@@ -350,15 +390,25 @@ function obtenerFechasFormulario() {
                     campoHora?.value ||
                     "";
 
+                const valorPlazas =
+                    campoPlazas?.value
+                        ? Number(
+                            campoPlazas.value
+                        )
+                        : null;
+
                 if (
                     valorFecha ||
-                    valorHora
+                    valorHora ||
+                    valorPlazas
                 ) {
                     fechasSeleccionadas.push({
                         fecha:
                             valorFecha,
                         hora:
-                            valorHora
+                            valorHora,
+                        plazas:
+                            valorPlazas
                     });
                 }
             }
@@ -392,7 +442,9 @@ function normalizarFechasBorrador(
                         fecha:
                             item,
                         hora:
-                            ""
+                            "",
+                        plazas:
+                            null
                     };
                 }
 
@@ -406,7 +458,18 @@ function normalizarFechasBorrador(
                         String(
                             item?.hora ||
                             ""
-                        )
+                        ),
+                    plazas:
+                        item?.plazas !==
+                            undefined &&
+                        item?.plazas !==
+                            null &&
+                        item?.plazas !==
+                            ""
+                            ? Number(
+                                item.plazas
+                            )
+                            : null
                 };
             }
         )
@@ -467,7 +530,9 @@ function cargarFechasAdicionalesBorrador(
 
             crearFilaFechaAdicional(
                 item.fecha,
-                item.hora
+                item.hora,
+                item.plazas ??
+                    ""
             );
         }
     );
@@ -501,11 +566,14 @@ function validarFechasAdicionales() {
     ) {
         if (
             !item.fecha ||
-            !item.hora
+            !item.hora ||
+            !item.plazas ||
+            Number(item.plazas) < 1 ||
+            Number(item.plazas) > 500
         ) {
             if (errorFechasPlan) {
                 errorFechasPlan.textContent =
-                    "Completa la fecha y la hora de todos los días o pases añadidos.";
+                    "Completa fecha, hora y plazas de todos los días o pases añadidos (entre 1 y 500 plazas).";
             }
 
             return false;
@@ -568,6 +636,8 @@ botonAnadirFecha?.addEventListener(
             crearFilaFechaAdicional(
                 "",
                 hora?.value ||
+                    "",
+                plazas?.value ||
                     ""
             );
 

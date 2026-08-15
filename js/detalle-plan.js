@@ -377,6 +377,280 @@ function formatearFechaDetalleSupabase(fechaIso) {
     ).format(fecha);
 }
 
+
+function normalizarHoraPlan(
+    valor
+) {
+    const texto =
+        String(
+            valor ||
+            ""
+        ).trim();
+
+    if (!texto) {
+        return "";
+    }
+
+    return texto.slice(
+        0,
+        5
+    );
+}
+
+
+function crearFechasReservaSupabase(
+    plan
+) {
+    const resultado =
+        [];
+
+    const claves =
+        new Set();
+
+    const anadirFecha = (
+        fechaValor,
+        horaValor = "",
+        plazasValor = null
+    ) => {
+        const fechaLimpia =
+            String(
+                fechaValor ||
+                ""
+            ).trim();
+
+        const horaLimpia =
+            normalizarHoraPlan(
+                horaValor
+            );
+
+        if (!fechaLimpia) {
+            return;
+        }
+
+        const clave =
+            `${fechaLimpia}|${horaLimpia}`;
+
+        if (
+            claves.has(
+                clave
+            )
+        ) {
+            return;
+        }
+
+        claves.add(
+            clave
+        );
+
+        const fechaTexto =
+            formatearFechaDetalleSupabase(
+                fechaLimpia
+            );
+
+        const texto =
+            horaLimpia
+                ? `${fechaTexto} · ${horaLimpia}`
+                : fechaTexto;
+
+        const plazasNumero =
+            Number(
+                plazasValor
+            );
+
+        resultado.push({
+            valor:
+                horaLimpia
+                    ? `${fechaLimpia}T${horaLimpia}`
+                    : fechaLimpia,
+            fecha:
+                fechaLimpia,
+            hora:
+                horaLimpia,
+            plazas:
+                Number.isFinite(
+                    plazasNumero
+                ) &&
+                plazasNumero > 0
+                    ? Math.floor(
+                        plazasNumero
+                    )
+                    : null,
+            texto
+        });
+    };
+
+    if (plan?.fecha) {
+        anadirFecha(
+            plan.fecha,
+            plan.hora,
+            plan.plazas
+        );
+    }
+
+    if (
+        Array.isArray(
+            plan?.fechas
+        )
+    ) {
+        plan.fechas.forEach(
+            (
+                item
+            ) => {
+                if (
+                    typeof item ===
+                    "string"
+                ) {
+                    anadirFecha(
+                        item,
+                        plan.hora,
+                        null
+                    );
+
+                    return;
+                }
+
+                anadirFecha(
+                    item?.fecha,
+                    item?.hora ||
+                        plan.hora,
+                    item?.plazas
+                );
+            }
+        );
+    }
+
+    resultado.sort(
+        (
+            a,
+            b
+        ) => {
+            const claveA =
+                `${a.fecha}T${a.hora || "00:00"}`;
+
+            const claveB =
+                `${b.fecha}T${b.hora || "00:00"}`;
+
+            return claveA.localeCompare(
+                claveB
+            );
+        }
+    );
+
+    return resultado;
+}
+
+
+function normalizarOpcionFechaReserva(
+    item
+) {
+    if (
+        Array.isArray(
+            item
+        )
+    ) {
+        const valor =
+            String(
+                item[0] ||
+                ""
+            );
+
+        const texto =
+            String(
+                item[1] ||
+                valor
+            );
+
+        return {
+            valor,
+            fecha:
+                /^\d{4}-\d{2}-\d{2}$/.test(
+                    valor
+                )
+                    ? valor
+                    : (
+                        planActual?.fechaIso ||
+                        valor
+                    ),
+            hora:
+                normalizarHoraPlan(
+                    planActual?.hora
+                ),
+            plazas:
+                null,
+            texto
+        };
+    }
+
+    if (
+        item &&
+        typeof item ===
+            "object"
+    ) {
+        const plazasNumero =
+            Number(
+                item.plazas
+            );
+
+        return {
+            valor:
+                String(
+                    item.valor ||
+                    item.fecha ||
+                    ""
+                ),
+            fecha:
+                String(
+                    item.fecha ||
+                    ""
+                ),
+            hora:
+                normalizarHoraPlan(
+                    item.hora
+                ),
+            plazas:
+                Number.isFinite(
+                    plazasNumero
+                ) &&
+                plazasNumero > 0
+                    ? Math.floor(
+                        plazasNumero
+                    )
+                    : null,
+            texto:
+                String(
+                    item.texto ||
+                    item.fecha ||
+                    ""
+                )
+        };
+    }
+
+    return null;
+}
+
+
+function obtenerOpcionesFechasReserva() {
+    const fechas =
+        Array.isArray(
+            planActual?.fechasReserva
+        )
+            ? planActual.fechasReserva
+            : [];
+
+    return fechas
+        .map(
+            normalizarOpcionFechaReserva
+        )
+        .filter(
+            (
+                item
+            ) =>
+                item &&
+                item.valor
+        );
+}
+
+
 function crearPlanDetalleDesdeSupabase(plan, perfil) {
     const nombreOrganizador =
         perfil?.nombre_visible ||
@@ -500,6 +774,11 @@ function crearPlanDetalleDesdeSupabase(plan, perfil) {
             ? `${latitud},${longitud}`
             : ubicacionMapa;
 
+    const fechasReserva =
+        crearFechasReservaSupabase(
+            plan
+        );
+
     return {
         planId: plan.id,
         titulo: plan.titulo || "Actividad de Suralia",
@@ -529,13 +808,17 @@ function crearPlanDetalleDesdeSupabase(plan, perfil) {
                 ? "Actividad abierta"
                 : `Dificultad: ${dificultad}`,
         maxPersonas:
-            plazas > 0
-                ? `Máximo ${plazas} ${
-                    plazas === 1
-                        ? "persona"
-                        : "personas"
-                }`
-                : "Plazas por confirmar",
+            fechasReserva.length > 1
+                ? "Plazas según fecha o pase"
+                : (
+                    plazas > 0
+                        ? `Máximo ${plazas} ${
+                            plazas === 1
+                                ? "persona"
+                                : "personas"
+                        }`
+                        : "Plazas por confirmar"
+                ),
         idioma: "Actividad en español",
         organizador: nombreOrganizador,
         organizadorIniciales:
@@ -565,19 +848,20 @@ function crearPlanDetalleDesdeSupabase(plan, perfil) {
             ["si", `Dificultad: ${dificultad}`],
             [
                 "si",
-                plazas > 0
-                    ? `${plazas} plazas disponibles inicialmente`
-                    : "Plazas por confirmar"
+                fechasReserva.length > 1
+                    ? "Plazas independientes según fecha o pase"
+                    : (
+                        plazas > 0
+                            ? `${plazas} plazas disponibles inicialmente`
+                            : "Plazas por confirmar"
+                    )
             ],
             [
                 "si",
                 `Provincia: ${plan.provincia || "Sevilla"}`
             ]
         ],
-        fechasReserva:
-            plan.fecha
-                ? [[plan.fecha, fechaTexto]]
-                : [],
+        fechasReserva,
         coordenadas,
         zoom:
             tieneCoordenadas
@@ -635,6 +919,7 @@ async function cargarPlanSupabaseDetalle() {
             descripcion,
             fecha,
             hora,
+            fechas,
             duracion,
             plazas,
             ubicacion,
@@ -1239,32 +1524,975 @@ function cargarIncluye() {
 }
 
 
+
+const disponibilidadGlobalPorPase =
+    new Map();
+
+let disponibilidadGlobalCargada =
+    false;
+
+
+function crearClaveFechaPase(
+    fechaValor,
+    horaValor
+) {
+    return `${
+        String(
+            fechaValor ||
+            ""
+        ).trim()
+    }|${
+        normalizarHoraPlan(
+            horaValor
+        )
+    }`;
+}
+
+
+async function cargarDisponibilidadGlobalPlan() {
+    disponibilidadGlobalPorPase.clear();
+    disponibilidadGlobalCargada =
+        false;
+
+    if (
+        !planActual?.esPlanSupabase ||
+        !esUuidPlan(
+            planActual?.planId
+        )
+    ) {
+        return;
+    }
+
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente) {
+        console.warn(
+            "Supabase no está disponible para consultar las plazas."
+        );
+
+        return;
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente.rpc(
+            "obtener_disponibilidad_plan",
+            {
+                p_plan_id:
+                    planActual.planId
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        (
+            Array.isArray(data)
+                ? data
+                : []
+        ).forEach(
+            (
+                item
+            ) => {
+                const clave =
+                    crearClaveFechaPase(
+                        item.fecha,
+                        item.hora
+                    );
+
+                const total =
+                    Number(
+                        item.plazas_totales
+                    );
+
+                const reservadas =
+                    Number(
+                        item.plazas_reservadas
+                    );
+
+                const disponibles =
+                    Number(
+                        item.plazas_disponibles
+                    );
+
+                disponibilidadGlobalPorPase.set(
+                    clave,
+                    {
+                        total:
+                            Number.isFinite(
+                                total
+                            ) &&
+                            total > 0
+                                ? total
+                                : null,
+
+                        reservadas:
+                            Number.isFinite(
+                                reservadas
+                            )
+                                ? reservadas
+                                : 0,
+
+                        restantes:
+                            Number.isFinite(
+                                disponibles
+                            )
+                                ? Math.max(
+                                    0,
+                                    disponibles
+                                )
+                                : null,
+
+                        agotado:
+                            Number.isFinite(
+                                disponibles
+                            ) &&
+                            disponibles <= 0
+                    }
+                );
+            }
+        );
+
+        disponibilidadGlobalCargada =
+            true;
+    } catch (error) {
+        console.error(
+            "No se pudo consultar la disponibilidad global:",
+            error
+        );
+    }
+}
+
+
+function obtenerReservasActivasDelPlan() {
+    const reservas =
+        obtenerDatosLocalStorage(
+            "reservasSuralia"
+        );
+
+    return reservas.filter(
+        (
+            reserva
+        ) =>
+            String(
+                reserva?.planId ||
+                ""
+            ) ===
+                String(
+                    planActual?.planId ||
+                    ""
+                ) &&
+            reserva?.estado !==
+                "cancelada"
+    );
+}
+
+
+function reservaCoincideConOpcionFecha(
+    reserva,
+    opcion
+) {
+    if (
+        !reserva ||
+        !opcion
+    ) {
+        return false;
+    }
+
+    if (
+        reserva.fechaValor &&
+        String(
+            reserva.fechaValor
+        ) ===
+            String(
+                opcion.valor
+            )
+    ) {
+        return true;
+    }
+
+    const fechaReserva =
+        String(
+            reserva.fechaIso ||
+            reserva.fecha ||
+            ""
+        );
+
+    const horaReserva =
+        normalizarHoraPlan(
+            reserva.hora
+        );
+
+    return (
+        fechaReserva ===
+            String(
+                opcion.fecha ||
+                ""
+            ) &&
+        (
+            !opcion.hora ||
+            !horaReserva ||
+            horaReserva ===
+                normalizarHoraPlan(
+                    opcion.hora
+                )
+        )
+    );
+}
+
+
+function obtenerDisponibilidadOpcionFecha(
+    opcion
+) {
+    if (
+        planActual?.esPlanSupabase &&
+        disponibilidadGlobalCargada
+    ) {
+        const clave =
+            crearClaveFechaPase(
+                opcion?.fecha,
+                opcion?.hora
+            );
+
+        const global =
+            disponibilidadGlobalPorPase.get(
+                clave
+            );
+
+        if (global) {
+            return {
+                total:
+                    global.total,
+                reservadas:
+                    global.reservadas,
+                restantes:
+                    global.restantes,
+                agotado:
+                    global.agotado
+            };
+        }
+    }
+
+    const total =
+        Number(
+            opcion?.plazas
+        );
+
+    const tieneCupo =
+        Number.isFinite(
+            total
+        ) &&
+        total > 0;
+
+    if (!tieneCupo) {
+        return {
+            total:
+                null,
+            reservadas:
+                0,
+            restantes:
+                null,
+            agotado:
+                false
+        };
+    }
+
+    const reservadas =
+        obtenerReservasActivasDelPlan()
+            .filter(
+                (
+                    reserva
+                ) =>
+                    reservaCoincideConOpcionFecha(
+                        reserva,
+                        opcion
+                    )
+            )
+            .reduce(
+                (
+                    acumulado,
+                    reserva
+                ) =>
+                    acumulado +
+                    Math.max(
+                        0,
+                        Number(
+                            reserva?.personas ||
+                            0
+                        )
+                    ),
+                0
+            );
+
+    const restantes =
+        Math.max(
+            0,
+            total -
+                reservadas
+        );
+
+    return {
+        total,
+        reservadas,
+        restantes,
+        agotado:
+            restantes <= 0
+    };
+}
+
+
+function obtenerOpcionFechaSeleccionada() {
+    const selectorFecha =
+        seleccionar(
+            "#fecha-reserva"
+        );
+
+    if (!selectorFecha) {
+        return null;
+    }
+
+    const valor =
+        selectorFecha.value;
+
+    return (
+        obtenerOpcionesFechasReserva()
+            .find(
+                (
+                    opcion
+                ) =>
+                    String(
+                        opcion.valor
+                    ) ===
+                    String(
+                        valor
+                    )
+            ) ||
+        null
+    );
+}
+
+
+function textoDisponibilidadFecha(
+    opcion,
+    paraReservaExterna = false
+) {
+    const disponibilidad =
+        obtenerDisponibilidadOpcionFecha(
+            opcion
+        );
+
+    if (
+        disponibilidad.total ===
+        null
+    ) {
+        return paraReservaExterna
+            ? "Disponibilidad en la web del organizador"
+            : "Plazas por confirmar";
+    }
+
+    if (paraReservaExterna) {
+        return `${disponibilidad.total} ${
+            disponibilidad.total === 1
+                ? "plaza"
+                : "plazas"
+        } indicadas`;
+    }
+
+    if (disponibilidad.agotado) {
+        return "Agotado";
+    }
+
+    return `${disponibilidad.restantes} ${
+        disponibilidad.restantes === 1
+            ? "plaza disponible"
+            : "plazas disponibles"
+    }`;
+}
+
+
+function actualizarSelectorPersonasPorDisponibilidad() {
+    const selectorPersonas =
+        seleccionar(
+            "#personas-reserva"
+        );
+
+    const botonReserva =
+        botonReservarPlan;
+
+    if (
+        !selectorPersonas ||
+        !botonReserva ||
+        planUsaReservaExterna()
+    ) {
+        return;
+    }
+
+    const opcion =
+        obtenerOpcionFechaSeleccionada();
+
+    const disponibilidad =
+        obtenerDisponibilidadOpcionFecha(
+            opcion
+        );
+
+    const valorAnterior =
+        Number(
+            selectorPersonas.value ||
+            1
+        );
+
+    selectorPersonas.innerHTML =
+        "";
+
+    if (
+        disponibilidad.total !==
+            null &&
+        disponibilidad.agotado
+    ) {
+        const opcionSinPlazas =
+            document.createElement(
+                "option"
+            );
+
+        opcionSinPlazas.value =
+            "";
+
+        opcionSinPlazas.textContent =
+            "Sin plazas disponibles";
+
+        selectorPersonas.appendChild(
+            opcionSinPlazas
+        );
+
+        selectorPersonas.disabled =
+            true;
+
+        botonReserva.disabled =
+            true;
+
+        botonReserva.textContent =
+            "Pase agotado";
+
+        return;
+    }
+
+    selectorPersonas.disabled =
+        false;
+
+    botonReserva.disabled =
+        false;
+
+    botonReserva.textContent =
+        "Reservar plaza";
+
+    const maximoPorReserva =
+        disponibilidad.restantes !==
+            null
+            ? Math.min(
+                4,
+                disponibilidad.restantes
+            )
+            : 4;
+
+    for (
+        let numero = 1;
+        numero <= maximoPorReserva;
+        numero += 1
+    ) {
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.value =
+            String(
+                numero
+            );
+
+        option.textContent =
+            `${numero} ${
+                numero === 1
+                    ? "persona"
+                    : "personas"
+            }`;
+
+        selectorPersonas.appendChild(
+            option
+        );
+    }
+
+    selectorPersonas.value =
+        String(
+            Math.min(
+                Math.max(
+                    1,
+                    Number.isFinite(
+                        valorAnterior
+                    )
+                        ? valorAnterior
+                        : 1
+                ),
+                maximoPorReserva
+            )
+        );
+}
+
+
+function actualizarEstadoPlazasReserva() {
+    const estado =
+        seleccionar(
+            "#estado-plazas-reserva"
+        );
+
+    if (
+        !estado ||
+        planUsaReservaExterna()
+    ) {
+        return;
+    }
+
+    const opcion =
+        obtenerOpcionFechaSeleccionada();
+
+    if (!opcion) {
+        estado.textContent =
+            "Selecciona una fecha para consultar las plazas.";
+
+        return;
+    }
+
+    const disponibilidad =
+        obtenerDisponibilidadOpcionFecha(
+            opcion
+        );
+
+    if (
+        disponibilidad.total ===
+        null
+    ) {
+        estado.textContent =
+            "Plazas por confirmar para esta fecha.";
+
+        return;
+    }
+
+    if (
+        disponibilidad.agotado
+    ) {
+        estado.textContent =
+            "No quedan plazas para esta fecha.";
+
+        return;
+    }
+
+    estado.textContent =
+        `Quedan ${disponibilidad.restantes} de ${disponibilidad.total} ${
+            disponibilidad.total === 1
+                ? "plaza"
+                : "plazas"
+        } para esta fecha.`;
+}
+
+
+function actualizarDisponibilidadReservaSeleccionada() {
+    actualizarSelectorPersonasPorDisponibilidad();
+    actualizarEstadoPlazasReserva();
+    actualizarDesgloseReserva();
+}
+
+
+function sincronizarFechaVisibleSeleccionada() {
+    const selectorFecha =
+        seleccionar(
+            "#fecha-reserva"
+        );
+
+    const lista =
+        seleccionar(
+            "#lista-fechas-disponibles"
+        );
+
+    if (
+        !selectorFecha ||
+        !lista
+    ) {
+        return;
+    }
+
+    const valorSeleccionado =
+        selectorFecha.value;
+
+    lista
+        .querySelectorAll(
+            "[data-fecha-reserva-valor]"
+        )
+        .forEach(
+            (
+                elemento
+            ) => {
+                elemento.classList.toggle(
+                    "fecha-disponible-detalle--seleccionada",
+                    !planUsaReservaExterna() &&
+                    elemento.dataset.fechaReservaValor ===
+                        valorSeleccionado
+                );
+            }
+        );
+}
+
+
+function cargarFechasDisponiblesDetalle() {
+    const bloque =
+        seleccionar(
+            "#bloque-fechas-disponibles"
+        );
+
+    const lista =
+        seleccionar(
+            "#lista-fechas-disponibles"
+        );
+
+    const contador =
+        seleccionar(
+            "#contador-fechas-disponibles"
+        );
+
+    const textoAyuda =
+        seleccionar(
+            "#texto-fechas-disponibles"
+        );
+
+    if (
+        !bloque ||
+        !lista
+    ) {
+        return;
+    }
+
+    const opciones =
+        obtenerOpcionesFechasReserva();
+
+    /*
+        Con una sola fecha ya se muestra arriba en el resumen.
+        Este bloque cobra sentido cuando existen varios días o pases.
+    */
+    if (
+        opciones.length <=
+        1
+    ) {
+        bloque.classList.add(
+            "oculto"
+        );
+
+        lista.innerHTML =
+            "";
+
+        return;
+    }
+
+    bloque.classList.remove(
+        "oculto"
+    );
+
+    if (contador) {
+        contador.textContent =
+            `${opciones.length} ${
+                opciones.length ===
+                    1
+                    ? "fecha"
+                    : "fechas"
+            }`;
+    }
+
+    if (textoAyuda) {
+        textoAyuda.textContent =
+            planUsaReservaExterna()
+                ? "Consulta los días y horarios disponibles. La compra o reserva se completará en la web del organizador."
+                : "Elige aquí un día o selecciónalo después en el cuadro de reserva.";
+    }
+
+    lista.innerHTML =
+        "";
+
+    opciones.forEach(
+        (
+            opcion
+        ) => {
+            const elemento =
+                document.createElement(
+                    planUsaReservaExterna()
+                        ? "div"
+                        : "button"
+                );
+
+            if (
+                elemento.tagName ===
+                "BUTTON"
+            ) {
+                elemento.type =
+                    "button";
+            }
+
+            elemento.className =
+                "fecha-disponible-detalle";
+
+            elemento.dataset.fechaReservaValor =
+                opcion.valor;
+
+            elemento.setAttribute(
+                "role",
+                "listitem"
+            );
+
+            const fechaTexto =
+                formatearFechaDetalleSupabase(
+                    opcion.fecha
+                );
+
+            const esReservaExterna =
+                planUsaReservaExterna();
+
+            const disponibilidad =
+                obtenerDisponibilidadOpcionFecha(
+                    opcion
+                );
+
+            const agotado =
+                !esReservaExterna &&
+                disponibilidad.agotado;
+
+            if (agotado) {
+                elemento.classList.add(
+                    "fecha-disponible-detalle--agotada"
+                );
+
+                if (
+                    elemento.tagName ===
+                    "BUTTON"
+                ) {
+                    elemento.disabled =
+                        true;
+                }
+            }
+
+            elemento.innerHTML = `
+                <span class="fecha-disponible-detalle__icono">
+                    <i
+                        class="fa-regular fa-calendar"
+                        aria-hidden="true"
+                    ></i>
+                </span>
+
+                <span class="fecha-disponible-detalle__contenido">
+                    <strong>
+                        ${fechaTexto}
+                    </strong>
+
+                    <span>
+                        <i
+                            class="fa-regular fa-clock"
+                            aria-hidden="true"
+                        ></i>
+                        ${
+                            opcion.hora ||
+                            "Hora por confirmar"
+                        }
+                    </span>
+
+                    <span class="fecha-disponible-detalle__plazas">
+                        <i
+                            class="fa-solid fa-user-group"
+                            aria-hidden="true"
+                        ></i>
+                        ${
+                            textoDisponibilidadFecha(
+                                opcion,
+                                esReservaExterna
+                            )
+                        }
+                    </span>
+                </span>
+
+                ${
+                    esReservaExterna
+                        ? ""
+                        : `
+                            <span class="fecha-disponible-detalle__accion">
+                                ${
+                                    agotado
+                                        ? "Agotado"
+                                        : "Elegir"
+                                }
+                            </span>
+                        `
+                }
+            `;
+
+            if (
+                elemento.tagName ===
+                "BUTTON"
+            ) {
+                elemento.addEventListener(
+                    "click",
+                    () => {
+                        const selectorFecha =
+                            seleccionar(
+                                "#fecha-reserva"
+                            );
+
+                        if (!selectorFecha) {
+                            return;
+                        }
+
+                        selectorFecha.value =
+                            opcion.valor;
+
+                        selectorFecha.dispatchEvent(
+                            new Event(
+                                "change",
+                                {
+                                    bubbles:
+                                        true
+                                }
+                            )
+                        );
+                    }
+                );
+            }
+
+            lista.appendChild(
+                elemento
+            );
+        }
+    );
+
+    sincronizarFechaVisibleSeleccionada();
+}
+
+
 function cargarFechasReserva() {
     const selectorFecha =
-        seleccionar("#fecha-reserva");
+        seleccionar(
+            "#fecha-reserva"
+        );
 
     if (!selectorFecha) {
         return;
     }
 
-    const fechas =
-        Array.isArray(planActual.fechasReserva)
-            ? planActual.fechasReserva
-            : [];
+    const opciones =
+        obtenerOpcionesFechasReserva();
 
     selectorFecha.innerHTML =
-        fechas.length > 0
-            ? fechas
-                .map(
-                    ([valor, texto]) =>
-                        `<option value="${valor}">${texto}</option>`
-                )
-                .join("")
-            : `
-                <option value="">
-                    Fecha por confirmar
-                </option>
-            `;
+        "";
+
+    if (
+        opciones.length ===
+        0
+    ) {
+        const opcion =
+            document.createElement(
+                "option"
+            );
+
+        opcion.value =
+            "";
+
+        opcion.textContent =
+            "Fecha por confirmar";
+
+        selectorFecha.appendChild(
+            opcion
+        );
+
+        cargarFechasDisponiblesDetalle();
+
+        return;
+    }
+
+    opciones.forEach(
+        (
+            item
+        ) => {
+            const opcion =
+                document.createElement(
+                    "option"
+                );
+
+            opcion.value =
+                item.valor;
+
+            opcion.textContent =
+                item.texto;
+
+            opcion.dataset.fecha =
+                item.fecha;
+
+            opcion.dataset.hora =
+                item.hora;
+
+            opcion.dataset.plazas =
+                item.plazas ??
+                "";
+
+            if (
+                !planUsaReservaExterna()
+            ) {
+                const disponibilidad =
+                    obtenerDisponibilidadOpcionFecha(
+                        item
+                    );
+
+                if (
+                    disponibilidad.agotado
+                ) {
+                    opcion.disabled =
+                        true;
+
+                    opcion.textContent =
+                        `${item.texto} · Agotado`;
+                } else if (
+                    disponibilidad.restantes !==
+                    null
+                ) {
+                    opcion.textContent =
+                        `${item.texto} · ${disponibilidad.restantes} ${
+                            disponibilidad.restantes ===
+                                1
+                                ? "plaza"
+                                : "plazas"
+                        }`;
+                }
+            }
+
+            selectorFecha.appendChild(
+                opcion
+            );
+        }
+    );
+
+    const primeraDisponible =
+        Array.from(
+            selectorFecha.options
+        ).find(
+            (
+                opcion
+            ) =>
+                !opcion.disabled
+        );
+
+    if (primeraDisponible) {
+        selectorFecha.value =
+            primeraDisponible.value;
+    }
+
+    cargarFechasDisponiblesDetalle();
+    sincronizarFechaVisibleSeleccionada();
+    actualizarDisponibilidadReservaSeleccionada();
 }
 
 
@@ -2045,6 +3273,9 @@ selectorFechaReserva?.addEventListener(
             selectorFechaReserva,
             false
         );
+
+        sincronizarFechaVisibleSeleccionada();
+        actualizarDisponibilidadReservaSeleccionada();
     }
 );
 
@@ -2061,6 +3292,225 @@ selectorPersonasReserva?.addEventListener(
 );
 
 
+async function crearReservaSupabaseDetalle({
+    fechaSeleccionada,
+    fechaIsoSeleccionada,
+    horaSeleccionada,
+    textoFecha,
+    numeroPersonas,
+    sesionActual
+}) {
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente) {
+        throw new Error(
+            "No se ha podido conectar con Supabase."
+        );
+    }
+
+    const {
+        data: datosSesion,
+        error: errorSesion
+    } = await cliente.auth.getSession();
+
+    if (errorSesion) {
+        throw errorSesion;
+    }
+
+    if (!datosSesion?.session) {
+        throw new Error(
+            "Tu sesión ha caducado. Inicia sesión de nuevo."
+        );
+    }
+
+    const {
+        data,
+        error
+    } = await cliente.rpc(
+        "crear_reserva_plan",
+        {
+            p_plan_id:
+                planActual.planId,
+
+            p_fecha:
+                fechaIsoSeleccionada,
+
+            p_hora:
+                horaSeleccionada,
+
+            p_personas:
+                numeroPersonas
+        }
+    );
+
+    if (error) {
+        throw error;
+    }
+
+    const respuesta =
+        Array.isArray(data)
+            ? data[0]
+            : data;
+
+    if (
+        !respuesta ||
+        respuesta.ok !== true
+    ) {
+        throw new Error(
+            "No se ha podido confirmar la reserva."
+        );
+    }
+
+    /*
+        Copia temporal para que perfil.html#reservas
+        siga mostrando la reserva mientras migramos
+        esa sección a Supabase.
+
+        La disponibilidad REAL ya no depende de esta copia.
+    */
+    const reservasLocales =
+        obtenerDatosLocalStorage(
+            "reservasSuralia"
+        );
+
+    const yaExisteCopia =
+        reservasLocales.some(
+            (
+                reserva
+            ) =>
+                String(
+                    reserva.reservaSupabaseId ||
+                    ""
+                ) ===
+                    String(
+                        respuesta.reserva_id ||
+                        ""
+                    )
+        );
+
+    if (!yaExisteCopia) {
+        reservasLocales.push({
+            id:
+                respuesta.reserva_id,
+
+            reservaSupabaseId:
+                respuesta.reserva_id,
+
+            origen:
+                "supabase",
+
+            planId:
+                planActual.planId,
+
+            titulo:
+                planActual.titulo,
+
+            categoria:
+                planActual.categoriaTexto,
+
+            imagen:
+                planActual.imagen,
+
+            fecha:
+                fechaIsoSeleccionada,
+
+            fechaIso:
+                fechaIsoSeleccionada,
+
+            fechaValor:
+                fechaSeleccionada,
+
+            fechaTexto:
+                textoFecha,
+
+            hora:
+                horaSeleccionada,
+
+            personas:
+                numeroPersonas,
+
+            ubicacion:
+                planActual.ubicacion,
+
+            precio:
+                Number(
+                    respuesta.precio_unitario ??
+                    planActual.precio ??
+                    0
+                ),
+
+            precioUnitario:
+                Number(
+                    respuesta.precio_unitario ??
+                    planActual.precio ??
+                    0
+                ),
+
+            precioTotal:
+                Number(
+                    respuesta.precio_total ??
+                    (
+                        Number(
+                            planActual.precio ||
+                            0
+                        ) *
+                        numeroPersonas
+                    )
+                ),
+
+            enlace:
+                planActual.enlace,
+
+            estado:
+                respuesta.estado ||
+                "confirmada",
+
+            usuarioEmail:
+                sesionActual?.email ||
+                datosSesion.session.user?.email ||
+                "",
+
+            fechaReserva:
+                new Date().toISOString()
+        });
+
+        guardarDatosLocalStorage(
+            "reservasSuralia",
+            reservasLocales
+        );
+    }
+
+    return respuesta;
+}
+
+
+function obtenerMensajeErrorReservaSupabase(
+    error
+) {
+    const mensaje =
+        String(
+            error?.message ||
+            ""
+        ).trim();
+
+    if (!mensaje) {
+        return "No se ha podido completar la reserva.";
+    }
+
+    return mensaje
+        .replace(
+            /^.*?error:\s*/i,
+            ""
+        )
+        .replace(
+            /\s+CONTEXT:.*$/i,
+            ""
+        )
+        .trim();
+}
+
+
 /* =====================================================
    RESERVAS
 ===================================================== */
@@ -2068,7 +3518,7 @@ selectorPersonasReserva?.addEventListener(
 if (formularioReserva) {
     formularioReserva.addEventListener(
         "submit",
-        (evento) => {
+        async (evento) => {
             evento.preventDefault();
 
             if (
@@ -2157,10 +3607,26 @@ if (formularioReserva) {
             const fechaSeleccionada =
                 selectorFecha.value;
 
-            const textoFecha =
+            const opcionFechaSeleccionada =
                 selectorFecha.options[
                     selectorFecha.selectedIndex
-                ]?.text || "";
+                ];
+
+            const fechaIsoSeleccionada =
+                opcionFechaSeleccionada?.dataset
+                    ?.fecha ||
+                fechaSeleccionada;
+
+            const horaSeleccionada =
+                opcionFechaSeleccionada?.dataset
+                    ?.hora ||
+                normalizarHoraPlan(
+                    planActual.hora
+                );
+
+            const textoFecha =
+                opcionFechaSeleccionada?.text ||
+                "";
 
             const numeroPersonas =
                 Number(
@@ -2212,6 +3678,110 @@ if (formularioReserva) {
                 false
             );
 
+            const opcionReserva =
+                obtenerOpcionFechaSeleccionada();
+
+            const disponibilidadReserva =
+                obtenerDisponibilidadOpcionFecha(
+                    opcionReserva
+                );
+
+            if (
+                disponibilidadReserva.restantes !==
+                    null &&
+                numeroPersonas >
+                    disponibilidadReserva.restantes
+            ) {
+                mostrarNotificacion(
+                    disponibilidadReserva.agotado
+                        ? "Este pase ya está agotado."
+                        : `Solo quedan ${disponibilidadReserva.restantes} ${
+                            disponibilidadReserva.restantes === 1
+                                ? "plaza"
+                                : "plazas"
+                        } para esta fecha.`
+                );
+
+                cargarFechasReserva();
+
+                return;
+            }
+
+            if (
+                planActual?.esPlanSupabase &&
+                esUuidPlan(
+                    planActual.planId
+                )
+            ) {
+                const textoOriginalBoton =
+                    botonReservarPlan?.textContent ||
+                    "Reservar plaza";
+
+                if (botonReservarPlan) {
+                    botonReservarPlan.disabled =
+                        true;
+
+                    botonReservarPlan.textContent =
+                        "Confirmando reserva...";
+                }
+
+                try {
+                    await crearReservaSupabaseDetalle({
+                        fechaSeleccionada,
+                        fechaIsoSeleccionada,
+                        horaSeleccionada,
+                        textoFecha,
+                        numeroPersonas,
+                        sesionActual
+                    });
+
+                    await cargarDisponibilidadGlobalPlan();
+
+                    cargarFechasReserva();
+
+                    mostrarNotificacion(
+                        `Reserva confirmada para ${numeroPersonas} ${
+                            numeroPersonas === 1
+                                ? "persona"
+                                : "personas"
+                        }.`
+                    );
+
+                    setTimeout(
+                        () => {
+                            window.location.href =
+                                "perfil.html#reservas";
+                        },
+                        1400
+                    );
+                } catch (error) {
+                    console.error(
+                        "No se pudo crear la reserva en Supabase:",
+                        error
+                    );
+
+                    await cargarDisponibilidadGlobalPlan();
+
+                    cargarFechasReserva();
+
+                    if (botonReservarPlan) {
+                        botonReservarPlan.disabled =
+                            false;
+
+                        botonReservarPlan.textContent =
+                            textoOriginalBoton;
+                    }
+
+                    mostrarNotificacion(
+                        obtenerMensajeErrorReservaSupabase(
+                            error
+                        )
+                    );
+                }
+
+                return;
+            }
+
             const reservasGuardadas =
                 obtenerDatosLocalStorage(
                     "reservasSuralia"
@@ -2225,12 +3795,23 @@ if (formularioReserva) {
                         reserva.planId ===
                             planActual.planId &&
                         (
-                            reserva.fecha ===
-                                fechaSeleccionada ||
-                            reserva.fechaIso ===
-                                fechaSeleccionada ||
                             reserva.fechaValor ===
-                                fechaSeleccionada
+                                fechaSeleccionada ||
+                            (
+                                (
+                                    reserva.fechaIso ===
+                                        fechaIsoSeleccionada ||
+                                    reserva.fecha ===
+                                        fechaIsoSeleccionada
+                                ) &&
+                                (
+                                    !reserva.hora ||
+                                    normalizarHoraPlan(
+                                        reserva.hora
+                                    ) ===
+                                        horaSeleccionada
+                                )
+                            )
                         ) &&
                         reserva.estado !==
                             "cancelada"
@@ -2261,16 +3842,19 @@ if (formularioReserva) {
                     planActual.imagen,
 
                 fecha:
-                    fechaSeleccionada,
+                    fechaIsoSeleccionada,
 
                 fechaIso:
+                    fechaIsoSeleccionada,
+
+                fechaValor:
                     fechaSeleccionada,
 
                 fechaTexto:
                     textoFecha,
 
                 hora:
-                    planActual.hora,
+                    horaSeleccionada,
 
                 personas:
                     numeroPersonas,
@@ -2318,6 +3902,8 @@ if (formularioReserva) {
 
                 return;
             }
+
+            cargarFechasReserva();
 
             mostrarNotificacion(
                 `Reserva confirmada para ${numeroPersonas} ${
@@ -2931,6 +4517,9 @@ async function iniciarDetallePlan() {
         cargarGaleria();
         cargarDescripcion();
         cargarIncluye();
+
+        await cargarDisponibilidadGlobalPlan();
+
         cargarFechasReserva();
         cargarMapa();
         configurarTipoReserva();

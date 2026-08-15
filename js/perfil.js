@@ -122,6 +122,7 @@ const confirmarCancelacion = document.querySelector(
 );
 
 let reservaPendienteCancelar = null;
+let tipoCancelacionReservaPendiente = "usuario";
 let elementoQueAbrioModalCancelacion = null;
 
 /* =========================================
@@ -3362,6 +3363,8 @@ function mantenerFocoDentroModal(
 
 /* =========================================
    RESERVAS DINÁMICAS
+   SUPABASE = FUENTE REAL PARA PLANES UUID
+   localStorage = compatibilidad con planes antiguos
 ========================================= */
 
 const listaReservasPerfil = document.querySelector(
@@ -3380,6 +3383,10 @@ const contadorReservasPerfil = document.querySelector(
     "#contador-reservas-perfil"
 );
 
+let reservasSupabasePerfil = [];
+let reservasSupabaseCargadas = false;
+
+
 function construirCatalogoPlanesPerfil() {
     if (
         typeof window.obtenerTodosPlanesSuralia !==
@@ -3394,10 +3401,6 @@ function construirCatalogoPlanesPerfil() {
                 catalogo[plan.planId] = {
                     ...plan,
 
-                    /*
-                       En el perfil mostramos el nombre
-                       legible de la categoría.
-                    */
                     categoria:
                         plan.categoriaTexto ||
                         plan.categoria ||
@@ -3418,6 +3421,7 @@ const catalogoPlanesReservas =
 function obtenerIdPlanReserva(reserva) {
     const idDirecto =
         reserva?.planId ||
+        reserva?.plan_id ||
         reserva?.idPlan ||
         "";
 
@@ -3462,6 +3466,7 @@ function normalizarReserva(reserva) {
     if (!datosOficiales) {
         return {
             ...reserva,
+
             planId:
                 planId ||
                 String(
@@ -3469,12 +3474,20 @@ function normalizarReserva(reserva) {
                     reserva?.id ||
                     ""
                 ),
+
             imagen:
                 reserva?.imagen ||
                 "img/placeholder-plan.jpg",
+
             enlace:
                 reserva?.enlace ||
-                "planes.html"
+                (
+                    esIdUuidPerfil(planId)
+                        ? `detalle-plan.html?id=${encodeURIComponent(
+                            planId
+                        )}`
+                        : "planes.html"
+                )
         };
     }
 
@@ -3482,11 +3495,6 @@ function normalizarReserva(reserva) {
         ...reserva,
         ...datosOficiales,
 
-        /*
-           Se conservan los datos propios de la reserva:
-           fecha elegida, texto de fecha, personas,
-           estado, usuario e identificador.
-        */
         id:
             reserva.id,
 
@@ -3502,10 +3510,41 @@ function normalizarReserva(reserva) {
             reserva.fecha ||
             "Fecha pendiente",
 
+        hora:
+            reserva.hora ||
+            datosOficiales.hora ||
+            "",
+
         personas:
             reserva.personas ||
             reserva.entradas ||
             1,
+
+        precioUnitario:
+            Number(
+                reserva.precioUnitario ??
+                reserva.precio ??
+                datosOficiales.precio ??
+                0
+            ),
+
+        precioTotal:
+            Number(
+                reserva.precioTotal ??
+                (
+                    Number(
+                        reserva.precioUnitario ??
+                        reserva.precio ??
+                        datosOficiales.precio ??
+                        0
+                    ) *
+                    Number(
+                        reserva.personas ||
+                        reserva.entradas ||
+                        1
+                    )
+                )
+            ),
 
         estado:
             reserva.estado ||
@@ -3538,27 +3577,44 @@ function migrarReservasAntiguas() {
         return [];
     }
 
-    const reservasActualizadas =
-        reservas.map(normalizarReserva);
+    /*
+       Las copias temporales creadas por detalle-plan.js
+       para reservas que ya existen en Supabase dejan de
+       utilizarse en el perfil.
 
-    guardarDatoLocal(
-        "reservasSuralia",
-        reservasActualizadas
-    );
+       Se conservan únicamente reservas antiguas de los
+       planes estáticos que todavía no usan Supabase.
+    */
+    const reservasLegacy =
+        reservas.filter(
+            (reserva) =>
+                reserva?.origen !==
+                    "supabase" &&
+                !reserva?.reservaSupabaseId
+        );
+
+    const reservasActualizadas =
+        reservasLegacy.map(
+            normalizarReserva
+        );
+
+    if (
+        reservasActualizadas.length !==
+        reservas.length
+    ) {
+        guardarDatoLocal(
+            "reservasSuralia",
+            reservasActualizadas
+        );
+    }
 
     return reservasActualizadas;
 }
 
 
-
-async function sincronizarReservasDinamicasEliminadas() {
-    const cliente =
-        window.clienteSupabase;
-
-    if (!cliente) {
-        return;
-    }
-
+function limpiarCopiaLocalReservaSupabase(
+    reservaId = ""
+) {
     const reservas =
         leerDatoLocal(
             "reservasSuralia",
@@ -3569,155 +3625,555 @@ async function sincronizarReservasDinamicasEliminadas() {
         return;
     }
 
-    const reservasUsuario =
-        reservas.filter(
-            (
-                reserva
-            ) =>
-                reserva.usuarioEmail ===
-                usuarioGuardado.email
+    const idSeguro =
+        String(
+            reservaId ||
+            ""
         );
 
-    const idsDinamicos =
-        [
-            ...new Set(
-                reservasUsuario
-                    .map(
-                        obtenerIdPlanReserva
-                    )
-                    .filter(
-                        esIdUuidPerfil
-                    )
-            )
-        ];
+    const reservasLimpias =
+        reservas.filter(
+            (reserva) => {
+                const esCopiaSupabase =
+                    reserva?.origen ===
+                        "supabase" ||
+                    Boolean(
+                        reserva?.reservaSupabaseId
+                    );
+
+                if (!esCopiaSupabase) {
+                    return true;
+                }
+
+                if (!idSeguro) {
+                    return false;
+                }
+
+                return (
+                    String(
+                        reserva?.reservaSupabaseId ||
+                        reserva?.id ||
+                        ""
+                    ) !==
+                    idSeguro
+                );
+            }
+        );
 
     if (
-        idsDinamicos.length ===
-        0
+        reservasLimpias.length !==
+        reservas.length
     ) {
-        return;
-    }
-
-    try {
-        const {
-            data,
-            error
-        } = await cliente
-            .from(
-                "planes"
-            )
-            .select(
-                "id"
-            )
-            .in(
-                "id",
-                idsDinamicos
-            )
-            .eq(
-                "estado",
-                "publicado"
-            );
-
-        if (error) {
-            throw error;
-        }
-
-        const idsDisponibles =
-            new Set(
-                (
-                    Array.isArray(data)
-                        ? data
-                        : []
-                ).map(
-                    (
-                        plan
-                    ) => String(
-                        plan.id
-                    )
-                )
-            );
-
-        const reservasActualizadas =
-            reservas.filter(
-                (
-                    reserva
-                ) => {
-                    if (
-                        reserva.usuarioEmail !==
-                        usuarioGuardado.email
-                    ) {
-                        return true;
-                    }
-
-                    const planId =
-                        obtenerIdPlanReserva(
-                            reserva
-                        );
-
-                    if (
-                        !esIdUuidPerfil(
-                            planId
-                        )
-                    ) {
-                        return true;
-                    }
-
-                    return idsDisponibles.has(
-                        String(
-                            planId
-                        )
-                    );
-                }
-            );
-
-        if (
-            reservasActualizadas.length !==
-            reservas.length
-        ) {
-            guardarDatoLocal(
-                "reservasSuralia",
-                reservasActualizadas
-            );
-
-            mostrarReservasPerfil();
-        }
-    } catch (error) {
-        console.error(
-            "No se pudieron sincronizar las reservas con Supabase:",
-            error
+        guardarDatoLocal(
+            "reservasSuralia",
+            reservasLimpias
         );
     }
 }
 
 
-function obtenerReservasUsuario() {
-    const reservas =
-        migrarReservasAntiguas();
+function formatearFechaReservaPerfil(
+    fechaIso
+) {
+    if (!fechaIso) {
+        return "Fecha pendiente";
+    }
 
-    return reservas
-        .filter((reserva) => {
-            return (
-                reserva.usuarioEmail === usuarioGuardado.email &&
-                reserva.estado === "confirmada"
+    const fecha =
+        new Date(
+            `${fechaIso}T00:00:00`
+        );
+
+    if (
+        Number.isNaN(
+            fecha.getTime()
+        )
+    ) {
+        return String(
+            fechaIso
+        );
+    }
+
+    return new Intl.DateTimeFormat(
+        "es-ES",
+        {
+            day:
+                "numeric",
+            month:
+                "long",
+            year:
+                "numeric"
+        }
+    ).format(
+        fecha
+    );
+}
+
+
+function formatearPrecioReservaPerfil(
+    precio
+) {
+    const valor =
+        Number(
+            precio ||
+            0
+        );
+
+    if (
+        !Number.isFinite(
+            valor
+        ) ||
+        valor <= 0
+    ) {
+        return "Gratis";
+    }
+
+    return `${valor
+        .toFixed(2)
+        .replace(".00", "")
+        .replace(".", ",")} €`;
+}
+
+
+function construirUbicacionReservaPlan(
+    plan
+) {
+    if (plan?.ubicacion) {
+        return plan.ubicacion;
+    }
+
+    const partes =
+        [
+            plan?.direccion,
+            plan?.municipio,
+            plan?.provincia
+        ]
+            .map(
+                (valor) =>
+                    String(
+                        valor ||
+                        ""
+                    ).trim()
+            )
+            .filter(Boolean);
+
+    return partes.join(", ") ||
+        "Ubicación pendiente";
+}
+
+
+async function cargarReservasSupabasePerfil() {
+    const cliente =
+        window.clienteSupabase;
+
+    reservasSupabaseCargadas =
+        false;
+
+    if (!cliente?.auth) {
+        reservasSupabasePerfil =
+            [];
+
+        mostrarReservasPerfil();
+
+        return;
+    }
+
+    try {
+        const {
+            data: datosSesion,
+            error: errorSesion
+        } = await cliente.auth.getSession();
+
+        if (errorSesion) {
+            throw errorSesion;
+        }
+
+        const usuario =
+            datosSesion.session?.user;
+
+        if (!usuario) {
+            reservasSupabasePerfil =
+                [];
+
+            mostrarReservasPerfil();
+
+            return;
+        }
+
+        const {
+            data: reservas,
+            error: errorReservas
+        } = await cliente
+            .from(
+                "reservas"
+            )
+            .select(
+                `
+                    id,
+                    plan_id,
+                    usuario_id,
+                    fecha,
+                    hora,
+                    personas,
+                    precio_unitario,
+                    precio_total,
+                    estado,
+                    created_at
+                `
+            )
+            .eq(
+                "usuario_id",
+                usuario.id
+            )
+            .eq(
+                "estado",
+                "confirmada"
+            )
+            .order(
+                "fecha",
+                {
+                    ascending:
+                        true
+                }
+            )
+            .order(
+                "hora",
+                {
+                    ascending:
+                        true
+                }
             );
-        })
-        .sort((reservaA, reservaB) => {
-            const fechaA = reservaA.fecha
-                ? new Date(`${reservaA.fecha}T${reservaA.hora || "00:00"}`)
-                : new Date(reservaA.fechaReserva);
 
-            const fechaB = reservaB.fecha
-                ? new Date(`${reservaB.fecha}T${reservaB.hora || "00:00"}`)
-                : new Date(reservaB.fechaReserva);
+        if (errorReservas) {
+            throw errorReservas;
+        }
 
-            return fechaA - fechaB;
-        });
+        const reservasRecibidas =
+            Array.isArray(reservas)
+                ? reservas
+                : [];
+
+        const idsPlanes =
+            [
+                ...new Set(
+                    reservasRecibidas
+                        .map(
+                            (reserva) =>
+                                String(
+                                    reserva.plan_id ||
+                                    ""
+                                )
+                        )
+                        .filter(Boolean)
+                )
+            ];
+
+        let planesPorId =
+            new Map();
+
+        if (
+            idsPlanes.length >
+            0
+        ) {
+            const {
+                data: planes,
+                error: errorPlanes
+            } = await cliente
+                .from(
+                    "planes"
+                )
+                .select(
+                    `
+                        id,
+                        titulo,
+                        categoria,
+                        nombre_categoria,
+                        ubicacion,
+                        municipio,
+                        direccion,
+                        provincia,
+                        imagen_url,
+                        precio,
+                        estado
+                    `
+                )
+                .in(
+                    "id",
+                    idsPlanes
+                );
+
+            if (errorPlanes) {
+                throw errorPlanes;
+            }
+
+            planesPorId =
+                new Map(
+                    (
+                        Array.isArray(planes)
+                            ? planes
+                            : []
+                    ).map(
+                        (plan) => [
+                            String(
+                                plan.id
+                            ),
+                            plan
+                        ]
+                    )
+                );
+        }
+
+        reservasSupabasePerfil =
+            reservasRecibidas.map(
+                (reserva) => {
+                    const planId =
+                        String(
+                            reserva.plan_id ||
+                            ""
+                        );
+
+                    const plan =
+                        planesPorId.get(
+                            planId
+                        ) ||
+                        null;
+
+                    const hora =
+                        reserva.hora
+                            ? String(
+                                reserva.hora
+                            ).slice(
+                                0,
+                                5
+                            )
+                            : "";
+
+                    const personas =
+                        Math.max(
+                            1,
+                            Number(
+                                reserva.personas ||
+                                1
+                            )
+                        );
+
+                    const precioUnitario =
+                        Number(
+                            reserva.precio_unitario ??
+                            plan?.precio ??
+                            0
+                        );
+
+                    const precioTotal =
+                        Number(
+                            reserva.precio_total ??
+                            (
+                                precioUnitario *
+                                personas
+                            )
+                        );
+
+                    return {
+                        id:
+                            String(
+                                reserva.id
+                            ),
+
+                        reservaSupabaseId:
+                            String(
+                                reserva.id
+                            ),
+
+                        origen:
+                            "supabase",
+
+                        planId,
+
+                        titulo:
+                            plan?.titulo ||
+                            "Plan reservado",
+
+                        categoria:
+                            plan?.nombre_categoria ||
+                            plan?.categoria ||
+                            "Actividad",
+
+                        imagen:
+                            plan?.imagen_url ||
+                            "img/placeholder-plan.jpg",
+
+                        ubicacion:
+                            construirUbicacionReservaPlan(
+                                plan
+                            ),
+
+                        fecha:
+                            reserva.fecha,
+
+                        fechaIso:
+                            reserva.fecha,
+
+                        fechaTexto:
+                            formatearFechaReservaPerfil(
+                                reserva.fecha
+                            ),
+
+                        hora,
+
+                        personas,
+
+                        precio:
+                            precioUnitario,
+
+                        precioUnitario,
+
+                        precioTotal,
+
+                        estado:
+                            reserva.estado ||
+                            "confirmada",
+
+                        enlace:
+                            `detalle-plan.html?id=${encodeURIComponent(
+                                planId
+                            )}`,
+
+                        usuarioEmail:
+                            usuario.email ||
+                            usuarioGuardado.email ||
+                            "",
+
+                        fechaReserva:
+                            reserva.created_at ||
+                            ""
+                    };
+                }
+            );
+
+        reservasSupabaseCargadas =
+            true;
+
+        /*
+           En cuanto Supabase se carga correctamente,
+           eliminamos las copias temporales que pudiera
+           haber dejado detalle-plan.js en localStorage.
+        */
+        limpiarCopiaLocalReservaSupabase();
+
+        mostrarReservasPerfil();
+    } catch (error) {
+        console.error(
+            "No se pudieron cargar las reservas desde Supabase:",
+            error
+        );
+
+        reservasSupabasePerfil =
+            [];
+
+        mostrarReservasPerfil();
+
+        mostrarNotificacion(
+            "No se han podido cargar tus reservas."
+        );
+    }
+}
+
+
+async function cargarReservasPerfil() {
+    await cargarReservasSupabasePerfil();
+}
+
+
+/*
+   Se mantiene este nombre porque otras partes del archivo
+   ya lo llamaban al volver a la pestaña. Ahora simplemente
+   refresca la fuente real de reservas.
+*/
+async function sincronizarReservasDinamicasEliminadas() {
+    await cargarReservasPerfil();
+}
+
+
+function obtenerReservasUsuario() {
+    const reservasLegacy =
+        migrarReservasAntiguas()
+            .filter(
+                (reserva) => {
+                    if (
+                        reserva.usuarioEmail !==
+                            usuarioGuardado.email ||
+                        reserva.estado !==
+                            "confirmada"
+                    ) {
+                        return false;
+                    }
+
+                    /*
+                       Los UUID pertenecen al nuevo sistema.
+                       Supabase es la única fuente válida para ellos.
+                    */
+                    return !esIdUuidPerfil(
+                        obtenerIdPlanReserva(
+                            reserva
+                        )
+                    );
+                }
+            );
+
+    return [
+        ...reservasSupabasePerfil,
+        ...reservasLegacy
+    ]
+        .filter(
+            (reserva) =>
+                reserva.estado ===
+                "confirmada"
+        )
+        .sort(
+            (
+                reservaA,
+                reservaB
+            ) => {
+                const fechaA =
+                    reservaA.fecha
+                        ? new Date(
+                            `${reservaA.fecha}T${reservaA.hora || "00:00"}`
+                        )
+                        : new Date(
+                            reservaA.fechaReserva ||
+                            0
+                        );
+
+                const fechaB =
+                    reservaB.fecha
+                        ? new Date(
+                            `${reservaB.fecha}T${reservaB.hora || "00:00"}`
+                        )
+                        : new Date(
+                            reservaB.fechaReserva ||
+                            0
+                        );
+
+                return fechaA -
+                    fechaB;
+            }
+        );
 }
 
 
 function obtenerEnlacePlan(plan) {
     if (plan?.enlace) {
         return plan.enlace;
+    }
+
+    if (
+        esIdUuidPerfil(
+            plan?.planId
+        )
+    ) {
+        return `detalle-plan.html?id=${encodeURIComponent(
+            plan.planId
+        )}`;
     }
 
     if (
@@ -3736,27 +4192,97 @@ function obtenerEnlacePlan(plan) {
     }
 
     const enlacesPorPlan = {
-        italica: "detalle-plan.html?id=italica",
-        "kayak-atardecer": "detalle-kayak.html",
-        "poncho-k-cartuja": "detalle-poncho-k.html",
-        "cerro-hierro": "detalle-plan.html?id=cerro-hierro",
-        "tapas-triana": "detalle-plan.html?id=tapas-triana",
+        italica:
+            "detalle-plan.html?id=italica",
+
+        "kayak-atardecer":
+            "detalle-kayak.html",
+
+        "poncho-k-cartuja":
+            "detalle-poncho-k.html",
+
+        "cerro-hierro":
+            "detalle-plan.html?id=cerro-hierro",
+
+        "tapas-triana":
+            "detalle-plan.html?id=tapas-triana",
+
         "exposicion-contemporanea":
             "detalle-plan.html?id=exposicion-contemporanea",
-        "sierra-norte": "detalle-sierra-norte.html"
+
+        "sierra-norte":
+            "detalle-sierra-norte.html"
     };
 
-    return enlacesPorPlan[plan?.planId] || "planes.html";
+    return enlacesPorPlan[
+        plan?.planId
+    ] ||
+        "planes.html";
 }
 
-function crearProximaReservaHTML(reserva) {
+
+function crearProximaReservaHTML(
+    reserva
+) {
+    const titulo =
+        escaparHTML(
+            reserva.titulo ||
+            "Plan reservado"
+        );
+
+    const imagen =
+        escaparHTML(
+            reserva.imagen ||
+            "img/placeholder-plan.jpg"
+        );
+
+    const fecha =
+        escaparHTML(
+            reserva.fechaTexto ||
+            reserva.fecha ||
+            "Fecha pendiente"
+        );
+
+    const hora =
+        escaparHTML(
+            reserva.hora ||
+            "Hora pendiente"
+        );
+
+    const ubicacion =
+        escaparHTML(
+            reserva.ubicacion ||
+            "Ubicación pendiente"
+        );
+
+    const personas =
+        Math.max(
+            1,
+            Number(
+                reserva.personas ||
+                1
+            )
+        );
+
+    const precioTotal =
+        formatearPrecioReservaPerfil(
+            reserva.precioTotal
+        );
+
+    const enlace =
+        escaparHTML(
+            obtenerEnlacePlan(
+                reserva
+            )
+        );
+
     return `
         <article class="reserva-resumen">
 
             <div class="reserva-resumen__imagen">
                 <img
-                    src="${reserva.imagen}"
-                    alt="${reserva.titulo}"
+                    src="${imagen}"
+                    alt="${titulo}"
                     onerror="
                         this.onerror=null;
                         this.src='img/placeholder-plan.jpg';
@@ -3770,23 +4296,23 @@ function crearProximaReservaHTML(reserva) {
                     Confirmada
                 </span>
 
-                <h3>${reserva.titulo}</h3>
+                <h3>${titulo}</h3>
 
                 <p>
                     <i class="fa-regular fa-calendar"></i>
-                    ${reserva.fechaTexto || reserva.fecha || "Fecha pendiente"}
+                    ${fecha}
                 </p>
 
                 <p>
                     <i class="fa-regular fa-clock"></i>
-                    ${reserva.hora || "Hora pendiente"}
+                    ${hora}
                 </p>
 
                 <p>
                     <i class="fa-solid fa-user-group"></i>
-                    ${reserva.personas}
+                    ${personas}
                     ${
-                        Number(reserva.personas) === 1
+                        personas === 1
                             ? "persona"
                             : "personas"
                     }
@@ -3794,11 +4320,22 @@ function crearProximaReservaHTML(reserva) {
 
                 <p>
                     <i class="fa-solid fa-location-dot"></i>
-                    ${reserva.ubicacion}
+                    ${ubicacion}
+                </p>
+
+                <p>
+                    <i class="fa-solid fa-euro-sign"></i>
+                    ${precioTotal}
+                    ${
+                        precioTotal !==
+                            "Gratis"
+                            ? " total"
+                            : ""
+                    }
                 </p>
 
                 <a
-                    href="${obtenerEnlacePlan(reserva)}"
+                    href="${enlace}"
                     class="boton-ver-reserva"
                 >
                     Ver actividad
@@ -3810,17 +4347,80 @@ function crearProximaReservaHTML(reserva) {
     `;
 }
 
-function crearReservaHTML(reserva) {
+
+function crearReservaHTML(
+    reserva
+) {
+    const idReserva =
+        escaparHTML(
+            reserva.id ||
+            ""
+        );
+
+    const titulo =
+        escaparHTML(
+            reserva.titulo ||
+            "Plan reservado"
+        );
+
+    const imagen =
+        escaparHTML(
+            reserva.imagen ||
+            "img/placeholder-plan.jpg"
+        );
+
+    const fecha =
+        escaparHTML(
+            reserva.fechaTexto ||
+            reserva.fecha ||
+            "Fecha pendiente"
+        );
+
+    const hora =
+        escaparHTML(
+            reserva.hora ||
+            "Hora pendiente"
+        );
+
+    const ubicacion =
+        escaparHTML(
+            reserva.ubicacion ||
+            "Ubicación pendiente"
+        );
+
+    const personas =
+        Math.max(
+            1,
+            Number(
+                reserva.personas ||
+                1
+            )
+        );
+
+    const precioTotal =
+        escaparHTML(
+            formatearPrecioReservaPerfil(
+                reserva.precioTotal
+            )
+        );
+
+    const enlace =
+        escaparHTML(
+            obtenerEnlacePlan(
+                reserva
+            )
+        );
+
     return `
         <article
             class="reserva-item"
-            data-reserva-id="${reserva.id}"
+            data-reserva-id="${idReserva}"
         >
 
             <div class="reserva-item__imagen">
                 <img
-                    src="${reserva.imagen}"
-                    alt="${reserva.titulo}"
+                    src="${imagen}"
+                    alt="${titulo}"
                     onerror="
                         this.onerror=null;
                         this.src='img/placeholder-plan.jpg';
@@ -3837,7 +4437,7 @@ function crearReservaHTML(reserva) {
                             Confirmada
                         </span>
 
-                        <h3>${reserva.titulo}</h3>
+                        <h3>${titulo}</h3>
                     </div>
 
                 </div>
@@ -3846,19 +4446,19 @@ function crearReservaHTML(reserva) {
 
                     <span>
                         <i class="fa-regular fa-calendar"></i>
-                        ${reserva.fechaTexto || reserva.fecha || "Fecha pendiente"}
+                        ${fecha}
                     </span>
 
                     <span>
                         <i class="fa-regular fa-clock"></i>
-                        ${reserva.hora || "Hora pendiente"}
+                        ${hora}
                     </span>
 
                     <span>
                         <i class="fa-solid fa-user-group"></i>
-                        ${reserva.personas}
+                        ${personas}
                         ${
-                            Number(reserva.personas) === 1
+                            personas === 1
                                 ? "persona"
                                 : "personas"
                         }
@@ -3866,7 +4466,18 @@ function crearReservaHTML(reserva) {
 
                     <span>
                         <i class="fa-solid fa-location-dot"></i>
-                        ${reserva.ubicacion}
+                        ${ubicacion}
+                    </span>
+
+                    <span>
+                        <i class="fa-solid fa-euro-sign"></i>
+                        ${precioTotal}
+                        ${
+                            precioTotal !==
+                                "Gratis"
+                                ? " total"
+                                : ""
+                        }
                     </span>
 
                 </div>
@@ -3874,7 +4485,7 @@ function crearReservaHTML(reserva) {
                 <div class="reserva-item__acciones">
 
                     <a
-                        href="${obtenerEnlacePlan(reserva)}"
+                        href="${enlace}"
                         class="boton-principal-pequeno"
                     >
                         Ver actividad
@@ -3883,7 +4494,7 @@ function crearReservaHTML(reserva) {
                     <button
                         type="button"
                         class="boton-cancelar-reserva"
-                        data-reserva-id="${reserva.id}"
+                        data-reserva-id="${idReserva}"
                     >
                         Cancelar reserva
                     </button>
@@ -3896,19 +4507,29 @@ function crearReservaHTML(reserva) {
     `;
 }
 
+
 function mostrarReservasPerfil() {
-    const reservas = obtenerReservasUsuario();
+    const reservas =
+        obtenerReservasUsuario();
 
     if (contadorReservasPerfil) {
-        contadorReservasPerfil.textContent = reservas.length;
+        contadorReservasPerfil.textContent =
+            reservas.length;
     }
 
-    if (!listaReservasPerfil || !proximaReservaPerfil) {
+    if (
+        !listaReservasPerfil ||
+        !proximaReservaPerfil
+    ) {
         return;
     }
 
-    if (reservas.length === 0) {
-        listaReservasPerfil.innerHTML = "";
+    if (
+        reservas.length ===
+        0
+    ) {
+        listaReservasPerfil.innerHTML =
+            "";
 
         proximaReservaPerfil.innerHTML = `
             <div class="estado-vacio estado-vacio--pequeno">
@@ -3934,104 +4555,189 @@ function mostrarReservasPerfil() {
         `;
 
         if (estadoVacioReservas) {
-            estadoVacioReservas.classList.remove("oculto");
+            estadoVacioReservas.classList.remove(
+                "oculto"
+            );
         }
 
         return;
     }
 
     if (estadoVacioReservas) {
-        estadoVacioReservas.classList.add("oculto");
+        estadoVacioReservas.classList.add(
+            "oculto"
+        );
     }
 
     proximaReservaPerfil.innerHTML =
-        crearProximaReservaHTML(reservas[0]);
+        crearProximaReservaHTML(
+            reservas[0]
+        );
 
-    listaReservasPerfil.innerHTML = reservas
-        .map(crearReservaHTML)
-        .join("");
+    listaReservasPerfil.innerHTML =
+        reservas
+            .map(
+                crearReservaHTML
+            )
+            .join("");
 
     activarBotonesCancelarReserva();
 }
 
+
 function activarBotonesCancelarReserva() {
     document
-        .querySelectorAll(".boton-cancelar-reserva")
-        .forEach((boton) => {
-            boton.addEventListener("click", () => {
-                reservaPendienteCancelar = Number(
-                    boton.dataset.reservaId
-                );
+        .querySelectorAll(
+            ".boton-cancelar-reserva"
+        )
+        .forEach(
+            (boton) => {
+                boton.addEventListener(
+                    "click",
+                    () => {
+                        reservaPendienteCancelar =
+                            String(
+                                boton.dataset
+                                    .reservaId ||
+                                ""
+                            );
 
-                elementoQueAbrioModalCancelacion =
-                    abrirModalAccesible(
-                        modalCancelacion,
-                        mantenerReserva,
-                        boton
-                    );
-            });
-        });
+                        tipoCancelacionReservaPendiente =
+                            "usuario";
+
+                        elementoQueAbrioModalCancelacion =
+                            abrirModalAccesible(
+                                modalCancelacion,
+                                mantenerReserva,
+                                boton
+                            );
+                    }
+                );
+            }
+        );
 }
 
-function cancelarReservaGuardada() {
+
+async function cancelarReservaSupabase(
+    reservaId
+) {
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente) {
+        throw new Error(
+            "No se ha podido conectar con Supabase."
+        );
+    }
+
+    const {
+        data,
+        error
+    } = await cliente.rpc(
+        "cancelar_reserva_plan",
+        {
+            p_reserva_id:
+                reservaId
+        }
+    );
+
+    if (error) {
+        throw error;
+    }
+
+    const respuesta =
+        Array.isArray(data)
+            ? data[0]
+            : data;
+
+    if (
+        !respuesta ||
+        respuesta.ok !==
+            true
+    ) {
+        throw new Error(
+            "No se ha podido cancelar la reserva."
+        );
+    }
+
+    return respuesta;
+}
+
+
+function cancelarReservaLegacyLocal(
+    reservaId
+) {
+    const reservas =
+        leerDatoLocal(
+            "reservasSuralia",
+            []
+        );
+
+    if (!Array.isArray(reservas)) {
+        return;
+    }
+
+    const reservasActualizadas =
+        reservas.filter(
+            (reserva) =>
+                String(
+                    reserva.id
+                ) !==
+                String(
+                    reservaId
+                )
+        );
+
+    guardarDatoLocal(
+        "reservasSuralia",
+        reservasActualizadas
+    );
+}
+
+
+async function cancelarReservaGuardada() {
     if (!reservaPendienteCancelar) {
         return;
     }
 
-    const reservas = JSON.parse(
-        localStorage.getItem("reservasSuralia")
-    ) || [];
-
-    const reservasActualizadas = reservas.filter((reserva) => {
-        return Number(reserva.id) !== reservaPendienteCancelar;
-    });
-
-    localStorage.setItem(
-        "reservasSuralia",
-        JSON.stringify(reservasActualizadas)
-    );
-
-    reservaPendienteCancelar = null;
-
-    cerrarModalAccesible(
-        modalCancelacion,
-        elementoQueAbrioModalCancelacion
-    );
-
-    elementoQueAbrioModalCancelacion =
-        null;
-
-    mostrarReservasPerfil();
-
-    mostrarNotificacion(
-        "La reserva se ha cancelado correctamente."
-    );
-}
-
-if (mantenerReserva) {
-    mantenerReserva.addEventListener("click", () => {
-        reservaPendienteCancelar = null;
-
-        cerrarModalAccesible(
-            modalCancelacion,
-            elementoQueAbrioModalCancelacion
+    const reservaId =
+        String(
+            reservaPendienteCancelar
         );
 
-        elementoQueAbrioModalCancelacion =
-            null;
-    });
-}
+    if (
+        tipoCancelacionReservaPendiente ===
+        "organizador"
+    ) {
+        const textoOriginal =
+            confirmarCancelacion?.innerHTML ||
+            "Cancelar reserva";
 
-if (confirmarCancelacion) {
-    confirmarCancelacion.addEventListener(
-        "click",
-        cancelarReservaGuardada
-    );
-}
+        if (confirmarCancelacion) {
+            confirmarCancelacion.disabled =
+                true;
 
-if (modalCancelacion) {
-    modalCancelacion.addEventListener("click", (evento) => {
-        if (evento.target === modalCancelacion) {
+            confirmarCancelacion.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Cancelando
+            `;
+        }
+
+        try {
+            await cancelarReservaSupabase(
+                reservaId
+            );
+
+            await cargarReservasOrganizadorPerfil(
+                false
+            );
+
+            reservaPendienteCancelar =
+                null;
+
+            tipoCancelacionReservaPendiente =
+                "usuario";
+
             cerrarModalAccesible(
                 modalCancelacion,
                 elementoQueAbrioModalCancelacion
@@ -4040,11 +4746,193 @@ if (modalCancelacion) {
             elementoQueAbrioModalCancelacion =
                 null;
 
+            mostrarPublicaciones();
+
+            mostrarNotificacion(
+                "La reserva se ha cancelado y las plazas se han liberado."
+            );
+        } catch (error) {
+            console.error(
+                "No se pudo cancelar la reserva como organizador:",
+                error
+            );
+
+            mostrarNotificacion(
+                error?.message ||
+                "No se ha podido cancelar la reserva."
+            );
+        } finally {
+            if (confirmarCancelacion) {
+                confirmarCancelacion.disabled =
+                    false;
+
+                confirmarCancelacion.innerHTML =
+                    textoOriginal;
+            }
+        }
+
+        return;
+    }
+
+    const reserva =
+        obtenerReservasUsuario()
+            .find(
+                (elemento) =>
+                    String(
+                        elemento.id
+                    ) ===
+                    reservaId
+            );
+
+    if (!reserva) {
+        mostrarNotificacion(
+            "La reserva ya no está disponible."
+        );
+
+        reservaPendienteCancelar =
+            null;
+
+        cerrarModalAccesible(
+            modalCancelacion,
+            elementoQueAbrioModalCancelacion
+        );
+
+        elementoQueAbrioModalCancelacion =
+            null;
+
+        await cargarReservasPerfil();
+
+        return;
+    }
+
+    const textoOriginal =
+        confirmarCancelacion?.innerHTML ||
+        "Cancelar reserva";
+
+    if (confirmarCancelacion) {
+        confirmarCancelacion.disabled =
+            true;
+
+        confirmarCancelacion.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Cancelando
+        `;
+    }
+
+    try {
+        if (
+            reserva.origen ===
+                "supabase"
+        ) {
+            await cancelarReservaSupabase(
+                reservaId
+            );
+
+            limpiarCopiaLocalReservaSupabase(
+                reservaId
+            );
+
+            await cargarReservasSupabasePerfil();
+        } else {
+            cancelarReservaLegacyLocal(
+                reservaId
+            );
+
+            mostrarReservasPerfil();
+        }
+
+        reservaPendienteCancelar =
+            null;
+
+        cerrarModalAccesible(
+            modalCancelacion,
+            elementoQueAbrioModalCancelacion
+        );
+
+        elementoQueAbrioModalCancelacion =
+            null;
+
+        mostrarNotificacion(
+            "La reserva se ha cancelado correctamente."
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo cancelar la reserva:",
+            error
+        );
+
+        mostrarNotificacion(
+            error?.message ||
+            "No se ha podido cancelar la reserva."
+        );
+    } finally {
+        if (confirmarCancelacion) {
+            confirmarCancelacion.disabled =
+                false;
+
+            confirmarCancelacion.innerHTML =
+                textoOriginal;
+        }
+    }
+}
+
+
+if (mantenerReserva) {
+    mantenerReserva.addEventListener(
+        "click",
+        () => {
             reservaPendienteCancelar =
                 null;
+
+            tipoCancelacionReservaPendiente =
+                "usuario";
+
+            cerrarModalAccesible(
+                modalCancelacion,
+                elementoQueAbrioModalCancelacion
+            );
+
+            elementoQueAbrioModalCancelacion =
+                null;
         }
-    });
+    );
 }
+
+
+if (confirmarCancelacion) {
+    confirmarCancelacion.addEventListener(
+        "click",
+        cancelarReservaGuardada
+    );
+}
+
+
+if (modalCancelacion) {
+    modalCancelacion.addEventListener(
+        "click",
+        (evento) => {
+            if (
+                evento.target ===
+                modalCancelacion
+            ) {
+                cerrarModalAccesible(
+                    modalCancelacion,
+                    elementoQueAbrioModalCancelacion
+                );
+
+                elementoQueAbrioModalCancelacion =
+                    null;
+
+                reservaPendienteCancelar =
+                    null;
+
+                tipoCancelacionReservaPendiente =
+                    "usuario";
+            }
+        }
+    );
+}
+
 
 /* =========================================
    FAVORITOS
@@ -5032,34 +5920,56 @@ async function limpiarAfinidadesDePlanesEliminados(
         !cliente ||
         !usuarioId ||
         !Array.isArray(afinidades) ||
-        afinidades.length ===
-            0
+        afinidades.length === 0
     ) {
         return afinidades;
+    }
+
+    /*
+       Los planes antiguos usan identificadores como
+       "sierra-norte", mientras que los planes nuevos
+       guardados en public.planes utilizan UUID.
+
+       Solo consultamos en Supabase los UUID para evitar
+       errores 400 al comparar una columna uuid con IDs legacy.
+    */
+
+    const afinidadesLegacy =
+        afinidades.filter(
+            (afinidad) =>
+                !esIdUuidPerfil(
+                    afinidad.plan_id
+                )
+        );
+
+    const afinidadesSupabase =
+        afinidades.filter(
+            (afinidad) =>
+                esIdUuidPerfil(
+                    afinidad.plan_id
+                )
+        );
+
+    if (
+        afinidadesSupabase.length === 0
+    ) {
+        return afinidadesLegacy;
     }
 
     const idsPlanes =
         [
             ...new Set(
-                afinidades
+                afinidadesSupabase
                     .map(
-                        (
-                            afinidad
-                        ) => String(
-                            afinidad.plan_id ||
-                            ""
-                        )
+                        (afinidad) =>
+                            String(
+                                afinidad.plan_id ||
+                                ""
+                            )
                     )
                     .filter(Boolean)
             )
         ];
-
-    if (
-        idsPlanes.length ===
-        0
-    ) {
-        return [];
-    }
 
     const {
         data,
@@ -5091,19 +6001,16 @@ async function limpiarAfinidadesDePlanesEliminados(
                     ? data
                     : []
             ).map(
-                (
-                    plan
-                ) => String(
-                    plan.id
-                )
+                (plan) =>
+                    String(
+                        plan.id
+                    )
             )
         );
 
     const idsEliminados =
         idsPlanes.filter(
-            (
-                planId
-            ) =>
+            (planId) =>
                 !idsDisponibles.has(
                     String(
                         planId
@@ -5111,9 +6018,14 @@ async function limpiarAfinidadesDePlanesEliminados(
                 )
         );
 
+    /*
+       Eliminamos únicamente afinidades de planes UUID
+       que ya no están publicados. Los planes legacy
+       se conservan y no se consultan en public.planes.
+    */
+
     if (
-        idsEliminados.length >
-        0
+        idsEliminados.length > 0
     ) {
         const {
             error: errorLimpieza
@@ -5139,16 +6051,20 @@ async function limpiarAfinidadesDePlanesEliminados(
         }
     }
 
-    return afinidades.filter(
-        (
-            afinidad
-        ) =>
-            idsDisponibles.has(
-                String(
-                    afinidad.plan_id
+    const afinidadesSupabaseValidas =
+        afinidadesSupabase.filter(
+            (afinidad) =>
+                idsDisponibles.has(
+                    String(
+                        afinidad.plan_id
+                    )
                 )
-            )
-    );
+        );
+
+    return [
+        ...afinidadesLegacy,
+        ...afinidadesSupabaseValidas
+    ];
 }
 
 
@@ -7342,6 +8258,9 @@ const BUCKET_IMAGENES_PLANES =
     "imagenes-planes";
 
 let planesSupabaseUsuario = [];
+let reservasOrganizadorPerfil = [];
+let reservasOrganizadorCargadas = false;
+let planReservasOrganizadorAbierto = null;
 let planPendienteEliminar = null;
 let filtroPublicacionActual = "todos";
 let elementoQueAbrioModalEliminar = null;
@@ -7408,6 +8327,11 @@ function normalizarPlanSupabase(
             plan.hora
                 ? String(plan.hora).slice(0, 5)
                 : "",
+
+        fechas:
+            Array.isArray(plan.fechas)
+                ? plan.fechas
+                : [],
 
         duracion:
             plan.duracion ||
@@ -7571,6 +8495,858 @@ function limpiarPublicacionesLocalesEliminadas(
 }
 
 
+
+function normalizarHoraReservasOrganizador(
+    valor
+) {
+    return String(
+        valor ||
+        ""
+    ).slice(
+        0,
+        5
+    );
+}
+
+
+function formatearPrecioReservasOrganizador(
+    valor
+) {
+    const numero =
+        Number(
+            valor ||
+            0
+        );
+
+    if (
+        !Number.isFinite(numero) ||
+        numero === 0
+    ) {
+        return "Gratis";
+    }
+
+    return `${numero
+        .toFixed(2)
+        .replace(".00", "")
+        .replace(".", ",")} €`;
+}
+
+
+function formatearFechaReservaOrganizador(
+    fechaIso
+) {
+    if (!fechaIso) {
+        return "Fecha pendiente";
+    }
+
+    const fecha =
+        new Date(
+            `${fechaIso}T00:00:00`
+        );
+
+    if (
+        Number.isNaN(
+            fecha.getTime()
+        )
+    ) {
+        return String(fechaIso);
+    }
+
+    return new Intl.DateTimeFormat(
+        "es-ES",
+        {
+            day:
+                "numeric",
+            month:
+                "long",
+            year:
+                "numeric"
+        }
+    ).format(fecha);
+}
+
+
+function formatearFechaCreacionReservaOrganizador(
+    valor
+) {
+    if (!valor) {
+        return "";
+    }
+
+    const fecha =
+        new Date(valor);
+
+    if (
+        Number.isNaN(
+            fecha.getTime()
+        )
+    ) {
+        return "";
+    }
+
+    return new Intl.DateTimeFormat(
+        "es-ES",
+        {
+            day:
+                "numeric",
+            month:
+                "short",
+            year:
+                "numeric",
+            hour:
+                "2-digit",
+            minute:
+                "2-digit"
+        }
+    ).format(fecha);
+}
+
+
+function obtenerReservasOrganizadorPlan(
+    planId
+) {
+    return reservasOrganizadorPerfil.filter(
+        (
+            reserva
+        ) =>
+            String(
+                reserva.plan_id ||
+                ""
+            ) ===
+            String(
+                planId ||
+                ""
+            )
+    );
+}
+
+
+function obtenerPlazasTotalesPaseOrganizador(
+    plan,
+    fecha,
+    hora
+) {
+    const fechaSegura =
+        String(
+            fecha ||
+            ""
+        );
+
+    const horaSegura =
+        normalizarHoraReservasOrganizador(
+            hora
+        );
+
+    const pase =
+        (
+            Array.isArray(plan?.fechas)
+                ? plan.fechas
+                : []
+        ).find(
+            (
+                item
+            ) =>
+                String(
+                    item?.fecha ||
+                    ""
+                ) ===
+                    fechaSegura &&
+                normalizarHoraReservasOrganizador(
+                    item?.hora
+                ) ===
+                    horaSegura
+        );
+
+    const plazasPase =
+        Number(
+            pase?.plazas
+        );
+
+    if (
+        Number.isFinite(
+            plazasPase
+        ) &&
+        plazasPase > 0
+    ) {
+        return Math.floor(
+            plazasPase
+        );
+    }
+
+    if (
+        String(
+            plan?.fecha ||
+            ""
+        ) ===
+            fechaSegura &&
+        normalizarHoraReservasOrganizador(
+            plan?.hora
+        ) ===
+            horaSegura
+    ) {
+        const plazasPrincipal =
+            Number(
+                plan?.plazas
+            );
+
+        if (
+            Number.isFinite(
+                plazasPrincipal
+            ) &&
+            plazasPrincipal > 0
+        ) {
+            return Math.floor(
+                plazasPrincipal
+            );
+        }
+    }
+
+    return null;
+}
+
+
+function agruparReservasOrganizadorPorPase(
+    plan
+) {
+    const reservas =
+        obtenerReservasOrganizadorPlan(
+            plan?.id
+        );
+
+    const grupos =
+        new Map();
+
+    reservas.forEach(
+        (
+            reserva
+        ) => {
+            const fecha =
+                String(
+                    reserva.fecha_reserva ||
+                    ""
+                );
+
+            const hora =
+                normalizarHoraReservasOrganizador(
+                    reserva.hora_reserva
+                );
+
+            const clave =
+                `${fecha}|${hora}`;
+
+            if (!grupos.has(clave)) {
+                grupos.set(
+                    clave,
+                    {
+                        fecha,
+                        hora,
+                        reservas:
+                            []
+                    }
+                );
+            }
+
+            grupos.get(
+                clave
+            ).reservas.push(
+                reserva
+            );
+        }
+    );
+
+    return Array.from(
+        grupos.values()
+    ).sort(
+        (
+            a,
+            b
+        ) =>
+            `${a.fecha}T${a.hora}`.localeCompare(
+                `${b.fecha}T${b.hora}`
+            )
+    );
+}
+
+
+function crearAvatarReservaOrganizadorHTML(
+    reserva
+) {
+    const nombre =
+        escaparHTML(
+            reserva.usuario_nombre ||
+            "Usuario de Suralia"
+        );
+
+    const foto =
+        escaparHTML(
+            reserva.usuario_foto ||
+            ""
+        );
+
+    if (foto) {
+        return `
+            <span class="reserva-organizador__avatar">
+                <img
+                    src="${foto}"
+                    alt="Foto de ${nombre}"
+                    loading="lazy"
+                    onerror="
+                        this.onerror=null;
+                        this.parentElement.innerHTML='<i class=&quot;fa-regular fa-user&quot;></i>';
+                    "
+                >
+            </span>
+        `;
+    }
+
+    return `
+        <span class="reserva-organizador__avatar" aria-hidden="true">
+            <i class="fa-regular fa-user"></i>
+        </span>
+    `;
+}
+
+
+function crearReservaOrganizadorHTML(
+    reserva
+) {
+    const reservaId =
+        escaparHTML(
+            reserva.reserva_id ||
+            ""
+        );
+
+    const nombre =
+        escaparHTML(
+            reserva.usuario_nombre ||
+            "Usuario de Suralia"
+        );
+
+    const perfilPublicoId =
+        escaparHTML(
+            reserva.usuario_perfil_publico_id ||
+            ""
+        );
+
+    const estado =
+        String(
+            reserva.estado ||
+            "confirmada"
+        ).toLowerCase();
+
+    const confirmada =
+        estado ===
+        "confirmada";
+
+    const personas =
+        Math.max(
+            1,
+            Number(
+                reserva.personas ||
+                1
+            )
+        );
+
+    const reservadoEn =
+        formatearFechaCreacionReservaOrganizador(
+            reserva.reservado_en
+        );
+
+    return `
+        <article
+            class="reserva-organizador ${
+                confirmada
+                    ? ""
+                    : "reserva-organizador--cancelada"
+            }"
+            data-reserva-organizador-id="${reservaId}"
+        >
+
+            ${crearAvatarReservaOrganizadorHTML(reserva)}
+
+            <div class="reserva-organizador__contenido">
+
+                <div class="reserva-organizador__superior">
+                    <div>
+                        <strong>${nombre}</strong>
+
+                        <span class="reserva-organizador__estado ${
+                            confirmada
+                                ? "reserva-organizador__estado--confirmada"
+                                : "reserva-organizador__estado--cancelada"
+                        }">
+                            ${
+                                confirmada
+                                    ? "Confirmada"
+                                    : "Cancelada"
+                            }
+                        </span>
+                    </div>
+
+                    <strong class="reserva-organizador__precio">
+                        ${formatearPrecioReservasOrganizador(
+                            reserva.precio_total
+                        )}
+                    </strong>
+                </div>
+
+                <div class="reserva-organizador__datos">
+                    <span>
+                        <i class="fa-solid fa-user-group"></i>
+                        ${personas}
+                        ${
+                            personas === 1
+                                ? "persona"
+                                : "personas"
+                        }
+                    </span>
+
+                    ${
+                        reservadoEn
+                            ? `
+                                <span>
+                                    <i class="fa-regular fa-clock"></i>
+                                    Reservó ${escaparHTML(reservadoEn)}
+                                </span>
+                            `
+                            : ""
+                    }
+                </div>
+
+                <div class="reserva-organizador__acciones">
+                    ${
+                        perfilPublicoId
+                            ? `
+                                <a
+                                    href="perfil-publico.html?id=${encodeURIComponent(
+                                        perfilPublicoId
+                                    )}"
+                                    class="boton-reserva-organizador boton-reserva-organizador--perfil"
+                                >
+                                    <i class="fa-regular fa-user"></i>
+                                    Ver perfil
+                                </a>
+                            `
+                            : ""
+                    }
+
+                    ${
+                        confirmada
+                            ? `
+                                <button
+                                    type="button"
+                                    class="boton-reserva-organizador boton-reserva-organizador--cancelar"
+                                    data-cancelar-reserva-organizador="${reservaId}"
+                                >
+                                    <i class="fa-solid fa-ban"></i>
+                                    Cancelar reserva
+                                </button>
+                            `
+                            : ""
+                    }
+                </div>
+
+            </div>
+
+        </article>
+    `;
+}
+
+
+function crearPanelReservasOrganizadorHTML(
+    plan
+) {
+    const reservas =
+        obtenerReservasOrganizadorPlan(
+            plan?.id
+        );
+
+    const confirmadas =
+        reservas.filter(
+            (
+                reserva
+            ) =>
+                reserva.estado ===
+                "confirmada"
+        );
+
+    const totalPersonas =
+        confirmadas.reduce(
+            (
+                total,
+                reserva
+            ) =>
+                total +
+                Math.max(
+                    0,
+                    Number(
+                        reserva.personas ||
+                        0
+                    )
+                ),
+            0
+        );
+
+    const ingresos =
+        confirmadas.reduce(
+            (
+                total,
+                reserva
+            ) =>
+                total +
+                Math.max(
+                    0,
+                    Number(
+                        reserva.precio_total ||
+                        0
+                    )
+                ),
+            0
+        );
+
+    if (
+        !reservasOrganizadorCargadas
+    ) {
+        return `
+            <div class="publicacion-reservas-panel__cargando">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Cargando reservas...
+            </div>
+        `;
+    }
+
+    if (
+        reservas.length ===
+        0
+    ) {
+        return `
+            <div class="publicacion-reservas-panel__vacio">
+                <span>
+                    <i class="fa-regular fa-calendar-check"></i>
+                </span>
+
+                <div>
+                    <strong>Todavía no hay reservas</strong>
+                    <p>
+                        Cuando alguien reserve este plan aparecerá aquí.
+                    </p>
+                </div>
+            </div>
+        `;
+    }
+
+    const grupos =
+        agruparReservasOrganizadorPorPase(
+            plan
+        );
+
+    return `
+        <div class="publicacion-reservas-panel__resumen">
+            <div>
+                <span>Reservas activas</span>
+                <strong>${confirmadas.length}</strong>
+            </div>
+
+            <div>
+                <span>Personas</span>
+                <strong>${totalPersonas}</strong>
+            </div>
+
+            <div>
+                <span>Total reservado</span>
+                <strong>${formatearPrecioReservasOrganizador(ingresos)}</strong>
+            </div>
+        </div>
+
+        <div class="publicacion-reservas-panel__pases">
+            ${grupos
+                .map(
+                    (
+                        grupo
+                    ) => {
+                        const activas =
+                            grupo.reservas.filter(
+                                (
+                                    reserva
+                                ) =>
+                                    reserva.estado ===
+                                    "confirmada"
+                            );
+
+                        const personasPase =
+                            activas.reduce(
+                                (
+                                    total,
+                                    reserva
+                                ) =>
+                                    total +
+                                    Math.max(
+                                        0,
+                                        Number(
+                                            reserva.personas ||
+                                            0
+                                        )
+                                    ),
+                                0
+                            );
+
+                        const plazasTotales =
+                            obtenerPlazasTotalesPaseOrganizador(
+                                plan,
+                                grupo.fecha,
+                                grupo.hora
+                            );
+
+                        const plazasDisponibles =
+                            plazasTotales ===
+                                null
+                                ? null
+                                : Math.max(
+                                    0,
+                                    plazasTotales -
+                                    personasPase
+                                );
+
+                        return `
+                            <section class="reservas-pase-organizador">
+
+                                <div class="reservas-pase-organizador__cabecera">
+                                    <div>
+                                        <strong>
+                                            ${escaparHTML(
+                                                formatearFechaReservaOrganizador(
+                                                    grupo.fecha
+                                                )
+                                            )}
+                                        </strong>
+
+                                        <span>
+                                            <i class="fa-regular fa-clock"></i>
+                                            ${escaparHTML(
+                                                grupo.hora ||
+                                                "Hora pendiente"
+                                            )}
+                                        </span>
+                                    </div>
+
+                                    <span class="reservas-pase-organizador__aforo ${
+                                        plazasDisponibles === 0
+                                            ? "reservas-pase-organizador__aforo--agotado"
+                                            : ""
+                                    }">
+                                        ${
+                                            plazasTotales ===
+                                                null
+                                                ? `${personasPase} reservadas`
+                                                : `${personasPase}/${plazasTotales} plazas`
+                                        }
+                                    </span>
+                                </div>
+
+                                ${
+                                    plazasDisponibles !==
+                                        null
+                                        ? `
+                                            <div class="reservas-pase-organizador__barra">
+                                                <span
+                                                    style="width: ${Math.min(
+                                                        100,
+                                                        plazasTotales > 0
+                                                            ? (
+                                                                personasPase /
+                                                                plazasTotales
+                                                            ) * 100
+                                                            : 0
+                                                    )}%"
+                                                ></span>
+                                            </div>
+
+                                            <p class="reservas-pase-organizador__disponibles">
+                                                ${
+                                                    plazasDisponibles === 0
+                                                        ? "Pase agotado"
+                                                        : `${plazasDisponibles} ${
+                                                            plazasDisponibles === 1
+                                                                ? "plaza disponible"
+                                                                : "plazas disponibles"
+                                                        }`
+                                                }
+                                            </p>
+                                        `
+                                        : ""
+                                }
+
+                                <div class="reservas-pase-organizador__lista">
+                                    ${grupo.reservas
+                                        .map(
+                                            crearReservaOrganizadorHTML
+                                        )
+                                        .join("")}
+                                </div>
+
+                            </section>
+                        `;
+                    }
+                )
+                .join("")}
+        </div>
+    `;
+}
+
+
+async function cargarReservasOrganizadorPerfil(
+    repintar = true
+) {
+    const cliente =
+        window.clienteSupabase;
+
+    reservasOrganizadorCargadas =
+        false;
+
+    if (!cliente?.auth) {
+        reservasOrganizadorPerfil =
+            [];
+
+        if (repintar) {
+            mostrarPublicaciones();
+        }
+
+        return;
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente.rpc(
+            "obtener_reservas_organizador"
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        reservasOrganizadorPerfil =
+            Array.isArray(data)
+                ? data
+                : [];
+
+        reservasOrganizadorCargadas =
+            true;
+    } catch (error) {
+        console.error(
+            "No se pudieron cargar las reservas de tus planes:",
+            error
+        );
+
+        reservasOrganizadorPerfil =
+            [];
+
+        reservasOrganizadorCargadas =
+            true;
+
+        if (repintar) {
+            mostrarNotificacion(
+                "No se han podido cargar las reservas de tus planes."
+            );
+        }
+    }
+
+    if (repintar) {
+        mostrarPublicaciones();
+    }
+}
+
+
+function activarBotonesReservasOrganizador() {
+    document
+        .querySelectorAll(
+            "[data-ver-reservas-plan]"
+        )
+        .forEach(
+            (
+                boton
+            ) => {
+                boton.addEventListener(
+                    "click",
+                    async () => {
+                        const planId =
+                            String(
+                                boton.dataset
+                                    .verReservasPlan ||
+                                ""
+                            );
+
+                        if (!planId) {
+                            return;
+                        }
+
+                        if (
+                            String(
+                                planReservasOrganizadorAbierto ||
+                                ""
+                            ) ===
+                            planId
+                        ) {
+                            planReservasOrganizadorAbierto =
+                                null;
+
+                            mostrarPublicaciones();
+
+                            return;
+                        }
+
+                        planReservasOrganizadorAbierto =
+                            planId;
+
+                        mostrarPublicaciones();
+
+                        await cargarReservasOrganizadorPerfil(
+                            true
+                        );
+                    }
+                );
+            }
+        );
+
+    document
+        .querySelectorAll(
+            "[data-cancelar-reserva-organizador]"
+        )
+        .forEach(
+            (
+                boton
+            ) => {
+                boton.addEventListener(
+                    "click",
+                    () => {
+                        reservaPendienteCancelar =
+                            String(
+                                boton.dataset
+                                    .cancelarReservaOrganizador ||
+                                ""
+                            );
+
+                        if (!reservaPendienteCancelar) {
+                            return;
+                        }
+
+                        tipoCancelacionReservaPendiente =
+                            "organizador";
+
+                        elementoQueAbrioModalCancelacion =
+                            abrirModalAccesible(
+                                modalCancelacion,
+                                mantenerReserva,
+                                boton
+                            );
+                    }
+                );
+            }
+        );
+}
+
+
 async function cargarPlanesSupabaseUsuario() {
     const cliente =
         window.clienteSupabase;
@@ -7613,6 +9389,7 @@ async function cargarPlanesSupabaseUsuario() {
                     descripcion,
                     fecha,
                     hora,
+                    fechas,
                     duracion,
                     plazas,
                     ubicacion,
@@ -7654,6 +9431,10 @@ async function cargarPlanesSupabaseUsuario() {
 
         limpiarPublicacionesLocalesEliminadas(
             planesSupabaseUsuario
+        );
+
+        await cargarReservasOrganizadorPerfil(
+            false
         );
 
         mostrarPublicaciones();
@@ -7933,6 +9714,40 @@ function crearPublicacionHTML(
                         }
 
                         ${
+                            plan.estado === "publicado"
+                                ? `
+                                    <button
+                                        type="button"
+                                        class="boton-publicacion boton-reservas-plan"
+                                        data-ver-reservas-plan="${idPlan}"
+                                        aria-expanded="${
+                                            String(
+                                                planReservasOrganizadorAbierto
+                                            ) ===
+                                            String(plan.id)
+                                                ? "true"
+                                                : "false"
+                                        }"
+                                    >
+                                        <i class="fa-regular fa-calendar-check"></i>
+                                        Ver reservas
+                                        <span class="boton-reservas-plan__contador">
+                                            ${
+                                                obtenerReservasOrganizadorPlan(
+                                                    plan.id
+                                                ).filter(
+                                                    reserva =>
+                                                        reserva.estado ===
+                                                        "confirmada"
+                                                ).length
+                                            }
+                                        </span>
+                                    </button>
+                                `
+                                : ""
+                        }
+
+                        ${
                             plan.estado !== "publicado"
                                 ? `
                                     <button
@@ -7951,6 +9766,24 @@ function crearPublicacionHTML(
                     </div>
 
                 </div>
+
+                ${
+                    plan.estado === "publicado" &&
+                    String(
+                        planReservasOrganizadorAbierto ||
+                        ""
+                    ) ===
+                    String(plan.id)
+                        ? `
+                            <div
+                                class="publicacion-reservas-panel"
+                                data-panel-reservas-plan="${idPlan}"
+                            >
+                                ${crearPanelReservasOrganizadorHTML(plan)}
+                            </div>
+                        `
+                        : ""
+                }
 
             </div>
 
@@ -8138,6 +9971,26 @@ function activarEventosPublicaciones() {
                 boton.addEventListener(
                     "click",
                     () => {
+                        const planId =
+                            String(
+                                boton.dataset
+                                    .planId ||
+                                ""
+                            );
+
+                        if (
+                            esIdUuidPerfil(
+                                planId
+                            )
+                        ) {
+                            window.location.href =
+                                `detalle-plan.html?id=${encodeURIComponent(
+                                    planId
+                                )}`;
+
+                            return;
+                        }
+
                         mostrarNotificacion(
                             "La vista individual de este plan se añadirá más adelante."
                         );
@@ -8145,6 +9998,8 @@ function activarEventosPublicaciones() {
                 );
             }
         );
+
+    activarBotonesReservasOrganizador();
 }
 
 
@@ -8450,6 +10305,9 @@ document.addEventListener(
             reservaPendienteCancelar =
                 null;
 
+            tipoCancelacionReservaPendiente =
+                "usuario";
+
             cerrarModalAccesible(
                 modalCancelacion,
                 elementoQueAbrioModalCancelacion
@@ -8504,7 +10362,7 @@ document.addEventListener(
             "visible"
         ) {
             cargarPlanesSupabaseUsuario();
-            sincronizarReservasDinamicasEliminadas();
+            cargarReservasPerfil();
             sincronizarFavoritosDinamicosEliminados();
             cargarAfinidadesPerfil();
         }
@@ -8530,8 +10388,7 @@ function iniciarPerfil() {
     cargarPerfilSocial();
     cargarGaleriaPerfil();
     cargarEstadoVerificacion();
-    mostrarReservasPerfil();
-    sincronizarReservasDinamicasEliminadas();
+    cargarReservasPerfil();
     mostrarFavoritosPerfil();
     sincronizarFavoritosDinamicosEliminados();
     cargarAfinidadesPerfil();

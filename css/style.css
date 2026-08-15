@@ -19677,3 +19677,1070 @@ button.conversaciones-cabecera__enlace:disabled {
         grid-column: 2;
     }
 }
+
+/* =====================================================
+   FECHAS MÚLTIPLES EN DETALLE DEL PLAN
+===================================================== */
+
+.fechas-disponibles-detalle__cabecera {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.fechas-disponibles-detalle__cabecera h2 {
+    margin-bottom: 0.3rem;
+}
+
+.fechas-disponibles-detalle__cabecera p {
+    margin: 0;
+    opacity: 0.72;
+}
+
+.fechas-disponibles-detalle__eyebrow {
+    display: inline-block;
+    margin-bottom: 0.25rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.58;
+}
+
+.fechas-disponibles-detalle__contador {
+    flex: 0 0 auto;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.75);
+    font-size: 0.82rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.fechas-disponibles-detalle__lista {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.fecha-disponible-detalle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 0;
+    padding: 0.85rem 0.9rem;
+    border: 1px solid rgba(0, 0, 0, 0.09);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.82);
+    color: inherit;
+    text-align: left;
+    font: inherit;
+}
+
+button.fecha-disponible-detalle {
+    cursor: pointer;
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+button.fecha-disponible-detalle:hover {
+    transform: translateY(-1px);
+    border-color: rgba(0, 0, 0, 0.18);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+}
+
+.fecha-disponible-detalle--seleccionada {
+    border-color: currentColor;
+    box-shadow: inset 0 0 0 1px currentColor;
+}
+
+.fecha-disponible-detalle__icono {
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: rgba(0, 0, 0, 0.055);
+}
+
+.fecha-disponible-detalle__contenido {
+    min-width: 0;
+    display: grid;
+    gap: 0.18rem;
+}
+
+.fecha-disponible-detalle__contenido strong {
+    line-height: 1.25;
+}
+
+.fecha-disponible-detalle__contenido > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.88rem;
+    opacity: 0.72;
+}
+
+.fecha-disponible-detalle__accion {
+    margin-left: auto;
+    flex: 0 0 auto;
+    font-size: 0.78rem;
+    font-weight: 800;
+    opacity: 0.68;
+}
+
+@media (max-width: 760px) {
+    .fechas-disponibles-detalle__cabecera {
+        flex-direction: column;
+    }
+
+    .fechas-disponibles-detalle__lista {
+        grid-template-columns: 1fr;
+    }
+
+    .fechas-disponibles-detalle__contador {
+        white-space: normal;
+    }
+}
+
+/* =====================================================
+   VARIAS FECHAS AL PUBLICAR UN PLAN
+===================================================== */
+
+.fechas-adicionales-publicar {
+    margin: 1rem 0 1.35rem;
+    padding: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.fechas-adicionales-publicar__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.fechas-adicionales-publicar__cabecera strong {
+    display: block;
+    margin-bottom: 0.15rem;
+}
+
+.boton-anadir-fecha {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 42px;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 12px;
+    background: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.boton-anadir-fecha:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.fechas-adicionales-publicar__lista {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.fecha-adicional-publicar {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1.15fr)
+        minmax(0, 0.85fr)
+        minmax(110px, 0.65fr)
+        44px;
+    align-items: end;
+    gap: 0.65rem;
+}
+
+.fecha-adicional-publicar .campo-formulario {
+    margin: 0;
+}
+
+.fecha-adicional-publicar__eliminar {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+}
+
+@media (max-width: 760px) {
+    .fechas-adicionales-publicar__cabecera {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .boton-anadir-fecha {
+        width: 100%;
+    }
+
+    .fecha-adicional-publicar {
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 0.85fr)
+            minmax(95px, 0.7fr)
+            42px;
+        gap: 0.45rem;
+    }
+
+    .fecha-adicional-publicar__eliminar {
+        width: 42px;
+        height: 42px;
+    }
+}
+
+@media (max-width: 560px) {
+    .fecha-adicional-publicar {
+        grid-template-columns: 1fr 1fr 42px;
+    }
+
+    .fecha-adicional-publicar .campo-formulario:first-child {
+        grid-column: 1 / -1;
+    }
+
+    .fecha-adicional-publicar .campo-formulario:nth-child(2) {
+        grid-column: 1;
+    }
+
+    .fecha-adicional-publicar .campo-formulario:nth-child(3) {
+        grid-column: 2;
+    }
+
+    .fecha-adicional-publicar__eliminar {
+        grid-column: 3;
+    }
+}
+
+/* =====================================================
+   FECHAS MÚLTIPLES EN DETALLE DEL PLAN
+===================================================== */
+
+.fechas-disponibles-detalle__cabecera {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.fechas-disponibles-detalle__cabecera h2 {
+    margin-bottom: 0.3rem;
+}
+
+.fechas-disponibles-detalle__cabecera p {
+    margin: 0;
+    opacity: 0.72;
+}
+
+.fechas-disponibles-detalle__eyebrow {
+    display: inline-block;
+    margin-bottom: 0.25rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.58;
+}
+
+.fechas-disponibles-detalle__contador {
+    flex: 0 0 auto;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.75);
+    font-size: 0.82rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.fechas-disponibles-detalle__lista {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.fecha-disponible-detalle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 0;
+    padding: 0.85rem 0.9rem;
+    border: 1px solid rgba(0, 0, 0, 0.09);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.82);
+    color: inherit;
+    text-align: left;
+    font: inherit;
+}
+
+button.fecha-disponible-detalle {
+    cursor: pointer;
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+button.fecha-disponible-detalle:hover {
+    transform: translateY(-1px);
+    border-color: rgba(0, 0, 0, 0.18);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+}
+
+.fecha-disponible-detalle--seleccionada {
+    border-color: currentColor;
+    box-shadow: inset 0 0 0 1px currentColor;
+}
+
+.fecha-disponible-detalle__icono {
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: rgba(0, 0, 0, 0.055);
+}
+
+.fecha-disponible-detalle__contenido {
+    min-width: 0;
+    display: grid;
+    gap: 0.18rem;
+}
+
+.fecha-disponible-detalle__contenido strong {
+    line-height: 1.25;
+}
+
+.fecha-disponible-detalle__contenido > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.88rem;
+    opacity: 0.72;
+}
+
+.fecha-disponible-detalle__accion {
+    margin-left: auto;
+    flex: 0 0 auto;
+    font-size: 0.78rem;
+    font-weight: 800;
+    opacity: 0.68;
+}
+
+@media (max-width: 760px) {
+    .fechas-disponibles-detalle__cabecera {
+        flex-direction: column;
+    }
+
+    .fechas-disponibles-detalle__lista {
+        grid-template-columns: 1fr;
+    }
+
+    .fechas-disponibles-detalle__contador {
+        white-space: normal;
+    }
+}
+
+
+/* =====================================================
+   DISPONIBILIDAD DE PLAZAS POR FECHA / PASE
+===================================================== */
+
+.fecha-disponible-detalle__plazas {
+    margin-top: 0.16rem;
+    font-weight: 700;
+}
+
+.fecha-disponible-detalle--agotada {
+    opacity: 0.58;
+}
+
+button.fecha-disponible-detalle--agotada {
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+button.fecha-disponible-detalle--agotada:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.fecha-disponible-detalle--agotada
+.fecha-disponible-detalle__accion {
+    opacity: 1;
+    font-weight: 900;
+}
+
+.boton-reservar:disabled {
+    opacity: 0.58;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* =====================================================
+   PANEL DE RESERVAS DEL ORGANIZADOR
+===================================================== */
+
+.boton-reservas-plan {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.boton-reservas-plan__contador {
+    min-width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.4rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.08);
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.publicacion-reservas-panel {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.publicacion-reservas-panel__cargando,
+.publicacion-reservas-panel__vacio {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1rem;
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.035);
+}
+
+.publicacion-reservas-panel__vacio > span {
+    flex: 0 0 auto;
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.055);
+}
+
+.publicacion-reservas-panel__vacio p {
+    margin: 0.2rem 0 0;
+    opacity: 0.7;
+}
+
+.publicacion-reservas-panel__resumen {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+    margin-bottom: 1rem;
+}
+
+.publicacion-reservas-panel__resumen > div {
+    display: grid;
+    gap: 0.22rem;
+    padding: 0.85rem;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.68);
+}
+
+.publicacion-reservas-panel__resumen span {
+    font-size: 0.78rem;
+    opacity: 0.68;
+}
+
+.publicacion-reservas-panel__resumen strong {
+    font-size: 1.08rem;
+}
+
+.publicacion-reservas-panel__pases {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.reservas-pase-organizador {
+    padding: 0.9rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.58);
+}
+
+.reservas-pase-organizador__cabecera {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.reservas-pase-organizador__cabecera > div {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.reservas-pase-organizador__cabecera span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.88rem;
+    opacity: 0.72;
+}
+
+.reservas-pase-organizador__aforo {
+    flex: 0 0 auto;
+    padding: 0.4rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.06);
+    font-size: 0.78rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.reservas-pase-organizador__aforo--agotado {
+    font-weight: 900;
+}
+
+.reservas-pase-organizador__barra {
+    height: 7px;
+    margin-top: 0.75rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.07);
+}
+
+.reservas-pase-organizador__barra > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: currentColor;
+    opacity: 0.65;
+}
+
+.reservas-pase-organizador__disponibles {
+    margin: 0.4rem 0 0;
+    font-size: 0.8rem;
+    opacity: 0.68;
+}
+
+.reservas-pase-organizador__lista {
+    display: grid;
+    gap: 0.65rem;
+    margin-top: 0.85rem;
+}
+
+.reserva-organizador {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.035);
+}
+
+.reserva-organizador--cancelada {
+    opacity: 0.58;
+}
+
+.reserva-organizador__avatar {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.07);
+}
+
+.reserva-organizador__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.reserva-organizador__contenido {
+    min-width: 0;
+}
+
+.reserva-organizador__superior {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.reserva-organizador__superior > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.reserva-organizador__estado {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
+.reserva-organizador__estado--confirmada {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.reserva-organizador__estado--cancelada {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.reserva-organizador__precio {
+    flex: 0 0 auto;
+}
+
+.reserva-organizador__datos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 0.85rem;
+    margin-top: 0.4rem;
+    font-size: 0.82rem;
+    opacity: 0.72;
+}
+
+.reserva-organizador__datos span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.reserva-organizador__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.65rem;
+}
+
+.boton-reserva-organizador {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 9px;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.boton-reserva-organizador--cancelar {
+    margin-left: auto;
+}
+
+@media (max-width: 760px) {
+    .publicacion-reservas-panel__resumen {
+        grid-template-columns: 1fr;
+    }
+
+    .reservas-pase-organizador__cabecera,
+    .reserva-organizador__superior {
+        flex-direction: column;
+    }
+
+    .reservas-pase-organizador__aforo {
+        white-space: normal;
+    }
+
+    .reserva-organizador {
+        grid-template-columns: 40px minmax(0, 1fr);
+    }
+
+    .reserva-organizador__avatar {
+        width: 40px;
+        height: 40px;
+    }
+
+    .boton-reserva-organizador--cancelar {
+        margin-left: 0;
+    }
+}
+
+/* ============================================================
+   SURALIA · CAMPANA DE NOTIFICACIONES
+   Añadir al final de css/style.css
+============================================================ */
+
+.notificaciones-cabecera {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+}
+
+.notificaciones-cabecera__boton {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 50%;
+    background: #ffffff;
+    color: #1f2937;
+    font-size: 1.05rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
+}
+
+.notificaciones-cabecera__boton:hover {
+    transform: translateY(-1px);
+    border-color: rgba(249, 115, 22, 0.35);
+    background: #fffaf5;
+    box-shadow: 0 7px 18px rgba(15, 23, 42, 0.12);
+}
+
+.notificaciones-cabecera__boton:focus-visible {
+    outline: 3px solid rgba(249, 115, 22, 0.22);
+    outline-offset: 3px;
+}
+
+.notificaciones-cabecera__boton i {
+    pointer-events: none;
+}
+
+.notificaciones-cabecera__contador {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+    border-radius: 999px;
+    background: #f97316;
+    color: #ffffff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    line-height: 1;
+    box-sizing: border-box;
+    box-shadow: 0 2px 7px rgba(249, 115, 22, 0.25);
+}
+
+.notificaciones-cabecera__contador.oculto {
+    display: none !important;
+}
+
+.notificaciones-cabecera__panel {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: min(390px, calc(100vw - 28px));
+    max-height: min(620px, calc(100vh - 110px));
+    overflow: hidden;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow:
+        0 22px 60px rgba(15, 23, 42, 0.18),
+        0 4px 16px rgba(15, 23, 42, 0.08);
+}
+
+.notificaciones-cabecera__panel[hidden] {
+    display: none !important;
+}
+
+.notificaciones-cabecera__cabecera {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+}
+
+.notificaciones-cabecera__subtitulo {
+    display: block;
+    margin-bottom: 2px;
+    color: #f97316;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.notificaciones-cabecera__cabecera h2 {
+    margin: 0;
+    color: #111827;
+    font-size: 1.05rem;
+    line-height: 1.2;
+}
+
+.notificaciones-cabecera__marcar {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #6b7280;
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.18s ease;
+}
+
+.notificaciones-cabecera__marcar:hover {
+    color: #f97316;
+}
+
+.notificaciones-cabecera__marcar:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.notificaciones-cabecera__lista {
+    max-height: 470px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.notificaciones-cabecera__lista::-webkit-scrollbar {
+    width: 8px;
+}
+
+.notificaciones-cabecera__lista::-webkit-scrollbar-thumb {
+    border: 2px solid #ffffff;
+    border-radius: 999px;
+    background: #d1d5db;
+}
+
+.notificaciones-cabecera__item {
+    position: relative;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.055);
+    background: #ffffff;
+}
+
+.notificaciones-cabecera__item:last-child {
+    border-bottom: 0;
+}
+
+.notificaciones-cabecera__item--no-leida {
+    background: #fff9f4;
+}
+
+.notificaciones-cabecera__item-boton {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) 9px;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 14px 16px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    transition: background 0.18s ease;
+}
+
+.notificaciones-cabecera__item-boton:hover {
+    background: rgba(249, 115, 22, 0.055);
+}
+
+.notificaciones-cabecera__icono {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #fff1e8;
+    color: #f97316;
+    font-size: 0.95rem;
+}
+
+.notificaciones-cabecera__contenido {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.notificaciones-cabecera__titulo {
+    color: #111827;
+    font-size: 0.9rem;
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.notificaciones-cabecera__mensaje {
+    display: -webkit-box;
+    overflow: hidden;
+    color: #667085;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.notificaciones-cabecera__fecha {
+    color: #98a2b3;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.notificaciones-cabecera__punto {
+    width: 8px;
+    height: 8px;
+    align-self: center;
+    border-radius: 50%;
+    background: #f97316;
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
+}
+
+.notificaciones-cabecera__vacio {
+    padding: 34px 22px 38px;
+    text-align: center;
+}
+
+.notificaciones-cabecera__vacio[hidden] {
+    display: none !important;
+}
+
+.notificaciones-cabecera__vacio > span {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: #fff1e8;
+    color: #f97316;
+    font-size: 1.15rem;
+}
+
+.notificaciones-cabecera__vacio strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #111827;
+    font-size: 0.95rem;
+}
+
+.notificaciones-cabecera__vacio p {
+    margin: 0;
+    color: #667085;
+    font-size: 0.82rem;
+}
+
+@keyframes suraliaCampanaNueva {
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    20% {
+        transform: rotate(12deg);
+    }
+
+    40% {
+        transform: rotate(-10deg);
+    }
+
+    60% {
+        transform: rotate(7deg);
+    }
+
+    80% {
+        transform: rotate(-4deg);
+    }
+}
+
+.notificaciones-cabecera__boton--nuevo i {
+    animation: suraliaCampanaNueva 0.7s ease;
+}
+
+@media (max-width: 700px) {
+    .notificaciones-cabecera__boton {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .notificaciones-cabecera__panel {
+        position: fixed;
+        top: 72px;
+        left: 14px;
+        right: 14px;
+        width: auto;
+        max-height: calc(100vh - 90px);
+        border-radius: 18px;
+    }
+
+    .notificaciones-cabecera__lista {
+        max-height: calc(100vh - 230px);
+    }
+
+    .notificaciones-cabecera__cabecera {
+        padding: 16px;
+    }
+
+    .notificaciones-cabecera__item-boton {
+        grid-template-columns: 38px minmax(0, 1fr) 8px;
+        gap: 9px;
+        padding: 13px 14px;
+    }
+
+    .notificaciones-cabecera__icono {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+    }
+}

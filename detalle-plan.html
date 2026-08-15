@@ -450,6 +450,45 @@
 
                     </section>
 
+                    <section
+                        class="bloque-detalle fechas-disponibles-detalle oculto"
+                        id="bloque-fechas-disponibles"
+                        aria-labelledby="titulo-fechas-disponibles"
+                    >
+
+                        <div class="fechas-disponibles-detalle__cabecera">
+
+                            <div>
+                                <span class="fechas-disponibles-detalle__eyebrow">
+                                    Calendario
+                                </span>
+
+                                <h2 id="titulo-fechas-disponibles">
+                                    Fechas disponibles
+                                </h2>
+
+                                <p id="texto-fechas-disponibles">
+                                    Elige el día y la hora que mejor te venga.
+                                </p>
+                            </div>
+
+                            <span
+                                class="fechas-disponibles-detalle__contador"
+                                id="contador-fechas-disponibles"
+                            >
+                                0 fechas
+                            </span>
+
+                        </div>
+
+                        <div
+                            class="fechas-disponibles-detalle__lista"
+                            id="lista-fechas-disponibles"
+                            role="list"
+                        ></div>
+
+                    </section>
+
                     <section class="bloque-detalle">
 
                         <h2>Sobre esta experiencia</h2>
@@ -727,7 +766,7 @@
                             <div class="campo-reserva">
 
                                 <label for="fecha-reserva">
-                                    Fecha
+                                    Fecha y hora
                                 </label>
 
                                 <div>
@@ -826,8 +865,11 @@
 
                             <i class="fa-solid fa-bolt" aria-hidden="true"></i>
 
-                            <span>
-                                Quedan pocas plazas para esta fecha
+                            <span
+                                id="estado-plazas-reserva"
+                                aria-live="polite"
+                            >
+                                Consulta las plazas disponibles
                             </span>
 
                         </div>
