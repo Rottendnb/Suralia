@@ -1069,6 +1069,9 @@ if (filtroTexto) {
    PLANES PUBLICADOS DESDE SUPABASE
 ===================================================== */
 
+const PLAN_PONCHO_K_SUPABASE_ID =
+    "b3039583-9882-4877-ac4a-5a713393f495";
+
 function escaparHTMLPlanes(
     valor = ""
 ) {
@@ -1378,6 +1381,8 @@ async function cargarPlanesPublicadosSupabase() {
             ).filter(
                 (plan) =>
                     plan.id &&
+                    String(plan.id) !==
+                        PLAN_PONCHO_K_SUPABASE_ID &&
                     !idsExistentes.has(
                         String(plan.id)
                     )

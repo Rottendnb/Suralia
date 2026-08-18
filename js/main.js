@@ -81,87 +81,30 @@ let enlaceAdministracionMovil =
 
 
 function crearEnlaceMensajesHeader() {
+    /*
+     * La campana de notificaciones sustituye el acceso
+     * "Mis mensajes" del header principal.
+     *
+     * Conservamos el acceso desde el menú del usuario.
+     */
     if (!navegacion) {
         return null;
     }
 
     const enlaceExistente =
         navegacion.querySelector(
-            'a[href="conversaciones.html"]'
+            'a.enlace-mensajes-header[href="conversaciones.html"]'
         );
 
-    if (enlaceExistente) {
-        enlaceMensajesHeader =
-            enlaceExistente;
-    } else {
-        enlaceMensajesHeader =
-            document.createElement(
-                "a"
-            );
+    enlaceExistente?.remove();
 
-        enlaceMensajesHeader.href =
-            "conversaciones.html";
-
-        enlaceMensajesHeader.className =
-            "enlace-mensajes-header";
-
-        enlaceMensajesHeader.innerHTML = `
-            <i
-                class="fa-regular fa-comments"
-                aria-hidden="true"
-            ></i>
-
-            <span>
-                Mis mensajes
-            </span>
-        `;
-
-        const enlacePublicar =
-            navegacion.querySelector(
-                ".enlace-publicar"
-            );
-
-        if (enlacePublicar) {
-            navegacion.insertBefore(
-                enlaceMensajesHeader,
-                enlacePublicar
-            );
-        } else {
-            navegacion.appendChild(
-                enlaceMensajesHeader
-            );
-        }
-    }
-
-    enlaceMensajesHeader.classList.add(
-        "enlace-mensajes-header"
-    );
+    enlaceMensajesHeader =
+        null;
 
     contadorMensajesHeader =
-        enlaceMensajesHeader.querySelector(
-            ".enlace-mensajes-header__contador"
-        );
+        null;
 
-    if (!contadorMensajesHeader) {
-        contadorMensajesHeader =
-            document.createElement(
-                "span"
-            );
-
-        contadorMensajesHeader.className =
-            "enlace-mensajes-header__contador oculto";
-
-        contadorMensajesHeader.setAttribute(
-            "aria-live",
-            "polite"
-        );
-
-        enlaceMensajesHeader.appendChild(
-            contadorMensajesHeader
-        );
-    }
-
-    return enlaceMensajesHeader;
+    return null;
 }
 
 
@@ -517,10 +460,6 @@ async function comprobarAccesoAdministracion() {
 function actualizarContadorMensajesHeader(
     total = 0
 ) {
-    if (!contadorMensajesHeader) {
-        return;
-    }
-
     const cantidad =
         Number(total) ||
         0;
@@ -530,13 +469,20 @@ function actualizarContadorMensajesHeader(
             ? "99+"
             : String(cantidad);
 
-    contadorMensajesHeader.textContent =
-        textoContador;
+    /*
+     * Ya no mostramos "Mis mensajes" en el header principal.
+     * Dejamos este bloque preparado por compatibilidad, pero
+     * normalmente estas referencias estarán a null.
+     */
+    if (contadorMensajesHeader) {
+        contadorMensajesHeader.textContent =
+            textoContador;
 
-    contadorMensajesHeader.classList.toggle(
-        "oculto",
-        cantidad === 0
-    );
+        contadorMensajesHeader.classList.toggle(
+            "oculto",
+            cantidad === 0
+        );
+    }
 
     enlaceMensajesHeader?.classList.toggle(
         "enlace-mensajes-header--pendientes",
@@ -550,6 +496,10 @@ function actualizarContadorMensajesHeader(
             : "Mis mensajes"
     );
 
+    /*
+     * El acceso a conversaciones sigue disponible
+     * dentro del menú del usuario.
+     */
     if (contadorMensajesMenuUsuario) {
         contadorMensajesMenuUsuario.textContent =
             textoContador;
@@ -601,8 +551,7 @@ async function consultarMensajesNoLeidosHeader() {
         window.clienteSupabase;
 
     if (
-        !cliente?.auth ||
-        !enlaceMensajesHeader
+        !cliente?.auth
     ) {
         return;
     }
@@ -2003,6 +1952,9 @@ gridPlanesPortada?.addEventListener(
    PRÓXIMOS PLANES DE LA PORTADA
 ===================================================== */
 
+const PLAN_PONCHO_K_SUPABASE_ID =
+    "b3039583-9882-4877-ac4a-5a713393f495";
+
 const MAXIMO_PLANES_PORTADA = 3;
 
 const planesFijosSuralia = [
@@ -2647,7 +2599,15 @@ async function cargarProximosPlanesPortada() {
                 Array.isArray(data)
                     ? data
                     : []
-            ).map(normalizarPlanSupabasePortada);
+            )
+                .filter(
+                    (plan) =>
+                        String(plan.id || "") !==
+                        PLAN_PONCHO_K_SUPABASE_ID
+                )
+                .map(
+                    normalizarPlanSupabasePortada
+                );
         } catch (error) {
             console.error(
                 "No se pudieron cargar los planes publicados para la portada:",
@@ -3106,3 +3066,70 @@ if (
 } else {
     iniciarPaginaPrincipal();
 }
+/* =====================================================
+   NOTIFICACIONES GLOBALES DE SURALIA
+   Carga js/notificaciones.js automáticamente en todas
+   las páginas que ya utilizan js/main.js
+===================================================== */
+
+(function cargarNotificacionesGlobales() {
+    function insertarScriptNotificaciones() {
+        const yaExiste =
+            Array.from(
+                document.scripts
+            ).some(
+                (script) => {
+                    const src =
+                        script.getAttribute(
+                            "src"
+                        ) || "";
+
+                    return (
+                        src ===
+                            "js/notificaciones.js" ||
+                        src.endsWith(
+                            "/js/notificaciones.js"
+                        )
+                    );
+                }
+            );
+
+        if (yaExiste) {
+            return;
+        }
+
+        const script =
+            document.createElement(
+                "script"
+            );
+
+        script.src =
+            "js/notificaciones.js";
+
+        script.defer =
+            true;
+
+        script.dataset.suraliaNotificaciones =
+            "true";
+
+        document.body.appendChild(
+            script
+        );
+    }
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+        document.addEventListener(
+            "DOMContentLoaded",
+            insertarScriptNotificaciones,
+            {
+                once:
+                    true
+            }
+        );
+    } else {
+        insertarScriptNotificaciones();
+    }
+})();

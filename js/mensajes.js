@@ -176,6 +176,15 @@ let conversacionActualId =
 let otroUsuarioActualId =
     "";
 
+let chatPuedeEnviar =
+    false;
+
+let avisoChatNoDisponible =
+    null;
+
+let intervaloDisponibilidadChat =
+    null;
+
 let intervaloPresenciaPropia =
     null;
 
@@ -2102,6 +2111,17 @@ async function alternarReaccionMensaje(
     mensajeId,
     emoji
 ) {
+    if (!chatPuedeEnviar) {
+        return;
+    }
+
+    const conexionSigueActiva =
+        await actualizarDisponibilidadChat();
+
+    if (!conexionSigueActiva) {
+        return;
+    }
+
     const cliente =
         window.clienteSupabase;
 
@@ -3355,6 +3375,8 @@ async function renderizarMensaje(
         )
     );
 
+    actualizarAccionesMensajesSegunDisponibilidad();
+
     const esMensajePropio =
         mensaje.remitente_id ===
         usuarioSesionActual?.id;
@@ -3525,7 +3547,219 @@ async function marcarMensajesComoLeidos() {
 }
 
 
-function activarFormularioChat() {
+async function limpiarNotificacionesConversacionActual() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (
+        !cliente ||
+        !usuarioSesionActual?.id ||
+        !conversacionActualId
+    ) {
+        return;
+    }
+
+    try {
+        /*
+         * Al entrar en una conversación eliminamos todas las
+         * notificaciones de mensajes pertenecientes a ese chat.
+         *
+         * La política RLS de notificaciones garantiza además
+         * que cada usuario solo pueda borrar sus propios avisos.
+         */
+        const {
+            error
+        } = await cliente
+            .from(
+                "notificaciones"
+            )
+            .delete()
+            .eq(
+                "usuario_id",
+                usuarioSesionActual.id
+            )
+            .eq(
+                "tipo",
+                "mensaje"
+            )
+            .contains(
+                "datos",
+                {
+                    conversacion_id:
+                        conversacionActualId
+                }
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        /*
+         * Realtime ya actualizará la campana mediante el DELETE,
+         * pero este evento fuerza una recarga inmediata como
+         * respaldo si el canal todavía se está conectando.
+         */
+        window.dispatchEvent(
+            new CustomEvent(
+                "suralia:notificaciones-actualizadas"
+            )
+        );
+    } catch (error) {
+        /*
+         * Un fallo al limpiar una notificación nunca debe
+         * impedir abrir o utilizar el chat.
+         */
+        console.error(
+            "No se pudieron limpiar las notificaciones de esta conversación:",
+            error
+        );
+    }
+}
+
+
+function asegurarAvisoChatNoDisponible() {
+    if (
+        avisoChatNoDisponible ||
+        !formularioChat
+    ) {
+        return avisoChatNoDisponible;
+    }
+
+    avisoChatNoDisponible =
+        document.createElement(
+            "div"
+        );
+
+    avisoChatNoDisponible.id =
+        "chat-no-disponible";
+
+    avisoChatNoDisponible.className =
+        "chat-suralia__aviso-bloqueo oculto";
+
+    avisoChatNoDisponible.setAttribute(
+        "role",
+        "status"
+    );
+
+    avisoChatNoDisponible.setAttribute(
+        "aria-live",
+        "polite"
+    );
+
+    avisoChatNoDisponible.innerHTML = `
+        <i
+            class="fa-solid fa-lock"
+            aria-hidden="true"
+        ></i>
+
+        <div>
+            <strong>
+                No puedes enviar mensajes a esta persona.
+            </strong>
+
+            <span>
+                La conversación solo está disponible mientras la conexión siga activa.
+            </span>
+        </div>
+    `;
+
+    formularioChat.before(
+        avisoChatNoDisponible
+    );
+
+    if (
+        !document.querySelector(
+            "#chat-aviso-bloqueo-estilos"
+        )
+    ) {
+        const estilos =
+            document.createElement(
+                "style"
+            );
+
+        estilos.id =
+            "chat-aviso-bloqueo-estilos";
+
+        estilos.textContent = `
+            .chat-suralia__aviso-bloqueo {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin: 0.75rem 0;
+                padding: 0.9rem 1rem;
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                border-radius: 14px;
+                background: rgba(0, 0, 0, 0.18);
+                line-height: 1.35;
+            }
+
+            .chat-suralia__aviso-bloqueo.oculto {
+                display: none;
+            }
+
+            .chat-suralia__aviso-bloqueo > i {
+                flex: 0 0 auto;
+                font-size: 1rem;
+                opacity: 0.8;
+            }
+
+            .chat-suralia__aviso-bloqueo > div {
+                display: grid;
+                gap: 0.15rem;
+            }
+
+            .chat-suralia__aviso-bloqueo strong {
+                font-size: 0.95rem;
+            }
+
+            .chat-suralia__aviso-bloqueo span {
+                font-size: 0.82rem;
+                opacity: 0.72;
+            }
+        `;
+
+        document.head.appendChild(
+            estilos
+        );
+    }
+
+    return avisoChatNoDisponible;
+}
+
+
+function actualizarAccionesMensajesSegunDisponibilidad() {
+    if (!listaMensajes) {
+        return;
+    }
+
+    listaMensajes
+        .querySelectorAll(
+            `
+                [data-abrir-reacciones],
+                [data-reaccion-rapida],
+                [data-responder-mensaje],
+                [data-editar-mensaje]
+            `
+        )
+        .forEach(
+            (
+                boton
+            ) => {
+                boton.disabled =
+                    !chatPuedeEnviar;
+
+                boton.setAttribute(
+                    "aria-disabled",
+                    chatPuedeEnviar
+                        ? "false"
+                        : "true"
+                );
+            }
+        );
+}
+
+
+function aplicarEstadoFormularioChat() {
     if (
         !campoMensaje ||
         !botonEnviarMensaje
@@ -3534,17 +3768,180 @@ function activarFormularioChat() {
     }
 
     campoMensaje.disabled =
-        false;
+        !chatPuedeEnviar;
 
     botonEnviarMensaje.disabled =
-        false;
+        !chatPuedeEnviar;
 
     if (botonAdjuntarImagen) {
         botonAdjuntarImagen.disabled =
-            false;
+            !chatPuedeEnviar ||
+            Boolean(
+                mensajeEdicionActual
+            );
     }
 
-    campoMensaje.focus();
+    if (!chatPuedeEnviar) {
+        ocultarMenuImagenChat();
+
+        campoMensaje.setAttribute(
+            "aria-disabled",
+            "true"
+        );
+    } else {
+        campoMensaje.removeAttribute(
+            "aria-disabled"
+        );
+    }
+}
+
+
+function establecerDisponibilidadChat(
+    disponible
+) {
+    const estadoAnterior =
+        chatPuedeEnviar;
+
+    chatPuedeEnviar =
+        Boolean(
+            disponible
+        );
+
+    const aviso =
+        asegurarAvisoChatNoDisponible();
+
+    aviso?.classList.toggle(
+        "oculto",
+        chatPuedeEnviar
+    );
+
+    if (!chatPuedeEnviar) {
+        mostrarEstadoEnLinea(
+            false
+        );
+
+        mostrarEstadoEscribiendo(
+            false
+        );
+
+        cerrarSelectoresReacciones();
+
+        cancelarRespuestaActual();
+
+        if (mensajeEdicionActual) {
+            cancelarEdicionMensaje();
+        }
+
+        detenerEstadoEscrituraLocal();
+    }
+
+    aplicarEstadoFormularioChat();
+
+    actualizarAccionesMensajesSegunDisponibilidad();
+
+    if (
+        chatPuedeEnviar &&
+        !estadoAnterior
+    ) {
+        campoMensaje?.focus();
+    }
+}
+
+
+async function comprobarConexionAceptadaChat() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (
+        !cliente ||
+        !usuarioSesionActual?.id ||
+        !otroUsuarioActualId
+    ) {
+        return false;
+    }
+
+    const usuarioActualId =
+        usuarioSesionActual.id;
+
+    const filtroParticipantes =
+        `and(solicitante_id.eq.${usuarioActualId},receptor_id.eq.${otroUsuarioActualId}),and(solicitante_id.eq.${otroUsuarioActualId},receptor_id.eq.${usuarioActualId})`;
+
+    const {
+        data,
+        error
+    } = await cliente
+        .from(
+            "solicitudes_conexion"
+        )
+        .select(
+            "id"
+        )
+        .eq(
+            "estado",
+            "aceptada"
+        )
+        .or(
+            filtroParticipantes
+        )
+        .limit(
+            1
+        );
+
+    if (error) {
+        throw error;
+    }
+
+    return Boolean(
+        data?.length
+    );
+}
+
+
+async function actualizarDisponibilidadChat() {
+    try {
+        const disponible =
+            await comprobarConexionAceptadaChat();
+
+        establecerDisponibilidadChat(
+            disponible
+        );
+
+        return disponible;
+    } catch (error) {
+        console.error(
+            "No se pudo comprobar si la conversación sigue activa:",
+            error
+        );
+
+        /*
+         * Un error puntual de red no debe cerrar una conversación
+         * que ya estaba habilitada. El servidor seguirá aplicando
+         * sus propias reglas al intentar enviar.
+         */
+        return chatPuedeEnviar;
+    }
+}
+
+
+function iniciarControlDisponibilidadChat() {
+    window.clearInterval(
+        intervaloDisponibilidadChat
+    );
+
+    intervaloDisponibilidadChat =
+        window.setInterval(
+            actualizarDisponibilidadChat,
+            4000
+        );
+}
+
+
+function activarFormularioChat() {
+    aplicarEstadoFormularioChat();
+
+    if (chatPuedeEnviar) {
+        campoMensaje?.focus();
+    }
 }
 
 
@@ -3779,6 +4176,7 @@ function iniciarEdicionMensaje(
     articuloMensaje
 ) {
     if (
+        !chatPuedeEnviar ||
         !articuloMensaje ||
         !campoMensaje
     ) {
@@ -3942,6 +4340,10 @@ async function actualizarMensajeEditadoEnPantalla(
 
 
 async function guardarEdicionMensaje() {
+    if (!chatPuedeEnviar) {
+        return;
+    }
+
     const cliente =
         window.clienteSupabase;
 
@@ -3956,6 +4358,13 @@ async function guardarEdicionMensaje() {
         !contenido ||
         contenido.length > 2000
     ) {
+        return;
+    }
+
+    const conexionSigueActiva =
+        await actualizarDisponibilidadChat();
+
+    if (!conexionSigueActiva) {
         return;
     }
 
@@ -4058,19 +4467,6 @@ async function guardarEdicionMensaje() {
             "No se ha podido editar el mensaje. Inténtalo de nuevo."
         );
     } finally {
-        campoMensaje.disabled =
-            false;
-
-        botonEnviarMensaje.disabled =
-            false;
-
-        if (botonAdjuntarImagen) {
-            botonAdjuntarImagen.disabled =
-                Boolean(
-                    mensajeEdicionActual
-                );
-        }
-
         botonEnviarMensaje.innerHTML = `
             <i
                 class="fa-solid fa-paper-plane"
@@ -4078,7 +4474,11 @@ async function guardarEdicionMensaje() {
             ></i>
         `;
 
-        campoMensaje.focus();
+        aplicarEstadoFormularioChat();
+
+        if (chatPuedeEnviar) {
+            campoMensaje.focus();
+        }
     }
 }
 
@@ -4152,7 +4552,10 @@ function crearBarraRespuestaChat() {
 function iniciarRespuestaMensaje(
     articuloMensaje
 ) {
-    if (!articuloMensaje) {
+    if (
+        !chatPuedeEnviar ||
+        !articuloMensaje
+    ) {
         return;
     }
 
@@ -4551,6 +4954,13 @@ async function enviarMensaje(
         return;
     }
 
+    const conexionSigueActiva =
+        await actualizarDisponibilidadChat();
+
+    if (!conexionSigueActiva) {
+        return;
+    }
+
     campoMensaje.disabled =
         true;
 
@@ -4700,10 +5110,6 @@ async function enviarMensaje(
     } catch (error) {
         cancelarProgresoImagen();
 
-        marcarMensajeTemporalConError(
-            mensajeTemporal
-        );
-
         console.error(
             "No se pudo enviar el mensaje:",
             error
@@ -4724,21 +5130,23 @@ async function enviarMensaje(
                 );
         }
 
-        window.alert(
-            "No se ha podido enviar el mensaje o la imagen. Comprueba que la conexión sigue activa."
-        );
-    } finally {
-        campoMensaje.disabled =
-            false;
+        const conexionSigueActiva =
+            await actualizarDisponibilidadChat();
 
-        botonEnviarMensaje.disabled =
-            false;
+        if (!conexionSigueActiva) {
+            eliminarMensajeTemporal(
+                mensajeTemporal
+            );
+        } else {
+            marcarMensajeTemporalConError(
+                mensajeTemporal
+            );
 
-        if (botonAdjuntarImagen) {
-            botonAdjuntarImagen.disabled =
-                false;
+            window.alert(
+                "No se ha podido enviar el mensaje o la imagen. Inténtalo de nuevo."
+            );
         }
-
+    } finally {
         botonEnviarMensaje.innerHTML = `
             <i
                 class="fa-solid fa-paper-plane"
@@ -4746,7 +5154,11 @@ async function enviarMensaje(
             ></i>
         `;
 
-        campoMensaje.focus();
+        aplicarEstadoFormularioChat();
+
+        if (chatPuedeEnviar) {
+            campoMensaje.focus();
+        }
     }
 }
 
@@ -4804,6 +5216,7 @@ async function consultarPresenciaRemota() {
         window.clienteSupabase;
 
     if (
+        !chatPuedeEnviar ||
         !cliente ||
         !otroUsuarioActualId
     ) {
@@ -4955,6 +5368,7 @@ async function establecerEstadoEscritura(
         window.clienteSupabase;
 
     if (
+        !chatPuedeEnviar ||
         !cliente ||
         !conversacionActualId
     ) {
@@ -4990,7 +5404,14 @@ async function establecerEstadoEscritura(
 
 
 function gestionarEscrituraLocal() {
-    if (!campoMensaje) {
+    if (
+        !chatPuedeEnviar ||
+        !campoMensaje
+    ) {
+        mostrarEstadoEscribiendo(
+            false
+        );
+
         return;
     }
 
@@ -5077,9 +5498,14 @@ async function consultarEstadoEscrituraRemota() {
         window.clienteSupabase;
 
     if (
+        !chatPuedeEnviar ||
         !cliente ||
         !conversacionActualId
     ) {
+        mostrarEstadoEscribiendo(
+            false
+        );
+
         return;
     }
 
@@ -5195,6 +5621,8 @@ function suscribirseAMensajes() {
                         await reproducirSonidoChat();
 
                         await marcarMensajesComoLeidos();
+
+                        await limpiarNotificacionesConversacionActual();
                     }
                 }
             );
@@ -5474,11 +5902,15 @@ async function cargarConversacion() {
             );
         }
 
+        await actualizarDisponibilidadChat();
+
         await cargarReaccionesConversacion();
 
         await cargarMensajesGuardados();
 
         await marcarMensajesComoLeidos();
+
+        await limpiarNotificacionesConversacionActual();
 
         suscribirseAMensajes();
         iniciarConsultaEstadoEscritura();
@@ -5498,7 +5930,9 @@ async function cargarConversacion() {
 
         asegurarIndicadorEscribiendo();
         crearBotonBajarUltimoMensaje();
+        actualizarAccionesMensajesSegunDisponibilidad();
         activarFormularioChat();
+        iniciarControlDisponibilidadChat();
 
         /*
          * Esperamos a que el chat sea visible y el navegador
@@ -5531,6 +5965,10 @@ async function cargarConversacion() {
 botonAdjuntarImagen?.addEventListener(
     "click",
     () => {
+        if (!chatPuedeEnviar) {
+            return;
+        }
+
         if (
             esDispositivoMovil()
         ) {
@@ -5638,6 +6076,11 @@ campoMensaje?.addEventListener(
     "input",
     () => {
         ajustarAlturaMensaje();
+
+        if (!chatPuedeEnviar) {
+            return;
+        }
+
         gestionarEscrituraLocal();
     }
 );
@@ -5696,6 +6139,8 @@ document.addEventListener(
         );
 
         consultarPresenciaRemota();
+
+        limpiarNotificacionesConversacionActual();
     }
 );
 
@@ -5976,6 +6421,13 @@ window.addEventListener(
         );
 
         canalEscrituraTabla =
+            null;
+
+        window.clearInterval(
+            intervaloDisponibilidadChat
+        );
+
+        intervaloDisponibilidadChat =
             null;
     }
 );

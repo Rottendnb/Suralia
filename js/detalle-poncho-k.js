@@ -81,6 +81,17 @@ const datosPlanPonchoK = {
 };
 
 
+/*
+   El plan conserva su ID histórico "poncho-k-cartuja"
+   para favoritos, catálogo y enlaces antiguos.
+
+   Las reservas usan el UUID real de public.planes.
+*/
+const PLAN_SUPABASE_ID_PONCHO_K =
+    document.body.dataset.planSupabaseId ||
+    "b3039583-9882-4877-ac4a-5a713393f495";
+
+
 /* =====================================================
    ELEMENTOS DE LA PÁGINA
 ===================================================== */
@@ -722,7 +733,7 @@ if (personasReserva) {
 
 
 /* =====================================================
-   RESERVAS
+   RESERVAS · SUPABASE
 ===================================================== */
 
 function obtenerTextoSeleccionado(select) {
@@ -754,187 +765,288 @@ function obtenerFechaIsoReserva(
 }
 
 
-function existeReserva(
-    reservas,
-    email,
-    planId,
-    fechaValor
+function limpiarReservaLegacyPonchoK(
+    emailUsuario
 ) {
-    return reservas.some(
-        (reserva) => {
-            return (
-                reserva.usuarioEmail ===
-                    email &&
-                reserva.planId ===
-                    planId &&
-                (
-                    reserva.fecha ===
-                        fechaValor ||
-                    reserva.fechaIso ===
-                        fechaValor ||
-                    reserva.fechaValor ===
-                        fechaValor
-                ) &&
-                reserva.estado !==
-                    "cancelada"
-            );
-        }
-    );
+    if (!emailUsuario) {
+        return;
+    }
+
+    const reservas =
+        obtenerReservas();
+
+    const reservasLimpias =
+        reservas.filter(
+            (reserva) => {
+                const esPonchoK =
+                    String(
+                        reserva?.planId ||
+                        ""
+                    ) ===
+                    "poncho-k-cartuja";
+
+                const esDelUsuario =
+                    String(
+                        reserva?.usuarioEmail ||
+                        ""
+                    ).toLowerCase() ===
+                    String(
+                        emailUsuario
+                    ).toLowerCase();
+
+                return !(
+                    esPonchoK &&
+                    esDelUsuario
+                );
+            }
+        );
+
+    if (
+        reservasLimpias.length !==
+        reservas.length
+    ) {
+        guardarReservas(
+            reservasLimpias
+        );
+    }
+}
+
+
+function obtenerMensajeErrorReservaPonchoK(
+    error
+) {
+    const mensaje =
+        String(
+            error?.message ||
+            error ||
+            ""
+        );
+
+    if (
+        mensaje.includes(
+            "Ya tienes una reserva activa"
+        )
+    ) {
+        return "Ya tienes una reserva para este concierto.";
+    }
+
+    if (
+        mensaje.includes(
+            "Solo quedan"
+        ) ||
+        mensaje.includes(
+            "agotado"
+        )
+    ) {
+        return mensaje;
+    }
+
+    if (
+        mensaje.includes(
+            "número de personas"
+        )
+    ) {
+        return "Puedes reservar entre 1 y 4 entradas.";
+    }
+
+    if (
+        mensaje.includes(
+            "plan no está disponible"
+        )
+    ) {
+        return "Este concierto no está disponible para reservar.";
+    }
+
+    return "No se ha podido completar la reserva. Inténtalo de nuevo.";
 }
 
 
 if (formularioReserva) {
     formularioReserva.addEventListener(
         "submit",
-        (evento) => {
+        async (evento) => {
             evento.preventDefault();
 
-            const sesion =
-                obtenerSesion();
+            const cliente =
+                window.clienteSupabase;
 
-            if (!sesion?.conectado) {
-                sessionStorage.setItem(
-                    "destinoDespuesLoginSuralia",
-                    window.location.href
+            if (!cliente?.auth) {
+                mostrarNotificacion(
+                    "No se ha podido conectar con el sistema de reservas."
+                );
+
+                return;
+            }
+
+            const botonReservar =
+                formularioReserva.querySelector(
+                    'button[type="submit"]'
+                );
+
+            const textoBotonOriginal =
+                botonReservar?.textContent ||
+                "Reservar entradas";
+
+            try {
+                const {
+                    data: datosSesion,
+                    error: errorSesion
+                } = await cliente.auth.getSession();
+
+                if (errorSesion) {
+                    throw errorSesion;
+                }
+
+                const usuario =
+                    datosSesion?.session?.user;
+
+                if (!usuario) {
+                    sessionStorage.setItem(
+                        "destinoDespuesLoginSuralia",
+                        window.location.href
+                    );
+
+                    mostrarNotificacion(
+                        "Debes iniciar sesión para reservar entradas."
+                    );
+
+                    setTimeout(() => {
+                        window.location.href =
+                            "login.html";
+                    }, 1200);
+
+                    return;
+                }
+
+                const fechaValor =
+                    fechaReserva?.value ||
+                    "";
+
+                const fechaIso =
+                    obtenerFechaIsoReserva(
+                        fechaValor
+                    );
+
+                const entradas =
+                    Number(
+                        personasReserva?.value ||
+                        1
+                    );
+
+                if (
+                    !fechaIso ||
+                    !datosPlanPonchoK.hora
+                ) {
+                    mostrarNotificacion(
+                        "Selecciona una fecha válida para reservar."
+                    );
+
+                    return;
+                }
+
+                if (
+                    !Number.isInteger(
+                        entradas
+                    ) ||
+                    entradas < 1 ||
+                    entradas > 4
+                ) {
+                    mostrarNotificacion(
+                        "Puedes reservar entre 1 y 4 entradas."
+                    );
+
+                    return;
+                }
+
+                if (botonReservar) {
+                    botonReservar.disabled =
+                        true;
+
+                    botonReservar.textContent =
+                        "Reservando...";
+                }
+
+                const {
+                    data,
+                    error
+                } = await cliente.rpc(
+                    "crear_reserva_plan",
+                    {
+                        p_plan_id:
+                            PLAN_SUPABASE_ID_PONCHO_K,
+
+                        p_fecha:
+                            fechaIso,
+
+                        p_hora:
+                            datosPlanPonchoK.hora,
+
+                        p_personas:
+                            entradas
+                    }
+                );
+
+                if (error) {
+                    throw error;
+                }
+
+                const respuesta =
+                    Array.isArray(data)
+                        ? data[0]
+                        : data;
+
+                if (
+                    !respuesta ||
+                    respuesta.ok !== true
+                ) {
+                    throw new Error(
+                        "No se ha podido confirmar la reserva."
+                    );
+                }
+
+                /*
+                    El perfil ya lee las reservas reales
+                    desde public.reservas. Eliminamos únicamente
+                    una posible reserva antigua de Poncho K que
+                    hubiera quedado en localStorage para evitar
+                    que se muestre duplicada.
+                */
+                limpiarReservaLegacyPonchoK(
+                    usuario.email ||
+                    ""
                 );
 
                 mostrarNotificacion(
-                    "Debes iniciar sesión para reservar entradas."
+                    "Entradas reservadas correctamente."
                 );
+
+                formularioReserva.reset();
+                actualizarPrecioReserva();
 
                 setTimeout(() => {
                     window.location.href =
-                        "login.html";
-                }, 1200);
-
-                return;
-            }
-
-            const fechaValor =
-                fechaReserva?.value || "";
-
-            const fechaTexto =
-                obtenerTextoSeleccionado(
-                    fechaReserva
+                        "perfil.html#reservas";
+                }, 900);
+            } catch (error) {
+                console.error(
+                    "No se pudo crear la reserva de Poncho K:",
+                    error
                 );
 
-            const fechaIso =
-                obtenerFechaIsoReserva(
-                    fechaValor
-                );
-
-            const entradas = Number(
-                personasReserva?.value || 1
-            );
-
-            const total =
-                entradas *
-                datosPlanPonchoK.precio;
-
-            const reservas =
-                obtenerReservas();
-
-            if (
-                existeReserva(
-                    reservas,
-                    sesion.email,
-                    datosPlanPonchoK.planId,
-                    fechaIso
-                )
-            ) {
                 mostrarNotificacion(
-                    "Ya tienes una reserva para este concierto."
+                    obtenerMensajeErrorReservaPonchoK(
+                        error
+                    )
                 );
+            } finally {
+                if (botonReservar) {
+                    botonReservar.disabled =
+                        false;
 
-                return;
+                    botonReservar.textContent =
+                        textoBotonOriginal.trim();
+                }
             }
-
-            const nuevaReserva = {
-                id:
-                    Date.now(),
-
-                planId:
-                    datosPlanPonchoK.planId,
-
-                titulo:
-                    datosPlanPonchoK.titulo,
-
-                categoria:
-                    datosPlanPonchoK.categoria,
-
-                imagen:
-                    datosPlanPonchoK.imagen,
-
-                ubicacion:
-                    datosPlanPonchoK.ubicacion,
-
-                enlace:
-                    datosPlanPonchoK.enlace,
-
-                precio:
-                    datosPlanPonchoK.precio,
-
-                precioUnitario:
-                    datosPlanPonchoK.precio,
-
-                personas:
-                    entradas,
-
-                entradas,
-
-                precioTotal:
-                    total,
-
-                fecha:
-                    fechaIso,
-
-                fechaIso,
-
-                fechaValor,
-
-                fechaTexto,
-
-                hora:
-                    datosPlanPonchoK.hora,
-
-                estado:
-                    "confirmada",
-
-                usuarioEmail:
-                    sesion.email,
-
-                fechaReserva:
-                    new Date().toISOString()
-            };
-
-            reservas.push(
-                nuevaReserva
-            );
-
-            const reservaGuardada =
-                guardarReservas(
-                    reservas
-                );
-
-            if (!reservaGuardada) {
-                mostrarNotificacion(
-                    "No se ha podido guardar la reserva."
-                );
-
-                return;
-            }
-
-            mostrarNotificacion(
-                "Entradas reservadas correctamente."
-            );
-
-            formularioReserva.reset();
-            actualizarPrecioReserva();
-
-            setTimeout(() => {
-                window.location.href =
-                    "perfil.html#reservas";
-            }, 900);
         }
     );
 }

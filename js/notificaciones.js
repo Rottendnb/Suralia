@@ -1119,6 +1119,28 @@
     }
 
 
+    /*
+       Permite que otras partes de Suralia, como mensajes.js,
+       pidan refrescar la campana inmediatamente después de
+       modificar notificaciones.
+    */
+    function refrescarNotificacionesDesdeSuralia() {
+        if (
+            !usuarioNotificaciones
+        ) {
+            return;
+        }
+
+        cargarNotificaciones();
+    }
+
+
+    window.addEventListener(
+        "suralia:notificaciones-actualizadas",
+        refrescarNotificacionesDesdeSuralia
+    );
+
+
     window.addEventListener(
         "beforeunload",
         limpiarCanalNotificaciones
