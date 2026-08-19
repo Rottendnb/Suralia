@@ -273,7 +273,10 @@
 
                         <div class="campo-formulario">
 
-                            <label for="plan-titulo">
+                            <label
+                                for="plan-titulo"
+                                id="etiqueta-plan-titulo"
+                            >
                                 Título del plan
                             </label>
 
@@ -383,9 +386,187 @@
 
                         </div>
 
+                        <div
+                            class="bloque-musica-publicar"
+                            id="bloque-musica-publicar"
+                            hidden
+                        >
+
+                            <div class="bloque-musica-publicar__cabecera">
+                                <span class="bloque-musica-publicar__icono">
+                                    <i class="fa-solid fa-music" aria-hidden="true"></i>
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        Datos del concierto o festival
+                                    </strong>
+
+                                    <p>
+                                        Completa estos datos para que el evento musical
+                                        tenga una ficha más clara y específica.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="formulario-doble">
+
+                                <div class="campo-formulario">
+                                    <label for="plan-tipo-evento">
+                                        Tipo de evento
+                                    </label>
+
+                                    <div class="campo-formulario__control">
+                                        <i class="fa-solid fa-icons" aria-hidden="true"></i>
+
+                                        <select
+                                            id="plan-tipo-evento"
+                                            name="tipo_evento"
+                                            aria-describedby="error-plan-tipo-evento"
+                                        >
+                                            <option value="">
+                                                Selecciona el tipo
+                                            </option>
+                                            <option value="Concierto">Concierto</option>
+                                            <option value="Festival">Festival</option>
+                                            <option value="Sesión DJ">Sesión DJ</option>
+                                            <option value="Fiesta">Fiesta</option>
+                                            <option value="Evento musical">Evento musical</option>
+                                            <option value="Otro">Otro</option>
+                                        </select>
+                                    </div>
+
+                                    <small
+                                        class="mensaje-error"
+                                        id="error-plan-tipo-evento"
+                                        aria-live="polite"
+                                    ></small>
+                                </div>
+
+                                <div class="campo-formulario">
+                                    <label for="plan-artista-cartel">
+                                        Artista o cartel
+                                    </label>
+
+                                    <div class="campo-formulario__control">
+                                        <i class="fa-solid fa-microphone-lines" aria-hidden="true"></i>
+
+                                        <input
+                                            type="text"
+                                            id="plan-artista-cartel"
+                                            name="artista_cartel"
+                                            maxlength="180"
+                                            aria-describedby="error-plan-artista-cartel"
+                                            placeholder="Ejemplo: Poncho K"
+                                        >
+                                    </div>
+
+                                    <small
+                                        class="mensaje-error"
+                                        id="error-plan-artista-cartel"
+                                        aria-live="polite"
+                                    ></small>
+                                </div>
+
+                            </div>
+
+                            <div class="formulario-doble">
+
+                                <div class="campo-formulario">
+                                    <label for="plan-apertura-puertas">
+                                        Apertura de puertas
+                                        <span class="campo-opcional">(opcional)</span>
+                                    </label>
+
+                                    <div class="campo-formulario__control">
+                                        <i class="fa-solid fa-door-open" aria-hidden="true"></i>
+
+                                        <input
+                                            type="time"
+                                            id="plan-apertura-puertas"
+                                            name="apertura_puertas"
+                                        >
+                                    </div>
+                                </div>
+
+                                <div class="campo-formulario">
+                                    <label for="plan-hora-fin">
+                                        Hora de finalización
+                                        <span class="campo-opcional">(opcional)</span>
+                                    </label>
+
+                                    <div class="campo-formulario__control">
+                                        <i class="fa-regular fa-clock" aria-hidden="true"></i>
+
+                                        <input
+                                            type="time"
+                                            id="plan-hora-fin"
+                                            name="hora_fin"
+                                        >
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="formulario-doble">
+
+                                <div class="campo-formulario">
+                                    <label for="plan-edad-minima">
+                                        Edad mínima
+                                    </label>
+
+                                    <div class="campo-formulario__control">
+                                        <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+
+                                        <select
+                                            id="plan-edad-minima"
+                                            name="edad_minima"
+                                        >
+                                            <option value="Todos los públicos">Todos los públicos</option>
+                                            <option value="Mayores de 14 años">Mayores de 14 años</option>
+                                            <option value="Mayores de 16 años">Mayores de 16 años</option>
+                                            <option value="Mayores de 18 años">Mayores de 18 años</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="campo-formulario">
+                                    <label for="plan-tipo-entrada">
+                                        Tipo de entrada
+                                    </label>
+
+                                    <div class="campo-formulario__control">
+                                        <i class="fa-solid fa-ticket" aria-hidden="true"></i>
+
+                                        <select
+                                            id="plan-tipo-entrada"
+                                            name="tipo_entrada"
+                                        >
+                                            <option value="General">General</option>
+                                            <option value="Numerada">Numerada</option>
+                                            <option value="Abono">Abono</option>
+                                            <option value="Gratuita">Gratuita</option>
+                                            <option value="Otro">Otro</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <p class="bloque-musica-publicar__ayuda">
+                                <i class="fa-regular fa-lightbulb" aria-hidden="true"></i>
+                                Para un festival de varios días, utiliza “Añadir otra fecha”
+                                para registrar cada jornada o pase.
+                            </p>
+
+                        </div>
+
                         <div class="campo-formulario">
 
-                            <label for="plan-descripcion">
+                            <label
+                                for="plan-descripcion"
+                                id="etiqueta-plan-descripcion"
+                            >
                                 Descripción
                             </label>
 
@@ -446,7 +627,10 @@
 
                             <div class="campo-formulario">
 
-                                <label for="plan-fecha">
+                                <label
+                                    for="plan-fecha"
+                                    id="etiqueta-plan-fecha"
+                                >
                                     Primera fecha
                                 </label>
 
@@ -469,7 +653,10 @@
 
                             <div class="campo-formulario">
 
-                                <label for="plan-hora">
+                                <label
+                                    for="plan-hora"
+                                    id="etiqueta-plan-hora"
+                                >
                                     Hora de inicio
                                 </label>
 
@@ -539,7 +726,10 @@
 
                             <div class="campo-formulario">
 
-                                <label for="plan-duracion">
+                                <label
+                                    for="plan-duracion"
+                                    id="etiqueta-plan-duracion"
+                                >
                                     Duración aproximada
                                 </label>
 
@@ -585,7 +775,10 @@
 
                             <div class="campo-formulario">
 
-                                <label for="plan-plazas">
+                                <label
+                                    for="plan-plazas"
+                                    id="etiqueta-plan-plazas"
+                                >
                                     Plazas de la primera fecha
                                 </label>
 
@@ -603,7 +796,10 @@
                                     >
                                 </div>
 
-                                <small class="campo-ayuda">
+                                <small
+                                    class="campo-ayuda"
+                                    id="ayuda-plan-plazas"
+                                >
                                     Si añades más fechas, cada una podrá tener
                                     un número de plazas diferente.
                                 </small>
@@ -635,7 +831,7 @@
                                     Ubicación y precio
                                 </h2>
 
-                                <p>
+                                <p id="texto-bloque-ubicacion">
                                     Añade el lugar de encuentro y el precio por
                                     persona.
                                 </p>
@@ -675,7 +871,10 @@
 
                             <div class="campo-formulario">
 
-                                <label for="plan-ubicacion">
+                                <label
+                                    for="plan-ubicacion"
+                                    id="etiqueta-plan-ubicacion"
+                                >
                                     Lugar o dirección concreta
                                 </label>
 
@@ -703,7 +902,10 @@
 
                         </div>
 
-                        <p class="campo-ayuda">
+                        <p
+                            class="campo-ayuda"
+                            id="ayuda-plan-ubicacion"
+                        >
                             Indica el municipio y el lugar exacto. En el detalle del plan se mostrará, por ejemplo, “Guillena, Sevilla” y la dirección concreta debajo.
                         </p>
 
@@ -761,7 +963,10 @@
 
                             <div class="campo-formulario">
 
-                                <label for="plan-precio">
+                                <label
+                                    for="plan-precio"
+                                    id="etiqueta-plan-precio"
+                                >
                                     Precio por persona
                                 </label>
 
@@ -787,7 +992,10 @@
 
                             </div>
 
-                            <div class="campo-formulario">
+                            <div
+                                class="campo-formulario"
+                                id="campo-plan-dificultad"
+                            >
 
                                 <label for="plan-dificultad">
                                     Nivel o dificultad

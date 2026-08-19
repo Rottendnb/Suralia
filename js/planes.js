@@ -1069,9 +1069,6 @@ if (filtroTexto) {
    PLANES PUBLICADOS DESDE SUPABASE
 ===================================================== */
 
-const PLAN_PONCHO_K_SUPABASE_ID =
-    "b3039583-9882-4877-ac4a-5a713393f495";
-
 function escaparHTMLPlanes(
     valor = ""
 ) {
@@ -1321,7 +1318,16 @@ async function cargarPlanesPublicadosSupabase() {
     const cliente =
         window.clienteSupabase;
 
-    if (!cliente || !listaPlanes) {
+    if (!listaPlanes) {
+        return;
+    }
+
+    if (!cliente) {
+        planes = [];
+        aplicarFiltros();
+        mostrarNotificacion(
+            "No se ha podido conectar para cargar los planes."
+        );
         return;
     }
 
@@ -1347,6 +1353,7 @@ async function cargarPlanesPublicadosSupabase() {
                 `
             )
             .eq("estado", "publicado")
+            .gte("fecha", obtenerFechaLocalISO())
             .order(
                 "creado_en",
                 {
@@ -1381,23 +1388,17 @@ async function cargarPlanesPublicadosSupabase() {
             ).filter(
                 (plan) =>
                     plan.id &&
-                    String(plan.id) !==
-                        PLAN_PONCHO_K_SUPABASE_ID &&
                     !idsExistentes.has(
                         String(plan.id)
                     )
             );
 
-        if (planesNuevos.length > 0) {
-            listaPlanes.insertAdjacentHTML(
-                "beforeend",
-                planesNuevos
-                    .map(
-                        crearTarjetaPlanSupabase
-                    )
-                    .join("")
-            );
-        }
+        listaPlanes.innerHTML =
+            planesNuevos
+                .map(
+                    crearTarjetaPlanSupabase
+                )
+                .join("");
 
         planes =
             Array.from(
@@ -1414,8 +1415,12 @@ async function cargarPlanesPublicadosSupabase() {
             error
         );
 
+        listaPlanes.innerHTML = "";
+        planes = [];
+        aplicarFiltros();
+
         mostrarNotificacion(
-            "No se han podido cargar las nuevas actividades."
+            "No se han podido cargar las actividades."
         );
     }
 }
@@ -1455,6 +1460,4 @@ if (
 aplicarParametrosIniciales();
 actualizarBotonVista();
 asegurarCategoriaTalleres();
-aplicarFiltros();
-cargarEstadoFavoritosTarjetas();
 cargarPlanesPublicadosSupabase();

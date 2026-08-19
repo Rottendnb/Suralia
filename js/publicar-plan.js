@@ -41,6 +41,67 @@ const precio = document.querySelector("#plan-precio");
 const dificultad = document.querySelector("#plan-dificultad");
 const enlaceReserva = document.querySelector("#plan-enlace-reserva");
 
+/* =====================================================
+   CAMPOS ESPECÍFICOS PARA CONCIERTOS Y FESTIVALES
+===================================================== */
+
+const bloqueMusicaPublicar =
+    document.querySelector("#bloque-musica-publicar");
+
+const tipoEventoMusica =
+    document.querySelector("#plan-tipo-evento");
+
+const artistaCartelMusica =
+    document.querySelector("#plan-artista-cartel");
+
+const aperturaPuertasMusica =
+    document.querySelector("#plan-apertura-puertas");
+
+const horaFinMusica =
+    document.querySelector("#plan-hora-fin");
+
+const edadMinimaMusica =
+    document.querySelector("#plan-edad-minima");
+
+const tipoEntradaMusica =
+    document.querySelector("#plan-tipo-entrada");
+
+const campoDificultad =
+    document.querySelector("#campo-plan-dificultad");
+
+const etiquetaTituloPlan =
+    document.querySelector("#etiqueta-plan-titulo");
+
+const etiquetaDescripcionPlan =
+    document.querySelector("#etiqueta-plan-descripcion");
+
+const etiquetaFechaPlan =
+    document.querySelector("#etiqueta-plan-fecha");
+
+const etiquetaHoraPlan =
+    document.querySelector("#etiqueta-plan-hora");
+
+const etiquetaDuracionPlan =
+    document.querySelector("#etiqueta-plan-duracion");
+
+const etiquetaPlazasPlan =
+    document.querySelector("#etiqueta-plan-plazas");
+
+const ayudaPlazasPlan =
+    document.querySelector("#ayuda-plan-plazas");
+
+const etiquetaUbicacionPlan =
+    document.querySelector("#etiqueta-plan-ubicacion");
+
+const ayudaUbicacionPlan =
+    document.querySelector("#ayuda-plan-ubicacion");
+
+const etiquetaPrecioPlan =
+    document.querySelector("#etiqueta-plan-precio");
+
+const textoBloqueUbicacion =
+    document.querySelector("#texto-bloque-ubicacion");
+
 const latitudPlan =
     document.querySelector("#plan-latitud");
 
@@ -698,6 +759,253 @@ fecha?.addEventListener(
 );
 
 
+/* =====================================================
+   MODO CONCIERTO / FESTIVAL
+===================================================== */
+
+function esPlanMusical() {
+    return categoria?.value === "musica";
+}
+
+
+function limpiarErroresMusica() {
+    limpiarError(
+        tipoEventoMusica,
+        "error-plan-tipo-evento"
+    );
+
+    limpiarError(
+        artistaCartelMusica,
+        "error-plan-artista-cartel"
+    );
+}
+
+
+function actualizarModoPublicacion() {
+    const modoMusica =
+        esPlanMusical();
+
+    if (bloqueMusicaPublicar) {
+        bloqueMusicaPublicar.hidden =
+            !modoMusica;
+    }
+
+    if (campoDificultad) {
+        campoDificultad.hidden =
+            modoMusica;
+    }
+
+    if (modoMusica) {
+        if (dificultad) {
+            dificultad.value =
+                "Todos los públicos";
+        }
+
+        if (etiquetaTituloPlan) {
+            etiquetaTituloPlan.textContent =
+                "Nombre del concierto o festival";
+        }
+
+        if (titulo) {
+            titulo.placeholder =
+                "Ejemplo: Poncho K - Cartuja Center CITE";
+        }
+
+        if (etiquetaDescripcionPlan) {
+            etiquetaDescripcionPlan.textContent =
+                "Información del evento";
+        }
+
+        if (descripcion) {
+            descripcion.placeholder =
+                "Cuenta quién actúa, cómo será el evento, qué incluye la entrada y cualquier información importante para asistir.";
+        }
+
+        if (etiquetaFechaPlan) {
+            etiquetaFechaPlan.textContent =
+                "Primera fecha / día";
+        }
+
+        if (etiquetaHoraPlan) {
+            etiquetaHoraPlan.textContent =
+                "Hora del concierto / inicio";
+        }
+
+        if (etiquetaDuracionPlan) {
+            etiquetaDuracionPlan.textContent =
+                "Duración aproximada del evento";
+        }
+
+        if (etiquetaPlazasPlan) {
+            etiquetaPlazasPlan.textContent =
+                "Aforo o entradas disponibles";
+        }
+
+        if (ayudaPlazasPlan) {
+            ayudaPlazasPlan.textContent =
+                "Indica las entradas disponibles para esta fecha. Si añades más días o pases, cada uno podrá tener su propio aforo.";
+        }
+
+        if (etiquetaUbicacionPlan) {
+            etiquetaUbicacionPlan.textContent =
+                "Recinto o sala";
+        }
+
+        if (ubicacion) {
+            ubicacion.placeholder =
+                "Ejemplo: Cartuja Center CITE";
+        }
+
+        if (ayudaUbicacionPlan) {
+            ayudaUbicacionPlan.textContent =
+                "Indica el municipio y el recinto exacto. Después marca en el mapa el acceso o punto principal del evento.";
+        }
+
+        if (etiquetaPrecioPlan) {
+            etiquetaPrecioPlan.textContent =
+                "Precio desde";
+        }
+
+        if (textoBloqueUbicacion) {
+            textoBloqueUbicacion.textContent =
+                "Añade el recinto, la ubicación exacta y el precio de las entradas.";
+        }
+    } else {
+        if (etiquetaTituloPlan) {
+            etiquetaTituloPlan.textContent =
+                "Título del plan";
+        }
+
+        if (titulo) {
+            titulo.placeholder =
+                "Ejemplo: Ruta nocturna por Sevilla";
+        }
+
+        if (etiquetaDescripcionPlan) {
+            etiquetaDescripcionPlan.textContent =
+                "Descripción";
+        }
+
+        if (descripcion) {
+            descripcion.placeholder =
+                "Explica en qué consiste la actividad, qué se hará y a quién está dirigida.";
+        }
+
+        if (etiquetaFechaPlan) {
+            etiquetaFechaPlan.textContent =
+                "Primera fecha";
+        }
+
+        if (etiquetaHoraPlan) {
+            etiquetaHoraPlan.textContent =
+                "Hora de inicio";
+        }
+
+        if (etiquetaDuracionPlan) {
+            etiquetaDuracionPlan.textContent =
+                "Duración aproximada";
+        }
+
+        if (etiquetaPlazasPlan) {
+            etiquetaPlazasPlan.textContent =
+                "Plazas de la primera fecha";
+        }
+
+        if (ayudaPlazasPlan) {
+            ayudaPlazasPlan.textContent =
+                "Si añades más fechas, cada una podrá tener un número de plazas diferente.";
+        }
+
+        if (etiquetaUbicacionPlan) {
+            etiquetaUbicacionPlan.textContent =
+                "Lugar o dirección concreta";
+        }
+
+        if (ubicacion) {
+            ubicacion.placeholder =
+                "Ejemplo: Auditorio Municipal de Guillena";
+        }
+
+        if (ayudaUbicacionPlan) {
+            ayudaUbicacionPlan.textContent =
+                "Indica el municipio y el lugar exacto. En el detalle del plan se mostrará el municipio y la dirección concreta debajo.";
+        }
+
+        if (etiquetaPrecioPlan) {
+            etiquetaPrecioPlan.textContent =
+                "Precio por persona";
+        }
+
+        if (textoBloqueUbicacion) {
+            textoBloqueUbicacion.textContent =
+                "Añade el lugar de encuentro y el precio por persona.";
+        }
+
+        limpiarErroresMusica();
+    }
+
+    actualizarVistaPrevia();
+}
+
+
+function obtenerDetallesExtraFormulario() {
+    if (!esPlanMusical()) {
+        return {};
+    }
+
+    return {
+        tipo_evento:
+            tipoEventoMusica?.value ||
+            "",
+
+        artista_cartel:
+            artistaCartelMusica?.value.trim() ||
+            "",
+
+        apertura_puertas:
+            aperturaPuertasMusica?.value ||
+            null,
+
+        hora_fin:
+            horaFinMusica?.value ||
+            null,
+
+        edad_minima:
+            edadMinimaMusica?.value ||
+            "Todos los públicos",
+
+        tipo_entrada:
+            tipoEntradaMusica?.value ||
+            "General"
+    };
+}
+
+
+categoria?.addEventListener(
+    "change",
+    actualizarModoPublicacion
+);
+
+[
+    tipoEventoMusica,
+    artistaCartelMusica,
+    aperturaPuertasMusica,
+    horaFinMusica,
+    edadMinimaMusica,
+    tipoEntradaMusica
+].forEach((campo) => {
+    campo?.addEventListener(
+        "input",
+        actualizarVistaPrevia
+    );
+
+    campo?.addEventListener(
+        "change",
+        actualizarVistaPrevia
+    );
+});
+
+
 function mostrarNotificacion(mensaje) {
     if (!notificacionPublicar) {
         console.log(mensaje);
@@ -778,9 +1086,19 @@ function actualizarVistaPrevia() {
         descripcion.value.trim() ||
         "La descripción del plan aparecerá aquí.";
 
-    vistaCategoria.textContent =
+    const categoriaTexto =
         categoria.options[categoria.selectedIndex]?.text ||
         "Categoría";
+
+    const tipoEventoTexto =
+        tipoEventoMusica?.value ||
+        "";
+
+    vistaCategoria.textContent =
+        esPlanMusical() &&
+        tipoEventoTexto
+            ? `${categoriaTexto} · ${tipoEventoTexto}`
+            : categoriaTexto;
 
     vistaFecha.innerHTML = `
         <i
@@ -827,10 +1145,15 @@ function actualizarVistaPrevia() {
 
     const valorPrecio = Number(precio.value);
 
+    const precioFormateado =
+        `${valorPrecio.toFixed(2).replace(".00", "")} €`;
+
     vistaPrecio.textContent =
         !precio.value || valorPrecio === 0
             ? "Gratis"
-            : `${valorPrecio.toFixed(2).replace(".00", "")} €`;
+            : esPlanMusical()
+                ? `Desde ${precioFormateado}`
+                : precioFormateado;
 }
 
 function actualizarContadores() {
@@ -1642,6 +1965,9 @@ async function publicarPlanEnSupabase(
                     fechas:
                         datos.fechas,
 
+                    detalles_extra:
+                        datos.detallesExtra,
+
                     duracion:
                         datos.duracion,
 
@@ -1790,6 +2116,9 @@ function obtenerDatosFormulario() {
 
         fechas:
             obtenerFechasFormulario(),
+
+        detallesExtra:
+            obtenerDetallesExtraFormulario(),
 
         duracion: duracion.value,
         plazas: Number(plazas.value),
@@ -1976,6 +2305,8 @@ formularioPublicar.addEventListener("submit", async (evento) => {
         "error-plan-enlace-reserva"
     );
 
+    limpiarErroresMusica();
+
     const errorImagen =
         document.querySelector(
             "#error-plan-imagen"
@@ -2022,6 +2353,31 @@ formularioPublicar.addEventListener("submit", async (evento) => {
         );
 
         formularioValido = false;
+    }
+
+    if (esPlanMusical()) {
+        if (!tipoEventoMusica?.value) {
+            mostrarError(
+                tipoEventoMusica,
+                "error-plan-tipo-evento",
+                "Selecciona si es concierto, festival, sesión DJ u otro tipo de evento."
+            );
+
+            formularioValido = false;
+        }
+
+        if (
+            !artistaCartelMusica?.value.trim() ||
+            artistaCartelMusica.value.trim().length < 2
+        ) {
+            mostrarError(
+                artistaCartelMusica,
+                "error-plan-artista-cartel",
+                "Indica el artista, grupo, DJ o cartel del evento."
+            );
+
+            formularioValido = false;
+        }
     }
 
     if (descripcion.value.trim().length < 50) {
@@ -2327,6 +2683,50 @@ function cargarBorradorParaEditar() {
 
     titulo.value = borrador.titulo || "";
     categoria.value = borrador.categoria || "";
+
+    const detallesExtraBorrador =
+        borrador.detallesExtra ||
+        borrador.detalles_extra ||
+        {};
+
+    if (tipoEventoMusica) {
+        tipoEventoMusica.value =
+            detallesExtraBorrador.tipo_evento ||
+            "";
+    }
+
+    if (artistaCartelMusica) {
+        artistaCartelMusica.value =
+            detallesExtraBorrador.artista_cartel ||
+            "";
+    }
+
+    if (aperturaPuertasMusica) {
+        aperturaPuertasMusica.value =
+            detallesExtraBorrador.apertura_puertas ||
+            "";
+    }
+
+    if (horaFinMusica) {
+        horaFinMusica.value =
+            detallesExtraBorrador.hora_fin ||
+            "";
+    }
+
+    if (edadMinimaMusica) {
+        edadMinimaMusica.value =
+            detallesExtraBorrador.edad_minima ||
+            "Todos los públicos";
+    }
+
+    if (tipoEntradaMusica) {
+        tipoEntradaMusica.value =
+            detallesExtraBorrador.tipo_entrada ||
+            "General";
+    }
+
+    actualizarModoPublicacion();
+
     descripcion.value = borrador.descripcion || "";
     fecha.value = borrador.fecha || "";
     hora.value = borrador.hora || "";
@@ -2443,6 +2843,12 @@ function cargarBorradorParaEditar() {
     ubicacion,
     precio,
     enlaceReserva,
+    tipoEventoMusica,
+    artistaCartelMusica,
+    aperturaPuertasMusica,
+    horaFinMusica,
+    edadMinimaMusica,
+    tipoEntradaMusica,
     imagen,
     imagen2,
     imagen3,
@@ -2456,6 +2862,7 @@ function cargarBorradorParaEditar() {
 
 cargarBorradorParaEditar();
 inicializarMapaPublicar();
+actualizarModoPublicacion();
 
 actualizarContadores();
 actualizarVistaPrevia();

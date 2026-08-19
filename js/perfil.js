@@ -27,6 +27,82 @@ function guardarDatoLocal(clave, valor) {
     }
 }
 
+const PLAN_PONCHO_K_UUID =
+    "b3039583-9882-4877-ac4a-5a713393f495";
+
+function migrarPonchoKAntiguoEnLocalStorage() {
+    const claves = [
+        "reservasSuralia",
+        "favoritosSuralia"
+    ];
+
+    claves.forEach((clave) => {
+        const elementos =
+            leerDatoLocal(
+                clave,
+                []
+            );
+
+        if (!Array.isArray(elementos)) {
+            return;
+        }
+
+        let huboCambios =
+            false;
+
+        const actualizados =
+            elementos.map((item) => {
+                const planId =
+                    String(
+                        item?.planId ||
+                        ""
+                    );
+
+                const titulo =
+                    String(
+                        item?.titulo ||
+                        item?.nombre ||
+                        ""
+                    )
+                        .trim()
+                        .toLowerCase();
+
+                const esPonchoAntiguo =
+                    planId ===
+                        "poncho-k-cartuja" ||
+                    (
+                        !planId &&
+                        titulo ===
+                            "poncho k - cartuja center cite"
+                    );
+
+                if (!esPonchoAntiguo) {
+                    return item;
+                }
+
+                huboCambios =
+                    true;
+
+                return {
+                    ...item,
+                    planId:
+                        PLAN_PONCHO_K_UUID,
+                    enlace:
+                        `detalle-plan.html?id=${PLAN_PONCHO_K_UUID}`
+                };
+            });
+
+        if (huboCambios) {
+            guardarDatoLocal(
+                clave,
+                actualizados
+            );
+        }
+    });
+}
+
+migrarPonchoKAntiguoEnLocalStorage();
+
 const usuarioGuardado =
     leerDatoLocal("usuarioSuralia", {});
 
@@ -3441,7 +3517,7 @@ function obtenerIdPlanReserva(reserva) {
         "visita guiada por itálica": "italica",
         "visita guiada por italica": "italica",
         "kayak al atardecer": "kayak-atardecer",
-        "poncho k - cartuja center cite": "poncho-k-cartuja",
+        "poncho k - cartuja center cite": PLAN_PONCHO_K_UUID,
         "ruta por el cerro del hierro": "cerro-hierro",
         "ruta de tapas por triana": "tapas-triana",
         "exposición de arte contemporáneo":
@@ -4199,7 +4275,10 @@ function obtenerEnlacePlan(plan) {
             "detalle-kayak.html",
 
         "poncho-k-cartuja":
-            "detalle-poncho-k.html",
+            `detalle-plan.html?id=${PLAN_PONCHO_K_UUID}`,
+
+        [PLAN_PONCHO_K_UUID]:
+            `detalle-plan.html?id=${PLAN_PONCHO_K_UUID}`,
 
         "cerro-hierro":
             "detalle-plan.html?id=cerro-hierro",
@@ -4990,7 +5069,7 @@ function obtenerIdPlanFavorito(favorito) {
             "kayak-atardecer",
 
         "poncho k - cartuja center cite":
-            "poncho-k-cartuja",
+            PLAN_PONCHO_K_UUID,
 
         "ruta por el cerro del hierro":
             "cerro-hierro",
@@ -5602,7 +5681,9 @@ function obtenerEnlaceAfinidad(planId) {
         "kayak-atardecer":
             "detalle-kayak.html",
         "poncho-k-cartuja":
-            "detalle-poncho-k.html"
+            `detalle-plan.html?id=${PLAN_PONCHO_K_UUID}`,
+        [PLAN_PONCHO_K_UUID]:
+            `detalle-plan.html?id=${PLAN_PONCHO_K_UUID}`
     };
 
     return enlaces[planId] ||

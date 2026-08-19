@@ -680,6 +680,54 @@ function crearPlanDetalleDesdeSupabase(plan, perfil) {
         plan.categoria ||
         "Actividad";
 
+    const esMusica =
+        String(
+            plan.categoria ||
+            ""
+        ).toLowerCase() ===
+            "musica";
+
+    const detallesExtra =
+        plan.detalles_extra &&
+        typeof plan.detalles_extra === "object" &&
+        !Array.isArray(plan.detalles_extra)
+            ? plan.detalles_extra
+            : {};
+
+    const tipoEvento =
+        String(
+            detallesExtra.tipo_evento ||
+            ""
+        ).trim();
+
+    const artistaCartel =
+        String(
+            detallesExtra.artista_cartel ||
+            ""
+        ).trim();
+
+    const aperturaPuertas =
+        normalizarHoraPlan(
+            detallesExtra.apertura_puertas
+        );
+
+    const horaFin =
+        normalizarHoraPlan(
+            detallesExtra.hora_fin
+        );
+
+    const edadMinima =
+        String(
+            detallesExtra.edad_minima ||
+            "Todos los públicos"
+        ).trim();
+
+    const tipoEntrada =
+        String(
+            detallesExtra.tipo_entrada ||
+            "General"
+        ).trim();
+
     const iconos = {
         cultura: "fa-solid fa-landmark",
         naturaleza: "fa-solid fa-leaf",
@@ -779,6 +827,75 @@ function crearPlanDetalleDesdeSupabase(plan, perfil) {
             plan
         );
 
+    let descripcionAmpliada;
+    let incluye;
+
+    if (esMusica) {
+        descripcionAmpliada = [
+            duracion !== "Duración por confirmar"
+                ? `Duración aproximada: ${duracion}.`
+                : "",
+            aperturaPuertas
+                ? `Apertura de puertas: ${aperturaPuertas}.`
+                : "",
+            horaFin
+                ? `Finalización aproximada: ${horaFin}.`
+                : ""
+        ].filter(Boolean);
+
+        if (descripcionAmpliada.length === 0) {
+            descripcionAmpliada = [
+                "Consulta la información principal del evento y las condiciones de acceso antes de asistir."
+            ];
+        }
+
+        incluye = [
+            [
+                "si",
+                tipoEvento ||
+                    "Evento musical"
+            ],
+            [
+                "si",
+                artistaCartel
+                    ? `Artista o cartel: ${artistaCartel}`
+                    : "Artista o cartel por confirmar"
+            ],
+            [
+                "si",
+                `Acceso: ${edadMinima || "Todos los públicos"}`
+            ],
+            [
+                "si",
+                `Tipo de entrada: ${tipoEntrada || "General"}`
+            ]
+        ];
+    } else {
+        descripcionAmpliada = [
+            `Duración: ${duracion}.`,
+            `Dificultad: ${dificultad}.`
+        ];
+
+        incluye = [
+            ["si", `Duración aproximada: ${duracion}`],
+            ["si", `Dificultad: ${dificultad}`],
+            [
+                "si",
+                fechasReserva.length > 1
+                    ? "Plazas independientes según fecha o pase"
+                    : (
+                        plazas > 0
+                            ? `${plazas} plazas disponibles inicialmente`
+                            : "Plazas por confirmar"
+                    )
+            ],
+            [
+                "si",
+                `Provincia: ${plan.provincia || "Sevilla"}`
+            ]
+        ];
+    }
+
     return {
         planId: plan.id,
         titulo: plan.titulo || "Actividad de Suralia",
@@ -796,30 +913,60 @@ function crearPlanDetalleDesdeSupabase(plan, perfil) {
         horario:
             hora === "Hora por confirmar"
                 ? hora
-                : `Hora de inicio: ${hora}`,
+                : esMusica
+                    ? `Inicio: ${hora}`
+                    : `Hora de inicio: ${hora}`,
         hora,
         ubicacion: ubicacionCabecera,
         direccion:
             direccion ||
             ubicacionCabecera,
-        personasApuntadas: "Actividad recién publicada",
+        personasApuntadas:
+            esMusica
+                ? "Evento recién publicado"
+                : "Actividad recién publicada",
         tipoGrupo:
-            dificultad === "No indicada"
-                ? "Actividad abierta"
-                : `Dificultad: ${dificultad}`,
-        maxPersonas:
-            fechasReserva.length > 1
-                ? "Plazas según fecha o pase"
+            esMusica
+                ? (
+                    tipoEvento ||
+                    "Evento musical"
+                )
                 : (
-                    plazas > 0
-                        ? `Máximo ${plazas} ${
-                            plazas === 1
-                                ? "persona"
-                                : "personas"
-                        }`
-                        : "Plazas por confirmar"
+                    dificultad === "No indicada"
+                        ? "Actividad abierta"
+                        : `Dificultad: ${dificultad}`
                 ),
-        idioma: "Actividad en español",
+        maxPersonas:
+            esMusica
+                ? (
+                    fechasReserva.length > 1
+                        ? "Entradas según fecha o pase"
+                        : (
+                            plazas > 0
+                                ? `Aforo indicado: ${plazas} entradas`
+                                : "Aforo por confirmar"
+                        )
+                )
+                : (
+                    fechasReserva.length > 1
+                        ? "Plazas según fecha o pase"
+                        : (
+                            plazas > 0
+                                ? `Máximo ${plazas} ${
+                                    plazas === 1
+                                        ? "persona"
+                                        : "personas"
+                                }`
+                                : "Plazas por confirmar"
+                        )
+                ),
+        idioma:
+            esMusica
+                ? (
+                    edadMinima ||
+                    "Todos los públicos"
+                )
+                : "Actividad en español",
         organizador: nombreOrganizador,
         organizadorIniciales:
             obtenerInicialesOrganizador(
@@ -839,28 +986,8 @@ function crearPlanDetalleDesdeSupabase(plan, perfil) {
                 : [
                     "El organizador todavía no ha añadido una descripción detallada."
                 ],
-        descripcionAmpliada: [
-            `Duración: ${duracion}.`,
-            `Dificultad: ${dificultad}.`
-        ],
-        incluye: [
-            ["si", `Duración aproximada: ${duracion}`],
-            ["si", `Dificultad: ${dificultad}`],
-            [
-                "si",
-                fechasReserva.length > 1
-                    ? "Plazas independientes según fecha o pase"
-                    : (
-                        plazas > 0
-                            ? `${plazas} plazas disponibles inicialmente`
-                            : "Plazas por confirmar"
-                    )
-            ],
-            [
-                "si",
-                `Provincia: ${plan.provincia || "Sevilla"}`
-            ]
-        ],
+        descripcionAmpliada,
+        incluye,
         fechasReserva,
         coordenadas,
         zoom:
@@ -887,7 +1014,26 @@ function crearPlanDetalleDesdeSupabase(plan, perfil) {
 
         esPlanSupabase: true,
         fotoOrganizador:
-            perfil?.foto_principal_url || ""
+            perfil?.foto_principal_url || "",
+
+        esMusica,
+        detallesExtra,
+        detallesMusica: {
+            tipoEvento,
+            artistaCartel,
+            aperturaPuertas,
+            horaInicio:
+                hora === "Hora por confirmar"
+                    ? ""
+                    : hora,
+            horaFin,
+            edadMinima:
+                edadMinima ||
+                "Todos los públicos",
+            tipoEntrada:
+                tipoEntrada ||
+                "General"
+        }
     };
 }
 
@@ -920,6 +1066,7 @@ async function cargarPlanSupabaseDetalle() {
             fecha,
             hora,
             fechas,
+            detalles_extra,
             duracion,
             plazas,
             ubicacion,
@@ -1363,6 +1510,16 @@ function cargarDatosBasicos() {
         seleccionar("#detalle-plan");
 
     if (body) {
+        body.classList.toggle(
+            "detalle-plan--musica",
+            Boolean(planActual.esMusica)
+        );
+
+        body.dataset.tipoDetalle =
+            planActual.esMusica
+                ? "musica"
+                : "actividad";
+
         body.dataset.planId =
             planActual.planId;
 
@@ -1523,6 +1680,238 @@ function cargarIncluye() {
             .join("");
 }
 
+
+function actualizarDatoMusica(
+    tarjetaSelector,
+    valorSelector,
+    valor,
+    ocultarSiVacio = false
+) {
+    const tarjeta =
+        seleccionar(tarjetaSelector);
+
+    const elementoValor =
+        seleccionar(valorSelector);
+
+    const texto =
+        String(
+            valor ||
+            ""
+        ).trim();
+
+    if (tarjeta) {
+        tarjeta.classList.toggle(
+            "oculto",
+            ocultarSiVacio && !texto
+        );
+    }
+
+    if (elementoValor && texto) {
+        elementoValor.textContent =
+            texto;
+    }
+}
+
+
+function cargarDetalleMusica() {
+    const bloqueMusica =
+        seleccionar(
+            "#detalle-musica-evento"
+        );
+
+    const bloqueIncluye =
+        seleccionar(
+            "#bloque-detalle-incluye"
+        );
+
+    if (!planActual?.esMusica) {
+        bloqueMusica?.classList.add(
+            "oculto"
+        );
+
+        bloqueIncluye?.classList.remove(
+            "oculto"
+        );
+
+        return;
+    }
+
+    const datos =
+        planActual.detallesMusica ||
+        {};
+
+    bloqueMusica?.classList.remove(
+        "oculto"
+    );
+
+    /*
+       En música sustituimos el bloque genérico “Qué incluye”
+       por una ficha de evento mucho más útil.
+    */
+    bloqueIncluye?.classList.add(
+        "oculto"
+    );
+
+    const tipoEvento =
+        String(
+            datos.tipoEvento ||
+            "Evento musical"
+        ).trim();
+
+    const tituloMusica =
+        tipoEvento.toLowerCase() ===
+            "festival"
+            ? "Información del festival"
+            : tipoEvento.toLowerCase() ===
+                "concierto"
+                ? "Información del concierto"
+                : "Información del evento";
+
+    cambiarTexto(
+        "#titulo-detalle-musica",
+        tituloMusica
+    );
+
+    cambiarTexto(
+        "#musica-tipo-evento-badge",
+        tipoEvento
+    );
+
+    actualizarDatoMusica(
+        "#musica-dato-artista",
+        "#musica-artista-cartel",
+        datos.artistaCartel,
+        true
+    );
+
+    actualizarDatoMusica(
+        "#musica-dato-apertura",
+        "#musica-apertura-puertas",
+        datos.aperturaPuertas,
+        true
+    );
+
+    actualizarDatoMusica(
+        "#musica-dato-inicio",
+        "#musica-hora-inicio",
+        datos.horaInicio,
+        false
+    );
+
+    actualizarDatoMusica(
+        "#musica-dato-fin",
+        "#musica-hora-fin",
+        datos.horaFin,
+        true
+    );
+
+    actualizarDatoMusica(
+        "#musica-dato-edad",
+        "#musica-edad-minima",
+        datos.edadMinima ||
+            "Todos los públicos",
+        false
+    );
+
+    actualizarDatoMusica(
+        "#musica-dato-entrada",
+        "#musica-tipo-entrada",
+        datos.tipoEntrada ||
+            "General",
+        false
+    );
+
+    cambiarTexto(
+        "#detalle-organizador-etiqueta",
+        "Evento organizado por"
+    );
+
+    const iconoGrupo =
+        seleccionar(
+            "#detalle-resumen-grupo-icono"
+        );
+
+    if (iconoGrupo) {
+        iconoGrupo.className =
+            "fa-solid fa-ticket";
+    }
+
+    const iconoAcceso =
+        seleccionar(
+            "#detalle-resumen-acceso-icono"
+        );
+
+    if (iconoAcceso) {
+        iconoAcceso.className =
+            "fa-solid fa-user-shield";
+    }
+
+    cambiarTexto(
+        "#detalle-resumen-acceso-titulo",
+        "Acceso"
+    );
+
+    cambiarTexto(
+        "#detalle-sobre-titulo",
+        tipoEvento.toLowerCase() ===
+            "festival"
+            ? "Sobre este festival"
+            : tipoEvento.toLowerCase() ===
+                "concierto"
+                ? "Sobre este concierto"
+                : "Sobre este evento"
+    );
+
+    cambiarTexto(
+        "#detalle-precio-unidad",
+        Number(planActual.precio || 0) > 0
+            ? "desde"
+            : "por entrada"
+    );
+
+    cambiarTexto(
+        "#etiqueta-personas-reserva",
+        "Entradas"
+    );
+}
+
+
+
+
+
+function obtenerUnidadReserva() {
+    return planActual?.esMusica
+        ? {
+            singular: "entrada",
+            plural: "entradas"
+        }
+        : {
+            singular: "plaza",
+            plural: "plazas"
+        };
+}
+
+
+function textoCantidadReserva(
+    cantidad
+) {
+    const numero =
+        Number(cantidad || 0);
+
+    if (planActual?.esMusica) {
+        return `${numero} ${
+            numero === 1
+                ? "entrada"
+                : "entradas"
+        }`;
+    }
+
+    return `${numero} ${
+        numero === 1
+            ? "persona"
+            : "personas"
+    }`;
+}
 
 
 const disponibilidadGlobalPorPase =
@@ -1885,20 +2274,25 @@ function textoDisponibilidadFecha(
             opcion
         );
 
+    const unidad =
+        obtenerUnidadReserva();
+
     if (
         disponibilidad.total ===
         null
     ) {
         return paraReservaExterna
             ? "Disponibilidad en la web del organizador"
-            : "Plazas por confirmar";
+            : planActual?.esMusica
+                ? "Entradas por confirmar"
+                : "Plazas por confirmar";
     }
 
     if (paraReservaExterna) {
         return `${disponibilidad.total} ${
             disponibilidad.total === 1
-                ? "plaza"
-                : "plazas"
+                ? unidad.singular
+                : unidad.plural
         } indicadas`;
     }
 
@@ -1908,8 +2302,8 @@ function textoDisponibilidadFecha(
 
     return `${disponibilidad.restantes} ${
         disponibilidad.restantes === 1
-            ? "plaza disponible"
-            : "plazas disponibles"
+            ? `${unidad.singular} disponible`
+            : `${unidad.plural} disponibles`
     }`;
 }
 
@@ -1975,7 +2369,9 @@ function actualizarSelectorPersonasPorDisponibilidad() {
             true;
 
         botonReserva.textContent =
-            "Pase agotado";
+            planActual?.esMusica
+                ? "Entradas agotadas"
+                : "Pase agotado";
 
         return;
     }
@@ -1987,7 +2383,9 @@ function actualizarSelectorPersonasPorDisponibilidad() {
         false;
 
     botonReserva.textContent =
-        "Reservar plaza";
+        planActual?.esMusica
+            ? "Reservar entrada"
+            : "Reservar plaza";
 
     const maximoPorReserva =
         disponibilidad.restantes !==
@@ -2014,11 +2412,9 @@ function actualizarSelectorPersonasPorDisponibilidad() {
             );
 
         option.textContent =
-            `${numero} ${
-                numero === 1
-                    ? "persona"
-                    : "personas"
-            }`;
+            textoCantidadReserva(
+                numero
+            );
 
         selectorPersonas.appendChild(
             option
@@ -2058,9 +2454,14 @@ function actualizarEstadoPlazasReserva() {
     const opcion =
         obtenerOpcionFechaSeleccionada();
 
+    const unidad =
+        obtenerUnidadReserva();
+
     if (!opcion) {
         estado.textContent =
-            "Selecciona una fecha para consultar las plazas.";
+            planActual?.esMusica
+                ? "Selecciona una fecha para consultar las entradas."
+                : "Selecciona una fecha para consultar las plazas.";
 
         return;
     }
@@ -2075,7 +2476,9 @@ function actualizarEstadoPlazasReserva() {
         null
     ) {
         estado.textContent =
-            "Plazas por confirmar para esta fecha.";
+            planActual?.esMusica
+                ? "Entradas por confirmar para esta fecha."
+                : "Plazas por confirmar para esta fecha.";
 
         return;
     }
@@ -2084,7 +2487,9 @@ function actualizarEstadoPlazasReserva() {
         disponibilidad.agotado
     ) {
         estado.textContent =
-            "No quedan plazas para esta fecha.";
+            planActual?.esMusica
+                ? "No quedan entradas para esta fecha."
+                : "No quedan plazas para esta fecha.";
 
         return;
     }
@@ -2092,8 +2497,8 @@ function actualizarEstadoPlazasReserva() {
     estado.textContent =
         `Quedan ${disponibilidad.restantes} de ${disponibilidad.total} ${
             disponibilidad.total === 1
-                ? "plaza"
-                : "plazas"
+                ? unidad.singular
+                : unidad.plural
         } para esta fecha.`;
 }
 
@@ -3101,6 +3506,11 @@ function configurarTipoReserva() {
     const esExterna =
         planUsaReservaExterna();
 
+    const esMusica =
+        Boolean(
+            planActual?.esMusica
+        );
+
     const camposReserva =
         formularioReserva.querySelectorAll(
             ".campo-reserva"
@@ -3137,23 +3547,56 @@ function configurarTipoReserva() {
             ".reserva-plan__plazas"
         );
 
+    const seguridadTitulo =
+        seleccionar(
+            "#seguridad-reserva-titulo"
+        );
+
+    const seguridadTexto =
+        seleccionar(
+            "#seguridad-reserva-texto"
+        );
+
     if (esExterna) {
-        botonReservarPlan.innerHTML = `
-            Reservar en la web
-            <i
-                class="fa-solid fa-arrow-up-right-from-square"
-                aria-hidden="true"
-            ></i>
-        `;
+        botonReservarPlan.innerHTML =
+            esMusica
+                ? `
+                    Comprar entradas
+                    <i
+                        class="fa-solid fa-arrow-up-right-from-square"
+                        aria-hidden="true"
+                    ></i>
+                `
+                : `
+                    Reservar en la web
+                    <i
+                        class="fa-solid fa-arrow-up-right-from-square"
+                        aria-hidden="true"
+                    ></i>
+                `;
 
         botonReservarPlan.setAttribute(
             "aria-label",
-            "Abrir la web externa de entradas o reservas"
+            esMusica
+                ? "Abrir la web externa de venta de entradas"
+                : "Abrir la web externa de entradas o reservas"
         );
 
         if (aviso) {
             aviso.textContent =
-                "La reserva o compra se completará en la web externa del organizador.";
+                esMusica
+                    ? "La compra de entradas se completará en la web externa del organizador."
+                    : "La reserva o compra se completará en la web externa del organizador.";
+        }
+
+        if (seguridadTitulo) {
+            seguridadTitulo.textContent =
+                "Compra en la web oficial";
+        }
+
+        if (seguridadTexto) {
+            seguridadTexto.textContent =
+                "Suralia te redirigirá al enlace facilitado por el organizador para completar el proceso.";
         }
 
         desglose?.classList.add(
@@ -3168,16 +3611,34 @@ function configurarTipoReserva() {
     }
 
     botonReservarPlan.innerHTML =
-        "Reservar plaza";
+        esMusica
+            ? "Reservar entrada"
+            : "Reservar plaza";
 
     botonReservarPlan.setAttribute(
         "aria-label",
-        "Reservar plaza en Suralia"
+        esMusica
+            ? "Reservar entrada en Suralia"
+            : "Reservar plaza en Suralia"
     );
 
     if (aviso) {
         aviso.textContent =
             "No se realizará ningún cobro.";
+    }
+
+    if (seguridadTitulo) {
+        seguridadTitulo.textContent =
+            esMusica
+                ? "Reserva de entradas segura"
+                : "Reserva segura";
+    }
+
+    if (seguridadTexto) {
+        seguridadTexto.textContent =
+            esMusica
+                ? "Tu reserva de entradas quedará registrada en Suralia."
+                : "Tus datos estarán protegidos durante todo el proceso.";
     }
 
     desglose?.classList.remove(
@@ -3697,8 +4158,8 @@ if (formularioReserva) {
                         ? "Este pase ya está agotado."
                         : `Solo quedan ${disponibilidadReserva.restantes} ${
                             disponibilidadReserva.restantes === 1
-                                ? "plaza"
-                                : "plazas"
+                                ? obtenerUnidadReserva().singular
+                                : obtenerUnidadReserva().plural
                         } para esta fecha.`
                 );
 
@@ -3740,11 +4201,9 @@ if (formularioReserva) {
                     cargarFechasReserva();
 
                     mostrarNotificacion(
-                        `Reserva confirmada para ${numeroPersonas} ${
-                            numeroPersonas === 1
-                                ? "persona"
-                                : "personas"
-                        }.`
+                        `Reserva confirmada para ${textoCantidadReserva(
+                            numeroPersonas
+                        )}.`
                     );
 
                     setTimeout(
@@ -3906,11 +4365,9 @@ if (formularioReserva) {
             cargarFechasReserva();
 
             mostrarNotificacion(
-                `Reserva confirmada para ${numeroPersonas} ${
-                    numeroPersonas === 1
-                        ? "persona"
-                        : "personas"
-                }.`
+                `Reserva confirmada para ${textoCantidadReserva(
+                    numeroPersonas
+                )}.`
             );
 
             setTimeout(() => {
@@ -3926,99 +4383,7 @@ if (formularioReserva) {
    OTROS PLANES CERCANOS DINÁMICOS
 ===================================================== */
 
-const PLANES_FIJOS_RELACIONADOS = [
-    {
-        planId: "italica",
-        titulo: "Visita guiada por Itálica",
-        categoria: "cultura",
-        categoriaTexto: "Cultura",
-        precio: 0,
-        valoracion: 4.8,
-        fechaTexto: "25 de julio",
-        fechaIso: "2026-07-25",
-        ubicacion: "Santiponce, Sevilla",
-        imagen: "img/italica principal.jpg",
-        enlace: "detalle-plan.html?id=italica"
-    },
-    {
-        planId: "kayak-atardecer",
-        titulo: "Kayak al atardecer",
-        categoria: "aventura",
-        categoriaTexto: "Aventura",
-        precio: 18,
-        valoracion: 4.9,
-        fechaTexto: "27 de julio",
-        fechaIso: "2026-07-27",
-        ubicacion: "Río Guadalquivir, Sevilla",
-        imagen: "img/kayak principal.jpg",
-        enlace: "detalle-kayak.html"
-    },
-    {
-        planId: "cerro-hierro",
-        titulo: "Ruta por el Cerro del Hierro",
-        categoria: "naturaleza",
-        categoriaTexto: "Naturaleza",
-        precio: 8,
-        valoracion: 4.9,
-        fechaTexto: "2 de agosto",
-        fechaIso: "2026-08-02",
-        ubicacion: "San Nicolás del Puerto",
-        imagen: "img/cerro1.jpg",
-        enlace: "detalle-plan.html?id=cerro-hierro"
-    },
-    {
-        planId: "tapas-triana",
-        titulo: "Ruta de tapas por Triana",
-        categoria: "gastronomia",
-        categoriaTexto: "Gastronomía",
-        precio: 25,
-        valoracion: 4.6,
-        fechaTexto: "3 de agosto",
-        fechaIso: "2026-08-03",
-        ubicacion: "Triana, Sevilla",
-        imagen: "img/triana1.jpg",
-        enlace: "detalle-plan.html?id=tapas-triana"
-    },
-    {
-        planId: "sierra-norte",
-        titulo: "Ruta de senderismo por la Sierra Norte",
-        categoria: "naturaleza",
-        categoriaTexto: "Naturaleza",
-        precio: 12,
-        valoracion: 4.9,
-        fechaTexto: "8 de agosto de 2026",
-        fechaIso: "2026-08-08",
-        ubicacion: "Constantina, Sevilla",
-        imagen: "img/sierra-norte-principal.jpg",
-        enlace: "detalle-sierra-norte.html"
-    },
-    {
-        planId: "exposicion-contemporanea",
-        titulo: "Exposición de arte contemporáneo",
-        categoria: "cultura",
-        categoriaTexto: "Cultura",
-        precio: 0,
-        valoracion: 4.5,
-        fechaTexto: "Hasta el 10 de agosto",
-        fechaIso: "2026-08-10",
-        ubicacion: "Centro de Sevilla",
-        imagen: "img/andaluz1.jpg",
-        enlace: "detalle-plan.html?id=exposicion-contemporanea"
-    },
-    {
-        planId: "poncho-k-cartuja",
-        titulo: "PONCHO K - Cartuja Center CITE",
-        categoria: "musica",
-        categoriaTexto: "Música",
-        precio: 25,
-        valoracion: 4.8,
-        fechaTexto: "21 de noviembre de 2026",
-        fechaIso: "2026-11-21",
-        ubicacion: "Cartuja Center CITE, Sevilla",
-        imagen: "img/poncho-k.jpg",
-        enlace: "detalle-poncho-k.html"
-    }
-];
+
 
 
 function obtenerFechaLocalISODetalle() {
@@ -4399,7 +4764,6 @@ async function cargarPlanesRelacionadosDinamicos() {
         new Set();
 
     const disponibles = [
-        ...PLANES_FIJOS_RELACIONADOS,
         ...planesSupabase
     ]
         .filter(
@@ -4517,6 +4881,7 @@ async function iniciarDetallePlan() {
         cargarGaleria();
         cargarDescripcion();
         cargarIncluye();
+        cargarDetalleMusica();
 
         await cargarDisponibilidadGlobalPlan();
 

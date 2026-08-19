@@ -1952,9 +1952,6 @@ gridPlanesPortada?.addEventListener(
    PRÓXIMOS PLANES DE LA PORTADA
 ===================================================== */
 
-const PLAN_PONCHO_K_SUPABASE_ID =
-    "b3039583-9882-4877-ac4a-5a713393f495";
-
 const MAXIMO_PLANES_PORTADA = 3;
 
 const planesFijosSuralia = [
@@ -2041,20 +2038,6 @@ const planesFijosSuralia = [
         ubicacion: "Centro de Sevilla",
         imagen: "img/andaluz1.jpg",
         enlace: "detalle-plan.html?id=exposicion-contemporanea"
-    },
-    {
-        planId: "poncho-k-cartuja",
-        titulo: "PONCHO K - Cartuja Center CITE",
-        categoria: "musica",
-        categoriaTexto: "Música",
-        precio: 25,
-        valoracion: 4.8,
-        fechaTexto: "21 de noviembre de 2026",
-        fechaIso: "2026-11-21",
-        hora: "21:00",
-        ubicacion: "Cartuja Center CITE, Sevilla",
-        imagen: "img/poncho-k.jpg",
-        enlace: "detalle-poncho-k.html"
     }
 ];
 
@@ -2599,15 +2582,9 @@ async function cargarProximosPlanesPortada() {
                 Array.isArray(data)
                     ? data
                     : []
-            )
-                .filter(
-                    (plan) =>
-                        String(plan.id || "") !==
-                        PLAN_PONCHO_K_SUPABASE_ID
-                )
-                .map(
-                    normalizarPlanSupabasePortada
-                );
+            ).map(
+                normalizarPlanSupabasePortada
+            );
         } catch (error) {
             console.error(
                 "No se pudieron cargar los planes publicados para la portada:",

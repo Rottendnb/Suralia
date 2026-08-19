@@ -33,21 +33,6 @@ window.PLANES_SURALIA = {
         enlace: "detalle-kayak.html"
     },
 
-    "poncho-k-cartuja": {
-        planId: "poncho-k-cartuja",
-        titulo: "PONCHO K - Cartuja Center CITE",
-        categoria: "musica",
-        categoriaTexto: "Música",
-        precio: 25,
-        valoracion: 4.8,
-        fechaTexto: "21 de noviembre de 2026",
-        fechaIso: "2026-11-21",
-        hora: "21:00",
-        ubicacion: "Cartuja Center CITE, Sevilla",
-        imagen: "img/poncho-k.jpg",
-        enlace: "detalle-poncho-k.html"
-    },
-
     "cerro-hierro": {
         planId: "cerro-hierro",
         titulo: "Ruta por el Cerro del Hierro",

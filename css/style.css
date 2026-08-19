@@ -20744,3 +20744,199 @@ button.fecha-disponible-detalle--agotada:hover {
         border-radius: 11px;
     }
 }
+
+/* =====================================================
+   PUBLICAR PLAN · MODO CONCIERTO / FESTIVAL
+   Añadir al final de css/style.css
+===================================================== */
+
+.bloque-musica-publicar[hidden],
+#campo-plan-dificultad[hidden] {
+    display: none !important;
+}
+
+.bloque-musica-publicar {
+    margin: 1.5rem 0 1.75rem;
+    padding: 1.35rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 126, 46, 0.10),
+            rgba(255, 255, 255, 0.03)
+        );
+}
+
+.bloque-musica-publicar__cabecera {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+    margin-bottom: 1.2rem;
+}
+
+.bloque-musica-publicar__icono {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(255, 126, 46, 0.14);
+}
+
+.bloque-musica-publicar__cabecera strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+}
+
+.bloque-musica-publicar__cabecera p,
+.bloque-musica-publicar__ayuda {
+    margin: 0;
+    line-height: 1.55;
+    opacity: 0.78;
+}
+
+.bloque-musica-publicar__ayuda {
+    display: flex;
+    gap: 0.55rem;
+    align-items: flex-start;
+    margin-top: 0.35rem;
+    font-size: 0.88rem;
+}
+
+@media (max-width: 700px) {
+    .bloque-musica-publicar {
+        padding: 1rem;
+        border-radius: 15px;
+    }
+}
+
+/* =====================================================
+   DETALLE ESPECÍFICO PARA CONCIERTOS Y FESTIVALES
+===================================================== */
+
+.detalle-musica-evento {
+    overflow: hidden;
+}
+
+.detalle-musica-evento__cabecera {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.detalle-musica-evento__cabecera h2 {
+    margin: 8px 0 6px;
+}
+
+.detalle-musica-evento__cabecera p {
+    margin: 0;
+    color: var(--color-texto-suave, #6b7280);
+}
+
+.detalle-musica-evento__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.detalle-musica-evento__tipo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 7px 13px;
+    border: 1px solid rgba(0, 0, 0, 0.09);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.035);
+    font-size: 0.82rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.detalle-musica-evento__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.detalle-musica-evento__dato {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.detalle-musica-evento__icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    background: rgba(0, 0, 0, 0.055);
+    font-size: 1rem;
+}
+
+.detalle-musica-evento__dato > div {
+    min-width: 0;
+}
+
+.detalle-musica-evento__dato > div > span {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--color-texto-suave, #6b7280);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.detalle-musica-evento__dato strong {
+    display: block;
+    overflow: hidden;
+    font-size: 0.95rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+body.detalle-plan--musica .detalle-categoria {
+    font-weight: 800;
+}
+
+body.detalle-plan--musica .reserva-plan__precio > div > strong {
+    line-height: 1;
+}
+
+@media (max-width: 900px) {
+    .detalle-musica-evento__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .detalle-musica-evento__cabecera {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .detalle-musica-evento__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detalle-musica-evento__tipo {
+        align-self: flex-start;
+    }
+}
