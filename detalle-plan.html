@@ -627,7 +627,10 @@
 
                     </section>
 
-                    <section class="bloque-detalle">
+                    <section
+                        class="bloque-detalle"
+                        id="seccion-opiniones-plan"
+                    >
 
                         <div class="cabecera-opiniones">
 
@@ -635,89 +638,48 @@
                                 <h2>Opiniones</h2>
 
                                 <p>
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <strong id="opiniones-valoracion">4,8</strong>
-                                    · <span id="opiniones-total">37 valoraciones</span>
+                                    <i
+                                        class="fa-solid fa-star"
+                                        aria-hidden="true"
+                                    ></i>
+                                    <strong id="opiniones-valoracion">
+                                        —
+                                    </strong>
+                                    ·
+                                    <span id="opiniones-total">
+                                        Sin valoraciones todavía
+                                    </span>
                                 </p>
                             </div>
-
-                            <button type="button" class="boton-secundario">
-                                Ver todas
-                            </button>
 
                         </div>
 
                         <div
                             class="opiniones-grid"
-                            aria-label="Opiniones destacadas"
+                            id="opiniones-grid"
+                            aria-live="polite"
                         >
 
-                            <article class="opinion">
+                            <div class="estado-vacio estado-vacio--pequeno">
 
-                                <div class="opinion__usuario">
+                                <span class="estado-vacio__icono">
+                                    <i
+                                        class="fa-regular fa-comment-dots"
+                                        aria-hidden="true"
+                                    ></i>
+                                </span>
 
-                                    <div class="opinion__avatar">
-                                        LM
-                                    </div>
-
-                                    <div>
-                                        <strong>Laura M.</strong>
-                                        <span>Julio de 2026</span>
-                                    </div>
-
-                                </div>
-
-                                <div
-                                    class="opinion__estrellas"
-                                    aria-label="5 de 5 estrellas"
-                                >
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                </div>
+                                <h3>
+                                    Todavía no hay opiniones
+                                </h3>
 
                                 <p>
-                                    Una visita muy interesante. El guía explicó
-                                    todo de forma cercana y el recorrido se hizo
-                                    muy ameno.
+                                    Las valoraciones reales aparecerán aquí cuando
+                                    personas que hayan asistido al plan compartan
+                                    su experiencia.
                                 </p>
 
-                            </article>
-
-                            <article class="opinion">
-
-                                <div class="opinion__usuario">
-
-                                    <div class="opinion__avatar">
-                                        JC
-                                    </div>
-
-                                    <div>
-                                        <strong>Javier C.</strong>
-                                        <span>Junio de 2026</span>
-                                    </div>
-
-                                </div>
-
-                                <div
-                                    class="opinion__estrellas"
-                                    aria-label="4 de 5 estrellas"
-                                >
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-regular fa-star" aria-hidden="true"></i>
-                                </div>
-
-                                <p>
-                                    Merece la pena para conocer mejor la historia
-                                    romana de Sevilla. Recomiendo llevar agua.
-                                </p>
-
-                            </article>
+                            </div>
 
                         </div>
 

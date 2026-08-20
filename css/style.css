@@ -20940,3 +20940,218 @@ body.detalle-plan--musica .reserva-plan__precio > div > strong {
         align-self: flex-start;
     }
 }
+
+/* =====================================================
+   PERFIL · VALORAR EXPERIENCIA
+===================================================== */
+
+.boton-valorar-reserva {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 40px;
+    padding: 0.65rem 1rem;
+    border: 1px solid currentColor;
+    border-radius: 10px;
+    background: transparent;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+        transform 0.18s ease,
+        opacity 0.18s ease;
+}
+
+.boton-valorar-reserva:hover {
+    transform: translateY(-1px);
+}
+
+.boton-valorar-reserva:focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 3px;
+}
+
+.reserva-item--realizada {
+    opacity: 0.96;
+}
+
+.reserva-item__valoracion-guardada {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.modal-valoracion-perfil {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+}
+
+.modal-valoracion-perfil.visible {
+    display: flex;
+}
+
+.modal-valoracion-perfil__fondo {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.58);
+    backdrop-filter: blur(3px);
+}
+
+.modal-valoracion-perfil__tarjeta {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 560px);
+    max-height: calc(100vh - 2.5rem);
+    overflow-y: auto;
+    padding: 2rem;
+    border-radius: 20px;
+    background: var(--blanco, #fff);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
+}
+
+.modal-valoracion-perfil__cerrar {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.modal-valoracion-perfil__icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+    border-radius: 50%;
+    font-size: 1.25rem;
+}
+
+.modal-valoracion-perfil__tarjeta h2 {
+    margin: 0 3rem 0.35rem 0;
+}
+
+.modal-valoracion-perfil__plan {
+    margin: 0 0 1.5rem;
+    font-weight: 700;
+}
+
+.modal-valoracion-perfil__ayuda {
+    margin-bottom: 0.75rem;
+}
+
+.estrellas-valoracion-perfil {
+    display: flex;
+    gap: 0.45rem;
+    margin-bottom: 1.5rem;
+}
+
+.estrellas-valoracion-perfil button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition:
+        transform 0.15s ease,
+        opacity 0.15s ease;
+}
+
+.estrellas-valoracion-perfil button:hover,
+.estrellas-valoracion-perfil button:focus-visible {
+    transform: scale(1.1);
+}
+
+.modal-valoracion-perfil__label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.modal-valoracion-perfil__label span {
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0.7;
+}
+
+#comentario-valoracion-perfil {
+    width: 100%;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.modal-valoracion-perfil__contador {
+    margin-top: 0.35rem;
+    text-align: right;
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.modal-valoracion-perfil__error {
+    margin: 1rem 0 0;
+    font-weight: 700;
+}
+
+.modal-valoracion-perfil__acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+body.modal-abierto {
+    overflow: hidden;
+}
+
+@media (max-width: 600px) {
+    .modal-valoracion-perfil {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .modal-valoracion-perfil__tarjeta {
+        width: 100%;
+        max-height: 90vh;
+        padding: 1.5rem;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .estrellas-valoracion-perfil {
+        justify-content: space-between;
+    }
+
+    .estrellas-valoracion-perfil button {
+        width: 44px;
+        height: 44px;
+    }
+
+    .modal-valoracion-perfil__acciones {
+        flex-direction: column-reverse;
+    }
+
+    .modal-valoracion-perfil__acciones button {
+        width: 100%;
+    }
+}

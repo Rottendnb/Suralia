@@ -171,6 +171,18 @@ let mapaUbicacionPublicar =
 let marcadorUbicacionPublicar =
     null;
 
+let temporizadorGeocodificacionDireccion =
+    null;
+
+let secuenciaGeocodificacionDireccion =
+    0;
+
+let secuenciaGeocodificacionInversa =
+    0;
+
+let ultimaConsultaGeocodificada =
+    "";
+
 
 let imagenBase64 = "";
 let imagen2Base64 = "";
@@ -853,12 +865,12 @@ function actualizarModoPublicacion() {
 
         if (ubicacion) {
             ubicacion.placeholder =
-                "Ejemplo: Cartuja Center CITE";
+                "Ejemplo: Cartuja Center CITE o Calle Leonardo da Vinci, 7";
         }
 
         if (ayudaUbicacionPlan) {
             ayudaUbicacionPlan.textContent =
-                "Indica el municipio y el recinto exacto. Después marca en el mapa el acceso o punto principal del evento.";
+                "Escribe el recinto o la calle con número. El mapa intentará localizarlo automáticamente; también puedes pulsar sobre el mapa para rellenar la dirección desde el marcador.";
         }
 
         if (etiquetaPrecioPlan) {
@@ -923,12 +935,12 @@ function actualizarModoPublicacion() {
 
         if (ubicacion) {
             ubicacion.placeholder =
-                "Ejemplo: Auditorio Municipal de Guillena";
+                "Ejemplo: Calle Feria, 12";
         }
 
         if (ayudaUbicacionPlan) {
             ayudaUbicacionPlan.textContent =
-                "Indica el municipio y el lugar exacto. En el detalle del plan se mostrará el municipio y la dirección concreta debajo.";
+                "Escribe la calle con su número o el nombre del lugar. El mapa intentará localizarlo automáticamente; si marcas un punto en el mapa, Suralia intentará rellenar municipio, calle y número.";
         }
 
         if (etiquetaPrecioPlan) {
@@ -1474,33 +1486,43 @@ function activarZonaImagen(
 );
 
 
-function actualizarEstadoPuntoMapa(
-    latitud,
-    longitud
+function actualizarEstadoMapaPublicar(
+    mensaje,
+    seleccionado = false
 ) {
     if (!estadoMapaPublicar) {
         return;
     }
 
+    estadoMapaPublicar.textContent =
+        mensaje;
+
+    estadoMapaPublicar.classList.toggle(
+        "mapa-publicar__estado--seleccionado",
+        seleccionado
+    );
+}
+
+
+function actualizarEstadoPuntoMapa(
+    latitud,
+    longitud
+) {
     if (
         !Number.isFinite(latitud) ||
         !Number.isFinite(longitud)
     ) {
-        estadoMapaPublicar.textContent =
-            "Punto pendiente";
-
-        estadoMapaPublicar.classList.remove(
-            "mapa-publicar__estado--seleccionado"
+        actualizarEstadoMapaPublicar(
+            "Ubicación pendiente",
+            false
         );
 
         return;
     }
 
-    estadoMapaPublicar.textContent =
-        `Punto seleccionado: ${latitud.toFixed(5)}, ${longitud.toFixed(5)}`;
-
-    estadoMapaPublicar.classList.add(
-        "mapa-publicar__estado--seleccionado"
+    actualizarEstadoMapaPublicar(
+        "Ubicación localizada",
+        true
     );
 }
 
@@ -1552,16 +1574,48 @@ function guardarPuntoMapa(
         return;
     }
 
+    const textoPopup =
+        ubicacion?.value.trim() ||
+        municipio?.value.trim() ||
+        "Ubicación del plan";
+
     if (!marcadorUbicacionPublicar) {
         marcadorUbicacionPublicar =
             L.marker(
                 [
                     lat,
                     lng
-                ]
+                ],
+                {
+                    draggable:
+                        true,
+                    autoPan:
+                        true
+                }
             ).addTo(
                 mapaUbicacionPublicar
             );
+
+        marcadorUbicacionPublicar.on(
+            "dragend",
+            async (
+                evento
+            ) => {
+                const posicion =
+                    evento.target.getLatLng();
+
+                guardarPuntoMapa(
+                    posicion.lat,
+                    posicion.lng,
+                    false
+                );
+
+                await rellenarDireccionDesdeMarcador(
+                    posicion.lat,
+                    posicion.lng
+                );
+            }
+        );
     } else {
         marcadorUbicacionPublicar.setLatLng(
             [
@@ -1572,7 +1626,7 @@ function guardarPuntoMapa(
     }
 
     marcadorUbicacionPublicar.bindPopup(
-        "Ubicación exacta del plan"
+        textoPopup
     );
 
     if (centrar) {
@@ -1585,6 +1639,1078 @@ function guardarPuntoMapa(
         );
 
         marcadorUbicacionPublicar.openPopup();
+    }
+}
+
+
+function obtenerDatosDireccionMapa() {
+    return {
+        municipio:
+            municipio?.value.trim() ||
+            "",
+
+        direccion:
+            ubicacion?.value.trim() ||
+            ""
+    };
+}
+
+
+function normalizarDireccionBusqueda(
+    valor
+) {
+    return String(
+        valor ||
+        ""
+    )
+        .replace(
+            /\bC\/\s*/gi,
+            "Calle "
+        )
+        .replace(
+            /\bC\.\s*/gi,
+            "Calle "
+        )
+        .replace(
+            /\bAvda\.?\s*/gi,
+            "Avenida "
+        )
+        .replace(
+            /\bAv\.\s*/gi,
+            "Avenida "
+        )
+        .replace(
+            /\bPza\.?\s*/gi,
+            "Plaza "
+        )
+        .replace(
+            /\s*,\s*/g,
+            ", "
+        )
+        .replace(
+            /\s+/g,
+            " "
+        )
+        .trim();
+}
+
+
+function obtenerConsultaDireccionMapa() {
+    const datos =
+        obtenerDatosDireccionMapa();
+
+    if (
+        datos.municipio.length < 2 ||
+        datos.direccion.length < 3
+    ) {
+        return "";
+    }
+
+    return [
+        normalizarDireccionBusqueda(
+            datos.direccion
+        ),
+        datos.municipio,
+        "Sevilla",
+        "España"
+    ]
+        .filter(Boolean)
+        .join(", ");
+}
+
+
+function obtenerVariantesDireccion(
+    direccion
+) {
+    const original =
+        normalizarDireccionBusqueda(
+            direccion
+        );
+
+    if (!original) {
+        return [];
+    }
+
+    const sinComas =
+        original.replace(
+            /,/g,
+            " "
+        );
+
+    const sinTipoVia =
+        sinComas
+            .replace(
+                /^(calle|avenida|plaza|paseo|camino|carretera|ronda|glorieta|alameda)\s+/i,
+                ""
+            )
+            .trim();
+
+    return [
+        ...new Set(
+            [
+                original,
+                sinComas,
+                sinTipoVia
+            ]
+                .map(
+                    (texto) =>
+                        texto
+                            .replace(
+                                /\s+/g,
+                                " "
+                            )
+                            .trim()
+                )
+                .filter(Boolean)
+        )
+    ];
+}
+
+
+function obtenerConsultasAlternativasDireccionMapa() {
+    const {
+        municipio:
+            municipioTexto,
+        direccion:
+            direccionTexto
+    } = obtenerDatosDireccionMapa();
+
+    if (
+        municipioTexto.length < 2 ||
+        direccionTexto.length < 3
+    ) {
+        return [];
+    }
+
+    const variantes =
+        obtenerVariantesDireccion(
+            direccionTexto
+        );
+
+    const consultas =
+        [];
+
+    variantes.forEach(
+        (
+            direccionVariante
+        ) => {
+            consultas.push(
+                [
+                    direccionVariante,
+                    municipioTexto,
+                    "Sevilla",
+                    "España"
+                ].join(", ")
+            );
+
+            consultas.push(
+                [
+                    direccionVariante,
+                    municipioTexto,
+                    "España"
+                ].join(", ")
+            );
+
+            consultas.push(
+                [
+                    direccionVariante,
+                    "Sevilla",
+                    "España"
+                ].join(", ")
+            );
+        }
+    );
+
+    return [
+        ...new Set(
+            consultas
+                .map(
+                    (consulta) =>
+                        consulta
+                            .replace(
+                                /\s+/g,
+                                " "
+                            )
+                            .trim()
+                )
+                .filter(Boolean)
+        )
+    ];
+}
+
+
+function limpiarCoordenadasPorCambioDireccion() {
+    if (latitudPlan) {
+        latitudPlan.value =
+            "";
+    }
+
+    if (longitudPlan) {
+        longitudPlan.value =
+            "";
+    }
+
+    mapaPublicarPlan?.setAttribute(
+        "aria-invalid",
+        "false"
+    );
+
+    if (errorCoordenadas) {
+        errorCoordenadas.textContent =
+            "";
+    }
+}
+
+
+async function buscarDireccionNominatimEstructurada() {
+    const {
+        municipio:
+            municipioTexto,
+        direccion:
+            direccionTexto
+    } = obtenerDatosDireccionMapa();
+
+    if (
+        municipioTexto.length < 2 ||
+        direccionTexto.length < 3
+    ) {
+        return null;
+    }
+
+    const variantes =
+        obtenerVariantesDireccion(
+            direccionTexto
+        );
+
+    for (
+        const calle of
+            variantes
+    ) {
+        const parametros =
+            new URLSearchParams({
+                street:
+                    calle,
+                city:
+                    municipioTexto,
+                county:
+                    "Sevilla",
+                country:
+                    "España",
+                countrycodes:
+                    "es",
+                format:
+                    "jsonv2",
+                limit:
+                    "1",
+                addressdetails:
+                    "1",
+                "accept-language":
+                    "es"
+            });
+
+        const respuesta =
+            await fetch(
+                `https://nominatim.openstreetmap.org/search?${parametros.toString()}`,
+                {
+                    method:
+                        "GET",
+                    headers: {
+                        Accept:
+                            "application/json"
+                    }
+                }
+            );
+
+        if (!respuesta.ok) {
+            throw new Error(
+                `Nominatim respondió ${respuesta.status}.`
+            );
+        }
+
+        const resultados =
+            await respuesta.json();
+
+        const resultado =
+            Array.isArray(
+                resultados
+            )
+                ? resultados[0]
+                : null;
+
+        const lat =
+            Number(
+                resultado?.lat
+            );
+
+        const lng =
+            Number(
+                resultado?.lon
+            );
+
+        if (
+            Number.isFinite(
+                lat
+            ) &&
+            Number.isFinite(
+                lng
+            )
+        ) {
+            return {
+                lat,
+                lng,
+                nombre:
+                    resultado?.display_name ||
+                    calle,
+                proveedor:
+                    "OpenStreetMap"
+            };
+        }
+    }
+
+    return null;
+}
+
+
+async function buscarDireccionNominatim(
+    consulta
+) {
+    const parametros =
+        new URLSearchParams({
+            q:
+                consulta,
+            format:
+                "jsonv2",
+            limit:
+                "1",
+            countrycodes:
+                "es",
+            addressdetails:
+                "1",
+            "accept-language":
+                "es"
+        });
+
+    const respuesta =
+        await fetch(
+            `https://nominatim.openstreetmap.org/search?${parametros.toString()}`,
+            {
+                method:
+                    "GET",
+                headers: {
+                    Accept:
+                        "application/json"
+                }
+            }
+        );
+
+    if (!respuesta.ok) {
+        throw new Error(
+            `Nominatim respondió ${respuesta.status}.`
+        );
+    }
+
+    const resultados =
+        await respuesta.json();
+
+    const resultado =
+        Array.isArray(resultados)
+            ? resultados[0]
+            : null;
+
+    const lat =
+        Number(
+            resultado?.lat
+        );
+
+    const lng =
+        Number(
+            resultado?.lon
+        );
+
+    if (
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lng)
+    ) {
+        return null;
+    }
+
+    return {
+        lat,
+        lng,
+        nombre:
+            resultado?.display_name ||
+            consulta,
+        proveedor:
+            "OpenStreetMap"
+    };
+}
+
+
+async function buscarDireccionPhoton(
+    consulta
+) {
+    const parametros =
+        new URLSearchParams({
+            q:
+                consulta,
+            limit:
+                "1",
+            lang:
+                "es",
+            lat:
+                "37.3891",
+            lon:
+                "-5.9845"
+        });
+
+    const respuesta =
+        await fetch(
+            `https://photon.komoot.io/api/?${parametros.toString()}`,
+            {
+                method:
+                    "GET",
+                headers: {
+                    Accept:
+                        "application/json"
+                }
+            }
+        );
+
+    if (!respuesta.ok) {
+        throw new Error(
+            `Photon respondió ${respuesta.status}.`
+        );
+    }
+
+    const datos =
+        await respuesta.json();
+
+    const feature =
+        Array.isArray(
+            datos?.features
+        )
+            ? datos.features[0]
+            : null;
+
+    const coordenadas =
+        feature?.geometry?.coordinates;
+
+    const lng =
+        Number(
+            coordenadas?.[0]
+        );
+
+    const lat =
+        Number(
+            coordenadas?.[1]
+        );
+
+    if (
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lng)
+    ) {
+        return null;
+    }
+
+    const propiedades =
+        feature?.properties ||
+        {};
+
+    const partesNombre = [
+        propiedades.name,
+        propiedades.street,
+        propiedades.housenumber,
+        propiedades.city ||
+            propiedades.town ||
+            propiedades.village,
+        propiedades.state
+    ]
+        .filter(Boolean);
+
+    return {
+        lat,
+        lng,
+        nombre:
+            partesNombre.join(", ") ||
+            consulta,
+        proveedor:
+            "Photon"
+    };
+}
+
+
+async function buscarDireccionConFallback(
+    consultas
+) {
+    /*
+        1. Búsqueda estructurada:
+        suele funcionar mejor cuando hay calle + número.
+    */
+    try {
+        const resultadoEstructurado =
+            await buscarDireccionNominatimEstructurada();
+
+        if (resultadoEstructurado) {
+            return resultadoEstructurado;
+        }
+    } catch (error) {
+        console.warn(
+            "La búsqueda estructurada de OpenStreetMap falló:",
+            error
+        );
+    }
+
+    /*
+        2. Búsquedas libres con distintas variantes.
+    */
+    for (
+        const consulta of
+            consultas
+    ) {
+        try {
+            const resultado =
+                await buscarDireccionNominatim(
+                    consulta
+                );
+
+            if (resultado) {
+                return {
+                    ...resultado,
+                    consulta
+                };
+            }
+        } catch (error) {
+            console.warn(
+                "Nominatim no pudo resolver la dirección:",
+                error
+            );
+
+            break;
+        }
+    }
+
+    /*
+        3. Proveedor alternativo.
+    */
+    for (
+        const consulta of
+            consultas
+    ) {
+        try {
+            const resultado =
+                await buscarDireccionPhoton(
+                    consulta
+                );
+
+            if (resultado) {
+                return {
+                    ...resultado,
+                    consulta
+                };
+            }
+        } catch (error) {
+            console.warn(
+                "Photon no pudo resolver la dirección:",
+                error
+            );
+
+            break;
+        }
+    }
+
+    return null;
+}
+
+
+async function geocodificarDireccionMapa() {
+    const consultaPrincipal =
+        obtenerConsultaDireccionMapa();
+
+    const consultas =
+        obtenerConsultasAlternativasDireccionMapa();
+
+    if (
+        !consultaPrincipal ||
+        consultas.length === 0
+    ) {
+        ultimaConsultaGeocodificada =
+            "";
+
+        limpiarCoordenadasPorCambioDireccion();
+
+        actualizarEstadoMapaPublicar(
+            "Escribe municipio, calle y número",
+            false
+        );
+
+        return;
+    }
+
+    if (
+        consultaPrincipal ===
+            ultimaConsultaGeocodificada &&
+        latitudPlan?.value &&
+        longitudPlan?.value
+    ) {
+        return;
+    }
+
+    const numeroSolicitud =
+        ++secuenciaGeocodificacionDireccion;
+
+    limpiarCoordenadasPorCambioDireccion();
+
+    actualizarEstadoMapaPublicar(
+        "Buscando dirección...",
+        false
+    );
+
+    try {
+        const resultado =
+            await buscarDireccionConFallback(
+                consultas
+            );
+
+        if (
+            numeroSolicitud !==
+            secuenciaGeocodificacionDireccion
+        ) {
+            return;
+        }
+
+        if (!resultado) {
+            actualizarEstadoMapaPublicar(
+                "No se ha encontrado la dirección",
+                false
+            );
+
+            if (errorCoordenadas) {
+                errorCoordenadas.textContent =
+                    "No hemos localizado esa dirección. Prueba con calle y número, por ejemplo: Calle Feria, 12. También puedes marcar el punto en el mapa y Suralia intentará rellenar la dirección.";
+            }
+
+            return;
+        }
+
+        ultimaConsultaGeocodificada =
+            consultaPrincipal;
+
+        guardarPuntoMapa(
+            resultado.lat,
+            resultado.lng,
+            true
+        );
+
+        actualizarEstadoMapaPublicar(
+            "Ubicación encontrada automáticamente",
+            true
+        );
+
+        if (errorCoordenadas) {
+            errorCoordenadas.textContent =
+                "";
+        }
+    } catch (error) {
+        if (
+            numeroSolicitud !==
+            secuenciaGeocodificacionDireccion
+        ) {
+            return;
+        }
+
+        console.error(
+            "No se pudo localizar automáticamente la dirección:",
+            error
+        );
+
+        actualizarEstadoMapaPublicar(
+            "No se pudo localizar automáticamente",
+            false
+        );
+
+        if (errorCoordenadas) {
+            errorCoordenadas.textContent =
+                "No se ha podido localizar automáticamente. Escribe calle y número o marca el punto en el mapa.";
+        }
+    }
+}
+
+
+function programarGeocodificacionDireccion(
+    espera = 1200
+) {
+    window.clearTimeout(
+        temporizadorGeocodificacionDireccion
+    );
+
+    secuenciaGeocodificacionDireccion +=
+        1;
+
+    const consulta =
+        obtenerConsultaDireccionMapa();
+
+    if (!consulta) {
+        limpiarCoordenadasPorCambioDireccion();
+
+        actualizarEstadoMapaPublicar(
+            "Escribe municipio, calle y número",
+            false
+        );
+
+        return;
+    }
+
+    actualizarEstadoMapaPublicar(
+        "Preparando ubicación...",
+        false
+    );
+
+    temporizadorGeocodificacionDireccion =
+        window.setTimeout(
+            geocodificarDireccionMapa,
+            espera
+        );
+}
+
+
+function construirDireccionDesdeAddressNominatim(
+    address
+) {
+    const datos =
+        address ||
+        {};
+
+    const via =
+        datos.road ||
+        datos.pedestrian ||
+        datos.residential ||
+        datos.living_street ||
+        datos.footway ||
+        datos.path ||
+        datos.cycleway ||
+        datos.square ||
+        datos.place ||
+        "";
+
+    const numero =
+        datos.house_number ||
+        "";
+
+    const direccion =
+        [
+            via,
+            numero
+        ]
+            .filter(Boolean)
+            .join(", ");
+
+    const municipioEncontrado =
+        datos.city ||
+        datos.town ||
+        datos.village ||
+        datos.municipality ||
+        datos.hamlet ||
+        "";
+
+    return {
+        direccion,
+        municipio:
+            municipioEncontrado
+    };
+}
+
+
+async function buscarDireccionInversaNominatim(
+    lat,
+    lng
+) {
+    const parametros =
+        new URLSearchParams({
+            lat:
+                String(lat),
+            lon:
+                String(lng),
+            format:
+                "jsonv2",
+            zoom:
+                "18",
+            addressdetails:
+                "1",
+            "accept-language":
+                "es"
+        });
+
+    const respuesta =
+        await fetch(
+            `https://nominatim.openstreetmap.org/reverse?${parametros.toString()}`,
+            {
+                method:
+                    "GET",
+                headers: {
+                    Accept:
+                        "application/json"
+                }
+            }
+        );
+
+    if (!respuesta.ok) {
+        throw new Error(
+            `Nominatim reverse respondió ${respuesta.status}.`
+        );
+    }
+
+    const datos =
+        await respuesta.json();
+
+    const direccion =
+        construirDireccionDesdeAddressNominatim(
+            datos?.address
+        );
+
+    if (
+        !direccion.direccion &&
+        !direccion.municipio
+    ) {
+        return null;
+    }
+
+    return {
+        ...direccion,
+        nombreCompleto:
+            datos?.display_name ||
+            ""
+    };
+}
+
+
+async function buscarDireccionInversaPhoton(
+    lat,
+    lng
+) {
+    const parametros =
+        new URLSearchParams({
+            lat:
+                String(lat),
+            lon:
+                String(lng),
+            lang:
+                "es"
+        });
+
+    const respuesta =
+        await fetch(
+            `https://photon.komoot.io/reverse?${parametros.toString()}`,
+            {
+                method:
+                    "GET",
+                headers: {
+                    Accept:
+                        "application/json"
+                }
+            }
+        );
+
+    if (!respuesta.ok) {
+        throw new Error(
+            `Photon reverse respondió ${respuesta.status}.`
+        );
+    }
+
+    const datos =
+        await respuesta.json();
+
+    const feature =
+        Array.isArray(
+            datos?.features
+        )
+            ? datos.features[0]
+            : null;
+
+    const propiedades =
+        feature?.properties ||
+        {};
+
+    const via =
+        propiedades.street ||
+        propiedades.name ||
+        "";
+
+    const numero =
+        propiedades.housenumber ||
+        "";
+
+    const municipioEncontrado =
+        propiedades.city ||
+        propiedades.town ||
+        propiedades.village ||
+        propiedades.district ||
+        "";
+
+    if (
+        !via &&
+        !municipioEncontrado
+    ) {
+        return null;
+    }
+
+    return {
+        direccion:
+            [
+                via,
+                numero
+            ]
+                .filter(Boolean)
+                .join(", "),
+
+        municipio:
+            municipioEncontrado,
+
+        nombreCompleto:
+            [
+                via,
+                numero,
+                municipioEncontrado
+            ]
+                .filter(Boolean)
+                .join(", ")
+    };
+}
+
+
+async function obtenerDireccionDesdeCoordenadas(
+    lat,
+    lng
+) {
+    try {
+        const resultado =
+            await buscarDireccionInversaNominatim(
+                lat,
+                lng
+            );
+
+        if (resultado) {
+            return resultado;
+        }
+    } catch (error) {
+        console.warn(
+            "OpenStreetMap no pudo obtener la dirección del marcador:",
+            error
+        );
+    }
+
+    try {
+        return await buscarDireccionInversaPhoton(
+            lat,
+            lng
+        );
+    } catch (error) {
+        console.warn(
+            "Photon no pudo obtener la dirección del marcador:",
+            error
+        );
+
+        return null;
+    }
+}
+
+
+async function rellenarDireccionDesdeMarcador(
+    lat,
+    lng
+) {
+    const numeroSolicitud =
+        ++secuenciaGeocodificacionInversa;
+
+    actualizarEstadoMapaPublicar(
+        "Obteniendo calle y municipio...",
+        true
+    );
+
+    const resultado =
+        await obtenerDireccionDesdeCoordenadas(
+            lat,
+            lng
+        );
+
+    if (
+        numeroSolicitud !==
+        secuenciaGeocodificacionInversa
+    ) {
+        return;
+    }
+
+    if (!resultado) {
+        actualizarEstadoMapaPublicar(
+            "Punto guardado; dirección no encontrada",
+            true
+        );
+
+        return;
+    }
+
+    if (
+        resultado.municipio &&
+        municipio
+    ) {
+        municipio.value =
+            resultado.municipio;
+    }
+
+    if (
+        resultado.direccion &&
+        ubicacion
+    ) {
+        ubicacion.value =
+            resultado.direccion;
+    }
+
+    limpiarError(
+        municipio,
+        "error-plan-municipio"
+    );
+
+    limpiarError(
+        ubicacion,
+        "error-plan-ubicacion"
+    );
+
+    if (errorCoordenadas) {
+        errorCoordenadas.textContent =
+            "";
+    }
+
+    ultimaConsultaGeocodificada =
+        obtenerConsultaDireccionMapa();
+
+    actualizarVistaPrevia();
+
+    if (marcadorUbicacionPublicar) {
+        const popup =
+            [
+                ubicacion?.value.trim(),
+                municipio?.value.trim()
+            ]
+                .filter(Boolean)
+                .join(" · ");
+
+        if (popup) {
+            marcadorUbicacionPublicar
+                .bindPopup(
+                    popup
+                )
+                .openPopup();
+        }
+    }
+
+    actualizarEstadoMapaPublicar(
+        "Municipio, calle y número obtenidos del mapa",
+        true
+    );
+
+    if (
+        marcadorUbicacionPublicar
+    ) {
+        marcadorUbicacionPublicar.dragging?.enable();
     }
 }
 
@@ -1603,7 +2729,19 @@ function inicializarMapaPublicar() {
             "mapa-publicar-plan",
             {
                 scrollWheelZoom:
-                    false
+                    true,
+                doubleClickZoom:
+                    true,
+                touchZoom:
+                    true,
+                boxZoom:
+                    true,
+                keyboard:
+                    true,
+                dragging:
+                    true,
+                zoomControl:
+                    true
             }
         ).setView(
             [
@@ -1626,14 +2764,162 @@ function inicializarMapaPublicar() {
         mapaUbicacionPublicar
     );
 
+    const ControlMiUbicacion =
+        L.Control.extend({
+            options: {
+                position:
+                    "topright"
+            },
+
+            onAdd() {
+                const boton =
+                    L.DomUtil.create(
+                        "button",
+                        "leaflet-bar mapa-publicar__mi-ubicacion"
+                    );
+
+                boton.type =
+                    "button";
+
+                boton.title =
+                    "Usar mi ubicación";
+
+                boton.setAttribute(
+                    "aria-label",
+                    "Usar mi ubicación"
+                );
+
+                boton.innerHTML = `
+                    <i
+                        class="fa-solid fa-location-crosshairs"
+                        aria-hidden="true"
+                    ></i>
+                `;
+
+                L.DomEvent.disableClickPropagation(
+                    boton
+                );
+
+                L.DomEvent.disableScrollPropagation(
+                    boton
+                );
+
+                L.DomEvent.on(
+                    boton,
+                    "click",
+                    async () => {
+                        if (
+                            !navigator.geolocation
+                        ) {
+                            actualizarEstadoMapaPublicar(
+                                "Tu navegador no permite obtener la ubicación",
+                                false
+                            );
+
+                            return;
+                        }
+
+                        boton.disabled =
+                            true;
+
+                        actualizarEstadoMapaPublicar(
+                            "Buscando tu ubicación...",
+                            false
+                        );
+
+                        navigator.geolocation.getCurrentPosition(
+                            async (
+                                posicion
+                            ) => {
+                                const lat =
+                                    posicion.coords.latitude;
+
+                                const lng =
+                                    posicion.coords.longitude;
+
+                                guardarPuntoMapa(
+                                    lat,
+                                    lng,
+                                    true
+                                );
+
+                                await rellenarDireccionDesdeMarcador(
+                                    lat,
+                                    lng
+                                );
+
+                                boton.disabled =
+                                    false;
+                            },
+
+                            (
+                                error
+                            ) => {
+                                console.warn(
+                                    "No se pudo obtener la ubicación actual:",
+                                    error
+                                );
+
+                                actualizarEstadoMapaPublicar(
+                                    "No se ha podido obtener tu ubicación",
+                                    false
+                                );
+
+                                boton.disabled =
+                                    false;
+                            },
+
+                            {
+                                enableHighAccuracy:
+                                    true,
+                                timeout:
+                                    10000,
+                                maximumAge:
+                                    30000
+                            }
+                        );
+                    }
+                );
+
+                return boton;
+            }
+        });
+
+    mapaUbicacionPublicar.addControl(
+        new ControlMiUbicacion()
+    );
+
+
     mapaUbicacionPublicar.on(
         "click",
-        (
+        async (
             evento
         ) => {
+            window.clearTimeout(
+                temporizadorGeocodificacionDireccion
+            );
+
+            /*
+                Invalida una búsqueda automática en curso.
+            */
+            secuenciaGeocodificacionDireccion +=
+                1;
+
+            const lat =
+                evento.latlng.lat;
+
+            const lng =
+                evento.latlng.lng;
+
             guardarPuntoMapa(
-                evento.latlng.lat,
-                evento.latlng.lng
+                lat,
+                lng,
+                false
+            );
+
+            await rellenarDireccionDesdeMarcador(
+                lat,
+                lng
             );
         }
     );
@@ -1677,6 +2963,39 @@ function inicializarMapaPublicar() {
         120
     );
 }
+
+
+municipio?.addEventListener(
+    "input",
+    () => {
+        programarGeocodificacionDireccion();
+    }
+);
+
+ubicacion?.addEventListener(
+    "input",
+    () => {
+        programarGeocodificacionDireccion();
+    }
+);
+
+municipio?.addEventListener(
+    "change",
+    () => {
+        programarGeocodificacionDireccion(
+            100
+        );
+    }
+);
+
+ubicacion?.addEventListener(
+    "change",
+    () => {
+        programarGeocodificacionDireccion(
+            100
+        );
+    }
+);
 
 
 const camposVistaPrevia = [
@@ -2494,7 +3813,7 @@ formularioPublicar.addEventListener("submit", async (evento) => {
     ) {
         if (errorCoordenadas) {
             errorCoordenadas.textContent =
-                "Marca en el mapa el punto exacto donde se realizará la actividad.";
+                "Escribe municipio, calle y número para localizar el plan. También puedes marcar el punto en el mapa y Suralia intentará rellenar esos datos.";
         }
 
         mapaPublicarPlan?.setAttribute(
@@ -2863,6 +4182,16 @@ function cargarBorradorParaEditar() {
 cargarBorradorParaEditar();
 inicializarMapaPublicar();
 actualizarModoPublicacion();
+
+if (
+    !latitudPlan?.value &&
+    !longitudPlan?.value &&
+    obtenerConsultaDireccionMapa()
+) {
+    programarGeocodificacionDireccion(
+        250
+    );
+}
 
 actualizarContadores();
 actualizarVistaPrevia();

@@ -1954,92 +1954,7 @@ gridPlanesPortada?.addEventListener(
 
 const MAXIMO_PLANES_PORTADA = 3;
 
-const planesFijosSuralia = [
-    {
-        planId: "italica",
-        titulo: "Visita guiada por Itálica",
-        categoria: "cultura",
-        categoriaTexto: "Cultura",
-        precio: 0,
-        valoracion: 4.8,
-        fechaTexto: "25 de julio",
-        fechaIso: "2026-07-25",
-        hora: "10:30",
-        ubicacion: "Santiponce, Sevilla",
-        imagen: "img/italica principal.jpg",
-        enlace: "detalle-plan.html?id=italica"
-    },
-    {
-        planId: "kayak-atardecer",
-        titulo: "Kayak al atardecer",
-        categoria: "aventura",
-        categoriaTexto: "Aventura",
-        precio: 18,
-        valoracion: 4.9,
-        fechaTexto: "27 de julio",
-        fechaIso: "2026-07-27",
-        hora: "19:00",
-        ubicacion: "Río Guadalquivir, Sevilla",
-        imagen: "img/kayak principal.jpg",
-        enlace: "detalle-kayak.html"
-    },
-    {
-        planId: "cerro-hierro",
-        titulo: "Ruta por el Cerro del Hierro",
-        categoria: "naturaleza",
-        categoriaTexto: "Naturaleza",
-        precio: 8,
-        valoracion: 4.9,
-        fechaTexto: "2 de agosto",
-        fechaIso: "2026-08-02",
-        hora: "09:00",
-        ubicacion: "San Nicolás del Puerto",
-        imagen: "img/cerro1.jpg",
-        enlace: "detalle-plan.html?id=cerro-hierro"
-    },
-    {
-        planId: "tapas-triana",
-        titulo: "Ruta de tapas por Triana",
-        categoria: "gastronomia",
-        categoriaTexto: "Gastronomía",
-        precio: 25,
-        valoracion: 4.6,
-        fechaTexto: "3 de agosto",
-        fechaIso: "2026-08-03",
-        hora: "13:00",
-        ubicacion: "Triana, Sevilla",
-        imagen: "img/triana1.jpg",
-        enlace: "detalle-plan.html?id=tapas-triana"
-    },
-    {
-        planId: "sierra-norte",
-        titulo: "Ruta de senderismo por la Sierra Norte",
-        categoria: "naturaleza",
-        categoriaTexto: "Naturaleza",
-        precio: 12,
-        valoracion: 4.9,
-        fechaTexto: "8 de agosto de 2026",
-        fechaIso: "2026-08-08",
-        hora: "09:00",
-        ubicacion: "Constantina, Sevilla",
-        imagen: "img/sierra-norte-principal.jpg",
-        enlace: "detalle-sierra-norte.html"
-    },
-    {
-        planId: "exposicion-contemporanea",
-        titulo: "Exposición de arte contemporáneo",
-        categoria: "cultura",
-        categoriaTexto: "Cultura",
-        precio: 0,
-        valoracion: 4.5,
-        fechaTexto: "Hasta el 10 de agosto",
-        fechaIso: "2026-08-10",
-        hora: "11:00",
-        ubicacion: "Centro de Sevilla",
-        imagen: "img/andaluz1.jpg",
-        enlace: "detalle-plan.html?id=exposicion-contemporanea"
-    }
-];
+
 
 function obtenerFechaLocalISO() {
     const ahora = new Date();
@@ -2389,7 +2304,7 @@ function actualizarHeroConProximoPlan(
                 : "Actividad recién publicada";
     }
 
-    botonFavoritoSierraNorte?.setAttribute(
+    botonFavoritoHero?.setAttribute(
         "aria-label",
         `Añadir ${
             plan.titulo ||
@@ -2465,8 +2380,8 @@ function cambiarHeroAleatoriamente() {
         ]
     );
 
-    actualizarFavoritoSierraNorte();
-    actualizarContadorSierraNorte();
+    actualizarFavoritoHero();
+    actualizarContadorPersonasHero();
 }
 
 
@@ -2594,7 +2509,6 @@ async function cargarProximosPlanesPortada() {
     }
 
     const planesDisponibles = [
-        ...planesFijosSuralia,
         ...planesSupabase
     ]
         .filter(
@@ -2653,25 +2567,25 @@ async function cargarProximosPlanesPortada() {
     );
 
     cargarFavoritosPortada();
-    actualizarFavoritoSierraNorte();
-    actualizarContadorSierraNorte();
+    actualizarFavoritoHero();
+    actualizarContadorPersonasHero();
     iniciarRotacionHero();
 }
 
 
 /* =====================================================
-   FAVORITO DEL HERO: SIERRA NORTE
+   FAVORITO DEL PLAN DESTACADO DEL HERO
 ===================================================== */
 
-const botonFavoritoSierraNorte =
+const botonFavoritoHero =
     document.querySelector(
-        "#favorito-sierra-norte"
+        "#favorito-plan-hero"
     );
 
 
-function obtenerDatosSierraNorte() {
+function obtenerDatosPlanHero() {
     const tarjeta =
-        botonFavoritoSierraNorte?.closest(
+        botonFavoritoHero?.closest(
             ".tarjeta-principal"
         );
 
@@ -2742,13 +2656,13 @@ function obtenerDatosSierraNorte() {
 }
 
 
-function actualizarFavoritoSierraNorte() {
-    if (!botonFavoritoSierraNorte) {
+function actualizarFavoritoHero() {
+    if (!botonFavoritoHero) {
         return;
     }
 
     const datosPlan =
-        obtenerDatosSierraNorte();
+        obtenerDatosPlanHero();
 
     const favoritos =
         obtenerFavoritosPortada();
@@ -2769,13 +2683,13 @@ function actualizarFavoritoSierraNorte() {
         );
 
     actualizarCorazonPortada(
-        botonFavoritoSierraNorte,
+        botonFavoritoHero,
         estaGuardado
     );
 }
 
 
-function alternarFavoritoSierraNorte() {
+function alternarFavoritoHero() {
     if (!sesionActual?.conectado) {
         sessionStorage.setItem(
             "destinoDespuesLoginSuralia",
@@ -2795,7 +2709,7 @@ function alternarFavoritoSierraNorte() {
     }
 
     const datosPlan =
-        obtenerDatosSierraNorte();
+        obtenerDatosPlanHero();
 
     const favoritos =
         obtenerFavoritosPortada();
@@ -2858,114 +2772,297 @@ function alternarFavoritoSierraNorte() {
     }
 
     actualizarCorazonPortada(
-        botonFavoritoSierraNorte,
+        botonFavoritoHero,
         quedaGuardado
     );
 }
 
 
-if (botonFavoritoSierraNorte) {
-    botonFavoritoSierraNorte.addEventListener(
+if (botonFavoritoHero) {
+    botonFavoritoHero.addEventListener(
         "click",
         (evento) => {
             evento.preventDefault();
             evento.stopPropagation();
 
-            alternarFavoritoSierraNorte();
+            alternarFavoritoHero();
         }
     );
 }
 
 
 /* =====================================================
-   CONTADOR DE PERSONAS DE SIERRA NORTE
+   ESTADÍSTICAS REALES DE PORTADA
 ===================================================== */
 
-const contadorPersonasSierraNorte =
-    document.querySelector(
-        "#contador-personas-sierra-norte"
-    );
-
-
-function obtenerReservasSierraNorte() {
-    const reservas =
-        leerLocalStorage(
-            "reservasSuralia",
-            []
+async function cargarEstadisticasPortada() {
+    const elementoPlanes =
+        document.querySelector(
+            "#estadistica-planes-disponibles"
         );
 
-    if (!Array.isArray(reservas)) {
-        return [];
+    const elementoNuevos =
+        document.querySelector(
+            "#estadistica-nuevos-semana"
+        );
+
+    const elementoValoracion =
+        document.querySelector(
+            "#estadistica-valoracion-media"
+        );
+
+    if (
+        !elementoPlanes &&
+        !elementoNuevos &&
+        !elementoValoracion
+    ) {
+        return;
+    }
+
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente) {
+        return;
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente.rpc(
+            "obtener_estadisticas_portada"
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        const estadisticas =
+            Array.isArray(data)
+                ? data[0]
+                : data;
+
+        if (!estadisticas) {
+            return;
+        }
+
+        if (elementoPlanes) {
+            elementoPlanes.textContent =
+                Number(
+                    estadisticas.planes_disponibles ||
+                    0
+                ).toLocaleString(
+                    "es-ES"
+                );
+        }
+
+        if (elementoNuevos) {
+            elementoNuevos.textContent =
+                Number(
+                    estadisticas.nuevos_semana ||
+                    0
+                ).toLocaleString(
+                    "es-ES"
+                );
+        }
+
+        if (elementoValoracion) {
+            const totalValoraciones =
+                Number(
+                    estadisticas.total_valoraciones ||
+                    0
+                );
+
+            const media =
+                Number(
+                    estadisticas.valoracion_media
+                );
+
+            if (
+                totalValoraciones > 0 &&
+                Number.isFinite(
+                    media
+                )
+            ) {
+                elementoValoracion.textContent =
+                    media
+                        .toFixed(1)
+                        .replace(
+                            ".",
+                            ","
+                        );
+
+                elementoValoracion.setAttribute(
+                    "title",
+                    `${totalValoraciones} ${
+                        totalValoraciones === 1
+                            ? "valoración real"
+                            : "valoraciones reales"
+                    }`
+                );
+            } else {
+                elementoValoracion.textContent =
+                    "—";
+
+                elementoValoracion.setAttribute(
+                    "title",
+                    "Todavía no hay valoraciones reales"
+                );
+            }
+        }
+    } catch (error) {
+        console.error(
+            "No se pudieron cargar las estadísticas reales de portada:",
+            error
+        );
+    }
+}
+
+
+/* =====================================================
+   CONTADOR REAL DE PERSONAS DEL HERO
+===================================================== */
+
+const contadorPersonasHero =
+    document.querySelector(
+        "#contador-personas-hero"
+    );
+
+let solicitudContadorHero =
+    0;
+
+
+function esUuidPlanPortada(
+    valor
+) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+        .test(
+            String(
+                valor ||
+                ""
+            )
+        );
+}
+
+
+async function actualizarContadorPersonasHero() {
+    if (!contadorPersonasHero) {
+        return;
     }
 
     const planActual =
-        obtenerDatosSierraNorte();
+        obtenerDatosPlanHero();
 
-    return reservas.filter(
-        (reserva) => {
-            return (
-                reserva.planId ===
-                    planActual.planId &&
-                reserva.estado ===
-                    "confirmada"
-            );
-        }
-    );
-}
+    const planId =
+        String(
+            planActual?.planId ||
+            ""
+        );
 
+    const cliente =
+        window.clienteSupabase;
 
-function obtenerNumeroPersonasSierraNorte() {
-    const reservas =
-        obtenerReservasSierraNorte();
+    const numeroSolicitud =
+        ++solicitudContadorHero;
 
-    return reservas.reduce(
-        (total, reserva) => {
-            const cantidad =
-                Number(
-                    reserva.personas ||
-                    reserva.entradas ||
-                    1
-                );
+    if (
+        !cliente ||
+        !esUuidPlanPortada(
+            planId
+        )
+    ) {
+        contadorPersonasHero.textContent =
+            "0 personas";
 
-            return (
-                total +
-                (
-                    Number.isNaN(
-                        cantidad
-                    )
-                        ? 0
-                        : cantidad
-                )
-            );
-        },
-        0
-    );
-}
-
-
-function actualizarContadorSierraNorte() {
-    if (!contadorPersonasSierraNorte) {
         return;
     }
 
-    const numeroPersonas =
-        obtenerNumeroPersonasSierraNorte();
+    contadorPersonasHero.textContent =
+        "Consultando...";
 
-    if (numeroPersonas > 0) {
-        contadorPersonasSierraNorte.textContent =
-            `${numeroPersonas} ${
-                numeroPersonas === 1
+    try {
+        const {
+            data,
+            error
+        } = await cliente.rpc(
+            "obtener_disponibilidad_plan",
+            {
+                p_plan_id:
+                    planId
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        /*
+            El hero puede rotar mientras llega la consulta.
+            Si ya estamos mostrando otro plan, ignoramos
+            el resultado anterior.
+        */
+        if (
+            numeroSolicitud !==
+            solicitudContadorHero
+        ) {
+            return;
+        }
+
+        const filas =
+            Array.isArray(
+                data
+            )
+                ? data
+                : [];
+
+        const personas =
+            filas.reduce(
+                (
+                    total,
+                    fila
+                ) => {
+                    const cantidad =
+                        Number(
+                            fila?.plazas_reservadas ||
+                            0
+                        );
+
+                    return (
+                        total +
+                        (
+                            Number.isFinite(
+                                cantidad
+                            )
+                                ? cantidad
+                                : 0
+                        )
+                    );
+                },
+                0
+            );
+
+        contadorPersonasHero.textContent =
+            `${personas} ${
+                personas === 1
                     ? "persona"
                     : "personas"
             }`;
+    } catch (error) {
+        console.error(
+            "No se pudo obtener el número real de personas apuntadas al plan del hero:",
+            error
+        );
 
-        return;
+        if (
+            numeroSolicitud ===
+            solicitudContadorHero
+        ) {
+            contadorPersonasHero.textContent =
+                "Sin datos";
+        }
     }
-
-    contadorPersonasSierraNorte.textContent =
-        "Nuevo plan";
 }
-
 
 
 window.addEventListener(
@@ -2985,7 +3082,7 @@ window.addEventListener(
             evento.key ===
             "reservasSuralia"
         ) {
-            actualizarContadorSierraNorte();
+            actualizarContadorPersonasHero();
         }
 
         if (
@@ -2993,7 +3090,7 @@ window.addEventListener(
             "favoritosSuralia"
         ) {
             cargarFavoritosPortada();
-            actualizarFavoritoSierraNorte();
+            actualizarFavoritoHero();
         }
 
         if (
@@ -3028,7 +3125,11 @@ async function iniciarPaginaPrincipal() {
     await comprobarAccesoAdministracion();
     await iniciarContadorMensajesHeader();
     prepararRotacionHero();
-    await cargarProximosPlanesPortada();
+
+    await Promise.all([
+        cargarEstadisticasPortada(),
+        cargarProximosPlanesPortada()
+    ]);
 }
 
 

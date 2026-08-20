@@ -316,8 +316,11 @@
 
                         <div class="dato">
 
-                            <strong>
-                                120+
+                            <strong
+                                id="estadistica-planes-disponibles"
+                                aria-live="polite"
+                            >
+                                —
                             </strong>
 
                             <span>
@@ -328,8 +331,11 @@
 
                         <div class="dato">
 
-                            <strong>
-                                35
+                            <strong
+                                id="estadistica-nuevos-semana"
+                                aria-live="polite"
+                            >
+                                —
                             </strong>
 
                             <span>
@@ -340,8 +346,11 @@
 
                         <div class="dato">
 
-                            <strong>
-                                4,8
+                            <strong
+                                id="estadistica-valoracion-media"
+                                aria-live="polite"
+                            >
+                                —
                             </strong>
 
                             <span>
@@ -358,47 +367,56 @@
 
                     <article
                         class="tarjeta-principal"
-                        data-plan-id="sierra-norte"
-                        data-titulo="Ruta de senderismo por la Sierra Norte"
-                        data-categoria="naturaleza"
-                        data-categoria-texto="Naturaleza"
-                        data-imagen="img/sierra-norte-principal.jpg"
-                        data-fecha="8 de agosto de 2026"
-                        data-fecha-iso="2026-08-08"
-                        data-ubicacion="Constantina, Sevilla"
-                        data-precio="12"
-                        data-valoracion="4.9"
-                        data-enlace="detalle-sierra-norte.html"
+                        data-plan-id=""
+                        data-titulo=""
+                        data-categoria=""
+                        data-categoria-texto=""
+                        data-imagen="img/placeholder-plan.jpg"
+                        data-fecha=""
+                        data-fecha-iso=""
+                        data-ubicacion=""
+                        data-precio="0"
+                        data-valoracion="0"
+                        data-enlace="planes.html"
                     >
 
                         <a
-                            href="detalle-sierra-norte.html"
+                            href="planes.html"
                             class="tarjeta-principal__enlace"
-                            aria-label="Ver ruta de senderismo por la Sierra Norte"
+                            aria-label="Ver planes de Suralia"
                         >
 
-                            <div class="tarjeta-principal__imagen">
+                            <div
+                                class="tarjeta-principal__imagen"
+                                style="background-image: url('img/placeholder-plan.jpg');"
+                            >
 
                                 <div class="tarjeta-principal__gradiente"></div>
 
                                 <span class="tarjeta-principal__categoria">
-                                    <i class="fa-solid fa-person-hiking" aria-hidden="true"></i>
-                                    Naturaleza
+                                    <i
+                                        class="fa-solid fa-compass"
+                                        aria-hidden="true"
+                                    ></i>
+                                    Actividad
                                 </span>
 
                                 <div class="tarjeta-principal__info">
 
                                     <span>
-                                        8 de agosto de 2026
+                                        Cargando fecha...
                                     </span>
 
                                     <h2>
-                                        Ruta de senderismo por la Sierra Norte
+                                        Cargando próximo plan...
                                     </h2>
 
                                     <p>
-                                        <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                                        Constantina, Sevilla
+                                        <i
+                                            class="fa-solid fa-location-dot"
+                                            aria-hidden="true"
+                                        ></i>
+                                        Sevilla
                                     </p>
 
                                 </div>
@@ -409,11 +427,14 @@
 
                         <button
                             class="boton-favorito boton-favorito-hero"
-                            id="favorito-sierra-norte"
+                            id="favorito-plan-hero"
                             type="button"
-                            aria-label="Añadir ruta de senderismo por la Sierra Norte a favoritos"
+                            aria-label="Añadir este plan a favoritos"
                         >
-                            <i class="fa-regular fa-heart" aria-hidden="true"></i>
+                            <i
+                                class="fa-regular fa-heart"
+                                aria-hidden="true"
+                            ></i>
                         </button>
 
                     </article>
@@ -422,16 +443,28 @@
                         class="tarjeta-flotante tarjeta-flotante--usuarios"
                     >
 
-                        <div class="avatares">
-                            <span>LM</span>
-                            <span>JR</span>
-                            <span>AC</span>
+                        <div
+                            class="avatares"
+                            aria-hidden="true"
+                        >
+                            <span>
+                                <i class="fa-solid fa-user"></i>
+                            </span>
+                            <span>
+                                <i class="fa-solid fa-user"></i>
+                            </span>
+                            <span>
+                                <i class="fa-solid fa-user"></i>
+                            </span>
                         </div>
 
                         <div>
 
-                            <strong id="contador-personas-sierra-norte">
-                                24 personas
+                            <strong
+                                id="contador-personas-hero"
+                                aria-live="polite"
+                            >
+                                Consultando...
                             </strong>
 
                             <span>
@@ -446,16 +479,19 @@
                         class="tarjeta-flotante tarjeta-flotante--valoracion"
                     >
 
-                        <i class="fa-solid fa-star" aria-hidden="true"></i>
+                        <i
+                            class="fa-solid fa-star"
+                            aria-hidden="true"
+                        ></i>
 
                         <div>
 
                             <strong>
-                                4,9
+                                —
                             </strong>
 
                             <span>
-                                Actividad recomendada
+                                Sin valoraciones
                             </span>
 
                         </div>

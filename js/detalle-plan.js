@@ -2,249 +2,6 @@
    DATOS DE LOS PLANES DINÁMICOS
 ===================================================== */
 
-const PLANES_DETALLE = {
-    italica: {
-        planId: "italica",
-        titulo: "Visita guiada por Itálica",
-        categoria: "cultura",
-        categoriaTexto: "Cultura",
-        categoriaIcono: "fa-solid fa-landmark",
-        precio: 0,
-        valoracion: 4.8,
-        opiniones: 37,
-        fechaTexto: "25 de julio",
-        fechaIso: "2026-07-25",
-        fechaPrincipal: "Sábado, 25 de julio",
-        horario: "De 10:30 a 13:00",
-        hora: "10:30",
-        ubicacion: "Santiponce, Sevilla",
-        direccion:
-            "Conjunto Arqueológico de Itálica, avenida de Extremadura, Santiponce.",
-        personasApuntadas: "24 personas apuntadas",
-        tipoGrupo: "Grupo reducido",
-        maxPersonas: "Máximo 30 personas",
-        idioma: "Actividad en español",
-        organizador: "Rutas Sevilla",
-        organizadorIniciales: "RS",
-        imagen: "img/italica principal.jpg",
-        imagenes: [
-            "img/Arquitectura histórica.jpg",
-            "img/Restos arqueológicos romanos.jpg",
-            "img/Ruinas del conjunto arqueológico de Itálica.jpg"
-        ],
-        descripcion: [
-            "Descubre uno de los conjuntos arqueológicos más importantes de la antigua Hispania romana en una visita guiada por Itálica.",
-            "Durante el recorrido conocerás la historia de la ciudad, sus principales edificios, el anfiteatro y las antiguas viviendas decoradas con mosaicos.",
-            "La actividad está pensada para personas interesadas en la historia, la arquitectura y el patrimonio de Sevilla."
-        ],
-        descripcionAmpliada: [
-            "El recorrido incluye explicaciones sobre la fundación de Itálica, su evolución durante el Imperio romano y la importancia de personajes como Trajano y Adriano.",
-            "Se recomienda llevar calzado cómodo, agua y protección solar, especialmente durante los meses de verano."
-        ],
-        incluye: [
-            ["si", "Guía especializado"],
-            ["si", "Entrada al recinto"],
-            ["si", "Recorrido de aproximadamente 2 horas y media"],
-            ["si", "Explicaciones históricas"],
-            ["no", "Transporte hasta Santiponce"],
-            ["no", "Comida o bebida"]
-        ],
-        fechasReserva: [
-            ["2026-07-25", "Sábado, 25 de julio"],
-            ["2026-08-01", "Sábado, 1 de agosto"],
-            ["2026-08-08", "Sábado, 8 de agosto"]
-        ],
-        coordenadas: [37.4431, -6.0448],
-        zoom: 15,
-        mapaTitulo: "Conjunto Arqueológico de Itálica",
-        enlaceMapa:
-            "https://www.google.com/maps/search/?api=1&query=Itálica+Santiponce",
-        enlace: "detalle-plan.html?id=italica"
-    },
-
-    "cerro-hierro": {
-        planId: "cerro-hierro",
-        titulo: "Ruta por el Cerro del Hierro",
-        categoria: "naturaleza",
-        categoriaTexto: "Naturaleza",
-        categoriaIcono: "fa-solid fa-mountain-sun",
-        precio: 8,
-        valoracion: 4.9,
-        opiniones: 29,
-        fechaTexto: "2 de agosto",
-        fechaIso: "2026-08-02",
-        fechaPrincipal: "Domingo, 2 de agosto",
-        horario: "De 09:00 a 13:30",
-        hora: "09:00",
-        ubicacion: "San Nicolás del Puerto",
-        direccion:
-            "Monumento Natural Cerro del Hierro, San Nicolás del Puerto, Sevilla.",
-        personasApuntadas: "18 personas apuntadas",
-        tipoGrupo: "Grupo de senderismo",
-        maxPersonas: "Máximo 25 personas",
-        idioma: "Actividad en español",
-        organizador: "Senderos del Sur",
-        organizadorIniciales: "SS",
-        imagen:
-            "img/cerro1.jpg",
-        imagenes: [
-            "img/cerro2.jpg",
-            "img/cerro3.jpg",
-            "img/cerro4.jpg"
-        ],
-        descripcion: [
-            "Recorre uno de los paisajes naturales más sorprendentes de la Sierra Norte de Sevilla.",
-            "La ruta atraviesa antiguas galerías mineras, formaciones de roca caliza y senderos rodeados de vegetación mediterránea.",
-            "Es una actividad pensada para disfrutar de la naturaleza a un ritmo tranquilo."
-        ],
-        descripcionAmpliada: [
-            "La ruta tiene dificultad baja-media y se realizarán varias paradas para conocer la historia geológica y minera del entorno.",
-            "Se recomienda llevar calzado de senderismo, agua, algo de comida y protección solar."
-        ],
-        incluye: [
-            ["si", "Guía acompañante"],
-            ["si", "Ruta interpretativa"],
-            ["si", "Seguro de la actividad"],
-            ["si", "Paradas explicativas"],
-            ["no", "Transporte hasta el punto de encuentro"],
-            ["no", "Comida o bebida"]
-        ],
-        fechasReserva: [
-            ["2026-08-02", "Domingo, 2 de agosto"],
-            ["2026-08-09", "Domingo, 9 de agosto"],
-            ["2026-08-16", "Domingo, 16 de agosto"]
-        ],
-        coordenadas: [37.9537, -5.6257],
-        zoom: 14,
-        mapaTitulo: "Cerro del Hierro",
-        enlaceMapa:
-            "https://www.google.com/maps/search/?api=1&query=Cerro+del+Hierro+Sevilla",
-        enlace: "detalle-plan.html?id=cerro-hierro"
-    },
-
-    "tapas-triana": {
-        planId: "tapas-triana",
-        titulo: "Ruta de tapas por Triana",
-        categoria: "gastronomia",
-        categoriaTexto: "Gastronomía",
-        categoriaIcono: "fa-solid fa-utensils",
-        precio: 25,
-        valoracion: 4.6,
-        opiniones: 41,
-        fechaTexto: "3 de agosto",
-        fechaIso: "2026-08-03",
-        fechaPrincipal: "Lunes, 3 de agosto",
-        horario: "De 13:00 a 15:30",
-        hora: "13:00",
-        ubicacion: "Triana, Sevilla",
-        direccion:
-            "Punto de encuentro en la plaza del Altozano, Triana, Sevilla.",
-        personasApuntadas: "16 personas apuntadas",
-        tipoGrupo: "Grupo reducido",
-        maxPersonas: "Máximo 18 personas",
-        idioma: "Actividad en español",
-        organizador: "Sabores de Sevilla",
-        organizadorIniciales: "SS",
-        imagen:
-            "img/triana1.jpg",
-        imagenes: [
-            "img/triana2.jpg",
-            "img/triana3.jpg",
-            "img/triana4.jpg"
-        ],
-        descripcion: [
-            "Disfruta de una selección de tapas tradicionales en varios establecimientos del barrio de Triana.",
-            "La ruta combina gastronomía, historia local y algunos de los rincones más conocidos del barrio.",
-            "Es una experiencia pensada para conocer sabores sevillanos en un ambiente cercano."
-        ],
-        descripcionAmpliada: [
-            "Durante la actividad se visitarán varios bares seleccionados y se explicará el origen de algunas tapas tradicionales.",
-            "Se recomienda avisar previamente en caso de alergias o intolerancias alimentarias."
-        ],
-        incluye: [
-            ["si", "Acompañamiento durante la ruta"],
-            ["si", "Selección de tapas"],
-            ["si", "Una bebida en cada parada incluida"],
-            ["si", "Explicaciones sobre la gastronomía local"],
-            ["no", "Consumiciones adicionales"],
-            ["no", "Transporte hasta Triana"]
-        ],
-        fechasReserva: [
-            ["2026-08-03", "Lunes, 3 de agosto"],
-            ["2026-08-07", "Viernes, 7 de agosto"],
-            ["2026-08-10", "Lunes, 10 de agosto"]
-        ],
-        coordenadas: [37.3853, -6.0035],
-        zoom: 16,
-        mapaTitulo: "Plaza del Altozano",
-        enlaceMapa:
-            "https://www.google.com/maps/search/?api=1&query=Plaza+del+Altozano+Sevilla",
-        enlace: "detalle-plan.html?id=tapas-triana"
-    },
-
-    "exposicion-contemporanea": {
-        planId: "exposicion-contemporanea",
-        titulo: "Exposición de arte contemporáneo",
-        categoria: "cultura",
-        categoriaTexto: "Cultura",
-        categoriaIcono: "fa-solid fa-palette",
-        precio: 0,
-        valoracion: 4.5,
-        opiniones: 22,
-        fechaTexto: "Hasta el 10 de agosto",
-        fechaIso: "2026-08-10",
-        fechaPrincipal: "Disponible hasta el 10 de agosto",
-        horario: "De 11:00 a 20:00",
-        hora: "11:00",
-        ubicacion: "Centro de Sevilla",
-        direccion:
-            "Espacio cultural situado en el centro de Sevilla.",
-        personasApuntadas: "31 personas interesadas",
-        tipoGrupo: "Acceso por turnos",
-        maxPersonas: "Aforo limitado",
-        idioma: "Contenido en español",
-        organizador: "Cultura Sevilla",
-        organizadorIniciales: "CS",
-        imagen:
-            "img/andaluz1.jpg",
-        imagenes: [
-            "img/andaluz2.jpg",
-            "img/andaluz3.jpg",
-            "img/andaluz4.jpg"
-        ],
-        descripcion: [
-            "Descubre una selección de obras de artistas emergentes en un espacio cultural sevillano.",
-            "La exposición reúne pintura, fotografía, instalación y diferentes propuestas visuales contemporáneas.",
-            "La visita puede realizarse libremente dentro del horario de apertura."
-        ],
-        descripcionAmpliada: [
-            "El recorrido está organizado por salas temáticas y permite conocer diferentes formas de creación artística actual.",
-            "La entrada es gratuita, aunque se recomienda reservar para controlar el aforo."
-        ],
-        incluye: [
-            ["si", "Entrada a la exposición"],
-            ["si", "Acceso a todas las salas"],
-            ["si", "Información de las obras"],
-            ["si", "Guardarropa sujeto a disponibilidad"],
-            ["no", "Visita guiada privada"],
-            ["no", "Consumiciones"]
-        ],
-        fechasReserva: [
-            ["2026-08-01", "Sábado, 1 de agosto"],
-            ["2026-08-05", "Miércoles, 5 de agosto"],
-            ["2026-08-10", "Lunes, 10 de agosto"]
-        ],
-        coordenadas: [37.3891, -5.9845],
-        zoom: 15,
-        mapaTitulo: "Centro de Sevilla",
-        enlaceMapa:
-            "https://www.google.com/maps/search/?api=1&query=Centro+de+Sevilla",
-        enlace:
-            "detalle-plan.html?id=exposicion-contemporanea"
-    }
-};
-
-
 /* =====================================================
    OBTENER PLAN DE LA URL
 ===================================================== */
@@ -254,80 +11,12 @@ const parametrosUrl = new URLSearchParams(
 );
 
 const planIdUrl =
-    parametrosUrl.get("id") || "italica";
+    String(
+        parametrosUrl.get("id") ||
+        ""
+    ).trim();
 
-function combinarConCatalogo(
-    planDetalle
-) {
-    if (
-        !planDetalle ||
-        typeof window.obtenerPlanSuralia !==
-            "function"
-    ) {
-        return planDetalle;
-    }
-
-    const datosCatalogo =
-        window.obtenerPlanSuralia(
-            planDetalle.planId
-        );
-
-    if (!datosCatalogo) {
-        return planDetalle;
-    }
-
-    return {
-        ...planDetalle,
-
-        /*
-           Los datos comunes del catálogo se colocan
-           al final para que sean la fuente oficial.
-        */
-        planId:
-            datosCatalogo.planId,
-
-        titulo:
-            datosCatalogo.titulo,
-
-        categoria:
-            datosCatalogo.categoria,
-
-        categoriaTexto:
-            datosCatalogo.categoriaTexto,
-
-        precio:
-            datosCatalogo.precio,
-
-        valoracion:
-            datosCatalogo.valoracion,
-
-        fechaTexto:
-            datosCatalogo.fechaTexto,
-
-        fechaIso:
-            datosCatalogo.fechaIso,
-
-        hora:
-            datosCatalogo.hora ||
-            planDetalle.hora,
-
-        ubicacion:
-            datosCatalogo.ubicacion,
-
-        imagen:
-            datosCatalogo.imagen,
-
-        enlace:
-            datosCatalogo.enlace
-    };
-}
-
-
-let planActual =
-    combinarConCatalogo(
-        PLANES_DETALLE[planIdUrl] ||
-        null
-    );
+let planActual = null;
 
 
 /* =====================================================
@@ -1638,6 +1327,363 @@ function cargarDescripcion() {
                         `<p>${parrafo}</p>`
                 )
                 .join("");
+    }
+}
+
+
+function escaparHTMLOpinionDetalle(valor) {
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+function obtenerInicialesOpinionDetalle(nombre) {
+    const partes =
+        String(nombre || "")
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
+
+    return (
+        partes
+            .slice(0, 2)
+            .map(
+                (parte) =>
+                    parte.charAt(0).toUpperCase()
+            )
+            .join("") ||
+        "SU"
+    );
+}
+
+
+function formatearFechaOpinionDetalle(fechaIso) {
+    if (!fechaIso) {
+        return "";
+    }
+
+    const fecha =
+        new Date(fechaIso);
+
+    if (Number.isNaN(fecha.getTime())) {
+        return "";
+    }
+
+    return new Intl.DateTimeFormat(
+        "es-ES",
+        {
+            month: "long",
+            year: "numeric"
+        }
+    ).format(fecha);
+}
+
+
+function crearEstrellasOpinionDetalle(puntuacion) {
+    const valor =
+        Math.max(
+            0,
+            Math.min(
+                5,
+                Number(puntuacion || 0)
+            )
+        );
+
+    return Array.from(
+        { length: 5 },
+        (_, indice) => `
+            <i
+                class="${
+                    indice < valor
+                        ? "fa-solid"
+                        : "fa-regular"
+                } fa-star"
+                aria-hidden="true"
+            ></i>
+        `
+    ).join("");
+}
+
+
+function actualizarResumenValoracionesDetalle(
+    media,
+    total
+) {
+    const totalNumero =
+        Number(total || 0);
+
+    const mediaNumero =
+        Number(media);
+
+    const tieneValoraciones =
+        totalNumero > 0 &&
+        Number.isFinite(mediaNumero);
+
+    const mediaTexto =
+        tieneValoraciones
+            ? mediaNumero
+                .toFixed(1)
+                .replace(".", ",")
+            : "Nuevo";
+
+    const totalTexto =
+        totalNumero > 0
+            ? `${totalNumero} ${
+                totalNumero === 1
+                    ? "opinión"
+                    : "opiniones"
+            }`
+            : "Sin opiniones todavía";
+
+    planActual.valoracion =
+        tieneValoraciones
+            ? mediaNumero
+            : 0;
+
+    planActual.opiniones =
+        totalNumero;
+
+    cambiarTexto(
+        "#detalle-valoracion",
+        mediaTexto
+    );
+
+    cambiarTexto(
+        "#detalle-opiniones-texto",
+        totalTexto
+    );
+
+    cambiarTexto(
+        "#opiniones-valoracion",
+        tieneValoraciones
+            ? mediaTexto
+            : "—"
+    );
+
+    cambiarTexto(
+        "#opiniones-total",
+        totalNumero > 0
+            ? `${totalNumero} ${
+                totalNumero === 1
+                    ? "valoración"
+                    : "valoraciones"
+            }`
+            : "Sin valoraciones todavía"
+    );
+
+    cambiarTexto(
+        "#reserva-valoracion",
+        mediaTexto
+    );
+}
+
+
+function pintarOpinionesRealesDetalle(opiniones) {
+    const contenedor =
+        seleccionar(
+            "#opiniones-grid"
+        );
+
+    if (!contenedor) {
+        return;
+    }
+
+    const lista =
+        Array.isArray(opiniones)
+            ? opiniones
+            : [];
+
+    if (lista.length === 0) {
+        contenedor.innerHTML = `
+            <div class="estado-vacio estado-vacio--pequeno">
+
+                <span class="estado-vacio__icono">
+                    <i
+                        class="fa-regular fa-comment-dots"
+                        aria-hidden="true"
+                    ></i>
+                </span>
+
+                <h3>
+                    Todavía no hay opiniones
+                </h3>
+
+                <p>
+                    Las valoraciones reales aparecerán aquí cuando
+                    personas que hayan asistido al plan compartan
+                    su experiencia.
+                </p>
+
+            </div>
+        `;
+
+        return;
+    }
+
+    contenedor.innerHTML =
+        lista
+            .map(
+                (opinion) => {
+                    const nombre =
+                        escaparHTMLOpinionDetalle(
+                            opinion.nombre_visible ||
+                            "Usuario de Suralia"
+                        );
+
+                    const iniciales =
+                        escaparHTMLOpinionDetalle(
+                            obtenerInicialesOpinionDetalle(
+                                opinion.nombre_visible
+                            )
+                        );
+
+                    const fecha =
+                        escaparHTMLOpinionDetalle(
+                            formatearFechaOpinionDetalle(
+                                opinion.creado_en
+                            )
+                        );
+
+                    const comentario =
+                        escaparHTMLOpinionDetalle(
+                            String(
+                                opinion.comentario ||
+                                ""
+                            ).trim()
+                        );
+
+                    const puntuacion =
+                        Math.max(
+                            1,
+                            Math.min(
+                                5,
+                                Number(
+                                    opinion.puntuacion ||
+                                    0
+                                )
+                            )
+                        );
+
+                    return `
+                        <article class="opinion">
+
+                            <div class="opinion__usuario">
+
+                                <div class="opinion__avatar">
+                                    ${iniciales}
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        ${nombre}
+                                    </strong>
+
+                                    <span>
+                                        ${fecha}
+                                    </span>
+                                </div>
+
+                            </div>
+
+                            <div
+                                class="opinion__estrellas"
+                                aria-label="${puntuacion} de 5 estrellas"
+                            >
+                                ${crearEstrellasOpinionDetalle(
+                                    puntuacion
+                                )}
+                            </div>
+
+                            ${
+                                comentario
+                                    ? `
+                                        <p>
+                                            ${comentario}
+                                        </p>
+                                    `
+                                    : `
+                                        <p class="texto-suave">
+                                            Valoración sin comentario escrito.
+                                        </p>
+                                    `
+                            }
+
+                        </article>
+                    `;
+                }
+            )
+            .join("");
+}
+
+
+async function cargarOpinionesRealesDetalle() {
+    if (
+        !planActual?.esPlanSupabase ||
+        !esUuidPlan(planActual?.planId)
+    ) {
+        return;
+    }
+
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente) {
+        return;
+    }
+
+    try {
+        const [
+            resultadoResumen,
+            resultadoOpiniones
+        ] = await Promise.all([
+            cliente.rpc(
+                "obtener_valoracion_plan",
+                {
+                    p_plan_id:
+                        planActual.planId
+                }
+            ),
+            cliente.rpc(
+                "obtener_opiniones_plan",
+                {
+                    p_plan_id:
+                        planActual.planId
+                }
+            )
+        ]);
+
+        if (resultadoResumen.error) {
+            throw resultadoResumen.error;
+        }
+
+        if (resultadoOpiniones.error) {
+            throw resultadoOpiniones.error;
+        }
+
+        const resumen =
+            Array.isArray(
+                resultadoResumen.data
+            )
+                ? resultadoResumen.data[0]
+                : resultadoResumen.data;
+
+        actualizarResumenValoracionesDetalle(
+            resumen?.valoracion_media,
+            resumen?.total_valoraciones
+        );
+
+        pintarOpinionesRealesDetalle(
+            resultadoOpiniones.data
+        );
+    } catch (error) {
+        console.error(
+            "No se pudieron cargar las opiniones reales del plan:",
+            error
+        );
     }
 }
 
@@ -4853,19 +4899,11 @@ window.addEventListener(
 ===================================================== */
 
 async function iniciarDetallePlan() {
-    if (
-        typeof window.obtenerPlanSuralia !==
-        "function"
-    ) {
-        console.warn(
-            "No se ha cargado js/datos-planes.js. Se usarán los datos internos del detalle."
-        );
-    }
-
     try {
         if (
-            !planActual &&
-            esUuidPlan(planIdUrl)
+            esUuidPlan(
+                planIdUrl
+            )
         ) {
             planActual =
                 await cargarPlanSupabaseDetalle();
@@ -4883,7 +4921,10 @@ async function iniciarDetallePlan() {
         cargarIncluye();
         cargarDetalleMusica();
 
-        await cargarDisponibilidadGlobalPlan();
+        await Promise.all([
+            cargarOpinionesRealesDetalle(),
+            cargarDisponibilidadGlobalPlan()
+        ]);
 
         cargarFechasReserva();
         cargarMapa();

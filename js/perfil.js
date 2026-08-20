@@ -3462,6 +3462,782 @@ const contadorReservasPerfil = document.querySelector(
 let reservasSupabasePerfil = [];
 let reservasSupabaseCargadas = false;
 
+let valoracionesPropiasPerfil =
+    new Map();
+
+let planValoracionActivo =
+    "";
+
+let puntuacionValoracionActiva =
+    0;
+
+
+function obtenerFechaLocalISOReservaPerfil() {
+    const ahora =
+        new Date();
+
+    const anio =
+        ahora.getFullYear();
+
+    const mes =
+        String(
+            ahora.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+    const dia =
+        String(
+            ahora.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+    return `${anio}-${mes}-${dia}`;
+}
+
+
+function reservaYaRealizadaPerfil(
+    reserva
+) {
+    const fecha =
+        String(
+            reserva?.fechaIso ||
+            reserva?.fecha ||
+            ""
+        ).slice(
+            0,
+            10
+        );
+
+    if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(
+            fecha
+        )
+    ) {
+        return false;
+    }
+
+    return (
+        fecha <=
+        obtenerFechaLocalISOReservaPerfil()
+    );
+}
+
+
+function reservaPuedeValorarsePerfil(
+    reserva
+) {
+    return Boolean(
+        reserva?.origen ===
+            "supabase" &&
+        esIdUuidPerfil(
+            reserva?.planId
+        ) &&
+        reserva?.estado ===
+            "confirmada" &&
+        reservaYaRealizadaPerfil(
+            reserva
+        )
+    );
+}
+
+
+function obtenerValoracionPropiaPerfil(
+    planId
+) {
+    return (
+        valoracionesPropiasPerfil.get(
+            String(
+                planId ||
+                ""
+            )
+        ) ||
+        null
+    );
+}
+
+
+async function cargarValoracionesPropiasPerfil() {
+    const cliente =
+        window.clienteSupabase;
+
+    valoracionesPropiasPerfil =
+        new Map();
+
+    if (!cliente?.auth) {
+        return;
+    }
+
+    try {
+        const {
+            data: datosSesion,
+            error: errorSesion
+        } = await cliente.auth.getSession();
+
+        if (errorSesion) {
+            throw errorSesion;
+        }
+
+        const usuario =
+            datosSesion.session?.user;
+
+        if (!usuario) {
+            return;
+        }
+
+        const {
+            data,
+            error
+        } = await cliente
+            .from(
+                "valoraciones_planes"
+            )
+            .select(
+                `
+                    id,
+                    plan_id,
+                    puntuacion,
+                    comentario,
+                    creado_en,
+                    actualizado_en
+                `
+            )
+            .eq(
+                "usuario_id",
+                usuario.id
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        valoracionesPropiasPerfil =
+            new Map(
+                (
+                    Array.isArray(data)
+                        ? data
+                        : []
+                ).map(
+                    (valoracion) => [
+                        String(
+                            valoracion.plan_id
+                        ),
+                        {
+                            ...valoracion,
+                            puntuacion:
+                                Number(
+                                    valoracion.puntuacion ||
+                                    0
+                                )
+                        }
+                    ]
+                )
+            );
+    } catch (error) {
+        console.error(
+            "No se pudieron cargar tus valoraciones:",
+            error
+        );
+    }
+}
+
+
+function crearModalValoracionPerfil() {
+    if (
+        document.querySelector(
+            "#modal-valoracion-perfil"
+        )
+    ) {
+        return;
+    }
+
+    const contenedor =
+        document.createElement(
+            "div"
+        );
+
+    contenedor.innerHTML = `
+        <div
+            class="modal-valoracion-perfil"
+            id="modal-valoracion-perfil"
+            aria-hidden="true"
+        >
+            <div
+                class="modal-valoracion-perfil__fondo"
+                data-cerrar-valoracion
+            ></div>
+
+            <section
+                class="modal-valoracion-perfil__tarjeta"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="titulo-modal-valoracion"
+            >
+                <button
+                    type="button"
+                    class="modal-valoracion-perfil__cerrar"
+                    id="cerrar-modal-valoracion"
+                    aria-label="Cerrar"
+                >
+                    <i
+                        class="fa-solid fa-xmark"
+                        aria-hidden="true"
+                    ></i>
+                </button>
+
+                <span class="modal-valoracion-perfil__icono">
+                    <i
+                        class="fa-solid fa-star"
+                        aria-hidden="true"
+                    ></i>
+                </span>
+
+                <h2 id="titulo-modal-valoracion">
+                    Valorar experiencia
+                </h2>
+
+                <p
+                    class="modal-valoracion-perfil__plan"
+                    id="nombre-plan-valoracion"
+                ></p>
+
+                <p class="modal-valoracion-perfil__ayuda">
+                    ¿Qué tal fue la experiencia?
+                </p>
+
+                <div
+                    class="estrellas-valoracion-perfil"
+                    id="estrellas-valoracion-perfil"
+                    role="group"
+                    aria-label="Selecciona una puntuación de 1 a 5 estrellas"
+                >
+                    ${[1, 2, 3, 4, 5]
+                        .map(
+                            (numero) => `
+                                <button
+                                    type="button"
+                                    data-puntuacion-valoracion="${numero}"
+                                    aria-label="${numero} ${
+                                        numero === 1
+                                            ? "estrella"
+                                            : "estrellas"
+                                    }"
+                                >
+                                    <i
+                                        class="fa-regular fa-star"
+                                        aria-hidden="true"
+                                    ></i>
+                                </button>
+                            `
+                        )
+                        .join("")}
+                </div>
+
+                <label
+                    for="comentario-valoracion-perfil"
+                    class="modal-valoracion-perfil__label"
+                >
+                    Comentario
+                    <span>Opcional</span>
+                </label>
+
+                <textarea
+                    id="comentario-valoracion-perfil"
+                    maxlength="1000"
+                    rows="5"
+                    placeholder="Cuenta qué te gustó de la experiencia..."
+                ></textarea>
+
+                <div class="modal-valoracion-perfil__contador">
+                    <span id="contador-comentario-valoracion">
+                        0
+                    </span>/1000
+                </div>
+
+                <p
+                    class="modal-valoracion-perfil__error oculto"
+                    id="error-valoracion-perfil"
+                    role="alert"
+                ></p>
+
+                <div class="modal-valoracion-perfil__acciones">
+                    <button
+                        type="button"
+                        class="boton-secundario"
+                        id="cancelar-modal-valoracion"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="button"
+                        class="boton-principal"
+                        id="guardar-valoracion-perfil"
+                    >
+                        Guardar valoración
+                    </button>
+                </div>
+            </section>
+        </div>
+    `;
+
+    document.body.appendChild(
+        contenedor.firstElementChild
+    );
+
+    document
+        .querySelectorAll(
+            "[data-puntuacion-valoracion]"
+        )
+        .forEach(
+            (boton) => {
+                boton.addEventListener(
+                    "click",
+                    () => {
+                        puntuacionValoracionActiva =
+                            Number(
+                                boton.dataset
+                                    .puntuacionValoracion ||
+                                0
+                            );
+
+                        actualizarEstrellasValoracionPerfil();
+                    }
+                );
+            }
+        );
+
+    document
+        .querySelector(
+            "#comentario-valoracion-perfil"
+        )
+        ?.addEventListener(
+            "input",
+            (evento) => {
+                const contador =
+                    document.querySelector(
+                        "#contador-comentario-valoracion"
+                    );
+
+                if (contador) {
+                    contador.textContent =
+                        String(
+                            evento.target.value.length
+                        );
+                }
+            }
+        );
+
+    document
+        .querySelector(
+            "#cerrar-modal-valoracion"
+        )
+        ?.addEventListener(
+            "click",
+            cerrarModalValoracionPerfil
+        );
+
+    document
+        .querySelector(
+            "#cancelar-modal-valoracion"
+        )
+        ?.addEventListener(
+            "click",
+            cerrarModalValoracionPerfil
+        );
+
+    document
+        .querySelector(
+            "[data-cerrar-valoracion]"
+        )
+        ?.addEventListener(
+            "click",
+            cerrarModalValoracionPerfil
+        );
+
+    document
+        .querySelector(
+            "#guardar-valoracion-perfil"
+        )
+        ?.addEventListener(
+            "click",
+            guardarValoracionPerfil
+        );
+}
+
+
+function actualizarEstrellasValoracionPerfil() {
+    document
+        .querySelectorAll(
+            "[data-puntuacion-valoracion]"
+        )
+        .forEach(
+            (boton) => {
+                const valor =
+                    Number(
+                        boton.dataset
+                            .puntuacionValoracion ||
+                        0
+                    );
+
+                const seleccionada =
+                    valor <=
+                    puntuacionValoracionActiva;
+
+                boton.classList.toggle(
+                    "activa",
+                    seleccionada
+                );
+
+                const icono =
+                    boton.querySelector(
+                        "i"
+                    );
+
+                if (icono) {
+                    icono.className =
+                        seleccionada
+                            ? "fa-solid fa-star"
+                            : "fa-regular fa-star";
+                }
+            }
+        );
+}
+
+
+function abrirModalValoracionPerfil(
+    planId
+) {
+    const modal =
+        document.querySelector(
+            "#modal-valoracion-perfil"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+    const reserva =
+        obtenerReservasUsuario()
+            .find(
+                (item) =>
+                    String(
+                        item.planId ||
+                        ""
+                    ) ===
+                    String(
+                        planId ||
+                        ""
+                    )
+            );
+
+    if (
+        !reserva ||
+        !reservaPuedeValorarsePerfil(
+            reserva
+        )
+    ) {
+        mostrarNotificacion(
+            "Esta experiencia todavía no se puede valorar."
+        );
+
+        return;
+    }
+
+    const valoracion =
+        obtenerValoracionPropiaPerfil(
+            planId
+        );
+
+    planValoracionActivo =
+        String(
+            planId
+        );
+
+    puntuacionValoracionActiva =
+        Number(
+            valoracion?.puntuacion ||
+            0
+        );
+
+    const nombrePlan =
+        document.querySelector(
+            "#nombre-plan-valoracion"
+        );
+
+    if (nombrePlan) {
+        nombrePlan.textContent =
+            reserva.titulo ||
+            "Experiencia de Suralia";
+    }
+
+    const comentario =
+        document.querySelector(
+            "#comentario-valoracion-perfil"
+        );
+
+    if (comentario) {
+        comentario.value =
+            valoracion?.comentario ||
+            "";
+    }
+
+    const contador =
+        document.querySelector(
+            "#contador-comentario-valoracion"
+        );
+
+    if (contador) {
+        contador.textContent =
+            String(
+                comentario?.value.length ||
+                0
+            );
+    }
+
+    const error =
+        document.querySelector(
+            "#error-valoracion-perfil"
+        );
+
+    if (error) {
+        error.textContent =
+            "";
+
+        error.classList.add(
+            "oculto"
+        );
+    }
+
+    actualizarEstrellasValoracionPerfil();
+
+    modal.classList.add(
+        "visible"
+    );
+
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    document.body.classList.add(
+        "modal-abierto"
+    );
+
+    document
+        .querySelector(
+            "[data-puntuacion-valoracion]"
+        )
+        ?.focus();
+}
+
+
+function cerrarModalValoracionPerfil() {
+    const modal =
+        document.querySelector(
+            "#modal-valoracion-perfil"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+    modal.classList.remove(
+        "visible"
+    );
+
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+    document.body.classList.remove(
+        "modal-abierto"
+    );
+
+    planValoracionActivo =
+        "";
+
+    puntuacionValoracionActiva =
+        0;
+}
+
+
+async function guardarValoracionPerfil() {
+    const cliente =
+        window.clienteSupabase;
+
+    const botonGuardar =
+        document.querySelector(
+            "#guardar-valoracion-perfil"
+        );
+
+    const errorTexto =
+        document.querySelector(
+            "#error-valoracion-perfil"
+        );
+
+    const comentario =
+        String(
+            document.querySelector(
+                "#comentario-valoracion-perfil"
+            )?.value ||
+            ""
+        ).trim();
+
+    if (
+        !cliente ||
+        !esIdUuidPerfil(
+            planValoracionActivo
+        )
+    ) {
+        mostrarNotificacion(
+            "No se ha podido guardar la valoración."
+        );
+
+        return;
+    }
+
+    if (
+        puntuacionValoracionActiva <
+            1 ||
+        puntuacionValoracionActiva >
+            5
+    ) {
+        if (errorTexto) {
+            errorTexto.textContent =
+                "Selecciona entre 1 y 5 estrellas.";
+
+            errorTexto.classList.remove(
+                "oculto"
+            );
+        }
+
+        return;
+    }
+
+    if (botonGuardar) {
+        botonGuardar.disabled =
+            true;
+
+        botonGuardar.textContent =
+            "Guardando...";
+    }
+
+    if (errorTexto) {
+        errorTexto.textContent =
+            "";
+
+        errorTexto.classList.add(
+            "oculto"
+        );
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente.rpc(
+            "guardar_valoracion_plan",
+            {
+                p_plan_id:
+                    planValoracionActivo,
+
+                p_puntuacion:
+                    puntuacionValoracionActiva,
+
+                p_comentario:
+                    comentario ||
+                    null
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        const respuesta =
+            Array.isArray(data)
+                ? data[0]
+                : data;
+
+        if (
+            respuesta &&
+            respuesta.ok !== true
+        ) {
+            throw new Error(
+                "No se ha podido guardar la valoración."
+            );
+        }
+
+        await cargarValoracionesPropiasPerfil();
+
+        cerrarModalValoracionPerfil();
+
+        mostrarReservasPerfil();
+
+        mostrarNotificacion(
+            "Tu valoración se ha guardado."
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo guardar la valoración:",
+            error
+        );
+
+        const mensaje =
+            String(
+                error?.message ||
+                "No se ha podido guardar la valoración."
+            )
+                .replace(
+                    /\s+CONTEXT:.*$/i,
+                    ""
+                )
+                .trim();
+
+        if (errorTexto) {
+            errorTexto.textContent =
+                mensaje;
+
+            errorTexto.classList.remove(
+                "oculto"
+            );
+        }
+    } finally {
+        if (botonGuardar) {
+            botonGuardar.disabled =
+                false;
+
+            botonGuardar.textContent =
+                "Guardar valoración";
+        }
+    }
+}
+
+
+function activarBotonesValorarReserva() {
+    document
+        .querySelectorAll(
+            ".boton-valorar-reserva"
+        )
+        .forEach(
+            (boton) => {
+                boton.addEventListener(
+                    "click",
+                    () => {
+                        abrirModalValoracionPerfil(
+                            boton.dataset.planId
+                        );
+                    }
+                );
+            }
+        );
+}
+
 
 function construirCatalogoPlanesPerfil() {
     if (
@@ -3505,32 +4281,22 @@ function obtenerIdPlanReserva(reserva) {
         return String(idDirecto);
     }
 
-    const titulo = String(
-        reserva?.titulo ||
-        reserva?.nombre ||
-        ""
-    )
-        .trim()
-        .toLowerCase();
+    const titulo =
+        String(
+            reserva?.titulo ||
+            reserva?.nombre ||
+            ""
+        )
+            .trim()
+            .toLowerCase();
 
     const idsPorTitulo = {
-        "visita guiada por itálica": "italica",
-        "visita guiada por italica": "italica",
-        "kayak al atardecer": "kayak-atardecer",
-        "poncho k - cartuja center cite": PLAN_PONCHO_K_UUID,
-        "ruta por el cerro del hierro": "cerro-hierro",
-        "ruta de tapas por triana": "tapas-triana",
-        "exposición de arte contemporáneo":
-            "exposicion-contemporanea",
-        "exposicion de arte contemporaneo":
-            "exposicion-contemporanea",
-        "ruta por la sierra norte": "sierra-norte",
-        "ruta de senderismo por la sierra norte": "sierra-norte"
+        "poncho k - cartuja center cite":
+            PLAN_PONCHO_K_UUID
     };
 
     return idsPorTitulo[titulo] || "";
 }
-
 
 function normalizarReserva(reserva) {
     const planId =
@@ -4156,6 +4922,7 @@ async function cargarReservasSupabasePerfil() {
 
 
 async function cargarReservasPerfil() {
+    await cargarValoracionesPropiasPerfil();
     await cargarReservasSupabasePerfil();
 }
 
@@ -4238,67 +5005,31 @@ function obtenerReservasUsuario() {
 
 
 function obtenerEnlacePlan(plan) {
-    if (plan?.enlace) {
-        return plan.enlace;
+    const planId =
+        String(
+            plan?.planId ||
+            ""
+        );
+
+    if (
+        planId ===
+        "poncho-k-cartuja"
+    ) {
+        return `detalle-plan.html?id=${PLAN_PONCHO_K_UUID}`;
     }
 
     if (
         esIdUuidPerfil(
-            plan?.planId
+            planId
         )
     ) {
         return `detalle-plan.html?id=${encodeURIComponent(
-            plan.planId
+            planId
         )}`;
     }
 
-    if (
-        plan?.planId &&
-        typeof window.obtenerPlanSuralia ===
-            "function"
-    ) {
-        const datosCatalogo =
-            window.obtenerPlanSuralia(
-                plan.planId
-            );
-
-        if (datosCatalogo?.enlace) {
-            return datosCatalogo.enlace;
-        }
-    }
-
-    const enlacesPorPlan = {
-        italica:
-            "detalle-plan.html?id=italica",
-
-        "kayak-atardecer":
-            "detalle-kayak.html",
-
-        "poncho-k-cartuja":
-            `detalle-plan.html?id=${PLAN_PONCHO_K_UUID}`,
-
-        [PLAN_PONCHO_K_UUID]:
-            `detalle-plan.html?id=${PLAN_PONCHO_K_UUID}`,
-
-        "cerro-hierro":
-            "detalle-plan.html?id=cerro-hierro",
-
-        "tapas-triana":
-            "detalle-plan.html?id=tapas-triana",
-
-        "exposicion-contemporanea":
-            "detalle-plan.html?id=exposicion-contemporanea",
-
-        "sierra-norte":
-            "detalle-sierra-norte.html"
-    };
-
-    return enlacesPorPlan[
-        plan?.planId
-    ] ||
-        "planes.html";
+    return "planes.html";
 }
-
 
 function crearProximaReservaHTML(
     reserva
@@ -4436,6 +5167,12 @@ function crearReservaHTML(
             ""
         );
 
+    const planId =
+        escaparHTML(
+            reserva.planId ||
+            ""
+        );
+
     const titulo =
         escaparHTML(
             reserva.titulo ||
@@ -4490,9 +5227,52 @@ function crearReservaHTML(
             )
         );
 
+    const realizada =
+        reservaYaRealizadaPerfil(
+            reserva
+        );
+
+    const puedeValorar =
+        reservaPuedeValorarsePerfil(
+            reserva
+        );
+
+    const valoracion =
+        obtenerValoracionPropiaPerfil(
+            reserva.planId
+        );
+
+    const textoValoracion =
+        valoracion
+            ? "Editar valoración"
+            : "Valorar experiencia";
+
+    const estrellasGuardadas =
+        valoracion
+            ? `
+                <span
+                    class="reserva-item__valoracion-guardada"
+                    title="Tu valoración"
+                >
+                    <i
+                        class="fa-solid fa-star"
+                        aria-hidden="true"
+                    ></i>
+                    ${Number(
+                        valoracion.puntuacion ||
+                        0
+                    )}
+                </span>
+            `
+            : "";
+
     return `
         <article
-            class="reserva-item"
+            class="reserva-item ${
+                realizada
+                    ? "reserva-item--realizada"
+                    : ""
+            }"
             data-reserva-id="${idReserva}"
         >
 
@@ -4512,12 +5292,22 @@ function crearReservaHTML(
                 <div class="reserva-item__superior">
 
                     <div>
-                        <span class="reserva-estado">
-                            Confirmada
+                        <span class="reserva-estado ${
+                            realizada
+                                ? "reserva-estado--realizada"
+                                : ""
+                        }">
+                            ${
+                                realizada
+                                    ? "Realizada"
+                                    : "Confirmada"
+                            }
                         </span>
 
                         <h3>${titulo}</h3>
                     </div>
+
+                    ${estrellasGuardadas}
 
                 </div>
 
@@ -4570,13 +5360,37 @@ function crearReservaHTML(
                         Ver actividad
                     </a>
 
-                    <button
-                        type="button"
-                        class="boton-cancelar-reserva"
-                        data-reserva-id="${idReserva}"
-                    >
-                        Cancelar reserva
-                    </button>
+                    ${
+                        puedeValorar
+                            ? `
+                                <button
+                                    type="button"
+                                    class="boton-valorar-reserva"
+                                    data-plan-id="${planId}"
+                                >
+                                    <i
+                                        class="fa-solid fa-star"
+                                        aria-hidden="true"
+                                    ></i>
+                                    ${textoValoracion}
+                                </button>
+                            `
+                            : ""
+                    }
+
+                    ${
+                        !realizada
+                            ? `
+                                <button
+                                    type="button"
+                                    class="boton-cancelar-reserva"
+                                    data-reserva-id="${idReserva}"
+                                >
+                                    Cancelar reserva
+                                </button>
+                            `
+                            : ""
+                    }
 
                 </div>
 
@@ -4586,10 +5400,17 @@ function crearReservaHTML(
     `;
 }
 
-
 function mostrarReservasPerfil() {
     const reservas =
         obtenerReservasUsuario();
+
+    const reservasProximas =
+        reservas.filter(
+            (reserva) =>
+                !reservaYaRealizadaPerfil(
+                    reserva
+                )
+        );
 
     if (contadorReservasPerfil) {
         contadorReservasPerfil.textContent =
@@ -4617,7 +5438,7 @@ function mostrarReservasPerfil() {
                     <i class="fa-regular fa-calendar"></i>
                 </span>
 
-                <h3>No tienes próximas reservas</h3>
+                <h3>No tienes reservas</h3>
 
                 <p>
                     Encuentra un plan y reserva tu próxima experiencia.
@@ -4648,10 +5469,38 @@ function mostrarReservasPerfil() {
         );
     }
 
-    proximaReservaPerfil.innerHTML =
-        crearProximaReservaHTML(
-            reservas[0]
-        );
+    if (
+        reservasProximas.length >
+        0
+    ) {
+        proximaReservaPerfil.innerHTML =
+            crearProximaReservaHTML(
+                reservasProximas[0]
+            );
+    } else {
+        proximaReservaPerfil.innerHTML = `
+            <div class="estado-vacio estado-vacio--pequeno">
+
+                <span class="estado-vacio__icono">
+                    <i class="fa-regular fa-calendar-check"></i>
+                </span>
+
+                <h3>No tienes próximas reservas</h3>
+
+                <p>
+                    Tus experiencias anteriores siguen disponibles abajo para que puedas valorarlas.
+                </p>
+
+                <a
+                    href="planes.html"
+                    class="boton-principal-pequeno"
+                >
+                    Explorar planes
+                </a>
+
+            </div>
+        `;
+    }
 
     listaReservasPerfil.innerHTML =
         reservas
@@ -4661,8 +5510,8 @@ function mostrarReservasPerfil() {
             .join("");
 
     activarBotonesCancelarReserva();
+    activarBotonesValorarReserva();
 }
-
 
 function activarBotonesCancelarReserva() {
     document
@@ -5059,35 +5908,8 @@ function obtenerIdPlanFavorito(favorito) {
             .toLowerCase();
 
     const idsPorTitulo = {
-        "visita guiada por itálica":
-            "italica",
-
-        "visita guiada por italica":
-            "italica",
-
-        "kayak al atardecer":
-            "kayak-atardecer",
-
         "poncho k - cartuja center cite":
-            PLAN_PONCHO_K_UUID,
-
-        "ruta por el cerro del hierro":
-            "cerro-hierro",
-
-        "ruta de tapas por triana":
-            "tapas-triana",
-
-        "exposición de arte contemporáneo":
-            "exposicion-contemporanea",
-
-        "exposicion de arte contemporaneo":
-            "exposicion-contemporanea",
-
-        "ruta por la sierra norte":
-            "sierra-norte",
-
-        "ruta de senderismo por la sierra norte":
-            "sierra-norte"
+            PLAN_PONCHO_K_UUID
     };
 
     return idsPorTitulo[titulo] || "";
@@ -5660,38 +6482,31 @@ function obtenerClienteAfinidades() {
 
 
 function obtenerEnlaceAfinidad(planId) {
-    if (
-        planId &&
-        typeof window.obtenerPlanSuralia ===
-            "function"
-    ) {
-        const plan =
-            window.obtenerPlanSuralia(
-                planId
-            );
+    const id =
+        String(
+            planId ||
+            ""
+        );
 
-        if (plan?.enlace) {
-            return plan.enlace;
-        }
+    if (
+        id ===
+        "poncho-k-cartuja"
+    ) {
+        return `detalle-plan.html?id=${PLAN_PONCHO_K_UUID}`;
     }
 
-    const enlaces = {
-        "sierra-norte":
-            "detalle-sierra-norte.html",
-        "kayak-atardecer":
-            "detalle-kayak.html",
-        "poncho-k-cartuja":
-            `detalle-plan.html?id=${PLAN_PONCHO_K_UUID}`,
-        [PLAN_PONCHO_K_UUID]:
-            `detalle-plan.html?id=${PLAN_PONCHO_K_UUID}`
-    };
-
-    return enlaces[planId] ||
-        `detalle-plan.html?id=${encodeURIComponent(
-            planId || ""
+    if (
+        esIdUuidPerfil(
+            id
+        )
+    ) {
+        return `detalle-plan.html?id=${encodeURIComponent(
+            id
         )}`;
-}
+    }
 
+    return "planes.html";
+}
 
 function formatearFechaAfinidad(fechaIso) {
     if (!fechaIso) {
@@ -6007,21 +6822,10 @@ async function limpiarAfinidadesDePlanesEliminados(
     }
 
     /*
-       Los planes antiguos usan identificadores como
-       "sierra-norte", mientras que los planes nuevos
-       guardados en public.planes utilizan UUID.
-
-       Solo consultamos en Supabase los UUID para evitar
-       errores 400 al comparar una columna uuid con IDs legacy.
+       Los planes fijos antiguos ya se han retirado.
+       El perfil solo conserva afinidades vinculadas
+       a planes actuales de Supabase (UUID).
     */
-
-    const afinidadesLegacy =
-        afinidades.filter(
-            (afinidad) =>
-                !esIdUuidPerfil(
-                    afinidad.plan_id
-                )
-        );
 
     const afinidadesSupabase =
         afinidades.filter(
@@ -6034,7 +6838,7 @@ async function limpiarAfinidadesDePlanesEliminados(
     if (
         afinidadesSupabase.length === 0
     ) {
-        return afinidadesLegacy;
+        return [];
     }
 
     const idsPlanes =
@@ -6142,10 +6946,7 @@ async function limpiarAfinidadesDePlanesEliminados(
                 )
         );
 
-    return [
-        ...afinidadesLegacy,
-        ...afinidadesSupabaseValidas
-    ];
+    return afinidadesSupabaseValidas;
 }
 
 
@@ -10431,6 +11232,26 @@ document.addEventListener(
 
 
 
+document.addEventListener(
+    "keydown",
+    (evento) => {
+        if (
+            evento.key ===
+                "Escape" &&
+            document
+                .querySelector(
+                    "#modal-valoracion-perfil"
+                )
+                ?.classList.contains(
+                    "visible"
+                )
+        ) {
+            cerrarModalValoracionPerfil();
+        }
+    }
+);
+
+
 /* =========================================
    SINCRONIZAR PUBLICACIONES AL VOLVER
 ========================================= */
@@ -10464,6 +11285,8 @@ function iniciarPerfil() {
             "No se ha cargado js/datos-planes.js. El perfil usará únicamente los datos guardados."
         );
     }
+
+    crearModalValoracionPerfil();
 
     cargarDatosUsuario();
     cargarPerfilSocial();
