@@ -310,6 +310,179 @@ function planHaCaducado(
 }
 
 
+function obtenerPasesVigentesPlan(
+    plan
+) {
+    const hoy =
+        obtenerFechaLocalISO();
+
+    const pases =
+        [];
+
+    const claves =
+        new Set();
+
+    function anadirPase(
+        fechaValor,
+        horaValor
+    ) {
+        const fecha =
+            String(
+                fechaValor ||
+                ""
+            )
+                .trim()
+                .slice(
+                    0,
+                    10
+                );
+
+        if (
+            !/^\d{4}-\d{2}-\d{2}$/.test(
+                fecha
+            )
+        ) {
+            return;
+        }
+
+        /*
+            Un plan de hoy sigue disponible durante todo el día.
+        */
+        if (
+            fecha <
+            hoy
+        ) {
+            return;
+        }
+
+        const hora =
+            String(
+                horaValor ||
+                ""
+            )
+                .trim()
+                .slice(
+                    0,
+                    5
+                );
+
+        const clave =
+            `${fecha}|${hora}`;
+
+        if (
+            claves.has(
+                clave
+            )
+        ) {
+            return;
+        }
+
+        claves.add(
+            clave
+        );
+
+        pases.push({
+            fecha,
+            hora
+        });
+    }
+
+
+    /*
+        Fecha principal.
+    */
+    anadirPase(
+        plan?.fecha,
+        plan?.hora
+    );
+
+
+    /*
+        Fechas adicionales guardadas en planes.fechas.
+    */
+    if (
+        Array.isArray(
+            plan?.fechas
+        )
+    ) {
+        plan.fechas.forEach(
+            (
+                pase
+            ) => {
+                anadirPase(
+                    pase?.fecha,
+                    pase?.hora
+                );
+            }
+        );
+    }
+
+
+    return pases.sort(
+        (
+            paseA,
+            paseB
+        ) => {
+            const fechaComparada =
+                paseA.fecha.localeCompare(
+                    paseB.fecha
+                );
+
+            if (
+                fechaComparada !==
+                0
+            ) {
+                return fechaComparada;
+            }
+
+            return String(
+                paseA.hora ||
+                ""
+            ).localeCompare(
+                String(
+                    paseB.hora ||
+                    ""
+                )
+            );
+        }
+    );
+}
+
+
+function prepararPlanPublicadoVigente(
+    plan
+) {
+    const pasesVigentes =
+        obtenerPasesVigentesPlan(
+            plan
+        );
+
+    if (
+        pasesVigentes.length ===
+        0
+    ) {
+        return null;
+    }
+
+    const proximoPase =
+        pasesVigentes[0];
+
+    /*
+        La tarjeta muestra siempre la próxima fecha disponible,
+        aunque la fecha principal original del plan ya haya pasado.
+    */
+    return {
+        ...plan,
+        fecha:
+            proximoPase.fecha,
+        hora:
+            proximoPase.hora ||
+            plan.hora ||
+            null
+    };
+}
+
+
 function cumpleFiltroPrecio(
     precio,
     filtro
@@ -1346,6 +1519,7 @@ async function cargarPlanesPublicadosSupabase() {
                     descripcion,
                     fecha,
                     hora,
+                    fechas,
                     ubicacion,
                     precio,
                     imagen_url,
@@ -1353,7 +1527,6 @@ async function cargarPlanesPublicadosSupabase() {
                 `
             )
             .eq("estado", "publicado")
-            .gte("fecha", obtenerFechaLocalISO())
             .order(
                 "creado_en",
                 {
@@ -1385,13 +1558,37 @@ async function cargarPlanesPublicadosSupabase() {
                 Array.isArray(data)
                     ? data
                     : []
-            ).filter(
-                (plan) =>
-                    plan.id &&
-                    !idsExistentes.has(
-                        String(plan.id)
-                    )
-            );
+            )
+                .map(
+                    prepararPlanPublicadoVigente
+                )
+                .filter(
+                    (
+                        plan
+                    ) =>
+                        plan &&
+                        plan.id &&
+                        !idsExistentes.has(
+                            String(
+                                plan.id
+                            )
+                        )
+                )
+                .sort(
+                    (
+                        planA,
+                        planB
+                    ) =>
+                        String(
+                            planA.fecha ||
+                            ""
+                        ).localeCompare(
+                            String(
+                                planB.fecha ||
+                                ""
+                            )
+                        )
+                );
 
         listaPlanes.innerHTML =
             planesNuevos

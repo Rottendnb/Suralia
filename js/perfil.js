@@ -3520,8 +3520,12 @@ function reservaYaRealizadaPerfil(
         return false;
     }
 
+    /*
+        Una reserva de HOY sigue considerándose activa.
+        Solo pasa a "Realizada" a partir del día siguiente.
+    */
     return (
-        fecha <=
+        fecha <
         obtenerFechaLocalISOReservaPerfil()
     );
 }

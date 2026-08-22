@@ -1978,6 +1978,176 @@ function planPortadaHaCaducado(fechaIso) {
     return fechaSegura < obtenerFechaLocalISO();
 }
 
+
+function obtenerPasesVigentesPortada(
+    plan
+) {
+    const hoy =
+        obtenerFechaLocalISO();
+
+    const pases =
+        [];
+
+    const claves =
+        new Set();
+
+
+    function anadirPase(
+        fechaValor,
+        horaValor
+    ) {
+        const fecha =
+            String(
+                fechaValor ||
+                ""
+            )
+                .trim()
+                .slice(
+                    0,
+                    10
+                );
+
+        if (
+            !/^\d{4}-\d{2}-\d{2}$/.test(
+                fecha
+            )
+        ) {
+            return;
+        }
+
+        /*
+            Un plan de hoy sigue vigente durante todo el día.
+        */
+        if (
+            fecha <
+            hoy
+        ) {
+            return;
+        }
+
+        const hora =
+            String(
+                horaValor ||
+                ""
+            )
+                .trim()
+                .slice(
+                    0,
+                    5
+                );
+
+        const clave =
+            `${fecha}|${hora}`;
+
+        if (
+            claves.has(
+                clave
+            )
+        ) {
+            return;
+        }
+
+        claves.add(
+            clave
+        );
+
+        pases.push({
+            fecha,
+            hora
+        });
+    }
+
+
+    /*
+        Fecha principal del plan.
+    */
+    anadirPase(
+        plan?.fecha,
+        plan?.hora
+    );
+
+
+    /*
+        Fechas/pases adicionales.
+    */
+    if (
+        Array.isArray(
+            plan?.fechas
+        )
+    ) {
+        plan.fechas.forEach(
+            (
+                pase
+            ) => {
+                anadirPase(
+                    pase?.fecha,
+                    pase?.hora
+                );
+            }
+        );
+    }
+
+
+    return pases.sort(
+        (
+            paseA,
+            paseB
+        ) => {
+            const comparacionFecha =
+                paseA.fecha.localeCompare(
+                    paseB.fecha
+                );
+
+            if (
+                comparacionFecha !==
+                0
+            ) {
+                return comparacionFecha;
+            }
+
+            return String(
+                paseA.hora ||
+                ""
+            ).localeCompare(
+                String(
+                    paseB.hora ||
+                    ""
+                )
+            );
+        }
+    );
+}
+
+
+function prepararPlanSupabaseVigentePortada(
+    plan
+) {
+    const pasesVigentes =
+        obtenerPasesVigentesPortada(
+            plan
+        );
+
+    if (
+        pasesVigentes.length ===
+        0
+    ) {
+        return null;
+    }
+
+    const proximoPase =
+        pasesVigentes[0];
+
+    return {
+        ...plan,
+        fecha:
+            proximoPase.fecha,
+        hora:
+            proximoPase.hora ||
+            plan.hora ||
+            null
+    };
+}
+
 function formatearPrecioPortada(precio) {
     const cantidad = Number(precio || 0);
 
@@ -2482,12 +2652,12 @@ async function cargarProximosPlanesPortada() {
                     nombre_categoria,
                     fecha,
                     hora,
+                    fechas,
                     ubicacion,
                     precio,
                     imagen_url
                 `)
-                .eq("estado", "publicado")
-                .gte("fecha", obtenerFechaLocalISO());
+                .eq("estado", "publicado");
 
             if (error) {
                 throw error;
@@ -2497,9 +2667,14 @@ async function cargarProximosPlanesPortada() {
                 Array.isArray(data)
                     ? data
                     : []
-            ).map(
-                normalizarPlanSupabasePortada
-            );
+            )
+                .map(
+                    prepararPlanSupabaseVigentePortada
+                )
+                .filter(Boolean)
+                .map(
+                    normalizarPlanSupabasePortada
+                );
         } catch (error) {
             console.error(
                 "No se pudieron cargar los planes publicados para la portada:",

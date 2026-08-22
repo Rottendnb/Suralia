@@ -67,6 +67,68 @@ function formatearFechaDetalleSupabase(fechaIso) {
 }
 
 
+function obtenerHoyLocalIso() {
+    const ahora =
+        new Date();
+
+    const anio =
+        ahora.getFullYear();
+
+    const mes =
+        String(
+            ahora.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+    const dia =
+        String(
+            ahora.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+    return `${anio}-${mes}-${dia}`;
+}
+
+
+function fechaPlanHaPasado(
+    fechaValor
+) {
+    const fecha =
+        String(
+            fechaValor ||
+            ""
+        )
+            .trim()
+            .slice(
+                0,
+                10
+            );
+
+    /*
+        Si no hay una fecha ISO válida, no la tratamos como
+        caducada automáticamente.
+    */
+    if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(
+            fecha
+        )
+    ) {
+        return false;
+    }
+
+    /*
+        Se compara solo el día, no la hora:
+        un plan de hoy sigue siendo reservable durante todo el día.
+    */
+    return fecha <
+        obtenerHoyLocalIso();
+}
+
+
 function normalizarHoraPlan(
     valor
 ) {
@@ -113,6 +175,18 @@ function crearFechasReservaSupabase(
             );
 
         if (!fechaLimpia) {
+            return;
+        }
+
+        /*
+            Las fechas anteriores a hoy desaparecen del detalle
+            y nunca llegan al selector de reserva.
+        */
+        if (
+            fechaPlanHaPasado(
+                fechaLimpia
+            )
+        ) {
             return;
         }
 
@@ -335,7 +409,10 @@ function obtenerOpcionesFechasReserva() {
                 item
             ) =>
                 item &&
-                item.valor
+                item.valor &&
+                !fechaPlanHaPasado(
+                    item.fecha
+                )
         );
 }
 
@@ -516,6 +593,34 @@ function crearPlanDetalleDesdeSupabase(plan, perfil) {
             plan
         );
 
+    /*
+        Si el plan tenía varias fechas y la principal ya pasó,
+        mostramos como fecha principal la siguiente disponible.
+    */
+    const primeraFechaVigente =
+        fechasReserva[0] ||
+        null;
+
+    const fechaPrincipalIso =
+        primeraFechaVigente?.fecha ||
+        plan.fecha ||
+        "";
+
+    const fechaPrincipalTexto =
+        primeraFechaVigente
+            ? formatearFechaDetalleSupabase(
+                primeraFechaVigente.fecha
+            )
+            : fechaTexto;
+
+    const horaPrincipal =
+        primeraFechaVigente?.hora ||
+        (
+            hora === "Hora por confirmar"
+                ? ""
+                : hora
+        );
+
     let descripcionAmpliada;
     let incluye;
 
@@ -596,16 +701,22 @@ function crearPlanDetalleDesdeSupabase(plan, perfil) {
         precio: Number(plan.precio || 0),
         valoracion: 0,
         opiniones: 0,
-        fechaTexto,
-        fechaIso: plan.fecha || "",
-        fechaPrincipal: fechaTexto,
+        fechaTexto:
+            fechaPrincipalTexto,
+        fechaIso:
+            fechaPrincipalIso,
+        fechaPrincipal:
+            fechaPrincipalTexto,
         horario:
-            hora === "Hora por confirmar"
-                ? hora
-                : esMusica
-                    ? `Inicio: ${hora}`
-                    : `Hora de inicio: ${hora}`,
-        hora,
+            horaPrincipal
+                ? (
+                    esMusica
+                        ? `Inicio: ${horaPrincipal}`
+                        : `Hora de inicio: ${horaPrincipal}`
+                )
+                : "Hora por confirmar",
+        hora:
+            horaPrincipal,
         ubicacion: ubicacionCabecera,
         direccion:
             direccion ||
@@ -809,6 +920,62 @@ async function cargarPlanSupabaseDetalle() {
         perfil
     );
 }
+
+function mostrarPlanFinalizado() {
+    document.title =
+        "Plan finalizado | Suralia";
+
+    cambiarTexto(
+        "#miga-plan",
+        "Plan finalizado"
+    );
+
+    cambiarTexto(
+        "#detalle-titulo",
+        "Este plan ya ha finalizado"
+    );
+
+    cambiarTexto(
+        "#detalle-ubicacion-cabecera",
+        "La fecha de este plan ya ha pasado."
+    );
+
+    const contenido =
+        seleccionar(
+            ".detalle-contenido"
+        );
+
+    if (contenido) {
+        contenido.innerHTML = `
+            <div class="contenedor">
+                <section class="bloque-detalle">
+                    <h2>Este plan ya no está disponible</h2>
+
+                    <p>
+                        Todas las fechas de este plan ya han pasado,
+                        por lo que no es posible realizar una reserva.
+                    </p>
+
+                    <a
+                        href="planes.html"
+                        class="boton-principal"
+                    >
+                        Ver planes disponibles
+                    </a>
+                </section>
+            </div>
+        `;
+    }
+
+    seleccionar(
+        ".galeria-plan"
+    )?.remove();
+
+    seleccionar(
+        ".planes-relacionados"
+    )?.remove();
+}
+
 
 function mostrarPlanNoEncontrado() {
     document.title =
@@ -2575,7 +2742,10 @@ function sincronizarFechaVisibleSeleccionada() {
     }
 
     const valorSeleccionado =
-        selectorFecha.value;
+        String(
+            selectorFecha.value ||
+            ""
+        );
 
     lista
         .querySelectorAll(
@@ -2585,12 +2755,45 @@ function sincronizarFechaVisibleSeleccionada() {
             (
                 elemento
             ) => {
+                const estaSeleccionada =
+                    !planUsaReservaExterna() &&
+                    String(
+                        elemento.dataset.fechaReservaValor ||
+                        ""
+                    ) ===
+                        valorSeleccionado;
+
                 elemento.classList.toggle(
                     "fecha-disponible-detalle--seleccionada",
-                    !planUsaReservaExterna() &&
-                    elemento.dataset.fechaReservaValor ===
-                        valorSeleccionado
+                    estaSeleccionada
                 );
+
+                if (
+                    elemento.tagName ===
+                    "BUTTON"
+                ) {
+                    elemento.setAttribute(
+                        "aria-pressed",
+                        String(
+                            estaSeleccionada
+                        )
+                    );
+                }
+
+                const accion =
+                    elemento.querySelector(
+                        ".fecha-disponible-detalle__accion"
+                    );
+
+                if (
+                    accion &&
+                    !elemento.disabled
+                ) {
+                    accion.textContent =
+                        estaSeleccionada
+                            ? "Seleccionada"
+                            : "Elegir";
+                }
             }
         );
 }
@@ -2686,6 +2889,11 @@ function cargarFechasDisponiblesDetalle() {
             ) {
                 elemento.type =
                     "button";
+
+                elemento.setAttribute(
+                    "aria-pressed",
+                    "false"
+                );
             }
 
             elemento.className =
@@ -4489,6 +4697,135 @@ function planRelacionadoCaducado(
 }
 
 
+function obtenerProximoPaseVigenteRelacionado(
+    plan
+) {
+    const hoy =
+        obtenerFechaLocalISODetalle();
+
+    const pases =
+        [];
+
+    const claves =
+        new Set();
+
+    function anadirPase(
+        fechaValor,
+        horaValor
+    ) {
+        const fecha =
+            String(
+                fechaValor ||
+                ""
+            )
+                .trim()
+                .slice(
+                    0,
+                    10
+                );
+
+        if (
+            !/^\d{4}-\d{2}-\d{2}$/.test(
+                fecha
+            )
+        ) {
+            return;
+        }
+
+        if (
+            fecha <
+            hoy
+        ) {
+            return;
+        }
+
+        const hora =
+            String(
+                horaValor ||
+                ""
+            )
+                .trim()
+                .slice(
+                    0,
+                    5
+                );
+
+        const clave =
+            `${fecha}|${hora}`;
+
+        if (
+            claves.has(
+                clave
+            )
+        ) {
+            return;
+        }
+
+        claves.add(
+            clave
+        );
+
+        pases.push({
+            fecha,
+            hora
+        });
+    }
+
+    anadirPase(
+        plan?.fecha,
+        plan?.hora
+    );
+
+    if (
+        Array.isArray(
+            plan?.fechas
+        )
+    ) {
+        plan.fechas.forEach(
+            (
+                pase
+            ) => {
+                anadirPase(
+                    pase?.fecha,
+                    pase?.hora
+                );
+            }
+        );
+    }
+
+    pases.sort(
+        (
+            a,
+            b
+        ) => {
+            const cmp =
+                a.fecha.localeCompare(
+                    b.fecha
+                );
+
+            if (
+                cmp !== 0
+            ) {
+                return cmp;
+            }
+
+            return String(
+                a.hora ||
+                ""
+            ).localeCompare(
+                String(
+                    b.hora ||
+                    ""
+                )
+            );
+        }
+    );
+
+    return pases[0] ||
+        null;
+}
+
+
 function barajarPlanesRelacionados(
     planes
 ) {
@@ -4706,6 +5043,8 @@ async function cargarPlanesRelacionadosDinamicos() {
                         categoria,
                         nombre_categoria,
                         fecha,
+                        hora,
+                        fechas,
                         ubicacion,
                         precio,
                         imagen_url
@@ -4714,10 +5053,6 @@ async function cargarPlanesRelacionadosDinamicos() {
                 .eq(
                     "estado",
                     "publicado"
-                )
-                .gte(
-                    "fecha",
-                    obtenerFechaLocalISODetalle()
                 );
 
             if (error) {
@@ -4729,75 +5064,87 @@ async function cargarPlanesRelacionadosDinamicos() {
                     Array.isArray(data)
                         ? data
                         : []
-                ).map(
-                    (
-                        plan
-                    ) => ({
-                        planId:
-                            plan.id,
+                )
+                    .map(
+                        (
+                            plan
+                        ) => {
+                            const proximoPase =
+                                obtenerProximoPaseVigenteRelacionado(
+                                    plan
+                                );
 
-                        titulo:
-                            plan.titulo ||
-                            "Actividad de Suralia",
+                            if (
+                                !proximoPase
+                            ) {
+                                return null;
+                            }
 
-                        categoria:
-                            plan.categoria ||
-                            "",
+                            return {
+                                planId:
+                                    plan.id,
 
-                        categoriaTexto:
-                            plan.nombre_categoria ||
-                            plan.categoria ||
-                            "Actividad",
+                                titulo:
+                                    plan.titulo ||
+                                    "Actividad de Suralia",
 
-                        precio:
-                            Number(
-                                plan.precio ||
-                                0
-                            ),
+                                categoria:
+                                    plan.categoria ||
+                                    "",
 
-                        valoracion:
-                            0,
+                                categoriaTexto:
+                                    plan.nombre_categoria ||
+                                    plan.categoria ||
+                                    "Actividad",
 
-                        fechaTexto:
-                            plan.fecha
-                                ? new Intl.DateTimeFormat(
-                                    "es-ES",
-                                    {
-                                        day:
-                                            "numeric",
+                                precio:
+                                    Number(
+                                        plan.precio ||
+                                        0
+                                    ),
 
-                                        month:
-                                            "long",
+                                valoracion:
+                                    0,
 
-                                        year:
-                                            "numeric"
-                                    }
-                                ).format(
-                                    new Date(
-                                        `${plan.fecha}T00:00:00`
-                                    )
-                                )
-                                : "Fecha por confirmar",
+                                fechaTexto:
+                                    new Intl.DateTimeFormat(
+                                        "es-ES",
+                                        {
+                                            day:
+                                                "numeric",
 
-                        fechaIso:
-                            plan.fecha ||
-                            "",
+                                            month:
+                                                "long",
 
-                        ubicacion:
-                            plan.ubicacion ||
-                            "Ubicación por confirmar",
+                                            year:
+                                                "numeric"
+                                        }
+                                    ).format(
+                                        new Date(
+                                            `${proximoPase.fecha}T00:00:00`
+                                        )
+                                    ),
 
-                        imagen:
-                            plan.imagen_url ||
-                            "img/placeholder-plan.jpg",
+                                fechaIso:
+                                    proximoPase.fecha,
 
-                        enlace:
-                            `detalle-plan.html?id=${encodeURIComponent(
-                                plan.id ||
-                                ""
-                            )}`
-                    })
-                );
+                                ubicacion:
+                                    plan.ubicacion ||
+                                    "Ubicación por confirmar",
+
+                                imagen:
+                                    plan.imagen_url ||
+                                    "img/placeholder-plan.jpg",
+
+                                enlace:
+                                    `detalle-plan.html?id=${encodeURIComponent(
+                                        plan.id ||
+                                        ""
+                                    )}`
+                            };
+                        }
+                    )
+                    .filter(Boolean);
         } catch (error) {
             console.error(
                 "No se pudieron cargar los planes relacionados desde Supabase:",
@@ -4911,6 +5258,26 @@ async function iniciarDetallePlan() {
 
         if (!planActual) {
             mostrarPlanNoEncontrado();
+            marcarDetalleComoListo();
+            return;
+        }
+
+        /*
+            Si el plan tenía fecha(s) pero ya no queda ninguna
+            vigente, no mostramos el detalle ni permitimos reservar.
+        */
+        if (
+            planActual.esPlanSupabase &&
+            Array.isArray(
+                planActual.fechasReserva
+            ) &&
+            planActual.fechasReserva.length ===
+                0 &&
+            Boolean(
+                planActual.fechaIso
+            )
+        ) {
+            mostrarPlanFinalizado();
             marcarDetalleComoListo();
             return;
         }

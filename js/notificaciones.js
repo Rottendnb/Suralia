@@ -11,6 +11,20 @@
 (() => {
     "use strict";
 
+    /*
+       Evita inicializar dos veces la campana si alguna página
+       carga notificaciones.js directamente y main.js también
+       intenta cargarlo de forma global.
+    */
+    if (
+        window.__suraliaNotificacionesInicializado
+    ) {
+        return;
+    }
+
+    window.__suraliaNotificacionesInicializado =
+        true;
+
     const SELECTOR_HEADER_ACCIONES =
         ".header__acciones";
 
@@ -216,7 +230,28 @@
                 "fa-solid fa-calendar-xmark",
 
             reserva_cancelada_organizador:
-                "fa-solid fa-circle-exclamation"
+                "fa-solid fa-circle-exclamation",
+
+            plan_pendiente_admin:
+                "fa-solid fa-clipboard-check",
+
+            plan_aprobado:
+                "fa-solid fa-circle-check",
+
+            plan_rechazado:
+                "fa-solid fa-circle-xmark",
+
+            verificacion_aprobada:
+                "fa-solid fa-circle-check",
+
+            verificacion_rechazada:
+                "fa-solid fa-circle-xmark",
+
+            mensaje:
+                "fa-solid fa-comment",
+
+            solicitud_conexion:
+                "fa-solid fa-user-plus"
         };
 
         return iconos[
@@ -781,7 +816,7 @@
        PANEL
     ======================================================== */
 
-    function abrirPanel() {
+    async function abrirPanel() {
         const {
             boton,
             panel
@@ -794,6 +829,12 @@
             return;
         }
 
+        /*
+           Recargamos SIEMPRE desde Supabase antes de mostrar.
+           Así la campana no depende únicamente de Realtime.
+        */
+        await cargarNotificaciones();
+
         panel.hidden =
             false;
 
@@ -801,8 +842,6 @@
             "aria-expanded",
             "true"
         );
-
-        cargarNotificaciones();
     }
 
 
@@ -1120,18 +1159,19 @@
 
 
     /*
-       Permite que otras partes de Suralia, como mensajes.js,
-       pidan refrescar la campana inmediatamente después de
-       modificar notificaciones.
+       Permite que otras partes de Suralia pidan refrescar
+       la campana inmediatamente después de modificar avisos.
     */
-    function refrescarNotificacionesDesdeSuralia() {
+    async function refrescarNotificacionesDesdeSuralia() {
         if (
             !usuarioNotificaciones
         ) {
-            return;
+            return false;
         }
 
-        cargarNotificaciones();
+        await cargarNotificaciones();
+
+        return true;
     }
 
 
@@ -1139,6 +1179,39 @@
         "suralia:notificaciones-actualizadas",
         refrescarNotificacionesDesdeSuralia
     );
+
+
+    /*
+       Respaldo para casos en los que Realtime tarde en conectar
+       o el navegador haya suspendido la pestaña.
+    */
+    window.addEventListener(
+        "focus",
+        () => {
+            refrescarNotificacionesDesdeSuralia();
+        }
+    );
+
+
+    document.addEventListener(
+        "visibilitychange",
+        () => {
+            if (
+                document.visibilityState ===
+                "visible"
+            ) {
+                refrescarNotificacionesDesdeSuralia();
+            }
+        }
+    );
+
+
+    /*
+       Función pública muy pequeña para poder comprobar o forzar
+       la recarga desde la consola sin tocar variables internas.
+    */
+    window.refrescarNotificacionesSuralia =
+        refrescarNotificacionesDesdeSuralia;
 
 
     window.addEventListener(

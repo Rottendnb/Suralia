@@ -21155,3 +21155,169 @@ body.modal-abierto {
         width: 100%;
     }
 }
+
+/* =========================================================
+   DETALLE DE PLAN
+   1. Fecha elegida claramente marcada
+   2. Leaflet siempre por debajo del header
+   Añadir al FINAL de css/style.css
+========================================================= */
+
+
+/* =========================
+   FECHA SELECCIONADA
+========================= */
+
+.fecha-disponible-detalle {
+    position: relative;
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+button.fecha-disponible-detalle:not(:disabled) {
+    cursor: pointer;
+}
+
+button.fecha-disponible-detalle:not(:disabled):hover {
+    transform: translateY(-2px);
+}
+
+.fecha-disponible-detalle--seleccionada {
+    border-color: var(--color-acento, #ff6546) !important;
+    background: rgba(255, 101, 70, 0.08);
+    box-shadow:
+        0 0 0 2px rgba(255, 101, 70, 0.12),
+        0 10px 24px rgba(0, 0, 0, 0.06);
+}
+
+.fecha-disponible-detalle--seleccionada::after {
+    content: "✓";
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--color-acento, #ff6546);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.fecha-disponible-detalle--seleccionada
+.fecha-disponible-detalle__accion {
+    font-weight: 800;
+    color: var(--color-acento, #ff6546);
+}
+
+
+/* =========================================================
+   DETALLE DE PLAN
+   CORRECCIÓN:
+   - Fecha seleccionada marcada
+   - Header FIXED
+   - Leaflet visible
+   - Controles + / - por debajo del header
+   ========================================================= */
+
+
+/* =========================
+   FECHA SELECCIONADA
+========================= */
+
+.fecha-disponible-detalle {
+    position: relative;
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+button.fecha-disponible-detalle:not(:disabled) {
+    cursor: pointer;
+}
+
+button.fecha-disponible-detalle:not(:disabled):hover {
+    transform: translateY(-2px);
+}
+
+.fecha-disponible-detalle--seleccionada {
+    border-color: var(--color-acento, #ff6546) !important;
+    background: rgba(255, 101, 70, 0.08);
+    box-shadow:
+        0 0 0 2px rgba(255, 101, 70, 0.12),
+        0 10px 24px rgba(0, 0, 0, 0.06);
+}
+
+.fecha-disponible-detalle--seleccionada::after {
+    content: "✓";
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--color-acento, #ff6546);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.fecha-disponible-detalle--seleccionada
+.fecha-disponible-detalle__accion {
+    font-weight: 800;
+    color: var(--color-acento, #ff6546);
+}
+
+
+/* =========================
+   HEADER SIEMPRE FIJO
+========================= */
+
+.header {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 10000 !important;
+}
+
+
+/* =========================
+   MAPA LEAFLET
+========================= */
+
+/*
+   IMPORTANTE:
+   No tocamos los z-index internos de .leaflet-pane ni
+   .leaflet-control-container porque Leaflet los necesita
+   para dibujar correctamente el mapa.
+
+   Solo metemos TODO Leaflet dentro de un contexto de
+   apilado inferior al header.
+*/
+
+#mapa-plan {
+    position: relative;
+    z-index: 1 !important;
+    isolation: isolate;
+}
+
+/*
+   Los controles siguen visibles dentro del mapa,
+   pero no pueden ponerse por encima del header fixed.
+*/
+#mapa-plan.leaflet-container {
+    z-index: 1 !important;
+}
