@@ -21321,3 +21321,142 @@ button.fecha-disponible-detalle:not(:disabled):hover {
 #mapa-plan.leaflet-container {
     z-index: 1 !important;
 }
+
+/* =========================================================
+   SURALIA · ¿CÓMO VIENES?
+   Versión compacta y limpia
+   Sustituye los CSS anteriores de "Voy solo" por este bloque
+========================================================= */
+
+#campo-como-vienes.campo-reserva--como-vienes {
+    display: block !important;
+    margin: 0.95rem 0 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+#campo-como-vienes .campo-reserva--como-vienes__titulo {
+    margin: 0 0 0.55rem !important;
+    padding: 0 !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+}
+
+#campo-como-vienes .opciones-como-vienes {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.55rem !important;
+}
+
+#campo-como-vienes .opcion-como-vienes {
+    position: relative !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    cursor: pointer !important;
+}
+
+#campo-como-vienes .opcion-como-vienes input {
+    position: absolute !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+#campo-como-vienes .opcion-como-vienes__contenido {
+    min-height: 54px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    padding: 0.7rem 0.65rem !important;
+
+    border: 1px solid #dfe5e2 !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+
+    color: #173f39 !important;
+
+    transition:
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        color 0.18s ease,
+        transform 0.18s ease !important;
+}
+
+#campo-como-vienes .opcion-como-vienes__contenido strong {
+    display: block !important;
+    margin: 0 !important;
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    line-height: 1.15 !important;
+    text-align: center !important;
+}
+
+#campo-como-vienes .opcion-como-vienes__icono {
+    flex: 0 0 auto !important;
+    font-size: 1.1rem !important;
+    line-height: 1 !important;
+}
+
+#campo-como-vienes .opcion-como-vienes:hover
+.opcion-como-vienes__contenido {
+    transform: translateY(-1px) !important;
+    border-color: #ff7658 !important;
+}
+
+#campo-como-vienes .opcion-como-vienes input:checked
++ .opcion-como-vienes__contenido {
+    border-color: #ff6546 !important;
+    background: #fff3ef !important;
+    color: #cf472d !important;
+}
+
+#campo-como-vienes .opcion-como-vienes input:focus-visible
++ .opcion-como-vienes__contenido {
+    outline: 3px solid rgba(255, 101, 70, 0.18) !important;
+    outline-offset: 2px !important;
+}
+
+#campo-como-vienes .ayuda-como-vienes {
+    display: block !important;
+    margin: 0.4rem 0 0 !important;
+    font-size: 0.76rem !important;
+    line-height: 1.25 !important;
+    color: #7b8783 !important;
+}
+
+#campo-como-vienes.campo-reserva--invalido
+.opcion-como-vienes__contenido {
+    border-color: #d93025 !important;
+}
+
+@media (max-width: 420px) {
+    #campo-como-vienes .opciones-como-vienes {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* =========================================================
+   SURALIA · PERSONAS SOLO SI VA ACOMPAÑADO
+   Añadir al FINAL de css/style.css
+========================================================= */
+
+#campo-personas-reserva[hidden] {
+    display: none !important;
+}
+
+#campo-personas-reserva {
+    margin-top: 0.75rem;
+}
+
+#campo-personas-reserva label {
+    display: block;
+    margin-bottom: 0.45rem;
+}

@@ -2084,7 +2084,7 @@ function cargarDetalleMusica() {
 
     cambiarTexto(
         "#etiqueta-personas-reserva",
-        "Entradas"
+        "¿Cuántas entradas necesitáis?"
     );
 }
 
@@ -2546,10 +2546,13 @@ function actualizarSelectorPersonasPorDisponibilidad() {
             opcion
         );
 
+    const voySolo =
+        obtenerVoySoloReserva();
+
     const valorAnterior =
         Number(
             selectorPersonas.value ||
-            1
+            2
         );
 
     selectorPersonas.innerHTML =
@@ -2589,17 +2592,6 @@ function actualizarSelectorPersonasPorDisponibilidad() {
         return;
     }
 
-    selectorPersonas.disabled =
-        false;
-
-    botonReserva.disabled =
-        false;
-
-    botonReserva.textContent =
-        planActual?.esMusica
-            ? "Reservar entrada"
-            : "Reservar plaza";
-
     const maximoPorReserva =
         disponibilidad.restantes !==
             null
@@ -2609,8 +2601,12 @@ function actualizarSelectorPersonasPorDisponibilidad() {
             )
             : 4;
 
+    /*
+        El selector solo representa reservas acompañadas,
+        por eso empieza en 2.
+    */
     for (
-        let numero = 1;
+        let numero = 2;
         numero <= maximoPorReserva;
         numero += 1
     ) {
@@ -2634,20 +2630,73 @@ function actualizarSelectorPersonasPorDisponibilidad() {
         );
     }
 
-    selectorPersonas.value =
-        String(
-            Math.min(
-                Math.max(
-                    1,
-                    Number.isFinite(
-                        valorAnterior
-                    )
-                        ? valorAnterior
-                        : 1
-                ),
-                maximoPorReserva
-            )
+    const hayPlazasParaAcompanado =
+        maximoPorReserva >=
+        2;
+
+    if (!hayPlazasParaAcompanado) {
+        const opcionSoloUna =
+            document.createElement(
+                "option"
+            );
+
+        opcionSoloUna.value =
+            "";
+
+        opcionSoloUna.textContent =
+            planActual?.esMusica
+                ? "Solo queda 1 entrada"
+                : "Solo queda 1 plaza";
+
+        selectorPersonas.appendChild(
+            opcionSoloUna
         );
+
+        selectorPersonas.disabled =
+            true;
+    } else {
+        selectorPersonas.disabled =
+            false;
+
+        selectorPersonas.value =
+            String(
+                Math.min(
+                    Math.max(
+                        2,
+                        Number.isFinite(
+                            valorAnterior
+                        )
+                            ? valorAnterior
+                            : 2
+                    ),
+                    maximoPorReserva
+                )
+            );
+    }
+
+    /*
+        Una sola plaza disponible sigue permitiendo reservar
+        cuando la persona ha elegido "Voy solo".
+    */
+    if (
+        voySolo ===
+            false &&
+        !hayPlazasParaAcompanado
+    ) {
+        botonReserva.disabled =
+            true;
+
+        botonReserva.textContent =
+            "No hay plazas para ir acompañado";
+    } else {
+        botonReserva.disabled =
+            false;
+
+        botonReserva.textContent =
+            planActual?.esMusica
+                ? "Reservar entrada"
+                : "Reservar plaza";
+    }
 }
 
 
@@ -3905,17 +3954,44 @@ function configurarTipoReserva() {
 }
 
 
-function actualizarDesgloseReserva() {
-    const selectorPersonas =
-        seleccionar(
-            "#personas-reserva"
-        );
+function obtenerNumeroPersonasReserva() {
+    const voySolo =
+        obtenerVoySoloReserva();
 
+    if (
+        voySolo ===
+        true
+    ) {
+        return 1;
+    }
+
+    if (
+        voySolo ===
+        false
+    ) {
+        const numero =
+            Number(
+                selectorPersonasReserva?.value
+            );
+
+        return Number.isInteger(
+            numero
+        )
+            ? numero
+            : 0;
+    }
+
+    /*
+        Antes de elegir cómo viene, mostramos el precio base
+        de una persona para no dar una cifra engañosa.
+    */
+    return 1;
+}
+
+
+function actualizarDesgloseReserva() {
     const numeroPersonas =
-        Number(
-            selectorPersonas?.value ||
-            1
-        );
+        obtenerNumeroPersonasReserva();
 
     const precioUnitario =
         Number(
@@ -3971,6 +4047,114 @@ const selectorFechaReserva =
 const selectorPersonasReserva =
     seleccionar("#personas-reserva");
 
+const campoPersonasReserva =
+    seleccionar("#campo-personas-reserva");
+
+const campoComoVienesReserva =
+    seleccionar("#campo-como-vienes");
+
+const opcionesVoySoloReserva =
+    document.querySelectorAll(
+        'input[name="voy_solo"]'
+    );
+
+
+function obtenerVoySoloReserva() {
+    const opcionSeleccionada =
+        document.querySelector(
+            'input[name="voy_solo"]:checked'
+        );
+
+    if (!opcionSeleccionada) {
+        return null;
+    }
+
+    return opcionSeleccionada.value ===
+        "true";
+}
+
+
+function actualizarCampoPersonasSegunComoVienes() {
+    const voySolo =
+        obtenerVoySoloReserva();
+
+    if (!campoPersonasReserva) {
+        return;
+    }
+
+    const mostrarPersonas =
+        voySolo ===
+        false;
+
+    campoPersonasReserva.hidden =
+        !mostrarPersonas;
+
+    campoPersonasReserva.setAttribute(
+        "aria-hidden",
+        String(
+            !mostrarPersonas
+        )
+    );
+
+    if (
+        voySolo ===
+        true
+    ) {
+        marcarCampoReserva(
+            selectorPersonasReserva,
+            false
+        );
+    }
+
+    if (
+        mostrarPersonas &&
+        selectorPersonasReserva &&
+        (
+            !selectorPersonasReserva.value ||
+            Number(
+                selectorPersonasReserva.value
+            ) < 2
+        )
+    ) {
+        const primeraOpcionValida =
+            Array.from(
+                selectorPersonasReserva.options
+            ).find(
+                (
+                    opcion
+                ) =>
+                    Number(
+                        opcion.value
+                    ) >= 2 &&
+                    !opcion.disabled
+            );
+
+        if (primeraOpcionValida) {
+            selectorPersonasReserva.value =
+                primeraOpcionValida.value;
+        }
+    }
+}
+
+
+function marcarComoVienesInvalido(
+    invalido
+) {
+    if (!campoComoVienesReserva) {
+        return;
+    }
+
+    campoComoVienesReserva.classList.toggle(
+        "campo-reserva--invalido",
+        invalido
+    );
+
+    campoComoVienesReserva.setAttribute(
+        "aria-invalid",
+        String(invalido)
+    );
+}
+
 selectorFechaReserva?.setAttribute(
     "aria-invalid",
     "false"
@@ -4007,12 +4191,37 @@ selectorPersonasReserva?.addEventListener(
 );
 
 
+opcionesVoySoloReserva.forEach(
+    (
+        opcion
+    ) => {
+        opcion.addEventListener(
+            "change",
+            () => {
+                marcarComoVienesInvalido(
+                    false
+                );
+
+                actualizarCampoPersonasSegunComoVienes();
+
+                actualizarSelectorPersonasPorDisponibilidad();
+
+                actualizarDesgloseReserva();
+            }
+        );
+    }
+);
+
+actualizarCampoPersonasSegunComoVienes();
+
+
 async function crearReservaSupabaseDetalle({
     fechaSeleccionada,
     fechaIsoSeleccionada,
     horaSeleccionada,
     textoFecha,
     numeroPersonas,
+    voySolo,
     sesionActual
 }) {
     const cliente =
@@ -4055,7 +4264,10 @@ async function crearReservaSupabaseDetalle({
                 horaSeleccionada,
 
             p_personas:
-                numeroPersonas
+                numeroPersonas,
+
+            p_voy_solo:
+                voySolo
         }
     );
 
@@ -4144,6 +4356,12 @@ async function crearReservaSupabaseDetalle({
 
             personas:
                 numeroPersonas,
+
+            voySolo:
+                voySolo,
+
+            voy_solo:
+                voySolo,
 
             ubicacion:
                 planActual.ubicacion,
@@ -4343,10 +4561,15 @@ if (formularioReserva) {
                 opcionFechaSeleccionada?.text ||
                 "";
 
+            const voySolo =
+                obtenerVoySoloReserva();
+
             const numeroPersonas =
-                Number(
-                    selectorPersonas.value
-                );
+                voySolo === true
+                    ? 1
+                    : Number(
+                        selectorPersonas.value
+                    );
 
             if (!fechaSeleccionada) {
                 marcarCampoReserva(
@@ -4369,10 +4592,40 @@ if (formularioReserva) {
             );
 
             if (
-                !Number.isInteger(
-                    numeroPersonas
-                ) ||
-                numeroPersonas < 1
+                typeof voySolo !==
+                "boolean"
+            ) {
+                marcarComoVienesInvalido(
+                    true
+                );
+
+                mostrarNotificacion(
+                    "Indica si vienes solo o acompañado."
+                );
+
+                campoComoVienesReserva?.scrollIntoView({
+                    behavior:
+                        "smooth",
+                    block:
+                        "center"
+                });
+
+                return;
+            }
+
+            marcarComoVienesInvalido(
+                false
+            );
+
+            if (
+                voySolo ===
+                    false &&
+                (
+                    !Number.isInteger(
+                        numeroPersonas
+                    ) ||
+                    numeroPersonas < 2
+                )
             ) {
                 marcarCampoReserva(
                     selectorPersonas,
@@ -4380,7 +4633,7 @@ if (formularioReserva) {
                 );
 
                 mostrarNotificacion(
-                    "Selecciona el número de personas."
+                    "Indica cuántos sois en total."
                 );
 
                 selectorPersonas.focus();
@@ -4447,6 +4700,7 @@ if (formularioReserva) {
                         horaSeleccionada,
                         textoFecha,
                         numeroPersonas,
+                        voySolo,
                         sesionActual
                     });
 
@@ -4571,6 +4825,12 @@ if (formularioReserva) {
 
                 personas:
                     numeroPersonas,
+
+                voySolo:
+                    voySolo,
+
+                voy_solo:
+                    voySolo,
 
                 ubicacion:
                     planActual.ubicacion,

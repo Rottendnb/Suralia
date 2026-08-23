@@ -450,45 +450,6 @@
 
                     </section>
 
-                    <section
-                        class="bloque-detalle fechas-disponibles-detalle oculto"
-                        id="bloque-fechas-disponibles"
-                        aria-labelledby="titulo-fechas-disponibles"
-                    >
-
-                        <div class="fechas-disponibles-detalle__cabecera">
-
-                            <div>
-                                <span class="fechas-disponibles-detalle__eyebrow">
-                                    Calendario
-                                </span>
-
-                                <h2 id="titulo-fechas-disponibles">
-                                    Fechas disponibles
-                                </h2>
-
-                                <p id="texto-fechas-disponibles">
-                                    Elige el día y la hora que mejor te venga.
-                                </p>
-                            </div>
-
-                            <span
-                                class="fechas-disponibles-detalle__contador"
-                                id="contador-fechas-disponibles"
-                            >
-                                0 fechas
-                            </span>
-
-                        </div>
-
-                        <div
-                            class="fechas-disponibles-detalle__lista"
-                            id="lista-fechas-disponibles"
-                            role="list"
-                        ></div>
-
-                    </section>
-
                     <section class="bloque-detalle">
 
                         <h2>Sobre esta experiencia</h2>
@@ -627,10 +588,7 @@
 
                     </section>
 
-                    <section
-                        class="bloque-detalle"
-                        id="seccion-opiniones-plan"
-                    >
+                    <section class="bloque-detalle">
 
                         <div class="cabecera-opiniones">
 
@@ -638,48 +596,89 @@
                                 <h2>Opiniones</h2>
 
                                 <p>
-                                    <i
-                                        class="fa-solid fa-star"
-                                        aria-hidden="true"
-                                    ></i>
-                                    <strong id="opiniones-valoracion">
-                                        —
-                                    </strong>
-                                    ·
-                                    <span id="opiniones-total">
-                                        Sin valoraciones todavía
-                                    </span>
+                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                                    <strong id="opiniones-valoracion">4,8</strong>
+                                    · <span id="opiniones-total">37 valoraciones</span>
                                 </p>
                             </div>
+
+                            <button type="button" class="boton-secundario">
+                                Ver todas
+                            </button>
 
                         </div>
 
                         <div
                             class="opiniones-grid"
-                            id="opiniones-grid"
-                            aria-live="polite"
+                            aria-label="Opiniones destacadas"
                         >
 
-                            <div class="estado-vacio estado-vacio--pequeno">
+                            <article class="opinion">
 
-                                <span class="estado-vacio__icono">
-                                    <i
-                                        class="fa-regular fa-comment-dots"
-                                        aria-hidden="true"
-                                    ></i>
-                                </span>
+                                <div class="opinion__usuario">
 
-                                <h3>
-                                    Todavía no hay opiniones
-                                </h3>
+                                    <div class="opinion__avatar">
+                                        LM
+                                    </div>
+
+                                    <div>
+                                        <strong>Laura M.</strong>
+                                        <span>Julio de 2026</span>
+                                    </div>
+
+                                </div>
+
+                                <div
+                                    class="opinion__estrellas"
+                                    aria-label="5 de 5 estrellas"
+                                >
+                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                                </div>
 
                                 <p>
-                                    Las valoraciones reales aparecerán aquí cuando
-                                    personas que hayan asistido al plan compartan
-                                    su experiencia.
+                                    Una visita muy interesante. El guía explicó
+                                    todo de forma cercana y el recorrido se hizo
+                                    muy ameno.
                                 </p>
 
-                            </div>
+                            </article>
+
+                            <article class="opinion">
+
+                                <div class="opinion__usuario">
+
+                                    <div class="opinion__avatar">
+                                        JC
+                                    </div>
+
+                                    <div>
+                                        <strong>Javier C.</strong>
+                                        <span>Junio de 2026</span>
+                                    </div>
+
+                                </div>
+
+                                <div
+                                    class="opinion__estrellas"
+                                    aria-label="4 de 5 estrellas"
+                                >
+                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                                    <i class="fa-regular fa-star" aria-hidden="true"></i>
+                                </div>
+
+                                <p>
+                                    Merece la pena para conocer mejor la historia
+                                    romana de Sevilla. Recomiendo llevar agua.
+                                </p>
+
+                            </article>
 
                         </div>
 
@@ -728,7 +727,7 @@
                             <div class="campo-reserva">
 
                                 <label for="fecha-reserva">
-                                    Fecha y hora
+                                    Fecha
                                 </label>
 
                                 <div>
@@ -754,23 +753,102 @@
 
                             </div>
 
-                            <div class="campo-reserva">
+                            <div
+                                id="campo-como-vienes"
+                                class="campo-reserva--como-vienes"
+                            >
 
-                                <label for="personas-reserva">
-                                    Personas
+                                <p class="campo-reserva--como-vienes__titulo">
+                                    ¿Cómo vienes?
+                                </p>
+
+                                <div
+                                    class="opciones-como-vienes"
+                                    role="radiogroup"
+                                    aria-label="Cómo vienes al plan"
+                                    aria-describedby="ayuda-como-vienes"
+                                >
+
+                                    <label class="opcion-como-vienes">
+
+                                        <input
+                                            type="radio"
+                                            name="voy_solo"
+                                            value="true"
+                                        >
+
+                                        <span class="opcion-como-vienes__contenido">
+                                            <span
+                                                class="opcion-como-vienes__icono"
+                                                aria-hidden="true"
+                                            >
+                                                🙋
+                                            </span>
+
+                                            <strong>
+                                                Voy solo
+                                            </strong>
+                                        </span>
+
+                                    </label>
+
+                                    <label class="opcion-como-vienes">
+
+                                        <input
+                                            type="radio"
+                                            name="voy_solo"
+                                            value="false"
+                                        >
+
+                                        <span class="opcion-como-vienes__contenido">
+                                            <span
+                                                class="opcion-como-vienes__icono"
+                                                aria-hidden="true"
+                                            >
+                                                👥
+                                            </span>
+
+                                            <strong>
+                                                Voy acompañado
+                                            </strong>
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+                                <small
+                                    id="ayuda-como-vienes"
+                                    class="ayuda-como-vienes"
+                                >
+                                    Podrás cambiarlo antes de reservar.
+                                </small>
+
+                            </div>
+
+                            <div
+                                id="campo-personas-reserva"
+                                class="campo-reserva campo-reserva--personas-acompanado"
+                                hidden
+                            >
+
+                                <label
+                                    id="etiqueta-personas-reserva"
+                                    for="personas-reserva"
+                                >
+                                    ¿Cuántos sois en total?
                                 </label>
 
                                 <div>
-                                    <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+                                    <i
+                                        class="fa-solid fa-user-group"
+                                        aria-hidden="true"
+                                    ></i>
 
                                     <select
                                         id="personas-reserva"
                                         name="personas"
                                     >
-                                        <option value="1">
-                                            1 persona
-                                        </option>
-
                                         <option value="2">
                                             2 personas
                                         </option>
@@ -827,11 +905,8 @@
 
                             <i class="fa-solid fa-bolt" aria-hidden="true"></i>
 
-                            <span
-                                id="estado-plazas-reserva"
-                                aria-live="polite"
-                            >
-                                Consulta las plazas disponibles
+                            <span>
+                                Quedan pocas plazas para esta fecha
                             </span>
 
                         </div>
@@ -888,10 +963,168 @@
 
                 </div>
 
-                <div
-                    class="planes__grid"
-                    id="planes-relacionados-grid"
-                ></div>
+                <div class="planes__grid">
+
+                    <article class="tarjeta-plan">
+
+                        <a
+                            href="detalle-plan.html?id=exposicion-contemporanea"
+                            class="tarjeta-plan__enlace"
+                            aria-label="Ver detalles de Exposición de arte contemporáneo"
+                        >
+
+                            <div class="tarjeta-plan__imagen imagen-plan--exposicion">
+
+                                <span class="tarjeta-plan__precio">
+                                    Gratis
+                                </span>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+
+                                    <span>
+                                        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                                        Hasta el 10 de agosto
+                                    </span>
+
+                                </div>
+
+                                <h3>
+                                    Exposición de arte contemporáneo
+                                </h3>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                                    Centro de Sevilla
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+
+                                    <span>Cultura</span>
+
+                                    <strong>
+                                        4,5
+                                        <i class="fa-solid fa-star" aria-hidden="true"></i>
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </article>
+
+                    <article class="tarjeta-plan">
+
+                        <a
+                            href="detalle-poncho-k.html"
+                            class="tarjeta-plan__enlace"
+                            aria-label="Ver detalles de PONCHO K en Cartuja Center CITE"
+                        >
+
+                            <div class="tarjeta-plan__imagen imagen-plan--poncho-k">
+
+                                <span class="tarjeta-plan__precio">
+                                    25 €
+                                </span>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+
+                                    <span>
+                                        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                                        21 de noviembre
+                                    </span>
+
+                                </div>
+
+                                <h3>
+                                    PONCHO K - Cartuja Center CITE
+                                </h3>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                                    Cartuja Center CITE
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+
+                                    <span>Música</span>
+
+                                    <strong>
+                                        4,8
+                                        <i class="fa-solid fa-star" aria-hidden="true"></i>
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </article>
+
+                    <article class="tarjeta-plan">
+
+                        <a
+                            href="detalle-plan.html?id=tapas-triana"
+                            class="tarjeta-plan__enlace"
+                            aria-label="Ver detalles de Ruta de tapas por Triana"
+                        >
+
+                            <div class="tarjeta-plan__imagen imagen-plan--tapas">
+
+                                <span class="tarjeta-plan__precio">
+                                    25 €
+                                </span>
+
+                            </div>
+
+                            <div class="tarjeta-plan__contenido">
+
+                                <div class="tarjeta-plan__meta">
+
+                                    <span>
+                                        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                                        3 de agosto
+                                    </span>
+
+                                </div>
+
+                                <h3>
+                                    Ruta de tapas por Triana
+                                </h3>
+
+                                <p class="tarjeta-plan__ubicacion">
+                                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                                    Triana, Sevilla
+                                </p>
+
+                                <div class="tarjeta-plan__pie">
+
+                                    <span>Gastronomía</span>
+
+                                    <strong>
+                                        4,6
+                                        <i class="fa-solid fa-star" aria-hidden="true"></i>
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </article>
+
+                </div>
 
             </div>
 
