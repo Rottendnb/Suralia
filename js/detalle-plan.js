@@ -2181,7 +2181,7 @@ async function cargarDisponibilidadGlobalPlan() {
             data,
             error
         } = await cliente.rpc(
-            "obtener_disponibilidad_plan",
+            "obtener_disponibilidad_social_plan",
             {
                 p_plan_id:
                     planActual.planId
@@ -2221,6 +2221,16 @@ async function cargarDisponibilidadGlobalPlan() {
                         item.plazas_disponibles
                     );
 
+                const personasSolas =
+                    Number(
+                        item.personas_solas
+                    );
+
+                const reservasSolas =
+                    Number(
+                        item.reservas_solas
+                    );
+
                 disponibilidadGlobalPorPase.set(
                     clave,
                     {
@@ -2253,7 +2263,27 @@ async function cargarDisponibilidadGlobalPlan() {
                             Number.isFinite(
                                 disponibles
                             ) &&
-                            disponibles <= 0
+                            disponibles <= 0,
+
+                        personasSolas:
+                            Number.isFinite(
+                                personasSolas
+                            )
+                                ? Math.max(
+                                    0,
+                                    personasSolas
+                                )
+                                : 0,
+
+                        reservasSolas:
+                            Number.isFinite(
+                                reservasSolas
+                            )
+                                ? Math.max(
+                                    0,
+                                    reservasSolas
+                                )
+                                : 0
                     }
                 );
             }
@@ -2374,7 +2404,15 @@ function obtenerDisponibilidadOpcionFecha(
                 restantes:
                     global.restantes,
                 agotado:
-                    global.agotado
+                    global.agotado,
+
+                personasSolas:
+                    global.personasSolas ||
+                    0,
+
+                reservasSolas:
+                    global.reservasSolas ||
+                    0
             };
         }
     }
@@ -2399,7 +2437,11 @@ function obtenerDisponibilidadOpcionFecha(
             restantes:
                 null,
             agotado:
-                false
+                false,
+            personasSolas:
+                0,
+            reservasSolas:
+                0
         };
     }
 
@@ -2442,7 +2484,11 @@ function obtenerDisponibilidadOpcionFecha(
         reservadas,
         restantes,
         agotado:
-            restantes <= 0
+            restantes <= 0,
+        personasSolas:
+            0,
+        reservasSolas:
+            0
     };
 }
 
@@ -2765,10 +2811,98 @@ function actualizarEstadoPlazasReserva() {
 }
 
 
+function actualizarResumenSocialFechaSeleccionada() {
+    const contadorApuntadas =
+        seleccionar(
+            "#detalle-personas-apuntadas"
+        );
+
+    const bloqueVoySolo =
+        seleccionar(
+            "#detalle-voy-solo-meta"
+        );
+
+    const contadorSolas =
+        seleccionar(
+            "#detalle-personas-solas"
+        );
+
+    if (
+        !contadorApuntadas ||
+        !bloqueVoySolo ||
+        !contadorSolas
+    ) {
+        return;
+    }
+
+    const opcion =
+        obtenerOpcionFechaSeleccionada();
+
+    if (
+        !opcion ||
+        !planActual?.esPlanSupabase ||
+        !disponibilidadGlobalCargada
+    ) {
+        bloqueVoySolo.hidden =
+            true;
+
+        return;
+    }
+
+    const disponibilidad =
+        obtenerDisponibilidadOpcionFecha(
+            opcion
+        );
+
+    const apuntadas =
+        Math.max(
+            0,
+            Number(
+                disponibilidad.reservadas ||
+                0
+            )
+        );
+
+    const solas =
+        Math.max(
+            0,
+            Number(
+                disponibilidad.personasSolas ||
+                0
+            )
+        );
+
+    contadorApuntadas.textContent =
+        `${apuntadas} ${
+            apuntadas === 1
+                ? "persona apuntada"
+                : "personas apuntadas"
+        }`;
+
+    if (
+        solas <= 0
+    ) {
+        contadorSolas.textContent =
+            "Nadie viene solo todavía";
+    } else {
+        contadorSolas.textContent =
+            `${solas} ${
+                solas === 1
+                    ? "viene sola"
+                    : "vienen solas"
+            }`;
+    }
+
+    bloqueVoySolo.hidden =
+        false;
+}
+
+
 function actualizarDisponibilidadReservaSeleccionada() {
     actualizarSelectorPersonasPorDisponibilidad();
     actualizarEstadoPlazasReserva();
     actualizarDesgloseReserva();
+    actualizarResumenSocialFechaSeleccionada();
 }
 
 

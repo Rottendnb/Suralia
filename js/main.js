@@ -2161,6 +2161,48 @@ function formatearPrecioPortada(precio) {
         .replace(".", ",")} €`;
 }
 
+function textoApuntadasPortada(
+    cantidad
+) {
+    const numero =
+        Math.max(
+            0,
+            Number(
+                cantidad ||
+                0
+            )
+        );
+
+    return numero === 1
+        ? "1 apuntada"
+        : `${numero} apuntadas`;
+}
+
+
+function textoSolasPortada(
+    cantidad
+) {
+    const numero =
+        Math.max(
+            0,
+            Number(
+                cantidad ||
+                0
+            )
+        );
+
+    if (
+        numero === 0
+    ) {
+        return "Nadie va solo aún";
+    }
+
+    return numero === 1
+        ? "1 va sola"
+        : `${numero} van solas`;
+}
+
+
 function crearTarjetaProximoPlanHTML(plan) {
     const planId = escaparAtributoHTML(plan.planId || "");
     const titulo = escaparTextoHTML(plan.titulo || "Actividad de Suralia");
@@ -2182,6 +2224,32 @@ function crearTarjetaProximoPlanHTML(plan) {
     const enlace = escaparAtributoHTML(plan.enlace || "planes.html");
     const precio = Number(plan.precio || 0);
     const valoracion = Number(plan.valoracion || 0);
+
+    const personasApuntadas =
+        Number(
+            plan.personas_apuntadas ||
+            0
+        );
+
+    const personasSolas =
+        Number(
+            plan.personas_solas ||
+            0
+        );
+
+    const textoApuntadas =
+        escaparTextoHTML(
+            textoApuntadasPortada(
+                personasApuntadas
+            )
+        );
+
+    const textoSolas =
+        escaparTextoHTML(
+            textoSolasPortada(
+                personasSolas
+            )
+        );
 
     return `
         <article
@@ -2241,6 +2309,24 @@ function crearTarjetaProximoPlanHTML(plan) {
                         <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
                         ${ubicacion}
                     </p>
+
+                    <div
+                        class="tarjeta-plan__social"
+                        aria-label="Personas apuntadas al próximo pase"
+                    >
+                        <span>
+                            <i
+                                class="fa-solid fa-user-group"
+                                aria-hidden="true"
+                            ></i>
+                            ${textoApuntadas}
+                        </span>
+
+                        <span class="tarjeta-plan__social-solas">
+                            <span aria-hidden="true">🙋</span>
+                            ${textoSolas}
+                        </span>
+                    </div>
 
                     <div class="tarjeta-plan__pie">
                         <span>${categoriaTexto}</span>
@@ -2717,9 +2803,113 @@ async function cargarProximosPlanesPortada() {
             MAXIMO_PLANES_PORTADA
         );
 
-    gridPlanesPortada.innerHTML =
+    let resumenSocialPorPlan =
+        new Map();
+
+    const idsProximosPlanes =
         proximosPlanes
-            .map(crearTarjetaProximoPlanHTML)
+            .map(
+                (
+                    plan
+                ) =>
+                    String(
+                        plan.planId ||
+                        ""
+                    )
+            )
+            .filter(
+                esUuidPlanPortada
+            );
+
+    if (
+        cliente &&
+        idsProximosPlanes.length >
+            0
+    ) {
+        try {
+            const {
+                data:
+                    resumenSocial,
+                error:
+                    errorResumenSocial
+            } = await cliente.rpc(
+                "obtener_resumen_social_planes",
+                {
+                    p_plan_ids:
+                        idsProximosPlanes
+                }
+            );
+
+            if (
+                errorResumenSocial
+            ) {
+                throw errorResumenSocial;
+            }
+
+            resumenSocialPorPlan =
+                new Map(
+                    (
+                        Array.isArray(
+                            resumenSocial
+                        )
+                            ? resumenSocial
+                            : []
+                    ).map(
+                        (
+                            item
+                        ) => [
+                            String(
+                                item.plan_id ||
+                                ""
+                            ),
+                            item
+                        ]
+                    )
+                );
+        } catch (error) {
+            console.warn(
+                "No se pudo cargar el resumen social de las tarjetas de portada:",
+                error
+            );
+        }
+    }
+
+    const proximosPlanesConSocial =
+        proximosPlanes.map(
+            (
+                plan
+            ) => {
+                const resumen =
+                    resumenSocialPorPlan.get(
+                        String(
+                            plan.planId ||
+                            ""
+                        )
+                    );
+
+                return {
+                    ...plan,
+
+                    personas_apuntadas:
+                        Number(
+                            resumen?.personas_apuntadas ||
+                            0
+                        ),
+
+                    personas_solas:
+                        Number(
+                            resumen?.personas_solas ||
+                            0
+                        )
+                };
+            }
+        );
+
+    gridPlanesPortada.innerHTML =
+        proximosPlanesConSocial
+            .map(
+                crearTarjetaProximoPlanHTML
+            )
             .join("");
 
     planesHeroDisponibles =
@@ -3104,6 +3294,11 @@ const contadorPersonasHero =
         "#contador-personas-hero"
     );
 
+const contadorSolasHero =
+    document.querySelector(
+        "#contador-solas-hero"
+    );
+
 let solicitudContadorHero =
     0;
 
@@ -3122,7 +3317,9 @@ function esUuidPlanPortada(
 
 
 async function actualizarContadorPersonasHero() {
-    if (!contadorPersonasHero) {
+    if (
+        !contadorPersonasHero
+    ) {
         return;
     }
 
@@ -3150,21 +3347,36 @@ async function actualizarContadorPersonasHero() {
         contadorPersonasHero.textContent =
             "0 personas";
 
+        if (
+            contadorSolasHero
+        ) {
+            contadorSolasHero.textContent =
+                "Nadie va solo todavía";
+        }
+
         return;
     }
 
     contadorPersonasHero.textContent =
         "Consultando...";
 
+    if (
+        contadorSolasHero
+    ) {
+        contadorSolasHero.textContent =
+            "Consultando cuántas vienen solas...";
+    }
+
     try {
         const {
             data,
             error
         } = await cliente.rpc(
-            "obtener_disponibilidad_plan",
+            "obtener_resumen_social_planes",
             {
-                p_plan_id:
+                p_plan_ids: [
                     planId
+                ]
             }
         );
 
@@ -3173,9 +3385,8 @@ async function actualizarContadorPersonasHero() {
         }
 
         /*
-            El hero puede rotar mientras llega la consulta.
-            Si ya estamos mostrando otro plan, ignoramos
-            el resultado anterior.
+            El hero rota cada pocos segundos. Si cambió de plan
+            mientras llegaba la consulta, ignoramos esta respuesta.
         */
         if (
             numeroSolicitud !==
@@ -3184,37 +3395,29 @@ async function actualizarContadorPersonasHero() {
             return;
         }
 
-        const filas =
+        const fila =
             Array.isArray(
                 data
             )
-                ? data
-                : [];
+                ? data[0]
+                : null;
 
         const personas =
-            filas.reduce(
-                (
-                    total,
-                    fila
-                ) => {
-                    const cantidad =
-                        Number(
-                            fila?.plazas_reservadas ||
-                            0
-                        );
+            Math.max(
+                0,
+                Number(
+                    fila?.personas_apuntadas ||
+                    0
+                )
+            );
 
-                    return (
-                        total +
-                        (
-                            Number.isFinite(
-                                cantidad
-                            )
-                                ? cantidad
-                                : 0
-                        )
-                    );
-                },
-                0
+        const personasSolas =
+            Math.max(
+                0,
+                Number(
+                    fila?.personas_solas ||
+                    0
+                )
             );
 
         contadorPersonasHero.textContent =
@@ -3223,9 +3426,28 @@ async function actualizarContadorPersonasHero() {
                     ? "persona"
                     : "personas"
             }`;
+
+        if (
+            contadorSolasHero
+        ) {
+            if (
+                personasSolas <=
+                0
+            ) {
+                contadorSolasHero.textContent =
+                    "🙋 Nadie va solo todavía";
+            } else {
+                contadorSolasHero.textContent =
+                    `🙋 ${personasSolas} ${
+                        personasSolas === 1
+                            ? "viene sola"
+                            : "vienen solas"
+                    }`;
+            }
+        }
     } catch (error) {
         console.error(
-            "No se pudo obtener el número real de personas apuntadas al plan del hero:",
+            "No se pudo obtener el resumen social real del plan del hero:",
             error
         );
 
@@ -3235,6 +3457,13 @@ async function actualizarContadorPersonasHero() {
         ) {
             contadorPersonasHero.textContent =
                 "Sin datos";
+
+            if (
+                contadorSolasHero
+            ) {
+                contadorSolasHero.textContent =
+                    "";
+            }
         }
     }
 }

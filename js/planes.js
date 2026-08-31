@@ -10,6 +10,10 @@ const filtroTexto = document.querySelector(
     "#filtro-texto"
 );
 
+const filtroMunicipio = document.querySelector(
+    "#filtro-municipio"
+);
+
 const filtroCategoria = document.querySelector(
     "#filtro-categoria"
 );
@@ -21,6 +25,26 @@ const filtroPrecio = document.querySelector(
 const filtroOrden = document.querySelector(
     "#filtro-orden"
 );
+
+const filtroVoySolo = document.querySelector(
+    "#filtro-voy-solo"
+);
+
+const botonesFiltroFecha = Array.from(
+    document.querySelectorAll(
+        ".filtro-fecha-rapida[data-filtro-fecha]"
+    )
+);
+
+const filtroFechaPersonalizada =
+    document.querySelector(
+        "#filtro-fecha-personalizada"
+    );
+
+const contenedorFechaPersonalizada =
+    document.querySelector(
+        ".filtro-fecha-personalizada"
+    );
 
 const botonLimpiar = document.querySelector(
     "#boton-limpiar"
@@ -117,6 +141,10 @@ function obtenerDatosPlan(
             tarjeta?.dataset.ubicacion ||
             "",
 
+        municipio:
+            tarjeta?.dataset.municipio ||
+            "",
+
         precio:
             Number(
                 datosCatalogo?.precio ??
@@ -159,6 +187,8 @@ const botonVista = document.querySelector(
 );
 
 let fechaBuscadaDesdePortada = "";
+
+let filtroFechaRapidaActual = "";
 
 let vistaCompactaActiva = false;
 
@@ -238,6 +268,19 @@ function aplicarParametrosIniciales() {
 
     fechaBuscadaDesdePortada =
         parametros.fecha;
+
+    if (
+        filtroFechaPersonalizada &&
+        parametros.fecha &&
+        /^\d{4}-\d{2}-\d{2}$/.test(
+            parametros.fecha
+        )
+    ) {
+        filtroFechaPersonalizada.value =
+            parametros.fecha;
+    }
+
+    actualizarEstadoFiltrosFecha();
 }
 
 
@@ -277,6 +320,536 @@ function obtenerFechaLocalISO() {
         );
 
     return `${anio}-${mes}-${dia}`;
+}
+
+
+function crearFechaLocalDesdeISO(
+    fechaIso
+) {
+    const valor =
+        String(
+            fechaIso ||
+            ""
+        ).slice(
+            0,
+            10
+        );
+
+    if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(
+            valor
+        )
+    ) {
+        return null;
+    }
+
+    const [
+        anio,
+        mes,
+        dia
+    ] = valor
+        .split("-")
+        .map(Number);
+
+    const fecha =
+        new Date(
+            anio,
+            mes - 1,
+            dia
+        );
+
+    if (
+        Number.isNaN(
+            fecha.getTime()
+        )
+    ) {
+        return null;
+    }
+
+    return fecha;
+}
+
+
+function convertirFechaLocalAISO(
+    fecha
+) {
+    if (
+        !(fecha instanceof Date) ||
+        Number.isNaN(
+            fecha.getTime()
+        )
+    ) {
+        return "";
+    }
+
+    const anio =
+        fecha.getFullYear();
+
+    const mes =
+        String(
+            fecha.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+    const dia =
+        String(
+            fecha.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+    return `${anio}-${mes}-${dia}`;
+}
+
+
+function sumarDiasFecha(
+    fecha,
+    dias
+) {
+    const copia =
+        new Date(
+            fecha.getFullYear(),
+            fecha.getMonth(),
+            fecha.getDate()
+        );
+
+    copia.setDate(
+        copia.getDate() +
+        Number(
+            dias ||
+            0
+        )
+    );
+
+    return copia;
+}
+
+
+function obtenerRangoFiltroFecha(
+    tipo
+) {
+    const hoy =
+        crearFechaLocalDesdeISO(
+            obtenerFechaLocalISO()
+        );
+
+    if (!hoy) {
+        return null;
+    }
+
+    let inicio =
+        new Date(
+            hoy.getFullYear(),
+            hoy.getMonth(),
+            hoy.getDate()
+        );
+
+    let fin =
+        new Date(
+            inicio.getFullYear(),
+            inicio.getMonth(),
+            inicio.getDate()
+        );
+
+    const diaSemana =
+        inicio.getDay();
+
+    if (
+        tipo ===
+        "hoy"
+    ) {
+        return {
+            inicio:
+                convertirFechaLocalAISO(
+                    inicio
+                ),
+
+            fin:
+                convertirFechaLocalAISO(
+                    fin
+                )
+        };
+    }
+
+    if (
+        tipo ===
+        "manana"
+    ) {
+        inicio =
+            sumarDiasFecha(
+                inicio,
+                1
+            );
+
+        fin =
+            new Date(
+                inicio.getFullYear(),
+                inicio.getMonth(),
+                inicio.getDate()
+            );
+
+        return {
+            inicio:
+                convertirFechaLocalAISO(
+                    inicio
+                ),
+
+            fin:
+                convertirFechaLocalAISO(
+                    fin
+                )
+        };
+    }
+
+    if (
+        tipo ===
+        "finde"
+    ) {
+        /*
+            Si hoy es sábado, el finde es sábado + domingo.
+            Si hoy es domingo, queda únicamente el domingo.
+            El resto de días toma el sábado y domingo próximos.
+        */
+        if (
+            diaSemana ===
+            6
+        ) {
+            fin =
+                sumarDiasFecha(
+                    inicio,
+                    1
+                );
+        } else if (
+            diaSemana ===
+            0
+        ) {
+            fin =
+                new Date(
+                    inicio.getFullYear(),
+                    inicio.getMonth(),
+                    inicio.getDate()
+                );
+        } else {
+            inicio =
+                sumarDiasFecha(
+                    inicio,
+                    6 -
+                    diaSemana
+                );
+
+            fin =
+                sumarDiasFecha(
+                    inicio,
+                    1
+                );
+        }
+
+        return {
+            inicio:
+                convertirFechaLocalAISO(
+                    inicio
+                ),
+
+            fin:
+                convertirFechaLocalAISO(
+                    fin
+                )
+        };
+    }
+
+    if (
+        tipo ===
+        "semana"
+    ) {
+        const diasHastaDomingo =
+            diaSemana ===
+                0
+                ? 0
+                : 7 -
+                  diaSemana;
+
+        fin =
+            sumarDiasFecha(
+                inicio,
+                diasHastaDomingo
+            );
+
+        return {
+            inicio:
+                convertirFechaLocalAISO(
+                    inicio
+                ),
+
+            fin:
+                convertirFechaLocalAISO(
+                    fin
+                )
+        };
+    }
+
+    if (
+        tipo ===
+        "proxima-semana"
+    ) {
+        const diasHastaLunesSiguiente =
+            diaSemana ===
+                0
+                ? 1
+                : 8 -
+                  diaSemana;
+
+        inicio =
+            sumarDiasFecha(
+                inicio,
+                diasHastaLunesSiguiente
+            );
+
+        fin =
+            sumarDiasFecha(
+                inicio,
+                6
+            );
+
+        return {
+            inicio:
+                convertirFechaLocalAISO(
+                    inicio
+                ),
+
+            fin:
+                convertirFechaLocalAISO(
+                    fin
+                )
+        };
+    }
+
+    return null;
+}
+
+
+function obtenerFechasVigentesTarjeta(
+    tarjeta
+) {
+    if (!tarjeta) {
+        return [];
+    }
+
+    const fechasDataset =
+        String(
+            tarjeta.dataset.fechasVigentes ||
+            ""
+        )
+            .split(",")
+            .map(
+                (
+                    fecha
+                ) =>
+                    fecha
+                        .trim()
+                        .slice(
+                            0,
+                            10
+                        )
+            )
+            .filter(
+                (
+                    fecha
+                ) =>
+                    /^\d{4}-\d{2}-\d{2}$/.test(
+                        fecha
+                    )
+            );
+
+    if (
+        fechasDataset.length >
+        0
+    ) {
+        return Array.from(
+            new Set(
+                fechasDataset
+            )
+        );
+    }
+
+    const fechaPrincipal =
+        String(
+            tarjeta.dataset.fechaIso ||
+            ""
+        ).slice(
+            0,
+            10
+        );
+
+    return /^\d{4}-\d{2}-\d{2}$/.test(
+        fechaPrincipal
+    )
+        ? [
+            fechaPrincipal
+        ]
+        : [];
+}
+
+
+function cumpleFiltroFechaPlan(
+    tarjeta
+) {
+    const fechas =
+        obtenerFechasVigentesTarjeta(
+            tarjeta
+        );
+
+    if (
+        fechas.length ===
+        0
+    ) {
+        return (
+            !fechaBuscadaDesdePortada &&
+            !filtroFechaRapidaActual &&
+            !filtroFechaPersonalizada?.value
+        );
+    }
+
+    /*
+        Si la búsqueda llega desde la portada con una fecha exacta,
+        esa fecha tiene prioridad hasta que el usuario toque
+        alguno de los filtros de fecha de esta página.
+    */
+    if (
+        fechaBuscadaDesdePortada
+    ) {
+        return fechas.includes(
+            fechaBuscadaDesdePortada
+        );
+    }
+
+    const fechaPersonalizada =
+        filtroFechaPersonalizada?.value ||
+        "";
+
+    if (
+        fechaPersonalizada
+    ) {
+        return fechas.includes(
+            fechaPersonalizada
+        );
+    }
+
+    if (
+        !filtroFechaRapidaActual
+    ) {
+        return true;
+    }
+
+    const rango =
+        obtenerRangoFiltroFecha(
+            filtroFechaRapidaActual
+        );
+
+    if (!rango) {
+        return true;
+    }
+
+    return fechas.some(
+        (
+            fecha
+        ) =>
+            fecha >=
+                rango.inicio &&
+            fecha <=
+                rango.fin
+    );
+}
+
+
+function actualizarEstadoFiltrosFecha() {
+    botonesFiltroFecha.forEach(
+        (
+            boton
+        ) => {
+            const activo =
+                boton.dataset.filtroFecha ===
+                filtroFechaRapidaActual;
+
+            boton.classList.toggle(
+                "filtro-fecha-rapida--activa",
+                activo
+            );
+
+            boton.setAttribute(
+                "aria-pressed",
+                String(
+                    activo
+                )
+            );
+        }
+    );
+
+    const hayFechaPersonalizada =
+        Boolean(
+            filtroFechaPersonalizada?.value ||
+            fechaBuscadaDesdePortada
+        );
+
+    contenedorFechaPersonalizada?.classList.toggle(
+        "filtro-fecha-personalizada--activa",
+        hayFechaPersonalizada
+    );
+}
+
+
+function limpiarFechaDeUrl() {
+    fechaBuscadaDesdePortada =
+        "";
+
+    window.history.replaceState(
+        {},
+        "",
+        window.location.pathname
+    );
+}
+
+
+function seleccionarFiltroFechaRapida(
+    tipo
+) {
+    const tipoSeguro =
+        String(
+            tipo ||
+            ""
+        );
+
+    filtroFechaRapidaActual =
+        filtroFechaRapidaActual ===
+            tipoSeguro
+            ? ""
+            : tipoSeguro;
+
+    if (
+        filtroFechaPersonalizada
+    ) {
+        filtroFechaPersonalizada.value =
+            "";
+    }
+
+    limpiarFechaDeUrl();
+
+    actualizarEstadoFiltrosFecha();
+    aplicarFiltros();
+}
+
+
+function prepararFiltrosFecha() {
+    if (
+        filtroFechaPersonalizada
+    ) {
+        filtroFechaPersonalizada.min =
+            obtenerFechaLocalISO();
+    }
+
+    actualizarEstadoFiltrosFecha();
 }
 
 
@@ -470,15 +1043,22 @@ function prepararPlanPublicadoVigente(
     /*
         La tarjeta muestra siempre la próxima fecha disponible,
         aunque la fecha principal original del plan ya haya pasado.
+        Conservamos además TODOS los pases vigentes para los nuevos
+        filtros Hoy / Mañana / Finde / Semana / Fecha concreta.
     */
     return {
         ...plan,
+
         fecha:
             proximoPase.fecha,
+
         hora:
             proximoPase.hora ||
             plan.hora ||
-            null
+            null,
+
+        pases_vigentes:
+            pasesVigentes
     };
 }
 
@@ -655,6 +1235,7 @@ function alternarVistaResultados() {
 function aplicarFiltros() {
     if (
         !filtroTexto ||
+        !filtroMunicipio ||
         !filtroCategoria ||
         !filtroPrecio ||
         !listaPlanes
@@ -666,11 +1247,19 @@ function aplicarFiltros() {
         filtroTexto.value.trim()
     );
 
+    const municipioSeleccionado =
+        filtroMunicipio.value;
+
     const categoriaSeleccionada =
         filtroCategoria.value;
 
     const precioSeleccionado =
         filtroPrecio.value;
+
+    const soloPlanesConGenteSola =
+        Boolean(
+            filtroVoySolo?.checked
+        );
 
     let planesVisibles = planes.filter(
         (plan) => {
@@ -699,6 +1288,11 @@ function aplicarFiltros() {
                     datosPlan.categoriaTexto
                 );
 
+            const municipio =
+                normalizarValorMunicipio(
+                    datosPlan.municipio
+                );
+
             const categoria =
                 datosPlan.categoria;
 
@@ -708,6 +1302,15 @@ function aplicarFiltros() {
             const fechaIso =
                 datosPlan.fechaIso;
 
+            const personasSolas =
+                Math.max(
+                    0,
+                    Number(
+                        plan.dataset.personasSolas ||
+                        0
+                    )
+                );
+
             const coincideTexto =
                 !textoBuscado ||
                 nombre.includes(textoBuscado) ||
@@ -716,6 +1319,12 @@ function aplicarFiltros() {
                 categoriaTexto.includes(
                     textoBuscado
                 );
+
+            const coincideMunicipio =
+                municipioSeleccionado ===
+                    "todos" ||
+                municipio ===
+                    municipioSeleccionado;
 
             const coincideCategoria =
                 categoriaSeleccionada ===
@@ -730,20 +1339,27 @@ function aplicarFiltros() {
                 );
 
             const coincideFecha =
-                !fechaBuscadaDesdePortada ||
-                fechaIso ===
-                    fechaBuscadaDesdePortada;
+                cumpleFiltroFechaPlan(
+                    plan
+                );
 
             const sigueDisponible =
                 !planHaCaducado(
                     fechaIso
                 );
 
+            const coincideVoySolo =
+                !soloPlanesConGenteSola ||
+                personasSolas >
+                    0;
+
             return (
                 coincideTexto &&
+                coincideMunicipio &&
                 coincideCategoria &&
                 coincidePrecio &&
                 coincideFecha &&
+                coincideVoySolo &&
                 sigueDisponible
             );
         }
@@ -778,6 +1394,11 @@ function limpiarFiltros(
         filtroTexto.value = "";
     }
 
+    if (filtroMunicipio) {
+        filtroMunicipio.value =
+            "todos";
+    }
+
     if (filtroCategoria) {
         filtroCategoria.value = "todas";
     }
@@ -791,6 +1412,21 @@ function limpiarFiltros(
             "recomendados";
     }
 
+    if (filtroVoySolo) {
+        filtroVoySolo.checked =
+            false;
+    }
+
+    filtroFechaRapidaActual =
+        "";
+
+    if (
+        filtroFechaPersonalizada
+    ) {
+        filtroFechaPersonalizada.value =
+            "";
+    }
+
     fechaBuscadaDesdePortada = "";
 
     window.history.replaceState(
@@ -799,6 +1435,7 @@ function limpiarFiltros(
         window.location.pathname
     );
 
+    actualizarEstadoFiltrosFecha();
     aplicarFiltros();
 
     if (
@@ -825,6 +1462,12 @@ if (formularioFiltros) {
         (evento) => {
             evento.preventDefault();
 
+            /*
+                La fecha llegada desde la portada deja de tener prioridad
+                cuando el usuario realiza una búsqueda manual aquí.
+                Si el selector personalizado conserva esa misma fecha,
+                seguirá aplicándose de forma visible.
+            */
             fechaBuscadaDesdePortada = "";
 
             window.history.replaceState(
@@ -833,6 +1476,7 @@ if (formularioFiltros) {
                 window.location.pathname
             );
 
+            actualizarEstadoFiltrosFecha();
             aplicarFiltros();
         }
     );
@@ -840,14 +1484,69 @@ if (formularioFiltros) {
 
 
 /*
-    La ordenación continúa reaccionando inmediatamente,
+    Municipio y ordenación reaccionan inmediatamente,
     sin necesidad de pulsar Buscar.
 */
+
+if (filtroMunicipio) {
+    filtroMunicipio.addEventListener(
+        "change",
+        aplicarFiltros
+    );
+}
+
 
 if (filtroOrden) {
     filtroOrden.addEventListener(
         "change",
         aplicarFiltros
+    );
+}
+
+
+if (filtroVoySolo) {
+    filtroVoySolo.addEventListener(
+        "change",
+        () => {
+            fechaBuscadaDesdePortada =
+                "";
+
+            aplicarFiltros();
+        }
+    );
+}
+
+
+botonesFiltroFecha.forEach(
+    (
+        boton
+    ) => {
+        boton.addEventListener(
+            "click",
+            () => {
+                seleccionarFiltroFechaRapida(
+                    boton.dataset.filtroFecha
+                );
+            }
+        );
+    }
+);
+
+
+if (
+    filtroFechaPersonalizada
+) {
+    filtroFechaPersonalizada.addEventListener(
+        "change",
+        () => {
+            filtroFechaRapidaActual =
+                "";
+
+            limpiarFechaDeUrl();
+
+            actualizarEstadoFiltrosFecha();
+            aplicarFiltros();
+        }
     );
 }
 
@@ -1322,6 +2021,188 @@ function asegurarCategoriaTalleres() {
 }
 
 
+
+function normalizarValorMunicipio(
+    valor = ""
+) {
+    return String(
+        valor ||
+        ""
+    )
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        );
+}
+
+
+function cargarOpcionesMunicipio(
+    planesPublicados = []
+) {
+    if (!filtroMunicipio) {
+        return;
+    }
+
+    const municipios =
+        new Map();
+
+    (
+        Array.isArray(
+            planesPublicados
+        )
+            ? planesPublicados
+            : []
+    ).forEach(
+        (
+            plan
+        ) => {
+            const nombre =
+                String(
+                    plan?.municipio ||
+                    ""
+                ).trim();
+
+            if (!nombre) {
+                return;
+            }
+
+            const clave =
+                normalizarValorMunicipio(
+                    nombre
+                );
+
+            if (
+                !clave ||
+                municipios.has(
+                    clave
+                )
+            ) {
+                return;
+            }
+
+            municipios.set(
+                clave,
+                nombre
+            );
+        }
+    );
+
+    const valorActual =
+        filtroMunicipio.value ||
+        "todos";
+
+    filtroMunicipio.innerHTML = `
+        <option value="todos">
+            Todos
+        </option>
+    `;
+
+    Array.from(
+        municipios.entries()
+    )
+        .sort(
+            (
+                [, nombreA],
+                [, nombreB]
+            ) =>
+                nombreA.localeCompare(
+                    nombreB,
+                    "es",
+                    {
+                        sensitivity:
+                            "base"
+                    }
+                )
+        )
+        .forEach(
+            (
+                [
+                    clave,
+                    nombre
+                ]
+            ) => {
+                const opcion =
+                    document.createElement(
+                        "option"
+                    );
+
+                opcion.value =
+                    clave;
+
+                opcion.textContent =
+                    nombre;
+
+                filtroMunicipio.appendChild(
+                    opcion
+                );
+            }
+        );
+
+    const sigueExistiendo =
+        valorActual ===
+            "todos" ||
+        Array.from(
+            filtroMunicipio.options
+        ).some(
+            (
+                opcion
+            ) =>
+                opcion.value ===
+                valorActual
+        );
+
+    filtroMunicipio.value =
+        sigueExistiendo
+            ? valorActual
+            : "todos";
+}
+
+
+function textoPersonasApuntadasTarjeta(
+    cantidad
+) {
+    const numero =
+        Math.max(
+            0,
+            Number(
+                cantidad ||
+                0
+            )
+        );
+
+    return numero === 1
+        ? "1 apuntada"
+        : `${numero} apuntadas`;
+}
+
+
+function textoPersonasSolasTarjeta(
+    cantidad
+) {
+    const numero =
+        Math.max(
+            0,
+            Number(
+                cantidad ||
+                0
+            )
+        );
+
+    if (
+        numero === 0
+    ) {
+        return "Nadie va solo aún";
+    }
+
+    return numero === 1
+        ? "1 va sola"
+        : `${numero} van solas`;
+}
+
+
 function crearTarjetaPlanSupabase(
     plan
 ) {
@@ -1376,6 +2257,12 @@ function crearTarjetaPlanSupabase(
             "Ubicación por confirmar"
         );
 
+    const municipio =
+        escaparHTMLPlanes(
+            plan.municipio ||
+            ""
+        );
+
     const imagen =
         escaparHTMLPlanes(
             plan.imagen_url ||
@@ -1397,6 +2284,95 @@ function crearTarjetaPlanSupabase(
             plan.id || ""
         )}`;
 
+    const personasApuntadas =
+        Number(
+            plan.personas_apuntadas ||
+            0
+        );
+
+    const personasSolas =
+        Number(
+            plan.personas_solas ||
+            0
+        );
+
+    const textoApuntadas =
+        escaparHTMLPlanes(
+            textoPersonasApuntadasTarjeta(
+                personasApuntadas
+            )
+        );
+
+    const textoSolas =
+        escaparHTMLPlanes(
+            textoPersonasSolasTarjeta(
+                personasSolas
+            )
+        );
+
+    const fechasVigentes =
+        Array.from(
+            new Set(
+                (
+                    Array.isArray(
+                        plan.pases_vigentes
+                    )
+                        ? plan.pases_vigentes
+                        : []
+                )
+                    .map(
+                        (
+                            pase
+                        ) =>
+                            String(
+                                pase?.fecha ||
+                                ""
+                            ).slice(
+                                0,
+                                10
+                            )
+                    )
+                    .filter(
+                        (
+                            fecha
+                        ) =>
+                            /^\d{4}-\d{2}-\d{2}$/.test(
+                                fecha
+                            )
+                    )
+            )
+        );
+
+    if (
+        fechasVigentes.length ===
+            0 &&
+        /^\d{4}-\d{2}-\d{2}$/.test(
+            String(
+                plan.fecha ||
+                ""
+            ).slice(
+                0,
+                10
+            )
+        )
+    ) {
+        fechasVigentes.push(
+            String(
+                plan.fecha
+            ).slice(
+                0,
+                10
+            )
+        );
+    }
+
+    const fechasVigentesDataset =
+        escaparHTMLPlanes(
+            fechasVigentes.join(
+                ","
+            )
+        );
+
     return `
         <article
             class="tarjeta-plan tarjeta-plan--publicada-usuario"
@@ -1409,9 +2385,13 @@ function crearTarjetaPlanSupabase(
             data-valoracion="0"
             data-fecha="${fechaTexto}"
             data-fecha-iso="${fechaIso}"
+            data-fechas-vigentes="${fechasVigentesDataset}"
             data-ubicacion="${ubicacion}"
+            data-municipio="${municipio}"
             data-imagen="${imagen}"
             data-enlace="${enlace}"
+            data-personas-apuntadas="${personasApuntadas}"
+            data-personas-solas="${personasSolas}"
         >
 
             <a
@@ -1470,6 +2450,26 @@ function crearTarjetaPlanSupabase(
                         ${ubicacion}
                     </p>
 
+                    <div
+                        class="tarjeta-plan__social"
+                        aria-label="Personas apuntadas al próximo pase"
+                    >
+
+                        <span>
+                            <i
+                                class="fa-solid fa-user-group"
+                                aria-hidden="true"
+                            ></i>
+                            ${textoApuntadas}
+                        </span>
+
+                        <span class="tarjeta-plan__social-solas">
+                            <span aria-hidden="true">🙋</span>
+                            ${textoSolas}
+                        </span>
+
+                    </div>
+
                     <div class="tarjeta-plan__pie">
 
                         <span>${categoriaTexto}</span>
@@ -1521,6 +2521,7 @@ async function cargarPlanesPublicadosSupabase() {
                     hora,
                     fechas,
                     ubicacion,
+                    municipio,
                     precio,
                     imagen_url,
                     creado_en
@@ -1590,8 +2591,105 @@ async function cargarPlanesPublicadosSupabase() {
                         )
                 );
 
-        listaPlanes.innerHTML =
+        let resumenSocialPorPlan =
+            new Map();
+
+        const idsPlanes =
             planesNuevos
+                .map(
+                    (
+                        plan
+                    ) =>
+                        plan.id
+                )
+                .filter(Boolean);
+
+        if (
+            idsPlanes.length >
+            0
+        ) {
+            const {
+                data:
+                    resumenSocial,
+                error:
+                    errorResumenSocial
+            } = await cliente.rpc(
+                "obtener_resumen_social_planes",
+                {
+                    p_plan_ids:
+                        idsPlanes
+                }
+            );
+
+            if (
+                errorResumenSocial
+            ) {
+                console.warn(
+                    "No se pudo cargar el resumen social de los planes:",
+                    errorResumenSocial
+                );
+            } else {
+                resumenSocialPorPlan =
+                    new Map(
+                        (
+                            Array.isArray(
+                                resumenSocial
+                            )
+                                ? resumenSocial
+                                : []
+                        ).map(
+                            (
+                                item
+                            ) => [
+                                String(
+                                    item.plan_id ||
+                                    ""
+                                ),
+
+                                item
+                            ]
+                        )
+                    );
+            }
+        }
+
+        cargarOpcionesMunicipio(
+            planesNuevos
+        );
+
+        const planesConResumenSocial =
+            planesNuevos.map(
+                (
+                    plan
+                ) => {
+                    const resumen =
+                        resumenSocialPorPlan.get(
+                            String(
+                                plan.id ||
+                                ""
+                            )
+                        );
+
+                    return {
+                        ...plan,
+
+                        personas_apuntadas:
+                            Number(
+                                resumen?.personas_apuntadas ||
+                                0
+                            ),
+
+                        personas_solas:
+                            Number(
+                                resumen?.personas_solas ||
+                                0
+                            )
+                    };
+                }
+            );
+
+        listaPlanes.innerHTML =
+            planesConResumenSocial
                 .map(
                     crearTarjetaPlanSupabase
                 )
@@ -1655,6 +2753,7 @@ if (
 }
 
 aplicarParametrosIniciales();
+prepararFiltrosFecha();
 actualizarBotonVista();
 asegurarCategoriaTalleres();
 cargarPlanesPublicadosSupabase();
