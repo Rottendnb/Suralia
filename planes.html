@@ -40,6 +40,12 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     >
 
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -244,6 +250,505 @@
 
             <div class="contenedor">
 
+                <section
+                    class="modo-suralia"
+                    id="modo-suralia"
+                    aria-labelledby="titulo-modo-suralia"
+                >
+
+                    <div class="modo-suralia__cabecera">
+
+                        <div class="modo-suralia__marca">
+
+                            <span
+                                class="modo-suralia__icono"
+                                aria-hidden="true"
+                            >
+                                ✨
+                            </span>
+
+                            <div>
+                                <span class="modo-suralia__eyebrow">
+                                    Tu plan, sin darle vueltas
+                                </span>
+
+                                <h2 id="titulo-modo-suralia">
+                                    Modo Suralia
+                                </h2>
+
+                                <p>
+                                    Cuéntanos cómo te apetece salir y elegimos los planes que mejor encajan contigo.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <button
+                            type="button"
+                            class="modo-suralia__abrir"
+                            id="boton-modo-suralia"
+                            aria-expanded="false"
+                            aria-controls="contenido-modo-suralia"
+                        >
+                            <span>Probar Modo Suralia</span>
+                            <i
+                                class="fa-solid fa-chevron-down"
+                                aria-hidden="true"
+                            ></i>
+                        </button>
+
+                    </div>
+
+                    <div
+                        class="modo-suralia__contenido"
+                        id="contenido-modo-suralia"
+                        hidden
+                    >
+
+                        <div class="modo-suralia__intro">
+                            <span class="modo-suralia__paso">
+                                1
+                            </span>
+
+                            <div>
+                                <span class="modo-suralia__intro-kicker">
+                                    Elige el ambiente
+                                </span>
+
+                                <h3>
+                                    ¿Qué te apetece hacer?
+                                </h3>
+
+                                <p>
+                                    No hace falta que sepas qué plan buscas. Empieza por cómo te gustaría sentirte.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div
+                            class="modo-suralia__intenciones"
+                            role="radiogroup"
+                            aria-label="Qué te apetece hacer"
+                        >
+
+                            <label class="modo-suralia-opcion">
+                                <input
+                                    type="radio"
+                                    name="modo-suralia-animo"
+                                    value="social"
+                                    checked
+                                >
+
+                                <span class="modo-suralia-opcion__contenido">
+                                    <span
+                                        class="modo-suralia-opcion__icono"
+                                        aria-hidden="true"
+                                    >
+                                        🎉
+                                    </span>
+
+                                    <span>
+                                        <strong>
+                                            Conocer gente
+                                        </strong>
+
+                                        <small>
+                                            Social, buen ambiente y gente nueva
+                                        </small>
+                                    </span>
+                                </span>
+                            </label>
+
+                            <label class="modo-suralia-opcion">
+                                <input
+                                    type="radio"
+                                    name="modo-suralia-animo"
+                                    value="tranquilo"
+                                >
+
+                                <span class="modo-suralia-opcion__contenido">
+                                    <span
+                                        class="modo-suralia-opcion__icono"
+                                        aria-hidden="true"
+                                    >
+                                        🌿
+                                    </span>
+
+                                    <span>
+                                        <strong>
+                                            Algo tranquilo
+                                        </strong>
+
+                                        <small>
+                                            Sin prisas y para desconectar
+                                        </small>
+                                    </span>
+                                </span>
+                            </label>
+
+                            <label class="modo-suralia-opcion">
+                                <input
+                                    type="radio"
+                                    name="modo-suralia-animo"
+                                    value="diferente"
+                                >
+
+                                <span class="modo-suralia-opcion__contenido">
+                                    <span
+                                        class="modo-suralia-opcion__icono"
+                                        aria-hidden="true"
+                                    >
+                                        🔥
+                                    </span>
+
+                                    <span>
+                                        <strong>
+                                            Algo diferente
+                                        </strong>
+
+                                        <small>
+                                            Salir de lo típico y probar algo nuevo
+                                        </small>
+                                    </span>
+                                </span>
+                            </label>
+
+                            <label class="modo-suralia-opcion">
+                                <input
+                                    type="radio"
+                                    name="modo-suralia-animo"
+                                    value="activo"
+                                >
+
+                                <span class="modo-suralia-opcion__contenido">
+                                    <span
+                                        class="modo-suralia-opcion__icono"
+                                        aria-hidden="true"
+                                    >
+                                        🥾
+                                    </span>
+
+                                    <span>
+                                        <strong>
+                                            Moverme
+                                        </strong>
+
+                                        <small>
+                                            Actividad, aventura y aire libre
+                                        </small>
+                                    </span>
+                                </span>
+                            </label>
+
+                            <label class="modo-suralia-opcion">
+                                <input
+                                    type="radio"
+                                    name="modo-suralia-animo"
+                                    value="cultural"
+                                >
+
+                                <span class="modo-suralia-opcion__contenido">
+                                    <span
+                                        class="modo-suralia-opcion__icono"
+                                        aria-hidden="true"
+                                    >
+                                        🎭
+                                    </span>
+
+                                    <span>
+                                        <strong>
+                                            Descubrir
+                                        </strong>
+
+                                        <small>
+                                            Cultura, gastronomía y lugares
+                                        </small>
+                                    </span>
+                                </span>
+                            </label>
+
+                        </div>
+
+                        <div class="modo-suralia__separador"></div>
+
+                        <div class="modo-suralia__intro modo-suralia__intro--compacto">
+                            <span class="modo-suralia__paso">
+                                2
+                            </span>
+
+                            <div>
+                                <span class="modo-suralia__intro-kicker">
+                                    Afina un poco
+                                </span>
+
+                                <h3>
+                                    ¿Tienes alguna preferencia?
+                                </h3>
+                            </div>
+                        </div>
+
+                        <div class="modo-suralia__preferencias">
+
+                            <fieldset class="modo-suralia-grupo">
+                                <legend>
+                                    <i
+                                        class="fa-regular fa-calendar"
+                                        aria-hidden="true"
+                                    ></i>
+                                    Cuándo
+                                </legend>
+
+                                <div class="modo-suralia-chips">
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-fecha"
+                                            value="cualquiera"
+                                            checked
+                                        >
+                                        <span>Cuando sea</span>
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-fecha"
+                                            value="hoy"
+                                        >
+                                        <span>Hoy</span>
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-fecha"
+                                            value="manana"
+                                        >
+                                        <span>Mañana</span>
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-fecha"
+                                            value="finde"
+                                        >
+                                        <span>Este finde</span>
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-fecha"
+                                            value="semana"
+                                        >
+                                        <span>Esta semana</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+
+                            <fieldset class="modo-suralia-grupo">
+                                <legend>
+                                    <i
+                                        class="fa-solid fa-wallet"
+                                        aria-hidden="true"
+                                    ></i>
+                                    Presupuesto
+                                </legend>
+
+                                <div class="modo-suralia-chips">
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-presupuesto"
+                                            value="cualquiera"
+                                            checked
+                                        >
+                                        <span>Me da igual</span>
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-presupuesto"
+                                            value="gratis"
+                                        >
+                                        <span>Gratis</span>
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-presupuesto"
+                                            value="20"
+                                        >
+                                        <span>Hasta 20 €</span>
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-presupuesto"
+                                            value="50"
+                                        >
+                                        <span>Hasta 50 €</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+
+                            <fieldset class="modo-suralia-grupo">
+                                <legend>
+                                    <i
+                                        class="fa-solid fa-user-group"
+                                        aria-hidden="true"
+                                    ></i>
+                                    Cómo vas
+                                </legend>
+
+                                <div class="modo-suralia-chips">
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-compania"
+                                            value="cualquiera"
+                                            checked
+                                        >
+                                        <span>Me da igual</span>
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-compania"
+                                            value="solo"
+                                        >
+                                        <span>🙋 Voy solo</span>
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-compania"
+                                            value="primera"
+                                        >
+                                        <span>👋 Primera vez</span>
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-compania"
+                                            value="acompanado"
+                                        >
+                                        <span>👥 Acompañado</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+
+                            <fieldset class="modo-suralia-grupo">
+                                <legend>
+                                    <i
+                                        class="fa-solid fa-location-dot"
+                                        aria-hidden="true"
+                                    ></i>
+                                    Distancia
+                                </legend>
+
+                                <div class="modo-suralia-chips">
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-distancia"
+                                            value="todas"
+                                            checked
+                                        >
+                                        <span>Sin límite</span>
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-distancia"
+                                            value="15"
+                                        >
+                                        <span>15 km</span>
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-distancia"
+                                            value="30"
+                                        >
+                                        <span>30 km</span>
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-distancia"
+                                            value="50"
+                                        >
+                                        <span>50 km</span>
+                                    </label>
+
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="modo-suralia-distancia"
+                                            value="100"
+                                        >
+                                        <span>100 km</span>
+                                    </label>
+                                </div>
+                            </fieldset>
+
+                        </div>
+
+                        <div class="modo-suralia__acciones">
+
+                            <button
+                                type="button"
+                                class="modo-suralia__buscar"
+                                id="buscar-modo-suralia"
+                            >
+                                <i
+                                    class="fa-solid fa-wand-magic-sparkles"
+                                    aria-hidden="true"
+                                ></i>
+
+                                <span>
+                                    Encuéntrame un plan
+                                </span>
+                            </button>
+
+                            <button
+                                type="button"
+                                class="modo-suralia__sorprendeme"
+                                id="sorprendeme-modo-suralia"
+                            >
+                                <i
+                                    class="fa-solid fa-shuffle"
+                                    aria-hidden="true"
+                                ></i>
+
+                                <span>
+                                    Sorpréndeme
+                                </span>
+                            </button>
+
+                        </div>
+
+                        <div
+                            class="modo-suralia__resultados"
+                            id="resultados-modo-suralia"
+                            aria-live="polite"
+                        ></div>
+
+                    </div>
+
+                </section>
+
                 <form
                     class="panel-filtros panel-filtros--suralia"
                     id="formulario-filtros"
@@ -254,11 +759,7 @@
                     <div class="panel-filtros__principal">
 
                         <div class="filtro-buscador filtro-buscador--principal">
-
-                            <i
-                                class="fa-solid fa-magnifying-glass"
-                                aria-hidden="true"
-                            ></i>
+                            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
 
                             <input
                                 type="search"
@@ -268,36 +769,18 @@
                                 aria-label="Buscar planes por nombre o contenido"
                                 autocomplete="off"
                             >
-
                         </div>
 
                         <div class="filtro-select filtro-select--compacto">
-
-                            <label for="filtro-municipio">
-                                Municipio
-                            </label>
-
-                            <select
-                                id="filtro-municipio"
-                                name="municipio"
-                            >
-                                <option value="todos">
-                                    Todos
-                                </option>
+                            <label for="filtro-municipio">Municipio</label>
+                            <select id="filtro-municipio" name="municipio">
+                                <option value="todos">Todos</option>
                             </select>
-
                         </div>
 
                         <div class="filtro-select filtro-select--compacto">
-
-                            <label for="filtro-categoria">
-                                Categoría
-                            </label>
-
-                            <select
-                                id="filtro-categoria"
-                                name="categoria"
-                            >
+                            <label for="filtro-categoria">Categoría</label>
+                            <select id="filtro-categoria" name="categoria">
                                 <option value="todas">Todas</option>
                                 <option value="cultura">Cultura</option>
                                 <option value="naturaleza">Naturaleza</option>
@@ -305,54 +788,83 @@
                                 <option value="gastronomia">Gastronomía</option>
                                 <option value="aventura">Aventura</option>
                             </select>
-
                         </div>
 
                         <div class="filtro-select filtro-select--compacto">
-
-                            <label for="filtro-precio">
-                                Precio
-                            </label>
-
-                            <select
-                                id="filtro-precio"
-                                name="precio"
-                            >
+                            <label for="filtro-precio">Precio</label>
+                            <select id="filtro-precio" name="precio">
                                 <option value="todos">Todos</option>
                                 <option value="gratis">Gratis</option>
                                 <option value="menos-20">Menos de 20 €</option>
                                 <option value="mas-20">Más de 20 €</option>
                             </select>
-
                         </div>
 
-                        <div class="filtro-voy-solo filtro-voy-solo--inline">
-
-                            <span class="filtro-voy-solo__titulo">
-                                🙋 Voy solo
-                            </span>
-
-                            <label
-                                class="interruptor-voy-solo-mini"
-                                for="filtro-voy-solo"
+                        <div class="filtro-select filtro-select--compacto filtro-distancia">
+                            <label for="filtro-distancia">Distancia</label>
+                            <select
+                                id="filtro-distancia"
+                                name="distancia"
+                                aria-describedby="estado-ubicacion-filtro"
                             >
-                                <input
-                                    type="checkbox"
-                                    id="filtro-voy-solo"
-                                    name="voy_solo"
-                                >
+                                <option value="todas">Sin límite</option>
+                                <option value="5">Hasta 5 km</option>
+                                <option value="15">Hasta 15 km</option>
+                                <option value="30">Hasta 30 km</option>
+                                <option value="50">Hasta 50 km</option>
+                                <option value="100">Hasta 100 km</option>
+                                <option value="200">Hasta 200 km</option>
+                            </select>
 
-                                <span
-                                    class="interruptor-voy-solo-mini__control"
-                                    aria-hidden="true"
-                                ></span>
-
-                                <span class="interruptor-voy-solo-mini__texto">
-                                    Hay gente que va sola
-                                </span>
-                            </label>
-
+                            <span
+                                class="filtro-distancia__estado"
+                                id="estado-ubicacion-filtro"
+                                aria-live="polite"
+                            ></span>
                         </div>
+
+                    </div>
+
+                    <div class="panel-filtros__sociales">
+
+                        <label class="filtro-social-toggle" for="filtro-voy-solo">
+                            <input
+                                type="checkbox"
+                                id="filtro-voy-solo"
+                                name="voy_solo"
+                            >
+
+                            <span class="filtro-social-toggle__control" aria-hidden="true"></span>
+
+                            <span class="filtro-social-toggle__contenido">
+                                <strong>🙋 Voy solo</strong>
+                                <small>Hay gente que también va sola</small>
+                            </span>
+                        </label>
+
+                        <label class="filtro-social-toggle" for="filtro-primera-vez">
+                            <input
+                                type="checkbox"
+                                id="filtro-primera-vez"
+                                name="primera_vez"
+                            >
+
+                            <span class="filtro-social-toggle__control" aria-hidden="true"></span>
+
+                            <span class="filtro-social-toggle__contenido">
+                                <strong>👋 Es mi primera vez</strong>
+                                <small>Planes fáciles para empezar</small>
+                            </span>
+                        </label>
+
+                        <button
+                            type="button"
+                            class="boton-cerca-de-mi"
+                            id="boton-cerca-de-mi"
+                        >
+                            <i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i>
+                            Cerca de mí
+                        </button>
 
                     </div>
 
@@ -360,69 +872,19 @@
                         class="panel-filtros__fechas"
                         aria-label="Filtrar planes por fecha"
                     >
-
-                        <span class="panel-filtros__fechas-titulo">
-                            ¿Cuándo?
-                        </span>
+                        <span class="panel-filtros__fechas-titulo">¿Cuándo?</span>
 
                         <div class="panel-filtros__fechas-opciones">
-
-                            <button
-                                type="button"
-                                class="filtro-fecha-rapida"
-                                data-filtro-fecha="hoy"
-                                aria-pressed="false"
-                            >
-                                Hoy
-                            </button>
-
-                            <button
-                                type="button"
-                                class="filtro-fecha-rapida"
-                                data-filtro-fecha="manana"
-                                aria-pressed="false"
-                            >
-                                Mañana
-                            </button>
-
-                            <button
-                                type="button"
-                                class="filtro-fecha-rapida"
-                                data-filtro-fecha="finde"
-                                aria-pressed="false"
-                            >
-                                Este finde
-                            </button>
-
-                            <button
-                                type="button"
-                                class="filtro-fecha-rapida"
-                                data-filtro-fecha="semana"
-                                aria-pressed="false"
-                            >
-                                Esta semana
-                            </button>
-
-                            <button
-                                type="button"
-                                class="filtro-fecha-rapida"
-                                data-filtro-fecha="proxima-semana"
-                                aria-pressed="false"
-                            >
-                                Próxima semana
-                            </button>
+                            <button type="button" class="filtro-fecha-rapida" data-filtro-fecha="hoy" aria-pressed="false">Hoy</button>
+                            <button type="button" class="filtro-fecha-rapida" data-filtro-fecha="manana" aria-pressed="false">Mañana</button>
+                            <button type="button" class="filtro-fecha-rapida" data-filtro-fecha="finde" aria-pressed="false">Este finde</button>
+                            <button type="button" class="filtro-fecha-rapida" data-filtro-fecha="semana" aria-pressed="false">Esta semana</button>
+                            <button type="button" class="filtro-fecha-rapida" data-filtro-fecha="proxima-semana" aria-pressed="false">Próxima semana</button>
 
                             <div class="filtro-fecha-personalizada">
-
                                 <label for="filtro-fecha-personalizada">
-                                    <i
-                                        class="fa-regular fa-calendar"
-                                        aria-hidden="true"
-                                    ></i>
-
-                                    <span>
-                                        Elegir fecha
-                                    </span>
+                                    <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                                    <span>Elegir fecha</span>
                                 </label>
 
                                 <input
@@ -431,49 +893,32 @@
                                     name="fecha_personalizada"
                                     aria-label="Elegir una fecha concreta"
                                 >
-
                             </div>
-
                         </div>
-
                     </div>
 
                     <div class="panel-filtros__acciones">
 
                         <div class="filtro-select filtro-select--orden">
-
-                            <label for="filtro-orden">
-                                Ordenar
-                            </label>
-
-                            <select
-                                id="filtro-orden"
-                                name="orden"
-                            >
+                            <label for="filtro-orden">Ordenar</label>
+                            <select id="filtro-orden" name="orden">
                                 <option value="recomendados">Recomendados</option>
                                 <option value="precio-menor">Precio: menor</option>
                                 <option value="precio-mayor">Precio: mayor</option>
                                 <option value="valoracion">Mejor valorados</option>
+                                <option value="cercania">Más cerca de mí</option>
                             </select>
-
                         </div>
 
                         <div class="panel-filtros__botones">
-
                             <button
                                 type="button"
                                 class="boton-limpiar boton-limpiar--ligero"
                                 id="boton-limpiar"
                                 aria-label="Limpiar filtros"
                             >
-                                <i
-                                    class="fa-solid fa-rotate-left"
-                                    aria-hidden="true"
-                                ></i>
-
-                                <span>
-                                    Limpiar
-                                </span>
+                                <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                                <span>Limpiar</span>
                             </button>
 
                             <button
@@ -481,19 +926,25 @@
                                 class="boton-buscar-filtros"
                                 id="boton-buscar-filtros"
                             >
-                                <i
-                                    class="fa-solid fa-magnifying-glass"
-                                    aria-hidden="true"
-                                ></i>
-
+                                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                                 Buscar planes
                             </button>
-
                         </div>
 
                     </div>
 
                 </form>
+
+                <div
+                    class="filtros-activos"
+                    id="filtros-activos"
+                    aria-live="polite"
+                    hidden
+                >
+                    <span class="filtros-activos__titulo">Filtros activos</span>
+                    <div class="filtros-activos__lista" id="lista-filtros-activos"></div>
+                </div>
+
 
                 <div
                     class="barra-resultados"
@@ -519,15 +970,31 @@
 
                     </div>
 
-                    <button
-                        type="button"
-                        class="boton-vista"
-                        aria-label="Cambiar vista de los resultados"
-                        aria-pressed="false"
-                        title="Cambiar vista"
+                    <div
+                        class="selector-vista-resultados"
+                        role="group"
+                        aria-label="Vista de resultados"
                     >
-                        <i class="fa-solid fa-grip" aria-hidden="true"></i>
-                    </button>
+                        <button
+                            type="button"
+                            class="selector-vista-resultados__boton activo"
+                            id="vista-lista"
+                            aria-pressed="true"
+                        >
+                            <i class="fa-solid fa-grip" aria-hidden="true"></i>
+                            Lista
+                        </button>
+
+                        <button
+                            type="button"
+                            class="selector-vista-resultados__boton"
+                            id="vista-mapa"
+                            aria-pressed="false"
+                        >
+                            <i class="fa-regular fa-map" aria-hidden="true"></i>
+                            Mapa
+                        </button>
+                    </div>
 
                 </div>
 
@@ -538,6 +1005,13 @@
                 >
                     <!-- Los planes se cargan únicamente desde Supabase -->
                 </div>
+
+                <div
+                    class="mapa-planes-explorar"
+                    id="mapa-planes-explorar"
+                    aria-label="Mapa de planes disponibles"
+                    hidden
+                ></div>
 
                 <div
                     class="sin-resultados"
@@ -751,6 +1225,10 @@
     <script src="js/supabase-config.js"></script>
     <script src="js/datos-planes.js"></script>
     <script src="js/main.js"></script>
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    ></script>
+
     <script src="js/planes.js"></script>
     <script src="js/cookies.js"></script>
 

@@ -22,12 +22,69 @@ const filtroPrecio = document.querySelector(
     "#filtro-precio"
 );
 
+const filtroDistancia = document.querySelector(
+    "#filtro-distancia"
+);
+
+const estadoUbicacionFiltro =
+    document.querySelector(
+        "#estado-ubicacion-filtro"
+    );
+
 const filtroOrden = document.querySelector(
     "#filtro-orden"
 );
 
 const filtroVoySolo = document.querySelector(
     "#filtro-voy-solo"
+);
+
+const filtroPrimeraVez = document.querySelector(
+    "#filtro-primera-vez"
+);
+
+const botonCercaDeMi = document.querySelector(
+    "#boton-cerca-de-mi"
+);
+
+const filtrosActivos = document.querySelector(
+    "#filtros-activos"
+);
+
+const listaFiltrosActivos = document.querySelector(
+    "#lista-filtros-activos"
+);
+
+const botonVistaLista = document.querySelector(
+    "#vista-lista"
+);
+
+const botonVistaMapa = document.querySelector(
+    "#vista-mapa"
+);
+
+const mapaPlanesExplorar = document.querySelector(
+    "#mapa-planes-explorar"
+);
+
+const botonModoSuralia = document.querySelector(
+    "#boton-modo-suralia"
+);
+
+const contenidoModoSuralia = document.querySelector(
+    "#contenido-modo-suralia"
+);
+
+const buscarModoSuralia = document.querySelector(
+    "#buscar-modo-suralia"
+);
+
+const resultadosModoSuralia = document.querySelector(
+    "#resultados-modo-suralia"
+);
+
+const sorprenderModoSuralia = document.querySelector(
+    "#sorprendeme-modo-suralia"
 );
 
 const botonesFiltroFecha = Array.from(
@@ -145,6 +202,29 @@ function obtenerDatosPlan(
             tarjeta?.dataset.municipio ||
             "",
 
+        descripcion:
+            tarjeta?.dataset.descripcion ||
+            tarjeta?.querySelector(
+                ".tarjeta-plan__descripcion"
+            )?.textContent ||
+            "",
+
+        idealPrimeraVez:
+            tarjeta?.dataset.idealPrimeraVez ===
+                "true",
+
+        latitud:
+            Number(
+                tarjeta?.dataset.latitud ||
+                0
+            ),
+
+        longitud:
+            Number(
+                tarjeta?.dataset.longitud ||
+                0
+            ),
+
         precio:
             Number(
                 datosCatalogo?.precio ??
@@ -191,6 +271,16 @@ let fechaBuscadaDesdePortada = "";
 let filtroFechaRapidaActual = "";
 
 let vistaCompactaActiva = false;
+
+let ubicacionUsuarioFiltro = null;
+
+let vistaResultadosActual = "lista";
+
+let mapaExplorar = null;
+
+let capaMarcadoresMapa = null;
+
+let planesVisiblesActuales = [];
 
 
 /* =====================================================
@@ -765,7 +855,8 @@ function cumpleFiltroFechaPlan(
 
 
 function actualizarEstadoFiltrosFecha() {
-    botonesFiltroFecha.forEach(
+    
+botonesFiltroFecha.forEach(
         (
             boton
         ) => {
@@ -1063,6 +1154,276 @@ function prepararPlanPublicadoVigente(
 }
 
 
+function gradosARadianes(grados) {
+    return Number(grados) * Math.PI / 180;
+}
+
+function calcularDistanciaKm(latitudA, longitudA, latitudB, longitudB) {
+    const latA = Number(latitudA);
+    const lonA = Number(longitudA);
+    const latB = Number(latitudB);
+    const lonB = Number(longitudB);
+
+    if (![latA, lonA, latB, lonB].every(Number.isFinite)) {
+        return null;
+    }
+
+    const radioTierraKm = 6371;
+    const dLat = gradosARadianes(latB - latA);
+    const dLon = gradosARadianes(lonB - lonA);
+    const latARad = gradosARadianes(latA);
+    const latBRad = gradosARadianes(latB);
+
+    const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(latARad) * Math.cos(latBRad) *
+        Math.sin(dLon / 2) ** 2;
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return radioTierraKm * c;
+}
+
+function actualizarEstadoUbicacionFiltro(mensaje = "", tipo = "") {
+    if (!estadoUbicacionFiltro) return;
+
+    estadoUbicacionFiltro.textContent = mensaje;
+    estadoUbicacionFiltro.classList.remove(
+        "filtro-distancia__estado--ok",
+        "filtro-distancia__estado--error"
+    );
+
+    if (tipo === "ok") {
+        estadoUbicacionFiltro.classList.add("filtro-distancia__estado--ok");
+    }
+
+    if (tipo === "error") {
+        estadoUbicacionFiltro.classList.add("filtro-distancia__estado--error");
+    }
+}
+
+function solicitarUbicacionParaFiltro() {
+    return new Promise((resolver) => {
+        if (ubicacionUsuarioFiltro) {
+            resolver(true);
+            return;
+        }
+
+        if (!navigator.geolocation) {
+            actualizarEstadoUbicacionFiltro(
+                "Tu navegador no permite usar la ubicación.",
+                "error"
+            );
+            resolver(false);
+            return;
+        }
+
+        actualizarEstadoUbicacionFiltro("Obteniendo tu ubicación…");
+
+        navigator.geolocation.getCurrentPosition(
+            (posicion) => {
+                const latitud = Number(posicion.coords.latitude);
+                const longitud = Number(posicion.coords.longitude);
+
+                if (!Number.isFinite(latitud) || !Number.isFinite(longitud)) {
+                    actualizarEstadoUbicacionFiltro(
+                        "No se ha podido determinar tu ubicación.",
+                        "error"
+                    );
+                    resolver(false);
+                    return;
+                }
+
+                ubicacionUsuarioFiltro = { latitud, longitud };
+                actualizarEstadoUbicacionFiltro("Ubicación activada", "ok");
+                resolver(true);
+            },
+            (error) => {
+                console.warn(
+                    "No se pudo obtener la ubicación del usuario:",
+                    error
+                );
+
+                const mensaje = error?.code === 1
+                    ? "Permite tu ubicación para usar la distancia."
+                    : "No se ha podido obtener tu ubicación.";
+
+                actualizarEstadoUbicacionFiltro(mensaje, "error");
+                resolver(false);
+            },
+            {
+                enableHighAccuracy: false,
+                timeout: 10000,
+                maximumAge: 300000
+            }
+        );
+    });
+}
+
+function obtenerDistanciaTarjetaKm(tarjeta) {
+    if (
+        !tarjeta ||
+        !ubicacionUsuarioFiltro
+    ) {
+        return null;
+    }
+
+    const datosPlan =
+        obtenerDatosPlan(
+            tarjeta
+        );
+
+    if (
+        !Number.isFinite(datosPlan.latitud) ||
+        !Number.isFinite(datosPlan.longitud) ||
+        (
+            datosPlan.latitud === 0 &&
+            datosPlan.longitud === 0
+        )
+    ) {
+        return null;
+    }
+
+    const distanciaKm =
+        calcularDistanciaKm(
+            ubicacionUsuarioFiltro.latitud,
+            ubicacionUsuarioFiltro.longitud,
+            datosPlan.latitud,
+            datosPlan.longitud
+        );
+
+    if (
+        distanciaKm === null
+    ) {
+        return null;
+    }
+
+    tarjeta.dataset.distanciaKm =
+        distanciaKm.toFixed(
+            2
+        );
+
+    return distanciaKm;
+}
+
+
+function formatearDistanciaTarjeta(distanciaKm) {
+    const distancia = Number(distanciaKm);
+
+    if (!Number.isFinite(distancia)) {
+        return "";
+    }
+
+    if (distancia < 1) {
+        const metros =
+            Math.max(
+                50,
+                Math.round(
+                    distancia * 1000 / 50
+                ) * 50
+            );
+
+        return `A ${metros} m de ti`;
+    }
+
+    const decimales =
+        distancia < 10
+            ? 1
+            : 0;
+
+    return `A ${distancia
+        .toFixed(decimales)
+        .replace(".", ",")} km de ti`;
+}
+
+
+function actualizarDistanciasTarjetas() {
+    const mostrarDistancias =
+        Boolean(
+            ubicacionUsuarioFiltro
+        ) &&
+        (
+            Number(
+                filtroDistancia?.value ||
+                0
+            ) >
+                0 ||
+            filtroOrden?.value ===
+                "cercania"
+        );
+
+    planes.forEach((tarjeta) => {
+        const elemento =
+            tarjeta.querySelector(
+                ".tarjeta-plan__distancia"
+            );
+
+        const texto =
+            elemento?.querySelector(
+                ".tarjeta-plan__distancia-texto"
+            );
+
+        if (!elemento || !texto) {
+            return;
+        }
+
+        if (!mostrarDistancias) {
+            elemento.hidden = true;
+            texto.textContent = "";
+            tarjeta.removeAttribute(
+                "data-distancia-km"
+            );
+            return;
+        }
+
+        const distanciaKm =
+            obtenerDistanciaTarjetaKm(
+                tarjeta
+            );
+
+        if (distanciaKm === null) {
+            elemento.hidden = true;
+            texto.textContent = "";
+            return;
+        }
+
+        texto.textContent =
+            formatearDistanciaTarjeta(
+                distanciaKm
+            );
+
+        elemento.hidden = false;
+    });
+}
+
+
+function cumpleFiltroDistancia(tarjeta) {
+    const radioSeleccionado =
+        Number(
+            filtroDistancia?.value ||
+            0
+        );
+
+    if (!radioSeleccionado) {
+        return true;
+    }
+
+    if (!ubicacionUsuarioFiltro) {
+        return true;
+    }
+
+    const distanciaKm =
+        obtenerDistanciaTarjetaKm(
+            tarjeta
+        );
+
+    if (distanciaKm === null) {
+        return false;
+    }
+
+    return distanciaKm <= radioSeleccionado;
+}
+
+
 function cumpleFiltroPrecio(
     precio,
     filtro
@@ -1080,6 +1441,1469 @@ function cumpleFiltroPrecio(
     }
 
     return true;
+}
+
+
+
+function textoOpcionSeleccionada(select) {
+    if (!select) {
+        return "";
+    }
+
+    return select.options[
+        select.selectedIndex
+    ]?.textContent?.trim() || "";
+}
+
+
+function obtenerEtiquetaFechaActiva() {
+    if (
+        filtroFechaPersonalizada?.value
+    ) {
+        const fecha = new Date(
+            `${filtroFechaPersonalizada.value}T12:00:00`
+        );
+
+        if (!Number.isNaN(fecha.getTime())) {
+            return new Intl.DateTimeFormat(
+                "es-ES",
+                {
+                    day: "numeric",
+                    month: "short"
+                }
+            ).format(fecha);
+        }
+    }
+
+    const etiquetas = {
+        hoy: "Hoy",
+        manana: "Mañana",
+        finde: "Este finde",
+        semana: "Esta semana",
+        "proxima-semana": "Próxima semana"
+    };
+
+    return etiquetas[
+        filtroFechaRapidaActual
+    ] || "";
+}
+
+
+function obtenerFiltrosActivosActuales() {
+    const activos = [];
+
+    const texto = filtroTexto?.value.trim();
+
+    if (texto) {
+        activos.push({
+            id: "texto",
+            texto: `“${texto}”`
+        });
+    }
+
+    if (
+        filtroMunicipio?.value &&
+        filtroMunicipio.value !== "todos"
+    ) {
+        activos.push({
+            id: "municipio",
+            texto: textoOpcionSeleccionada(
+                filtroMunicipio
+            )
+        });
+    }
+
+    if (
+        filtroCategoria?.value &&
+        filtroCategoria.value !== "todas"
+    ) {
+        activos.push({
+            id: "categoria",
+            texto: textoOpcionSeleccionada(
+                filtroCategoria
+            )
+        });
+    }
+
+    if (
+        filtroPrecio?.value &&
+        filtroPrecio.value !== "todos"
+    ) {
+        activos.push({
+            id: "precio",
+            texto: textoOpcionSeleccionada(
+                filtroPrecio
+            )
+        });
+    }
+
+    if (
+        filtroDistancia?.value &&
+        filtroDistancia.value !== "todas"
+    ) {
+        activos.push({
+            id: "distancia",
+            texto: textoOpcionSeleccionada(
+                filtroDistancia
+            )
+        });
+    }
+
+    const fecha = obtenerEtiquetaFechaActiva();
+
+    if (fecha) {
+        activos.push({
+            id: "fecha",
+            texto: fecha
+        });
+    }
+
+    if (filtroVoySolo?.checked) {
+        activos.push({
+            id: "voy-solo",
+            texto: "Voy solo"
+        });
+    }
+
+    if (filtroPrimeraVez?.checked) {
+        activos.push({
+            id: "primera-vez",
+            texto: "Es mi primera vez"
+        });
+    }
+
+    return activos;
+}
+
+
+function actualizarChipsFiltrosActivos() {
+    if (
+        !filtrosActivos ||
+        !listaFiltrosActivos
+    ) {
+        return;
+    }
+
+    const activos =
+        obtenerFiltrosActivosActuales();
+
+    filtrosActivos.hidden =
+        activos.length === 0;
+
+    listaFiltrosActivos.innerHTML =
+        activos
+            .map(
+                (filtro) => `
+                    <button
+                        type="button"
+                        class="filtro-activo-chip"
+                        data-quitar-filtro="${escaparHTMLPlanes(
+                            filtro.id
+                        )}"
+                        title="Quitar filtro"
+                    >
+                        <span>${escaparHTMLPlanes(
+                            filtro.texto
+                        )}</span>
+                        <i
+                            class="fa-solid fa-xmark"
+                            aria-hidden="true"
+                        ></i>
+                    </button>
+                `
+            )
+            .join("");
+}
+
+
+function quitarFiltroActivo(id) {
+    switch (id) {
+        case "texto":
+            filtroTexto.value = "";
+            break;
+
+        case "municipio":
+            filtroMunicipio.value = "todos";
+            break;
+
+        case "categoria":
+            filtroCategoria.value = "todas";
+            break;
+
+        case "precio":
+            filtroPrecio.value = "todos";
+            break;
+
+        case "distancia":
+            filtroDistancia.value = "todas";
+            actualizarEstadoUbicacionFiltro("");
+            break;
+
+        case "fecha":
+            filtroFechaRapidaActual = "";
+            fechaBuscadaDesdePortada = "";
+
+            if (filtroFechaPersonalizada) {
+                filtroFechaPersonalizada.value = "";
+            }
+
+            actualizarEstadoFiltrosFecha();
+            break;
+
+        case "voy-solo":
+            if (filtroVoySolo) {
+                filtroVoySolo.checked = false;
+            }
+            break;
+
+        case "primera-vez":
+            if (filtroPrimeraVez) {
+                filtroPrimeraVez.checked = false;
+            }
+            break;
+    }
+
+    actualizarDistanciasTarjetas();
+    aplicarFiltros();
+}
+
+
+function actualizarSelectorVistaResultados() {
+    const esMapa =
+        vistaResultadosActual === "mapa";
+
+    botonVistaLista?.classList.toggle(
+        "activo",
+        !esMapa
+    );
+
+    botonVistaMapa?.classList.toggle(
+        "activo",
+        esMapa
+    );
+
+    botonVistaLista?.setAttribute(
+        "aria-pressed",
+        String(!esMapa)
+    );
+
+    botonVistaMapa?.setAttribute(
+        "aria-pressed",
+        String(esMapa)
+    );
+
+    if (listaPlanes) {
+        listaPlanes.hidden = esMapa;
+    }
+
+    if (mapaPlanesExplorar) {
+        mapaPlanesExplorar.hidden = !esMapa;
+    }
+
+    if (esMapa) {
+        renderizarMapaPlanes(
+            planesVisiblesActuales
+        );
+    }
+}
+
+
+function obtenerMapaExplorar() {
+    if (
+        !mapaPlanesExplorar ||
+        !window.L
+    ) {
+        return null;
+    }
+
+    if (!mapaExplorar) {
+        mapaExplorar = window.L.map(
+            mapaPlanesExplorar,
+            {
+                scrollWheelZoom: false
+            }
+        ).setView(
+            [37.3891, -5.9845],
+            11
+        );
+
+        window.L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                maxZoom: 19,
+                attribution:
+                    "&copy; OpenStreetMap"
+            }
+        ).addTo(mapaExplorar);
+
+        capaMarcadoresMapa =
+            window.L.layerGroup()
+                .addTo(mapaExplorar);
+    }
+
+    return mapaExplorar;
+}
+
+
+function renderizarMapaPlanes(planesMostrar = []) {
+    const mapa = obtenerMapaExplorar();
+
+    if (!mapa || !capaMarcadoresMapa) {
+        return;
+    }
+
+    capaMarcadoresMapa.clearLayers();
+
+    const coordenadas = [];
+
+    planesMostrar.forEach((tarjeta) => {
+        const datos = obtenerDatosPlan(tarjeta);
+
+        if (
+            !Number.isFinite(datos.latitud) ||
+            !Number.isFinite(datos.longitud) ||
+            (
+                datos.latitud === 0 &&
+                datos.longitud === 0
+            )
+        ) {
+            return;
+        }
+
+        const distancia =
+            ubicacionUsuarioFiltro
+                ? obtenerDistanciaTarjetaKm(
+                    tarjeta
+                )
+                : null;
+
+        const distanciaTexto =
+            distancia === null
+                ? ""
+                : `<span class="mapa-plan-popup__distancia">${escaparHTMLPlanes(
+                    formatearDistanciaTarjeta(
+                        distancia
+                    )
+                )}</span>`;
+
+        const iconoSuralia =
+            window.L.divIcon({
+                className:
+                    "mapa-plan-marcador-wrapper",
+                html: `
+                    <div class="mapa-plan-marcador">
+                        <i
+                            class="fa-solid fa-location-dot"
+                            aria-hidden="true"
+                        ></i>
+                    </div>
+                `,
+                iconSize: [42, 48],
+                iconAnchor: [21, 45],
+                popupAnchor: [0, -42]
+            });
+
+        const marcador = window.L.marker(
+            [
+                datos.latitud,
+                datos.longitud
+            ],
+            {
+                icon: iconoSuralia,
+                riseOnHover: true,
+                riseOffset: 500
+            }
+        );
+
+        marcador.bindPopup(
+            `
+                <article class="mapa-plan-popup">
+                    <span class="mapa-plan-popup__eyebrow">
+                        <i
+                            class="fa-solid fa-compass"
+                            aria-hidden="true"
+                        ></i>
+                        Plan en Suralia
+                    </span>
+
+                    <strong class="mapa-plan-popup__titulo">
+                        ${escaparHTMLPlanes(
+                            datos.titulo
+                        )}
+                    </strong>
+
+                    <span class="mapa-plan-popup__ubicacion">
+                        <i
+                            class="fa-solid fa-location-dot"
+                            aria-hidden="true"
+                        ></i>
+                        ${escaparHTMLPlanes(
+                            datos.ubicacion
+                        )}
+                    </span>
+
+                    ${distanciaTexto}
+
+                    <div class="mapa-plan-popup__acciones">
+                        <a
+                            class="mapa-plan-popup__enlace"
+                            href="${escaparHTMLPlanes(
+                                datos.enlace
+                            )}"
+                        >
+                            <span>Ver plan</span>
+                            <i
+                                class="fa-solid fa-arrow-right"
+                                aria-hidden="true"
+                            ></i>
+                        </a>
+
+                        <a
+                            class="mapa-plan-popup__como-llegar"
+                            href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+                                datos.latitud
+                            )}%2C${encodeURIComponent(
+                                datos.longitud
+                            )}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <span>Cómo llegar</span>
+                            <i
+                                class="fa-solid fa-route"
+                                aria-hidden="true"
+                            ></i>
+                        </a>
+                    </div>
+                </article>
+            `,
+            {
+                maxWidth: 330,
+                minWidth: 310,
+                className:
+                    "mapa-popup-suralia",
+                closeButton: true
+            }
+        );
+
+        marcador.addTo(capaMarcadoresMapa);
+
+        coordenadas.push([
+            datos.latitud,
+            datos.longitud
+        ]);
+    });
+
+    setTimeout(() => {
+        mapa.invalidateSize();
+
+        if (coordenadas.length === 1) {
+            mapa.setView(
+                coordenadas[0],
+                14
+            );
+        } else if (coordenadas.length > 1) {
+            mapa.fitBounds(
+                coordenadas,
+                {
+                    padding: [35, 35],
+                    maxZoom: 14
+                }
+            );
+        } else {
+            mapa.setView(
+                [37.3891, -5.9845],
+                10
+            );
+        }
+    }, 50);
+}
+
+
+function cumpleFiltroFechaModoSuralia(
+    tarjeta,
+    filtro
+) {
+    if (!filtro || filtro === "cualquiera") {
+        return true;
+    }
+
+    const rango = obtenerRangoFiltroFecha(
+        filtro
+    );
+
+    if (!rango) {
+        return true;
+    }
+
+    return obtenerFechasVigentesTarjeta(
+        tarjeta
+    ).some(
+        (fecha) =>
+            fecha >= rango.inicio &&
+            fecha <= rango.fin
+    );
+}
+
+
+function obtenerValorModoSuralia(
+    nombre,
+    valorPorDefecto
+) {
+    return (
+        document.querySelector(
+            `input[name="${nombre}"]:checked`
+        )?.value ||
+        valorPorDefecto
+    );
+}
+
+
+function obtenerOpcionesModoSuralia() {
+    return {
+        animo:
+            obtenerValorModoSuralia(
+                "modo-suralia-animo",
+                "social"
+            ),
+
+        fecha:
+            obtenerValorModoSuralia(
+                "modo-suralia-fecha",
+                "cualquiera"
+            ),
+
+        presupuesto:
+            obtenerValorModoSuralia(
+                "modo-suralia-presupuesto",
+                "cualquiera"
+            ),
+
+        compania:
+            obtenerValorModoSuralia(
+                "modo-suralia-compania",
+                "cualquiera"
+            ),
+
+        distancia:
+            obtenerValorModoSuralia(
+                "modo-suralia-distancia",
+                "todas"
+            )
+    };
+}
+
+
+function categoriaAfinAnimo(
+    categoria,
+    animo
+) {
+    const mapa = {
+        tranquilo: [
+            "naturaleza",
+            "gastronomia",
+            "cultura"
+        ],
+
+        social: [
+            "musica",
+            "gastronomia",
+            "cultura"
+        ],
+
+        diferente: [
+            "aventura",
+            "musica",
+            "cultura",
+            "naturaleza"
+        ],
+
+        activo: [
+            "aventura",
+            "naturaleza"
+        ],
+
+        cultural: [
+            "cultura",
+            "gastronomia"
+        ]
+    };
+
+    return (
+        mapa[animo] || []
+    ).includes(categoria);
+}
+
+
+function cumplePresupuestoModoSuralia(
+    precio,
+    presupuesto
+) {
+    if (
+        !presupuesto ||
+        presupuesto === "cualquiera"
+    ) {
+        return true;
+    }
+
+    if (presupuesto === "gratis") {
+        return Number(precio) === 0;
+    }
+
+    const limite = Number(presupuesto);
+
+    return (
+        Number.isFinite(limite) &&
+        Number(precio) <= limite
+    );
+}
+
+
+function cumpleCompaniaModoSuralia(
+    tarjeta,
+    datos,
+    compania
+) {
+    if (
+        !compania ||
+        compania === "cualquiera"
+    ) {
+        return true;
+    }
+
+    const personasSolas =
+        Number(
+            tarjeta.dataset.personasSolas || 0
+        );
+
+    const personasApuntadas =
+        Number(
+            tarjeta.dataset.personasApuntadas || 0
+        );
+
+    if (compania === "solo") {
+        return personasSolas > 0;
+    }
+
+    if (compania === "primera") {
+        return Boolean(
+            datos.idealPrimeraVez
+        );
+    }
+
+    if (compania === "acompanado") {
+        return personasApuntadas > 1;
+    }
+
+    return true;
+}
+
+
+function obtenerMotivosModoSuralia(
+    tarjeta,
+    datos,
+    opciones,
+    distancia
+) {
+    const motivos = [];
+
+    const personasSolas =
+        Number(
+            tarjeta.dataset.personasSolas || 0
+        );
+
+    const personasApuntadas =
+        Number(
+            tarjeta.dataset.personasApuntadas || 0
+        );
+
+    if (
+        opciones.compania === "solo" &&
+        personasSolas > 0
+    ) {
+        motivos.push(
+            personasSolas === 1
+                ? "1 persona va sola"
+                : `${personasSolas} personas van solas`
+        );
+    }
+
+    if (
+        opciones.compania !== "solo" &&
+        personasSolas > 0
+    ) {
+        motivos.push(
+            "Ideal si no conoces a nadie"
+        );
+    }
+
+    if (
+        opciones.compania === "primera" &&
+        datos.idealPrimeraVez
+    ) {
+        motivos.push(
+            "Ideal para tu primera vez"
+        );
+    }
+
+    if (
+        opciones.animo &&
+        categoriaAfinAnimo(
+            datos.categoria,
+            opciones.animo
+        )
+    ) {
+        const textos = {
+            social:
+                "Buen ambiente para conocer gente",
+
+            tranquilo:
+                "Encaja con un plan tranquilo",
+
+            diferente:
+                "Una opción para salir de lo típico",
+
+            activo:
+                "Perfecto para moverte",
+
+            cultural:
+                "Buen plan para descubrir algo"
+        };
+
+        if (textos[opciones.animo]) {
+            motivos.push(
+                textos[opciones.animo]
+            );
+        }
+    }
+
+    if (
+        opciones.presupuesto === "gratis" &&
+        datos.precio === 0
+    ) {
+        motivos.push("Es gratis");
+    } else if (
+        opciones.presupuesto !== "cualquiera" &&
+        cumplePresupuestoModoSuralia(
+            datos.precio,
+            opciones.presupuesto
+        )
+    ) {
+        motivos.push(
+            "Encaja con tu presupuesto"
+        );
+    }
+
+    if (
+        distancia !== null &&
+        Number.isFinite(distancia)
+    ) {
+        motivos.push(
+            formatearDistanciaTarjeta(
+                distancia
+            )
+        );
+    }
+
+    if (
+        personasApuntadas > 1 &&
+        motivos.length < 4
+    ) {
+        motivos.push(
+            `${personasApuntadas} personas apuntadas`
+        );
+    }
+
+    return Array.from(
+        new Set(motivos)
+    ).slice(0, 4);
+}
+
+
+function cumpleCoincidenciaExactaModoSuralia(
+    tarjeta,
+    datos,
+    opciones,
+    distancia
+) {
+    if (
+        opciones.animo &&
+        !categoriaAfinAnimo(
+            datos.categoria,
+            opciones.animo
+        )
+    ) {
+        return false;
+    }
+
+    if (
+        opciones.fecha !== "cualquiera" &&
+        !cumpleFiltroFechaModoSuralia(
+            tarjeta,
+            opciones.fecha
+        )
+    ) {
+        return false;
+    }
+
+    if (
+        !cumplePresupuestoModoSuralia(
+            datos.precio,
+            opciones.presupuesto
+        )
+    ) {
+        return false;
+    }
+
+    if (
+        !cumpleCompaniaModoSuralia(
+            tarjeta,
+            datos,
+            opciones.compania
+        )
+    ) {
+        return false;
+    }
+
+    const radio =
+        Number(
+            opciones.distancia || 0
+        );
+
+    if (
+        radio > 0 &&
+        (
+            distancia === null ||
+            distancia > radio
+        )
+    ) {
+        return false;
+    }
+
+    return true;
+}
+
+
+function puntuarPlanModoSuralia(
+    tarjeta,
+    datos,
+    opciones,
+    distancia
+) {
+    let puntuacion = 10;
+
+    if (
+        categoriaAfinAnimo(
+            datos.categoria,
+            opciones.animo
+        )
+    ) {
+        puntuacion += 9;
+    }
+
+    if (
+        opciones.fecha !== "cualquiera"
+    ) {
+        puntuacion +=
+            cumpleFiltroFechaModoSuralia(
+                tarjeta,
+                opciones.fecha
+            )
+                ? 7
+                : -5;
+    }
+
+    if (
+        opciones.presupuesto !== "cualquiera"
+    ) {
+        puntuacion +=
+            cumplePresupuestoModoSuralia(
+                datos.precio,
+                opciones.presupuesto
+            )
+                ? 6
+                : -4;
+    }
+
+    if (
+        opciones.compania !== "cualquiera"
+    ) {
+        puntuacion +=
+            cumpleCompaniaModoSuralia(
+                tarjeta,
+                datos,
+                opciones.compania
+            )
+                ? 8
+                : -4;
+    }
+
+    const radio =
+        Number(
+            opciones.distancia || 0
+        );
+
+    if (
+        radio > 0 &&
+        distancia !== null
+    ) {
+        if (distancia <= radio) {
+            puntuacion += Math.max(
+                2,
+                7 - distancia / radio * 5
+            );
+        } else {
+            puntuacion -= Math.min(
+                7,
+                (
+                    distancia - radio
+                ) / Math.max(
+                    radio,
+                    1
+                ) * 5
+            );
+        }
+    }
+
+    const valoracion =
+        Number(
+            datos.valoracion || 0
+        );
+
+    if (valoracion > 0) {
+        puntuacion += Math.min(
+            3,
+            valoracion / 2
+        );
+    }
+
+    return puntuacion;
+}
+
+
+function mezclarArrayModoSuralia(
+    elementos
+) {
+    const copia = [...elementos];
+
+    for (
+        let i = copia.length - 1;
+        i > 0;
+        i -= 1
+    ) {
+        const j = Math.floor(
+            Math.random() * (i + 1)
+        );
+
+        [
+            copia[i],
+            copia[j]
+        ] = [
+            copia[j],
+            copia[i]
+        ];
+    }
+
+    return copia;
+}
+
+
+function crearEstadoModoSuralia(
+    cantidad,
+    relajado,
+    sorpresaTotal
+) {
+    if (sorpresaTotal) {
+        return `
+            <div class="modo-suralia__resultado-cabecera">
+                <div>
+                    <span class="modo-suralia__resultado-eyebrow">
+                        Selección sorpresa
+                    </span>
+
+                    <h3>
+                        ${cantidad} ${
+                            cantidad === 1
+                                ? "plan para romper la rutina"
+                                : "planes para romper la rutina"
+                        }
+                    </h3>
+                </div>
+
+                <span class="modo-suralia__resultado-estado">
+                    <i
+                        class="fa-solid fa-shuffle"
+                        aria-hidden="true"
+                    ></i>
+                    Elegidos al azar
+                </span>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="modo-suralia__resultado-cabecera">
+            <div>
+                <span class="modo-suralia__resultado-eyebrow">
+                    Tus recomendaciones
+                </span>
+
+                <h3>
+                    ${cantidad} ${
+                        cantidad === 1
+                            ? "plan que encaja contigo"
+                            : "planes que encajan contigo"
+                    }
+                </h3>
+            </div>
+
+            <span class="modo-suralia__resultado-estado ${
+                relajado
+                    ? "modo-suralia__resultado-estado--relajado"
+                    : ""
+            }">
+                <i
+                    class="fa-solid ${
+                        relajado
+                            ? "fa-wand-magic-sparkles"
+                            : "fa-circle-check"
+                    }"
+                    aria-hidden="true"
+                ></i>
+
+                ${
+                    relajado
+                        ? "Hemos ampliado un poco la búsqueda"
+                        : "Coincidencia alta"
+                }
+            </span>
+        </div>
+    `;
+}
+
+
+function renderizarRecomendacionesModoSuralia(
+    candidatos,
+    relajado,
+    sorpresaTotal
+) {
+    if (!resultadosModoSuralia) {
+        return;
+    }
+
+    resultadosModoSuralia.innerHTML = `
+        ${crearEstadoModoSuralia(
+            candidatos.length,
+            relajado,
+            sorpresaTotal
+        )}
+
+        <div class="modo-suralia__recomendaciones">
+            ${candidatos
+                .map(
+                    (
+                        item,
+                        indice
+                    ) => {
+                        const destacada =
+                            indice === 0;
+
+                        const motivos =
+                            item.motivos.length
+                                ? item.motivos
+                                : [
+                                    "Puede encajar contigo"
+                                ];
+
+                        const imagen =
+                            item.datos.imagen
+                                ? `
+                                    <img
+                                        src="${escaparHTMLPlanes(
+                                            item.datos.imagen
+                                        )}"
+                                        alt=""
+                                        loading="lazy"
+                                    >
+                                `
+                                : `
+                                    <span
+                                        class="modo-suralia-recomendacion__sin-imagen"
+                                        aria-hidden="true"
+                                    >
+                                        ✨
+                                    </span>
+                                `;
+
+                        const personasSolas =
+                            Number(
+                                item.tarjeta.dataset.personasSolas || 0
+                            );
+
+                        return `
+                            <article
+                                class="modo-suralia-recomendacion ${
+                                    destacada
+                                        ? "modo-suralia-recomendacion--destacada"
+                                        : ""
+                                }"
+                            >
+
+                                <div class="modo-suralia-recomendacion__imagen">
+                                    ${imagen}
+
+                                    <span class="modo-suralia-recomendacion__categoria">
+                                        ${escaparHTMLPlanes(
+                                            item.datos.categoriaTexto
+                                        )}
+                                    </span>
+
+                                    ${
+                                        destacada
+                                            ? `
+                                                <span class="modo-suralia-recomendacion__eleccion">
+                                                    <i
+                                                        class="fa-solid fa-sparkles"
+                                                        aria-hidden="true"
+                                                    ></i>
+                                                    La elección Suralia
+                                                </span>
+                                            `
+                                            : ""
+                                    }
+                                </div>
+
+                                <div class="modo-suralia-recomendacion__cuerpo">
+
+                                    <div class="modo-suralia-recomendacion__encabezado">
+                                        <div>
+                                            <span class="modo-suralia-recomendacion__fecha">
+                                                ${escaparHTMLPlanes(
+                                                    item.datos.fechaTexto || "Próximamente"
+                                                )}
+                                            </span>
+
+                                            <h3>
+                                                ${escaparHTMLPlanes(
+                                                    item.datos.titulo
+                                                )}
+                                            </h3>
+                                        </div>
+
+                                        <span class="modo-suralia-recomendacion__precio">
+                                            ${
+                                                item.datos.precio === 0
+                                                    ? "Gratis"
+                                                    : `${item.datos.precio
+                                                        .toFixed(2)
+                                                        .replace(".", ",")} €`
+                                            }
+                                        </span>
+                                    </div>
+
+                                    <div class="modo-suralia-recomendacion__motivos">
+                                        ${motivos
+                                            .map(
+                                                (motivo) => `
+                                                    <span>
+                                                        <i
+                                                            class="fa-solid fa-check"
+                                                            aria-hidden="true"
+                                                        ></i>
+                                                        ${escaparHTMLPlanes(
+                                                            motivo
+                                                        )}
+                                                    </span>
+                                                `
+                                            )
+                                            .join("")}
+                                    </div>
+
+                                    <div class="modo-suralia-recomendacion__pie">
+                                        <div class="modo-suralia-recomendacion__social">
+                                            ${
+                                                personasSolas > 0
+                                                    ? `
+                                                        <span>
+                                                            🙋
+                                                            ${
+                                                                personasSolas === 1
+                                                                    ? "1 va sola"
+                                                                    : `${personasSolas} van solas`
+                                                            }
+                                                        </span>
+                                                    `
+                                                    : ""
+                                            }
+
+                                            ${
+                                                item.datos.ubicacion
+                                                    ? `
+                                                        <span>
+                                                            <i
+                                                                class="fa-solid fa-location-dot"
+                                                                aria-hidden="true"
+                                                            ></i>
+                                                            ${escaparHTMLPlanes(
+                                                                item.datos.ubicacion
+                                                            )}
+                                                        </span>
+                                                    `
+                                                    : ""
+                                            }
+                                        </div>
+
+                                        <a
+                                            href="${escaparHTMLPlanes(
+                                                item.datos.enlace
+                                            )}"
+                                            class="modo-suralia-recomendacion__ver"
+                                        >
+                                            Ver plan
+                                            <i
+                                                class="fa-solid fa-arrow-right"
+                                                aria-hidden="true"
+                                            ></i>
+                                        </a>
+                                    </div>
+
+                                </div>
+
+                            </article>
+                        `;
+                    }
+                )
+                .join("")}
+        </div>
+    `;
+}
+
+
+async function recomendarModoSuralia(
+    {
+        sorpresaTotal = false
+    } = {}
+) {
+    if (!resultadosModoSuralia) {
+        return;
+    }
+
+    const opciones =
+        obtenerOpcionesModoSuralia();
+
+    if (!sorpresaTotal) {
+        const radio =
+            Number(
+                opciones.distancia || 0
+            );
+
+        if (radio > 0) {
+            resultadosModoSuralia.innerHTML = `
+                <div class="modo-suralia__cargando">
+                    <span class="modo-suralia__cargando-icono">
+                        <i
+                            class="fa-solid fa-location-crosshairs"
+                            aria-hidden="true"
+                        ></i>
+                    </span>
+
+                    <div>
+                        <strong>
+                            Calculando qué tienes cerca...
+                        </strong>
+
+                        <span>
+                            Usamos tu ubicación solo para esta recomendación.
+                        </span>
+                    </div>
+                </div>
+            `;
+
+            const disponible =
+                await solicitarUbicacionParaFiltro();
+
+            if (!disponible) {
+                resultadosModoSuralia.innerHTML = `
+                    <div class="modo-suralia__vacio">
+                        <span aria-hidden="true">
+                            📍
+                        </span>
+
+                        <div>
+                            <strong>
+                                No hemos podido usar tu ubicación
+                            </strong>
+
+                            <p>
+                                Selecciona “Sin límite” o permite la ubicación para recomendarte por distancia.
+                            </p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+        }
+    }
+
+    const candidatosBase =
+        planes
+            .filter(
+                (tarjeta) => {
+                    const datos =
+                        obtenerDatosPlan(
+                            tarjeta
+                        );
+
+                    return !planHaCaducado(
+                        datos.fechaIso
+                    );
+                }
+            )
+            .map(
+                (
+                    tarjeta,
+                    indice
+                ) => {
+                    const datos =
+                        obtenerDatosPlan(
+                            tarjeta
+                        );
+
+                    const distancia =
+                        ubicacionUsuarioFiltro
+                            ? obtenerDistanciaTarjetaKm(
+                                tarjeta
+                            )
+                            : null;
+
+                    const exacto =
+                        sorpresaTotal
+                            ? true
+                            : cumpleCoincidenciaExactaModoSuralia(
+                                tarjeta,
+                                datos,
+                                opciones,
+                                distancia
+                            );
+
+                    const puntuacion =
+                        sorpresaTotal
+                            ? 0
+                            : puntuarPlanModoSuralia(
+                                tarjeta,
+                                datos,
+                                opciones,
+                                distancia
+                            );
+
+                    return {
+                        tarjeta,
+                        datos,
+                        distancia,
+                        exacto,
+                        puntuacion,
+                        indice,
+                        motivos:
+                            sorpresaTotal
+                                ? obtenerMotivosModoSuralia(
+                                    tarjeta,
+                                    datos,
+                                    opciones,
+                                    distancia
+                                )
+                                : obtenerMotivosModoSuralia(
+                                    tarjeta,
+                                    datos,
+                                    opciones,
+                                    distancia
+                                )
+                    };
+                }
+            );
+
+    if (!candidatosBase.length) {
+        resultadosModoSuralia.innerHTML = `
+            <div class="modo-suralia__vacio">
+                <span aria-hidden="true">
+                    🌱
+                </span>
+
+                <div>
+                    <strong>
+                        Todavía no hay planes disponibles
+                    </strong>
+
+                    <p>
+                        En cuanto haya nuevos planes publicados aparecerán aquí.
+                    </p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    if (sorpresaTotal) {
+        const seleccion =
+            mezclarArrayModoSuralia(
+                candidatosBase
+            ).slice(0, 3);
+
+        renderizarRecomendacionesModoSuralia(
+            seleccion,
+            false,
+            true
+        );
+
+        resultadosModoSuralia.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+        });
+
+        return;
+    }
+
+    const exactos =
+        candidatosBase
+            .filter(
+                (item) =>
+                    item.exacto
+            )
+            .sort(
+                (a, b) =>
+                    b.puntuacion -
+                        a.puntuacion ||
+                    a.indice -
+                        b.indice
+            );
+
+    const relajado =
+        exactos.length < 3;
+
+    const seleccion =
+        (
+            relajado
+                ? [...candidatosBase]
+                : exactos
+        )
+            .sort(
+                (a, b) =>
+                    b.puntuacion -
+                        a.puntuacion ||
+                    a.indice -
+                        b.indice
+            )
+            .slice(0, 3);
+
+    renderizarRecomendacionesModoSuralia(
+        seleccion,
+        relajado,
+        false
+    );
+
+    resultadosModoSuralia.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest"
+    });
 }
 
 
@@ -1124,6 +2948,52 @@ function ordenarPlanes(
 
             if (orden === "valoracion") {
                 return valoracionB - valoracionA;
+            }
+
+            if (
+                orden ===
+                "cercania"
+            ) {
+                const distanciaA =
+                    obtenerDistanciaTarjetaKm(
+                        planA
+                    );
+
+                const distanciaB =
+                    obtenerDistanciaTarjetaKm(
+                        planB
+                    );
+
+                /*
+                    Los planes sin coordenadas se envían al final.
+                */
+                if (
+                    distanciaA ===
+                        null &&
+                    distanciaB ===
+                        null
+                ) {
+                    return 0;
+                }
+
+                if (
+                    distanciaA ===
+                    null
+                ) {
+                    return 1;
+                }
+
+                if (
+                    distanciaB ===
+                    null
+                ) {
+                    return -1;
+                }
+
+                return (
+                    distanciaA -
+                    distanciaB
+                );
             }
 
             return 0;
@@ -1238,6 +3108,7 @@ function aplicarFiltros() {
         !filtroMunicipio ||
         !filtroCategoria ||
         !filtroPrecio ||
+        !filtroDistancia ||
         !listaPlanes
     ) {
         return;
@@ -1259,6 +3130,11 @@ function aplicarFiltros() {
     const soloPlanesConGenteSola =
         Boolean(
             filtroVoySolo?.checked
+        );
+
+    const soloPlanesPrimeraVez =
+        Boolean(
+            filtroPrimeraVez?.checked
         );
 
     let planesVisibles = planes.filter(
@@ -1338,6 +3214,11 @@ function aplicarFiltros() {
                     precioSeleccionado
                 );
 
+            const coincideDistancia =
+                cumpleFiltroDistancia(
+                    plan
+                );
+
             const coincideFecha =
                 cumpleFiltroFechaPlan(
                     plan
@@ -1353,13 +3234,19 @@ function aplicarFiltros() {
                 personasSolas >
                     0;
 
+            const coincidePrimeraVez =
+                !soloPlanesPrimeraVez ||
+                datosPlan.idealPrimeraVez;
+
             return (
                 coincideTexto &&
                 coincideMunicipio &&
                 coincideCategoria &&
                 coincidePrecio &&
+                coincideDistancia &&
                 coincideFecha &&
                 coincideVoySolo &&
+                coincidePrimeraVez &&
                 sigueDisponible
             );
         }
@@ -1381,9 +3268,27 @@ function aplicarFiltros() {
         planesVisibles.length
     );
 
+    planesVisiblesActuales =
+        [...planesVisibles];
+
+    actualizarResumenResultados(
+        planesVisibles.length
+    );
+
     actualizarEstadoSinResultados(
         planesVisibles.length
     );
+
+    actualizarChipsFiltrosActivos();
+
+    if (
+        vistaResultadosActual ===
+            "mapa"
+    ) {
+        renderizarMapaPlanes(
+            planesVisiblesActuales
+        );
+    }
 }
 
 
@@ -1407,13 +3312,28 @@ function limpiarFiltros(
         filtroPrecio.value = "todos";
     }
 
+    if (filtroDistancia) {
+        filtroDistancia.value = "todas";
+    }
+
+    actualizarEstadoUbicacionFiltro(
+        ""
+    );
+
     if (filtroOrden) {
         filtroOrden.value =
             "recomendados";
     }
 
+    actualizarDistanciasTarjetas();
+
     if (filtroVoySolo) {
         filtroVoySolo.checked =
+            false;
+    }
+
+    if (filtroPrimeraVez) {
+        filtroPrimeraVez.checked =
             false;
     }
 
@@ -1477,6 +3397,7 @@ if (formularioFiltros) {
             );
 
             actualizarEstadoFiltrosFecha();
+            actualizarDistanciasTarjetas();
             aplicarFiltros();
         }
     );
@@ -1496,10 +3417,73 @@ if (filtroMunicipio) {
 }
 
 
+if (filtroDistancia) {
+    filtroDistancia.addEventListener(
+        "change",
+        async () => {
+            const radio =
+                Number(
+                    filtroDistancia.value ||
+                    0
+                );
+
+            if (!radio) {
+                actualizarEstadoUbicacionFiltro(
+                    ""
+                );
+
+                actualizarDistanciasTarjetas();
+                aplicarFiltros();
+                return;
+            }
+
+            const ubicacionDisponible =
+                await solicitarUbicacionParaFiltro();
+
+            if (!ubicacionDisponible) {
+                filtroDistancia.value =
+                    "todas";
+                aplicarFiltros();
+                return;
+            }
+
+            aplicarFiltros();
+        }
+    );
+}
+
+
 if (filtroOrden) {
     filtroOrden.addEventListener(
         "change",
-        aplicarFiltros
+        async () => {
+            if (
+                filtroOrden.value !==
+                "cercania"
+            ) {
+                actualizarDistanciasTarjetas();
+                aplicarFiltros();
+                return;
+            }
+
+            const ubicacionDisponible =
+                await solicitarUbicacionParaFiltro();
+
+            if (
+                !ubicacionDisponible
+            ) {
+                filtroOrden.value =
+                    "recomendados";
+
+                actualizarDistanciasTarjetas();
+                aplicarFiltros();
+
+                return;
+            }
+
+            actualizarDistanciasTarjetas();
+            aplicarFiltros();
+        }
     );
 }
 
@@ -1515,6 +3499,127 @@ if (filtroVoySolo) {
         }
     );
 }
+
+
+if (filtroPrimeraVez) {
+    filtroPrimeraVez.addEventListener(
+        "change",
+        () => {
+            fechaBuscadaDesdePortada = "";
+            aplicarFiltros();
+        }
+    );
+}
+
+
+botonCercaDeMi?.addEventListener(
+    "click",
+    async () => {
+        const disponible =
+            await solicitarUbicacionParaFiltro();
+
+        if (!disponible) {
+            return;
+        }
+
+        if (
+            !filtroDistancia.value ||
+            filtroDistancia.value === "todas"
+        ) {
+            filtroDistancia.value = "15";
+        }
+
+        if (filtroOrden) {
+            filtroOrden.value = "cercania";
+        }
+
+        actualizarEstadoUbicacionFiltro(
+            "Ubicación activada",
+            "ok"
+        );
+
+        actualizarDistanciasTarjetas();
+        aplicarFiltros();
+    }
+);
+
+
+listaFiltrosActivos?.addEventListener(
+    "click",
+    (evento) => {
+        const boton = evento.target.closest(
+            "[data-quitar-filtro]"
+        );
+
+        if (!boton) {
+            return;
+        }
+
+        quitarFiltroActivo(
+            boton.dataset.quitarFiltro || ""
+        );
+    }
+);
+
+
+botonVistaLista?.addEventListener(
+    "click",
+    () => {
+        vistaResultadosActual = "lista";
+        actualizarSelectorVistaResultados();
+    }
+);
+
+
+botonVistaMapa?.addEventListener(
+    "click",
+    () => {
+        vistaResultadosActual = "mapa";
+        actualizarSelectorVistaResultados();
+    }
+);
+
+
+botonModoSuralia?.addEventListener(
+    "click",
+    () => {
+        const abrir =
+            contenidoModoSuralia?.hidden !== false;
+
+        if (contenidoModoSuralia) {
+            contenidoModoSuralia.hidden = !abrir;
+        }
+
+        botonModoSuralia.setAttribute(
+            "aria-expanded",
+            String(abrir)
+        );
+
+        botonModoSuralia.classList.toggle(
+            "activo",
+            abrir
+        );
+    }
+);
+
+
+buscarModoSuralia?.addEventListener(
+    "click",
+    () => {
+        recomendarModoSuralia();
+    }
+);
+
+
+sorprenderModoSuralia?.addEventListener(
+    "click",
+    () => {
+        recomendarModoSuralia({
+            sorpresaTotal: true
+        });
+    }
+);
+
 
 
 botonesFiltroFecha.forEach(
@@ -1575,14 +3680,6 @@ if (botonRestablecer) {
 }
 
 
-if (botonVista) {
-    botonVista.addEventListener(
-        "click",
-        alternarVistaResultados
-    );
-
-    actualizarBotonVista();
-}
 
 
 /* =====================================================
@@ -2263,6 +4360,18 @@ function crearTarjetaPlanSupabase(
             ""
         );
 
+    const latitud =
+        Number(
+            plan.latitud ||
+            0
+        );
+
+    const longitud =
+        Number(
+            plan.longitud ||
+            0
+        );
+
     const imagen =
         escaparHTMLPlanes(
             plan.imagen_url ||
@@ -2373,6 +4482,23 @@ function crearTarjetaPlanSupabase(
             )
         );
 
+    const detallesExtra =
+        plan.detalles_extra &&
+        typeof plan.detalles_extra === "object"
+            ? plan.detalles_extra
+            : {};
+
+    const textoPrimeraVez =
+        `${plan.titulo || ""} ${plan.descripcion || ""} ${plan.dificultad || ""}`
+            .toLowerCase();
+
+    const idealPrimeraVez =
+        detallesExtra.ideal_primera_vez === true ||
+        personasSolas > 0 ||
+        /(primera vez|principiante|nivel inicial|sin experiencia|no necesitas experiencia)/i.test(
+            textoPrimeraVez
+        );
+
     return `
         <article
             class="tarjeta-plan tarjeta-plan--publicada-usuario"
@@ -2388,6 +4514,10 @@ function crearTarjetaPlanSupabase(
             data-fechas-vigentes="${fechasVigentesDataset}"
             data-ubicacion="${ubicacion}"
             data-municipio="${municipio}"
+            data-descripcion="${descripcion}"
+            data-ideal-primera-vez="${idealPrimeraVez}"
+            data-latitud="${latitud}"
+            data-longitud="${longitud}"
             data-imagen="${imagen}"
             data-enlace="${enlace}"
             data-personas-apuntadas="${personasApuntadas}"
@@ -2448,6 +4578,18 @@ function crearTarjetaPlanSupabase(
                     <p class="tarjeta-plan__ubicacion">
                         <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
                         ${ubicacion}
+                    </p>
+
+                    <p
+                        class="tarjeta-plan__distancia"
+                        hidden
+                    >
+                        <i
+                            class="fa-solid fa-location-arrow"
+                            aria-hidden="true"
+                        ></i>
+
+                        <span class="tarjeta-plan__distancia-texto"></span>
                     </p>
 
                     <div
@@ -2522,6 +4664,10 @@ async function cargarPlanesPublicadosSupabase() {
                     fechas,
                     ubicacion,
                     municipio,
+                    latitud,
+                    longitud,
+                    dificultad,
+                    detalles_extra,
                     precio,
                     imagen_url,
                     creado_en
@@ -2702,7 +4848,9 @@ async function cargarPlanesPublicadosSupabase() {
                 )
             );
 
+        actualizarDistanciasTarjetas();
         aplicarFiltros();
+        actualizarSelectorVistaResultados();
         cargarEstadoFavoritosTarjetas();
     } catch (error) {
         console.error(
