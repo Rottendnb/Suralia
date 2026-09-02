@@ -31039,3 +31039,610 @@ body.modal-post-plan-abierto {
         font-size: 0.7rem;
     }
 }
+
+/* =========================================================
+   SURALIA · PLANES.HTML · RESPONSIVE MÓVIL V7
+   Pegar AL FINAL de css/style.css
+
+   Objetivos:
+   - Modo Suralia compacto y ordenado en móvil.
+   - Sin carruseles horizontales incómodos en los filtros.
+   - Buscador + selects bien distribuidos.
+   - Chips de ánimo, fecha y distancia en rejilla táctil.
+   - Bloque social 2x2.
+   - Búsquedas guardadas y barra de resultados compactas.
+   - Tarjetas de planes más pequeñas en móvil.
+========================================================= */
+
+@media (max-width: 700px) {
+
+    /* -----------------------------------------------------
+       CONTENEDOR GENERAL DE EXPLORAR
+    ----------------------------------------------------- */
+
+    .cabecera-pagina {
+        padding: 38px 0 34px !important;
+    }
+
+    .cabecera-pagina__contenido {
+        gap: 18px !important;
+    }
+
+    .cabecera-pagina h1 {
+        margin-top: 5px !important;
+        font-size: clamp(2rem, 9vw, 2.65rem) !important;
+        line-height: 1.04 !important;
+    }
+
+    .cabecera-pagina p {
+        margin-top: 12px !important;
+        font-size: 0.86rem !important;
+        line-height: 1.6 !important;
+    }
+
+    .seccion-explorar {
+        padding: 26px 0 70px !important;
+    }
+
+    .seccion-explorar > .contenedor {
+        width: min(calc(100% - 24px), var(--ancho-maximo)) !important;
+    }
+
+
+    /* -----------------------------------------------------
+       MODO SURALIA · TARJETA PRINCIPAL
+    ----------------------------------------------------- */
+
+    .filtro-unificado-suralia {
+        margin-bottom: 18px !important;
+        overflow: visible !important;
+        border-radius: 18px !important;
+        box-shadow: 0 10px 28px rgba(9, 63, 54, 0.07) !important;
+    }
+
+    .filtro-unificado-suralia__cabecera {
+        position: relative;
+        padding: 15px !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        border-radius: 18px 18px 0 0;
+    }
+
+    .filtro-unificado-suralia__marca {
+        width: 100%;
+        padding-right: 46px;
+        align-items: flex-start !important;
+        gap: 10px !important;
+    }
+
+    .filtro-unificado-suralia__icono {
+        width: 39px !important;
+        height: 39px !important;
+        flex: 0 0 39px !important;
+        border-radius: 11px !important;
+        font-size: 0.9rem !important;
+    }
+
+    .filtro-unificado-suralia__eyebrow {
+        font-size: 0.55rem !important;
+    }
+
+    .filtro-unificado-suralia__cabecera h2 {
+        font-size: 1.14rem !important;
+    }
+
+    .filtro-unificado-suralia__cabecera p {
+        max-width: 31rem;
+        margin-top: 3px !important;
+        font-size: 0.66rem !important;
+        line-height: 1.45 !important;
+    }
+
+    .filtro-unificado-suralia__limpiar {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 38px;
+        min-width: 38px !important;
+        height: 38px;
+        min-height: 38px !important;
+        padding: 0 !important;
+        border-radius: 10px !important;
+        font-size: 0 !important;
+    }
+
+    .filtro-unificado-suralia__limpiar i {
+        font-size: 0.76rem !important;
+    }
+
+    .filtro-unificado-suralia__formulario {
+        padding: 12px !important;
+        gap: 9px !important;
+    }
+
+
+    /* -----------------------------------------------------
+       BÚSQUEDA + MUNICIPIO + CATEGORÍA + PRECIO + ORDEN
+       Buscador completo y selects en 2 columnas.
+    ----------------------------------------------------- */
+
+    .filtro-unificado-suralia__basicos {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+    }
+
+    .filtro-unificado-suralia__buscador {
+        grid-column: 1 / -1 !important;
+        min-height: 44px !important;
+        padding: 0 12px !important;
+        border-radius: 10px !important;
+    }
+
+    .filtro-unificado-suralia__buscador input {
+        font-size: 0.78rem !important;
+    }
+
+    .filtro-unificado-suralia__select {
+        min-width: 0;
+    }
+
+    .filtro-unificado-suralia__select label {
+        margin-bottom: 2px !important;
+        font-size: 0.56rem !important;
+    }
+
+    .filtro-unificado-suralia__select select {
+        min-height: 43px !important;
+        padding: 0 8px !important;
+        border-radius: 10px !important;
+        font-size: 0.67rem !important;
+    }
+
+
+    /* -----------------------------------------------------
+       BLOQUES INTERIORES
+    ----------------------------------------------------- */
+
+    .filtro-unificado-suralia__bloque {
+        padding: 10px !important;
+        border-radius: 12px !important;
+    }
+
+    .filtro-unificado-suralia__doble {
+        grid-template-columns: 1fr !important;
+        gap: 9px !important;
+    }
+
+    .filtro-unificado-suralia__titulo-bloque {
+        margin-bottom: 8px !important;
+        gap: 7px !important;
+    }
+
+    .filtro-unificado-suralia__titulo-bloque > i,
+    .filtro-unificado-suralia__titulo-bloque > span {
+        width: 25px !important;
+        height: 25px !important;
+        flex: 0 0 25px !important;
+        border-radius: 7px !important;
+        font-size: 0.68rem !important;
+    }
+
+    .filtro-unificado-suralia__titulo-bloque strong {
+        font-size: 0.69rem !important;
+    }
+
+    .filtro-unificado-suralia__titulo-bloque small {
+        font-size: 0.54rem !important;
+    }
+
+
+    /* -----------------------------------------------------
+       CHIPS · EN MÓVIL NO HAY SCROLL HORIZONTAL
+    ----------------------------------------------------- */
+
+    .filtro-unificado-suralia__chips {
+        width: 100%;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px !important;
+        overflow: visible !important;
+        padding-bottom: 0 !important;
+    }
+
+    .filtro-unificado-chip,
+    .filtro-unificado-suralia .filtro-fecha-rapida {
+        width: 100% !important;
+        min-width: 0 !important;
+        flex: none !important;
+    }
+
+    .filtro-unificado-chip span,
+    .filtro-unificado-suralia .filtro-fecha-rapida {
+        width: 100% !important;
+        min-height: 38px !important;
+        padding: 0 7px !important;
+        border-radius: 9px !important;
+        font-size: 0.62rem !important;
+        white-space: normal !important;
+        text-align: center;
+        line-height: 1.2 !important;
+    }
+
+    /* Ánimo: 6 opciones = rejilla 2 x 3 */
+    .filtro-unificado-suralia__chips--animo {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    /* Fechas: 6 opciones = rejilla 2 x 3 */
+    .filtro-unificado-suralia__chips--fecha {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    /* Distancia: 5 opciones. */
+    .filtro-unificado-suralia__bloque--mitad:last-child
+    .filtro-unificado-suralia__chips {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .filtro-unificado-suralia__bloque--mitad:last-child
+    .filtro-unificado-chip:first-child {
+        grid-column: span 2;
+    }
+
+
+    /* -----------------------------------------------------
+       FECHA EXACTA
+    ----------------------------------------------------- */
+
+    .filtro-unificado-suralia__fecha-personalizada {
+        width: 100% !important;
+        max-width: none !important;
+        margin-top: 7px !important;
+        padding: 6px 7px 6px 9px !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 7px !important;
+        border-radius: 9px !important;
+    }
+
+    .filtro-unificado-suralia__fecha-personalizada label {
+        min-width: 0;
+        font-size: 0.58rem !important;
+        white-space: normal !important;
+    }
+
+    .filtro-unificado-suralia__fecha-personalizada input {
+        width: 126px !important;
+        min-width: 0 !important;
+        min-height: 33px !important;
+        font-size: 0.61rem !important;
+    }
+
+
+    /* -----------------------------------------------------
+       DISTANCIA
+    ----------------------------------------------------- */
+
+    .filtro-unificado-suralia__estado-ubicacion {
+        min-height: 0 !important;
+        margin-top: 6px !important;
+        font-size: 0.55rem !important;
+        line-height: 1.35;
+    }
+
+    .filtro-unificado-suralia__estado-ubicacion:empty {
+        display: none;
+    }
+
+
+    /* -----------------------------------------------------
+       EL TOQUE SURALIA · 2 x 2 TAMBIÉN EN MÓVILES PEQUEÑOS
+    ----------------------------------------------------- */
+
+    .filtro-unificado-suralia__sociales {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 6px !important;
+    }
+
+    .filtro-social-unificado {
+        min-height: 48px !important;
+        padding: 7px 8px !important;
+        gap: 6px !important;
+        border-radius: 9px !important;
+    }
+
+    .filtro-social-unificado > span {
+        font-size: 0.8rem !important;
+    }
+
+    .filtro-social-unificado strong {
+        font-size: 0.58rem !important;
+        line-height: 1.2 !important;
+    }
+
+
+    /* -----------------------------------------------------
+       TEXTO DE ACTUALIZACIÓN
+    ----------------------------------------------------- */
+
+    .filtro-unificado-suralia__pie {
+        padding: 1px 2px 0;
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+        font-size: 0.54rem !important;
+        line-height: 1.4;
+    }
+
+
+    /* -----------------------------------------------------
+       BÚSQUEDAS GUARDADAS
+    ----------------------------------------------------- */
+
+    .busquedas-guardadas {
+        margin: 10px 0 12px !important;
+    }
+
+    .busquedas-guardadas__barra {
+        min-height: 0 !important;
+        padding: 11px !important;
+        gap: 10px !important;
+        border-radius: 13px !important;
+    }
+
+    .busquedas-guardadas__texto {
+        gap: 8px !important;
+    }
+
+    .busquedas-guardadas__icono {
+        width: 34px !important;
+        height: 34px !important;
+        flex: 0 0 34px !important;
+        border-radius: 9px !important;
+        font-size: 0.76rem !important;
+    }
+
+    .busquedas-guardadas__texto h2 {
+        font-size: 0.86rem !important;
+    }
+
+    .busquedas-guardadas__texto p {
+        margin-top: 1px !important;
+        font-size: 0.55rem !important;
+        line-height: 1.35 !important;
+    }
+
+    .busquedas-guardadas__acciones {
+        width: 100%;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px !important;
+    }
+
+    .busquedas-guardadas__boton {
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 40px !important;
+        padding: 0 8px !important;
+        justify-content: center !important;
+        border-radius: 9px !important;
+        font-size: 0.6rem !important;
+    }
+
+
+    /* -----------------------------------------------------
+       FILTROS ACTIVOS
+    ----------------------------------------------------- */
+
+    .filtros-activos {
+        margin-top: 10px !important;
+        padding: 8px 9px !important;
+        align-items: flex-start !important;
+        flex-direction: column !important;
+        gap: 6px !important;
+    }
+
+    .filtros-activos__titulo {
+        font-size: 0.58rem !important;
+    }
+
+    .filtros-activos__lista {
+        width: 100%;
+        justify-content: flex-start !important;
+        gap: 5px !important;
+    }
+
+
+    /* -----------------------------------------------------
+       PLANES DISPONIBLES + LISTA / MAPA
+    ----------------------------------------------------- */
+
+    .barra-resultados {
+        margin: 22px 0 14px !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-direction: row !important;
+        gap: 10px !important;
+    }
+
+    .barra-resultados h2 {
+        font-size: 1.12rem !important;
+        line-height: 1.15 !important;
+    }
+
+    .barra-resultados p {
+        margin-top: 2px !important;
+        font-size: 0.63rem !important;
+    }
+
+    .selector-vista-resultados {
+        flex: 0 0 auto;
+        gap: 4px !important;
+        padding: 3px !important;
+        border-radius: 9px !important;
+    }
+
+    .selector-vista-resultados__boton {
+        min-height: 36px !important;
+        padding: 0 8px !important;
+        gap: 5px !important;
+        border-radius: 7px !important;
+        font-size: 0.59rem !important;
+    }
+
+
+    /* -----------------------------------------------------
+       TARJETAS DE PLAN · MÁS PEQUEÑAS EN MÓVIL
+    ----------------------------------------------------- */
+
+    .planes__grid--explorar {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .planes__grid--explorar .tarjeta-plan {
+        border-radius: 13px !important;
+        box-shadow: 0 6px 18px rgba(9, 63, 54, 0.065) !important;
+    }
+
+    .planes__grid--explorar .tarjeta-plan__imagen {
+        height: 164px !important;
+    }
+
+    .planes__grid--explorar .tarjeta-plan__contenido {
+        padding: 12px 13px 13px !important;
+    }
+
+    .planes__grid--explorar .tarjeta-plan__meta {
+        font-size: 0.58rem !important;
+        gap: 7px !important;
+    }
+
+    .planes__grid--explorar .tarjeta-plan h3 {
+        margin: 6px 0 5px !important;
+        font-size: 0.9rem !important;
+        line-height: 1.25 !important;
+    }
+
+    .planes__grid--explorar .tarjeta-plan__descripcion {
+        display: none !important;
+    }
+
+    .planes__grid--explorar .tarjeta-plan__ubicacion {
+        font-size: 0.62rem !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .planes__grid--explorar .tarjeta-plan__pie {
+        margin-top: 9px !important;
+        padding-top: 8px !important;
+        font-size: 0.6rem !important;
+    }
+
+    .planes__grid--explorar .tarjeta-plan__precio {
+        bottom: 8px !important;
+        left: 8px !important;
+        padding: 4px 7px !important;
+        font-size: 0.59rem !important;
+    }
+
+    .planes__grid--explorar .tarjeta-plan__favorito {
+        top: 8px !important;
+        right: 8px !important;
+        width: 32px !important;
+        height: 32px !important;
+    }
+
+    .planes__grid--explorar .tarjeta-plan__primera-vez {
+        right: 7px !important;
+        bottom: 7px !important;
+        max-width: 66% !important;
+        padding: 4px 6px !important;
+        font-size: 0.53rem !important;
+    }
+
+
+    /* -----------------------------------------------------
+       MAPA Y ESTADO VACÍO
+    ----------------------------------------------------- */
+
+    .mapa-planes-explorar {
+        height: 390px !important;
+        margin-top: 14px !important;
+        border-radius: 14px !important;
+    }
+
+    .mapa-planes-explorar::before {
+        display: none !important;
+    }
+
+    .sin-resultados {
+        padding: 48px 15px !important;
+    }
+
+    .sin-resultados i {
+        font-size: 34px !important;
+    }
+
+    .sin-resultados h3 {
+        margin-top: 13px !important;
+        font-size: 1.05rem !important;
+    }
+
+    .sin-resultados p {
+        margin-bottom: 18px !important;
+        font-size: 0.72rem !important;
+    }
+}
+
+
+@media (max-width: 390px) {
+
+    .seccion-explorar > .contenedor {
+        width: min(calc(100% - 18px), var(--ancho-maximo)) !important;
+    }
+
+    .filtro-unificado-suralia__formulario {
+        padding: 9px !important;
+    }
+
+    .filtro-unificado-suralia__select select {
+        font-size: 0.63rem !important;
+    }
+
+    .filtro-unificado-chip span,
+    .filtro-unificado-suralia .filtro-fecha-rapida {
+        min-height: 36px !important;
+        font-size: 0.59rem !important;
+    }
+
+    .filtro-social-unificado {
+        min-height: 46px !important;
+        padding: 6px !important;
+    }
+
+    .filtro-social-unificado strong {
+        font-size: 0.55rem !important;
+    }
+
+    .filtro-unificado-suralia__fecha-personalizada {
+        grid-template-columns: 1fr !important;
+    }
+
+    .filtro-unificado-suralia__fecha-personalizada input {
+        width: 100% !important;
+    }
+
+    .barra-resultados {
+        align-items: flex-start !important;
+    }
+
+    .selector-vista-resultados__boton {
+        padding: 0 7px !important;
+    }
+
+    .planes__grid--explorar .tarjeta-plan__imagen {
+        height: 150px !important;
+    }
+}
