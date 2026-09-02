@@ -4492,12 +4492,24 @@ function crearTarjetaPlanSupabase(
         `${plan.titulo || ""} ${plan.descripcion || ""} ${plan.dificultad || ""}`
             .toLowerCase();
 
+    /*
+       Los planes nuevos usan el dato explícito del organizador.
+       Solo los planes antiguos, que todavía no tengan la propiedad,
+       conservan la detección anterior para no perder compatibilidad.
+    */
+    const tieneMarcaPrimeraVez =
+        typeof detallesExtra.ideal_primera_vez ===
+        "boolean";
+
     const idealPrimeraVez =
-        detallesExtra.ideal_primera_vez === true ||
-        personasSolas > 0 ||
-        /(primera vez|principiante|nivel inicial|sin experiencia|no necesitas experiencia)/i.test(
-            textoPrimeraVez
-        );
+        tieneMarcaPrimeraVez
+            ? detallesExtra.ideal_primera_vez
+            : (
+                personasSolas > 0 ||
+                /(primera vez|principiante|nivel inicial|sin experiencia|no necesitas experiencia)/i.test(
+                    textoPrimeraVez
+                )
+            );
 
     return `
         <article
@@ -4538,6 +4550,17 @@ function crearTarjetaPlanSupabase(
                     <span class="tarjeta-plan__precio">
                         ${precioTexto}
                     </span>
+
+                    ${
+                        idealPrimeraVez
+                            ? `
+                                <span class="tarjeta-plan__primera-vez">
+                                    <span aria-hidden="true">👋</span>
+                                    Ideal para primera vez
+                                </span>
+                            `
+                            : ""
+                    }
 
                     <button
                         class="tarjeta-plan__favorito"
@@ -4905,3 +4928,1148 @@ prepararFiltrosFecha();
 actualizarBotonVista();
 asegurarCategoriaTalleres();
 cargarPlanesPublicadosSupabase();
+
+
+/* =========================================================
+   SURALIA · BÚSQUEDAS GUARDADAS + AVISOS
+========================================================= */
+
+(() => {
+    const botonGuardar =
+        document.querySelector(
+            "#guardar-busqueda-actual"
+        );
+
+    const botonAbrir =
+        document.querySelector(
+            "#abrir-busquedas-guardadas"
+        );
+
+    const botonCerrarPanel =
+        document.querySelector(
+            "#cerrar-busquedas-guardadas"
+        );
+
+    const panel =
+        document.querySelector(
+            "#panel-busquedas-guardadas"
+        );
+
+    const formulario =
+        document.querySelector(
+            "#formulario-guardar-busqueda"
+        );
+
+    const botonCerrarFormulario =
+        document.querySelector(
+            "#cerrar-formulario-guardar-busqueda"
+        );
+
+    const inputNombre =
+        document.querySelector(
+            "#nombre-busqueda-guardada"
+        );
+
+    const inputAvisos =
+        document.querySelector(
+            "#avisos-busqueda-guardada"
+        );
+
+    const notaDistancia =
+        document.querySelector(
+            "#nota-distancia-busqueda"
+        );
+
+    const lista =
+        document.querySelector(
+            "#lista-busquedas-guardadas"
+        );
+
+    const vacio =
+        document.querySelector(
+            "#busquedas-guardadas-vacias"
+        );
+
+    const contador =
+        document.querySelector(
+            "#contador-busquedas-guardadas"
+        );
+
+    if (
+        !botonGuardar ||
+        !botonAbrir ||
+        !panel ||
+        !formulario ||
+        !lista
+    ) {
+        return;
+    }
+
+    let busquedasGuardadas = [];
+
+
+    function obtenerSesionBusquedaGuardada() {
+        try {
+            const sesion =
+                JSON.parse(
+                    localStorage.getItem(
+                        "sesionSuralia"
+                    ) ||
+                    "null"
+                );
+
+            if (
+                !sesion?.conectado ||
+                !sesion?.id
+            ) {
+                return null;
+            }
+
+            return sesion;
+        } catch (error) {
+            console.error(
+                "No se pudo leer la sesión para búsquedas guardadas:",
+                error
+            );
+
+            return null;
+        }
+    }
+
+
+    function pedirInicioSesionBusquedas() {
+        sessionStorage.setItem(
+            "destinoDespuesLoginSuralia",
+            "planes.html"
+        );
+
+        mostrarNotificacion(
+            "Inicia sesión para guardar tus búsquedas."
+        );
+
+        setTimeout(
+            () => {
+                window.location.href =
+                    "login.html";
+            },
+            700
+        );
+    }
+
+
+    function abrirPanelBusquedas(
+        mostrarFormulario = false
+    ) {
+        panel.hidden = false;
+
+        botonAbrir.setAttribute(
+            "aria-expanded",
+            "true"
+        );
+
+        if (mostrarFormulario) {
+            formulario.hidden = false;
+
+            const activos =
+                obtenerFiltrosActivosActuales();
+
+            const sugerencia =
+                activos
+                    .slice(0, 3)
+                    .map(
+                        (item) =>
+                            item.texto
+                    )
+                    .join(" · ");
+
+            if (inputNombre) {
+                inputNombre.value =
+                    sugerencia ||
+                    "Mis planes favoritos";
+
+                requestAnimationFrame(
+                    () => {
+                        inputNombre.focus();
+                        inputNombre.select();
+                    }
+                );
+            }
+
+            if (inputAvisos) {
+                inputAvisos.checked = true;
+            }
+
+            if (notaDistancia) {
+                notaDistancia.hidden =
+                    !(
+                        filtroDistancia?.value &&
+                        filtroDistancia.value !==
+                            "todas"
+                    );
+            }
+        }
+    }
+
+
+    function cerrarFormularioBusqueda() {
+        formulario.hidden = true;
+
+        if (inputNombre) {
+            inputNombre.value = "";
+        }
+    }
+
+
+    function cerrarPanelBusquedas() {
+        panel.hidden = true;
+
+        botonAbrir.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+        cerrarFormularioBusqueda();
+    }
+
+
+    function obtenerFiltrosParaGuardar() {
+        return {
+            texto:
+                filtroTexto?.value.trim() ||
+                "",
+
+            municipio:
+                filtroMunicipio?.value ||
+                "todos",
+
+            categoria:
+                filtroCategoria?.value ||
+                "todas",
+
+            precio:
+                filtroPrecio?.value ||
+                "todos",
+
+            distancia:
+                filtroDistancia?.value ||
+                "todas",
+
+            fecha_rapida:
+                filtroFechaRapidaActual ||
+                "",
+
+            fecha_personalizada:
+                filtroFechaPersonalizada?.value ||
+                "",
+
+            voy_solo:
+                Boolean(
+                    filtroVoySolo?.checked
+                ),
+
+            primera_vez:
+                Boolean(
+                    filtroPrimeraVez?.checked
+                ),
+
+            orden:
+                filtroOrden?.value ||
+                "recomendados"
+        };
+    }
+
+
+    function tieneFiltrosUtiles(
+        filtros
+    ) {
+        return Boolean(
+            filtros.texto ||
+            filtros.municipio !== "todos" ||
+            filtros.categoria !== "todas" ||
+            filtros.precio !== "todos" ||
+            filtros.distancia !== "todas" ||
+            filtros.fecha_rapida ||
+            filtros.fecha_personalizada ||
+            filtros.voy_solo ||
+            filtros.primera_vez
+        );
+    }
+
+
+    function textoValorSelect(
+        selector,
+        valor
+    ) {
+        if (!selector) {
+            return "";
+        }
+
+        return (
+            Array.from(
+                selector.options
+            ).find(
+                (option) =>
+                    option.value === valor
+            )?.textContent?.trim() ||
+            ""
+        );
+    }
+
+
+    function obtenerResumenBusqueda(
+        filtros
+    ) {
+        const partes = [];
+
+        if (filtros.texto) {
+            partes.push(
+                `“${filtros.texto}”`
+            );
+        }
+
+        if (
+            filtros.municipio &&
+            filtros.municipio !== "todos"
+        ) {
+            partes.push(
+                textoValorSelect(
+                    filtroMunicipio,
+                    filtros.municipio
+                ) ||
+                filtros.municipio
+            );
+        }
+
+        if (
+            filtros.categoria &&
+            filtros.categoria !== "todas"
+        ) {
+            partes.push(
+                textoValorSelect(
+                    filtroCategoria,
+                    filtros.categoria
+                ) ||
+                filtros.categoria
+            );
+        }
+
+        if (
+            filtros.precio &&
+            filtros.precio !== "todos"
+        ) {
+            partes.push(
+                textoValorSelect(
+                    filtroPrecio,
+                    filtros.precio
+                ) ||
+                filtros.precio
+            );
+        }
+
+        if (
+            filtros.distancia &&
+            filtros.distancia !== "todas"
+        ) {
+            partes.push(
+                textoValorSelect(
+                    filtroDistancia,
+                    filtros.distancia
+                ) ||
+                `${filtros.distancia} km`
+            );
+        }
+
+        if (filtros.fecha_rapida) {
+            const etiquetas = {
+                hoy:
+                    "Hoy",
+
+                manana:
+                    "Mañana",
+
+                finde:
+                    "Este finde",
+
+                semana:
+                    "Esta semana",
+
+                "proxima-semana":
+                    "Próxima semana"
+            };
+
+            partes.push(
+                etiquetas[
+                    filtros.fecha_rapida
+                ] ||
+                filtros.fecha_rapida
+            );
+        }
+
+        if (filtros.fecha_personalizada) {
+            partes.push(
+                filtros.fecha_personalizada
+            );
+        }
+
+        if (filtros.voy_solo) {
+            partes.push(
+                "Voy solo"
+            );
+        }
+
+        if (filtros.primera_vez) {
+            partes.push(
+                "Primera vez"
+            );
+        }
+
+        return partes.length
+            ? partes.join(" · ")
+            : "Todos los planes";
+    }
+
+
+    function escaparAtributoBusqueda(
+        valor
+    ) {
+        return escaparHTMLPlanes(
+            String(
+                valor ?? ""
+            )
+        );
+    }
+
+
+    function renderizarBusquedasGuardadas() {
+        if (contador) {
+            contador.textContent =
+                String(
+                    busquedasGuardadas.length
+                );
+        }
+
+        if (vacio) {
+            vacio.hidden =
+                busquedasGuardadas.length >
+                0;
+        }
+
+        if (
+            busquedasGuardadas.length ===
+            0
+        ) {
+            lista.innerHTML = "";
+            return;
+        }
+
+        lista.innerHTML =
+            busquedasGuardadas
+                .map(
+                    (busqueda) => {
+                        const filtros =
+                            busqueda.filtros &&
+                            typeof busqueda.filtros ===
+                                "object"
+                                ? busqueda.filtros
+                                : {};
+
+                        const resumen =
+                            obtenerResumenBusqueda(
+                                filtros
+                            );
+
+                        return `
+                            <article
+                                class="busqueda-guardada-card"
+                                data-busqueda-id="${escaparAtributoBusqueda(
+                                    busqueda.id
+                                )}"
+                            >
+                                <div class="busqueda-guardada-card__cabecera">
+                                    <span class="busqueda-guardada-card__icono">
+                                        <i
+                                            class="fa-regular fa-bookmark"
+                                            aria-hidden="true"
+                                        ></i>
+                                    </span>
+
+                                    <div>
+                                        <h4>
+                                            ${escaparHTMLPlanes(
+                                                busqueda.nombre ||
+                                                "Búsqueda guardada"
+                                            )}
+                                        </h4>
+
+                                        <p>
+                                            ${escaparHTMLPlanes(
+                                                resumen
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="busqueda-guardada-card__pie">
+                                    <label class="busqueda-guardada-card__alerta">
+                                        <input
+                                            type="checkbox"
+                                            data-alerta-busqueda="${escaparAtributoBusqueda(
+                                                busqueda.id
+                                            )}"
+                                            ${
+                                                busqueda.avisos
+                                                    ? "checked"
+                                                    : ""
+                                            }
+                                        >
+
+                                        <span
+                                            class="busqueda-guardada-card__alerta-control"
+                                            aria-hidden="true"
+                                        ></span>
+
+                                        <span>
+                                            ${
+                                                busqueda.avisos
+                                                    ? "Avisos activos"
+                                                    : "Avisos desactivados"
+                                            }
+                                        </span>
+                                    </label>
+
+                                    <div class="busqueda-guardada-card__acciones">
+                                        <button
+                                            type="button"
+                                            class="busqueda-guardada-card__aplicar"
+                                            data-aplicar-busqueda="${escaparAtributoBusqueda(
+                                                busqueda.id
+                                            )}"
+                                        >
+                                            <i
+                                                class="fa-solid fa-arrow-rotate-left"
+                                                aria-hidden="true"
+                                            ></i>
+                                            Aplicar
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            class="busqueda-guardada-card__eliminar"
+                                            data-eliminar-busqueda="${escaparAtributoBusqueda(
+                                                busqueda.id
+                                            )}"
+                                            aria-label="Eliminar búsqueda"
+                                            title="Eliminar búsqueda"
+                                        >
+                                            <i
+                                                class="fa-regular fa-trash-can"
+                                                aria-hidden="true"
+                                            ></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </article>
+                        `;
+                    }
+                )
+                .join("");
+    }
+
+
+    async function cargarBusquedasGuardadas() {
+        const sesion =
+            obtenerSesionBusquedaGuardada();
+
+        const cliente =
+            window.clienteSupabase;
+
+        if (
+            !sesion ||
+            !cliente
+        ) {
+            busquedasGuardadas = [];
+            renderizarBusquedasGuardadas();
+            return;
+        }
+
+        const {
+            data,
+            error
+        } = await cliente
+            .from(
+                "busquedas_guardadas"
+            )
+            .select(
+                `
+                    id,
+                    nombre,
+                    filtros,
+                    avisos,
+                    creado_en,
+                    actualizado_en
+                `
+            )
+            .eq(
+                "usuario_id",
+                sesion.id
+            )
+            .order(
+                "actualizado_en",
+                {
+                    ascending:
+                        false
+                }
+            );
+
+        if (error) {
+            console.error(
+                "No se pudieron cargar las búsquedas guardadas:",
+                error
+            );
+
+            return;
+        }
+
+        busquedasGuardadas =
+            Array.isArray(data)
+                ? data
+                : [];
+
+        renderizarBusquedasGuardadas();
+    }
+
+
+    async function guardarBusquedaActual(
+        evento
+    ) {
+        evento.preventDefault();
+
+        const sesion =
+            obtenerSesionBusquedaGuardada();
+
+        if (!sesion) {
+            pedirInicioSesionBusquedas();
+            return;
+        }
+
+        const cliente =
+            window.clienteSupabase;
+
+        if (!cliente) {
+            mostrarNotificacion(
+                "No se ha podido conectar con Suralia."
+            );
+            return;
+        }
+
+        const nombre =
+            inputNombre?.value.trim() ||
+            "";
+
+        if (!nombre) {
+            inputNombre?.focus();
+
+            mostrarNotificacion(
+                "Ponle un nombre a la búsqueda."
+            );
+            return;
+        }
+
+        const filtros =
+            obtenerFiltrosParaGuardar();
+
+        if (
+            !tieneFiltrosUtiles(
+                filtros
+            )
+        ) {
+            mostrarNotificacion(
+                "Selecciona al menos un filtro antes de guardar."
+            );
+            return;
+        }
+
+        const {
+            data,
+            error
+        } = await cliente
+            .from(
+                "busquedas_guardadas"
+            )
+            .insert({
+                usuario_id:
+                    sesion.id,
+
+                nombre,
+
+                filtros,
+
+                avisos:
+                    Boolean(
+                        inputAvisos?.checked
+                    )
+            })
+            .select(
+                `
+                    id,
+                    nombre,
+                    filtros,
+                    avisos,
+                    creado_en,
+                    actualizado_en
+                `
+            )
+            .single();
+
+        if (error) {
+            console.error(
+                "No se pudo guardar la búsqueda:",
+                error
+            );
+
+            mostrarNotificacion(
+                "No se ha podido guardar la búsqueda."
+            );
+            return;
+        }
+
+        busquedasGuardadas.unshift(
+            data
+        );
+
+        renderizarBusquedasGuardadas();
+
+        cerrarFormularioBusqueda();
+
+        mostrarNotificacion(
+            inputAvisos?.checked
+                ? "Búsqueda guardada. Te avisaremos de nuevos planes."
+                : "Búsqueda guardada."
+        );
+    }
+
+
+    async function cambiarAvisosBusqueda(
+        id,
+        activo,
+        checkbox
+    ) {
+        const sesion =
+            obtenerSesionBusquedaGuardada();
+
+        const cliente =
+            window.clienteSupabase;
+
+        if (
+            !sesion ||
+            !cliente
+        ) {
+            checkbox.checked =
+                !activo;
+
+            return;
+        }
+
+        const {
+            error
+        } = await cliente
+            .from(
+                "busquedas_guardadas"
+            )
+            .update({
+                avisos:
+                    activo,
+
+                actualizado_en:
+                    new Date().toISOString()
+            })
+            .eq(
+                "id",
+                id
+            )
+            .eq(
+                "usuario_id",
+                sesion.id
+            );
+
+        if (error) {
+            console.error(
+                "No se pudieron cambiar los avisos:",
+                error
+            );
+
+            checkbox.checked =
+                !activo;
+
+            mostrarNotificacion(
+                "No se han podido cambiar los avisos."
+            );
+
+            return;
+        }
+
+        const busqueda =
+            busquedasGuardadas.find(
+                (item) =>
+                    String(item.id) ===
+                    String(id)
+            );
+
+        if (busqueda) {
+            busqueda.avisos =
+                activo;
+        }
+
+        renderizarBusquedasGuardadas();
+
+        mostrarNotificacion(
+            activo
+                ? "Avisos activados."
+                : "Avisos desactivados."
+        );
+    }
+
+
+    async function eliminarBusquedaGuardada(
+        id
+    ) {
+        const sesion =
+            obtenerSesionBusquedaGuardada();
+
+        const cliente =
+            window.clienteSupabase;
+
+        if (
+            !sesion ||
+            !cliente
+        ) {
+            return;
+        }
+
+        const {
+            error
+        } = await cliente
+            .from(
+                "busquedas_guardadas"
+            )
+            .delete()
+            .eq(
+                "id",
+                id
+            )
+            .eq(
+                "usuario_id",
+                sesion.id
+            );
+
+        if (error) {
+            console.error(
+                "No se pudo eliminar la búsqueda:",
+                error
+            );
+
+            mostrarNotificacion(
+                "No se ha podido eliminar la búsqueda."
+            );
+
+            return;
+        }
+
+        busquedasGuardadas =
+            busquedasGuardadas.filter(
+                (item) =>
+                    String(item.id) !==
+                    String(id)
+            );
+
+        renderizarBusquedasGuardadas();
+
+        mostrarNotificacion(
+            "Búsqueda eliminada."
+        );
+    }
+
+
+    async function aplicarBusquedaGuardada(
+        id
+    ) {
+        const busqueda =
+            busquedasGuardadas.find(
+                (item) =>
+                    String(item.id) ===
+                    String(id)
+            );
+
+        if (!busqueda) {
+            return;
+        }
+
+        const filtros =
+            busqueda.filtros &&
+            typeof busqueda.filtros ===
+                "object"
+                ? busqueda.filtros
+                : {};
+
+        if (filtroTexto) {
+            filtroTexto.value =
+                filtros.texto ||
+                "";
+        }
+
+        if (filtroMunicipio) {
+            filtroMunicipio.value =
+                filtros.municipio ||
+                "todos";
+        }
+
+        if (filtroCategoria) {
+            filtroCategoria.value =
+                filtros.categoria ||
+                "todas";
+        }
+
+        if (filtroPrecio) {
+            filtroPrecio.value =
+                filtros.precio ||
+                "todos";
+        }
+
+        if (filtroDistancia) {
+            filtroDistancia.value =
+                filtros.distancia ||
+                "todas";
+        }
+
+        if (filtroVoySolo) {
+            filtroVoySolo.checked =
+                Boolean(
+                    filtros.voy_solo
+                );
+        }
+
+        if (filtroPrimeraVez) {
+            filtroPrimeraVez.checked =
+                Boolean(
+                    filtros.primera_vez
+                );
+        }
+
+        if (filtroOrden) {
+            filtroOrden.value =
+                filtros.orden ||
+                "recomendados";
+        }
+
+        fechaBuscadaDesdePortada = "";
+
+        filtroFechaRapidaActual =
+            filtros.fecha_rapida ||
+            "";
+
+        if (filtroFechaPersonalizada) {
+            filtroFechaPersonalizada.value =
+                filtros.fecha_personalizada ||
+                "";
+        }
+
+        actualizarEstadoFiltrosFecha();
+
+        const necesitaUbicacion =
+            (
+                filtroDistancia?.value &&
+                filtroDistancia.value !==
+                    "todas"
+            ) ||
+            filtroOrden?.value ===
+                "cercania";
+
+        if (necesitaUbicacion) {
+            const disponible =
+                await solicitarUbicacionParaFiltro();
+
+            if (!disponible) {
+                if (filtroDistancia) {
+                    filtroDistancia.value =
+                        "todas";
+                }
+
+                if (
+                    filtroOrden?.value ===
+                        "cercania"
+                ) {
+                    filtroOrden.value =
+                        "recomendados";
+                }
+            }
+        }
+
+        actualizarDistanciasTarjetas();
+        aplicarFiltros();
+
+        cerrarPanelBusquedas();
+
+        formularioFiltros?.scrollIntoView({
+            behavior:
+                "smooth",
+
+            block:
+                "start"
+        });
+
+        mostrarNotificacion(
+            `Búsqueda “${busqueda.nombre}” aplicada.`
+        );
+    }
+
+
+    botonGuardar.addEventListener(
+        "click",
+        () => {
+            const sesion =
+                obtenerSesionBusquedaGuardada();
+
+            if (!sesion) {
+                pedirInicioSesionBusquedas();
+                return;
+            }
+
+            if (
+                !tieneFiltrosUtiles(
+                    obtenerFiltrosParaGuardar()
+                )
+            ) {
+                mostrarNotificacion(
+                    "Selecciona al menos un filtro antes de guardar."
+                );
+
+                formularioFiltros?.scrollIntoView({
+                    behavior:
+                        "smooth",
+
+                    block:
+                        "center"
+                });
+
+                return;
+            }
+
+            abrirPanelBusquedas(
+                true
+            );
+        }
+    );
+
+
+    botonAbrir.addEventListener(
+        "click",
+        () => {
+            const sesion =
+                obtenerSesionBusquedaGuardada();
+
+            if (!sesion) {
+                pedirInicioSesionBusquedas();
+                return;
+            }
+
+            if (panel.hidden) {
+                abrirPanelBusquedas(
+                    false
+                );
+            } else {
+                cerrarPanelBusquedas();
+            }
+        }
+    );
+
+
+    botonCerrarPanel?.addEventListener(
+        "click",
+        cerrarPanelBusquedas
+    );
+
+
+    botonCerrarFormulario?.addEventListener(
+        "click",
+        cerrarFormularioBusqueda
+    );
+
+
+    formulario.addEventListener(
+        "submit",
+        guardarBusquedaActual
+    );
+
+
+    lista.addEventListener(
+        "click",
+        async (evento) => {
+            const aplicar =
+                evento.target.closest(
+                    "[data-aplicar-busqueda]"
+                );
+
+            if (aplicar) {
+                await aplicarBusquedaGuardada(
+                    aplicar.dataset
+                        .aplicarBusqueda
+                );
+
+                return;
+            }
+
+            const eliminar =
+                evento.target.closest(
+                    "[data-eliminar-busqueda]"
+                );
+
+            if (eliminar) {
+                await eliminarBusquedaGuardada(
+                    eliminar.dataset
+                        .eliminarBusqueda
+                );
+            }
+        }
+    );
+
+
+    lista.addEventListener(
+        "change",
+        async (evento) => {
+            const checkbox =
+                evento.target.closest(
+                    "[data-alerta-busqueda]"
+                );
+
+            if (!checkbox) {
+                return;
+            }
+
+            await cambiarAvisosBusqueda(
+                checkbox.dataset
+                    .alertaBusqueda,
+
+                checkbox.checked,
+
+                checkbox
+            );
+        }
+    );
+
+
+    document.addEventListener(
+        "keydown",
+        (evento) => {
+            if (
+                evento.key === "Escape" &&
+                !panel.hidden
+            ) {
+                cerrarPanelBusquedas();
+            }
+        }
+    );
+
+
+    cargarBusquedasGuardadas();
+})();
+

@@ -935,6 +935,175 @@
 
                 </form>
 
+                <section
+                    class="busquedas-guardadas"
+                    id="busquedas-guardadas"
+                    aria-labelledby="titulo-busquedas-guardadas"
+                >
+                    <div class="busquedas-guardadas__barra">
+                        <div class="busquedas-guardadas__texto">
+                            <span class="busquedas-guardadas__icono" aria-hidden="true">
+                                <i class="fa-regular fa-bookmark"></i>
+                            </span>
+
+                            <div>
+                                <span class="busquedas-guardadas__eyebrow">
+                                    Encuéntralo otra vez
+                                </span>
+
+                                <h2 id="titulo-busquedas-guardadas">
+                                    Guarda esta búsqueda
+                                </h2>
+
+                                <p>
+                                    Conserva tus filtros y activa avisos para nuevos planes que encajen.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="busquedas-guardadas__acciones">
+                            <button
+                                type="button"
+                                class="busquedas-guardadas__boton busquedas-guardadas__boton--guardar"
+                                id="guardar-busqueda-actual"
+                            >
+                                <i class="fa-regular fa-bookmark" aria-hidden="true"></i>
+                                <span>Guardar búsqueda</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                class="busquedas-guardadas__boton busquedas-guardadas__boton--lista"
+                                id="abrir-busquedas-guardadas"
+                                aria-expanded="false"
+                                aria-controls="panel-busquedas-guardadas"
+                            >
+                                <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+                                <span>Mis búsquedas</span>
+                                <span
+                                    class="busquedas-guardadas__contador"
+                                    id="contador-busquedas-guardadas"
+                                >
+                                    0
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div
+                        class="busquedas-guardadas__panel"
+                        id="panel-busquedas-guardadas"
+                        hidden
+                    >
+                        <form
+                            class="busquedas-guardadas__formulario"
+                            id="formulario-guardar-busqueda"
+                            hidden
+                        >
+                            <div class="busquedas-guardadas__formulario-cabecera">
+                                <div>
+                                    <span>Guardar búsqueda actual</span>
+                                    <strong>Ponle un nombre para reconocerla después.</strong>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="busquedas-guardadas__cerrar-formulario"
+                                    id="cerrar-formulario-guardar-busqueda"
+                                    aria-label="Cerrar"
+                                >
+                                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                                </button>
+                            </div>
+
+                            <div class="busquedas-guardadas__campos">
+                                <label class="busquedas-guardadas__campo">
+                                    <span>Nombre</span>
+                                    <input
+                                        type="text"
+                                        id="nombre-busqueda-guardada"
+                                        maxlength="70"
+                                        autocomplete="off"
+                                        placeholder="Ej. Música este finde"
+                                        required
+                                    >
+                                </label>
+
+                                <label class="busquedas-guardadas__avisos">
+                                    <input
+                                        type="checkbox"
+                                        id="avisos-busqueda-guardada"
+                                        checked
+                                    >
+
+                                    <span class="busquedas-guardadas__avisos-control" aria-hidden="true"></span>
+
+                                    <span>
+                                        <strong>Avisarme de nuevos planes</strong>
+                                        <small>Los avisos aparecerán en la campana de Suralia.</small>
+                                    </span>
+                                </label>
+
+                                <button
+                                    type="submit"
+                                    class="busquedas-guardadas__confirmar"
+                                >
+                                    <i class="fa-solid fa-check" aria-hidden="true"></i>
+                                    Guardar
+                                </button>
+                            </div>
+
+                            <p
+                                class="busquedas-guardadas__nota-distancia"
+                                id="nota-distancia-busqueda"
+                                hidden
+                            >
+                                <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                                La distancia se guardará, pero tu ubicación exacta no. Se volverá a pedir al abrir la búsqueda.
+                            </p>
+                        </form>
+
+                        <div class="busquedas-guardadas__panel-cabecera">
+                            <div>
+                                <span class="busquedas-guardadas__eyebrow">
+                                    Tus búsquedas
+                                </span>
+                                <h3>Búsquedas guardadas</h3>
+                            </div>
+
+                            <button
+                                type="button"
+                                class="busquedas-guardadas__cerrar-panel"
+                                id="cerrar-busquedas-guardadas"
+                                aria-label="Cerrar búsquedas guardadas"
+                            >
+                                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                            </button>
+                        </div>
+
+                        <div
+                            class="busquedas-guardadas__lista"
+                            id="lista-busquedas-guardadas"
+                        ></div>
+
+                        <div
+                            class="busquedas-guardadas__vacio"
+                            id="busquedas-guardadas-vacias"
+                        >
+                            <span aria-hidden="true">
+                                <i class="fa-regular fa-bookmark"></i>
+                            </span>
+
+                            <div>
+                                <strong>Aún no has guardado ninguna búsqueda</strong>
+                                <p>
+                                    Configura los filtros de arriba y pulsa “Guardar búsqueda”.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <div
                     class="filtros-activos"
                     id="filtros-activos"
