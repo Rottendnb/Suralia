@@ -42,7 +42,8 @@
     <link rel="stylesheet" href="css/style.css">
 
     <style>
-        body[data-detalle-listo="false"] main {
+        body[data-detalle-listo="false"] main,
+        body[data-detalle-listo="false"] #barra-reserva-movil {
             visibility: hidden;
         }
     </style>
@@ -221,44 +222,34 @@
 
 </header>
 
-    <main>
+    <main class="detalle-pagina">
 
         <section
-            class="detalle-cabecera"
+            class="detalle-cabecera detalle-cabecera--experiencia"
             aria-labelledby="detalle-titulo"
         >
-
             <div class="contenedor">
 
                 <nav class="migas-pan" aria-label="Ruta de navegación">
-
-                    <a href="index.html">
-                        Inicio
-                    </a>
-
+                    <a href="index.html">Inicio</a>
                     <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-
-                    <a href="planes.html">
-                        Planes
-                    </a>
-
+                    <a href="planes.html">Planes</a>
                     <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-
-                    <span
-                        id="miga-plan"
-                        aria-current="page"
-                    >
+                    <span id="miga-plan" aria-current="page">
                         Visita guiada por Itálica
                     </span>
-
                 </nav>
 
                 <div class="detalle-cabecera__contenido">
 
-                    <div>
+                    <div class="detalle-cabecera__informacion">
 
                         <span class="detalle-categoria" id="detalle-categoria">
-                            <i class="fa-solid fa-landmark" id="detalle-categoria-icono" aria-hidden="true"></i>
+                            <i
+                                class="fa-solid fa-landmark"
+                                id="detalle-categoria-icono"
+                                aria-hidden="true"
+                            ></i>
                             <span id="detalle-categoria-texto">Cultura</span>
                         </span>
 
@@ -268,25 +259,29 @@
 
                         <div class="detalle-cabecera__meta">
 
-                            <span>
+                            <span class="detalle-meta-item detalle-meta-item--valoracion">
                                 <i class="fa-solid fa-star" aria-hidden="true"></i>
                                 <strong id="detalle-valoracion">4,8</strong>
                                 <span id="detalle-opiniones-texto">37 opiniones</span>
                             </span>
 
-                            <span>
+                            <span class="detalle-meta-item">
                                 <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                                <span id="detalle-ubicacion-cabecera">Santiponce, Sevilla</span>
+                                <span id="detalle-ubicacion-cabecera">
+                                    Santiponce, Sevilla
+                                </span>
                             </span>
 
-                            <span>
+                            <span class="detalle-meta-item">
                                 <i class="fa-solid fa-user-group" aria-hidden="true"></i>
-                                <span id="detalle-personas-apuntadas">0 personas apuntadas</span>
+                                <span id="detalle-personas-apuntadas">
+                                    0 personas apuntadas
+                                </span>
                             </span>
 
                             <span
                                 id="detalle-voy-solo-meta"
-                                class="detalle-voy-solo-meta"
+                                class="detalle-meta-item detalle-voy-solo-meta"
                                 hidden
                             >
                                 <span
@@ -295,7 +290,6 @@
                                 >
                                     🙋
                                 </span>
-
                                 <span id="detalle-personas-solas">
                                     Nadie viene solo todavía
                                 </span>
@@ -317,12 +311,12 @@
                             Compartir
                         </button>
 
-                       <button
-                             type="button"
-                             class="boton-favorito-detalle"
-                             id="boton-favorito-plan"
-                             aria-label="Añadir plan a favoritos"
-                             aria-pressed="false"
+                        <button
+                            type="button"
+                            class="boton-favorito-detalle"
+                            id="boton-favorito-plan"
+                            aria-label="Añadir plan a favoritos"
+                            aria-pressed="false"
                         >
                             <i class="fa-regular fa-heart" aria-hidden="true"></i>
                             <span>Guardar</span>
@@ -333,14 +327,12 @@
                 </div>
 
             </div>
-
         </section>
 
         <section
-            class="galeria-plan"
+            class="galeria-plan galeria-plan--experiencia"
             aria-label="Galería de imágenes del plan"
         >
-
             <div class="contenedor galeria-plan__grid">
 
                 <button
@@ -391,39 +383,80 @@
                 </button>
 
             </div>
-
         </section>
+
+        <nav
+            class="detalle-navegacion"
+            id="detalle-navegacion"
+            aria-label="Secciones del plan"
+        >
+            <div class="contenedor detalle-navegacion__interior">
+                <a href="#resumen" data-detalle-ancla class="activo">
+                    Resumen
+                </a>
+                <a href="#descripcion" data-detalle-ancla>
+                    Descripción
+                </a>
+                <a href="#ubicacion" data-detalle-ancla>
+                    Ubicación
+                </a>
+                <a href="#opiniones" data-detalle-ancla>
+                    Opiniones
+                </a>
+            </div>
+        </nav>
 
         <section
             class="detalle-contenido"
             aria-label="Información y reserva del plan"
         >
-
             <div class="contenedor detalle-contenido__grid">
 
                 <div class="detalle-principal">
 
-                    <section class="bloque-detalle resumen-plan">
+                    <section
+                        class="bloque-detalle resumen-plan detalle-seccion-ancla"
+                        id="resumen"
+                    >
 
-                        <div class="resumen-plan__organizador">
+                        <div class="resumen-plan__cabecera">
 
-                            <div
-                                class="organizador-avatar"
-                                id="organizador-avatar"
-                                role="img"
-                                aria-label="Avatar de Rutas Sevilla"
-                            >
-                                RS
+                            <div class="resumen-plan__organizador">
+
+                                <div
+                                    class="organizador-avatar"
+                                    id="organizador-avatar"
+                                    role="img"
+                                    aria-label="Avatar de Rutas Sevilla"
+                                >
+                                    RS
+                                </div>
+
+                                <div>
+                                    <span id="detalle-organizador-etiqueta">
+                                        Actividad organizada por
+                                    </span>
+
+                                    <h2 id="organizador-nombre">
+                                        Rutas Sevilla
+                                    </h2>
+
+                                    <p class="resumen-plan__organizador-info">
+                                        <i
+                                            class="fa-regular fa-circle-user"
+                                            aria-hidden="true"
+                                        ></i>
+                                        Perfil del organizador en Suralia
+                                    </p>
+                                </div>
+
                             </div>
 
-                            <div>
-                                <span>Actividad organizada por</span>
-                                <h2 id="organizador-nombre">Rutas Sevilla</h2>
-
-                                <p>
-                                    Organizador verificado
-                                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-                                </p>
+                            <div class="resumen-plan__sello">
+                                <i class="fa-solid fa-shield-heart" aria-hidden="true"></i>
+                                <span>
+                                    Reserva gestionada desde Suralia
+                                </span>
                             </div>
 
                         </div>
@@ -436,61 +469,237 @@
                                 </span>
 
                                 <div>
-                                    <strong id="detalle-fecha-principal">Sábado, 25 de julio</strong>
-                                    <span id="detalle-horario">De 10:30 a 13:00</span>
+                                    <strong id="detalle-fecha-principal">
+                                        Sábado, 25 de julio
+                                    </strong>
+                                    <span id="detalle-horario">
+                                        De 10:30 a 13:00
+                                    </span>
                                 </div>
                             </article>
 
                             <article>
                                 <span class="resumen-plan__icono">
-                                    <i class="fa-solid fa-users" aria-hidden="true"></i>
+                                    <i
+                                        class="fa-solid fa-users"
+                                        id="detalle-resumen-grupo-icono"
+                                        aria-hidden="true"
+                                    ></i>
                                 </span>
 
                                 <div>
-                                    <strong id="detalle-tipo-grupo">Grupo reducido</strong>
-                                    <span id="detalle-max-personas">Máximo 30 personas</span>
+                                    <strong id="detalle-tipo-grupo">
+                                        Grupo reducido
+                                    </strong>
+                                    <span id="detalle-max-personas">
+                                        Máximo 30 personas
+                                    </span>
                                 </div>
                             </article>
 
                             <article>
                                 <span class="resumen-plan__icono">
-                                    <i class="fa-solid fa-language" aria-hidden="true"></i>
+                                    <i
+                                        class="fa-solid fa-language"
+                                        id="detalle-resumen-acceso-icono"
+                                        aria-hidden="true"
+                                    ></i>
                                 </span>
 
                                 <div>
-                                    <strong>Idioma</strong>
-                                    <span id="detalle-idioma">Actividad en español</span>
+                                    <strong id="detalle-resumen-acceso-titulo">
+                                        Idioma
+                                    </strong>
+                                    <span id="detalle-idioma">
+                                        Actividad en español
+                                    </span>
                                 </div>
                             </article>
 
                         </div>
 
+                        <div class="detalle-social-destacado">
+                            <span class="detalle-social-destacado__icono" aria-hidden="true">
+                                🙋
+                            </span>
+
+                            <div>
+                                <strong>¿Te apetece ir aunque no conozcas a nadie?</strong>
+                                <p>
+                                    En Suralia puedes indicar que vienes solo. Así sabrás
+                                    si otras personas están en la misma situación antes de reservar.
+                                </p>
+                            </div>
+                        </div>
+
                     </section>
 
-                    <section class="bloque-detalle">
+                    <section
+                        class="bloque-detalle fechas-disponibles-detalle oculto"
+                        id="bloque-fechas-disponibles"
+                    >
+                        <div class="fechas-disponibles-detalle__cabecera">
 
-                        <h2>Sobre esta experiencia</h2>
+                            <div>
+                                <span class="fechas-disponibles-detalle__eyebrow">
+                                    Disponibilidad
+                                </span>
+
+                                <h2>Fechas disponibles</h2>
+
+                                <p id="texto-fechas-disponibles">
+                                    Elige un día o selecciónalo en el cuadro de reserva.
+                                </p>
+                            </div>
+
+                            <span
+                                class="fechas-disponibles-detalle__contador"
+                                id="contador-fechas-disponibles"
+                            >
+                                0 fechas
+                            </span>
+
+                        </div>
+
+                        <div
+                            class="fechas-disponibles-detalle__lista"
+                            id="lista-fechas-disponibles"
+                            role="list"
+                        ></div>
+                    </section>
+
+                    <section
+                        class="bloque-detalle detalle-musica-evento oculto"
+                        id="detalle-musica-evento"
+                    >
+                        <div class="detalle-musica-evento__cabecera">
+
+                            <div>
+                                <span class="detalle-musica-evento__eyebrow">
+                                    <i class="fa-solid fa-music" aria-hidden="true"></i>
+                                    Evento musical
+                                </span>
+
+                                <h2 id="titulo-detalle-musica">
+                                    Información del evento
+                                </h2>
+
+                                <p>
+                                    Datos principales para organizar tu asistencia.
+                                </p>
+                            </div>
+
+                            <span
+                                class="detalle-musica-evento__tipo"
+                                id="musica-tipo-evento-badge"
+                            >
+                                Evento musical
+                            </span>
+
+                        </div>
+
+                        <div class="detalle-musica-evento__grid">
+
+                            <article
+                                class="detalle-musica-evento__dato"
+                                id="musica-dato-artista"
+                            >
+                                <span class="detalle-musica-evento__icono">
+                                    <i class="fa-solid fa-microphone-lines" aria-hidden="true"></i>
+                                </span>
+                                <div>
+                                    <span>Artista o cartel</span>
+                                    <strong id="musica-artista-cartel">Por confirmar</strong>
+                                </div>
+                            </article>
+
+                            <article
+                                class="detalle-musica-evento__dato"
+                                id="musica-dato-apertura"
+                            >
+                                <span class="detalle-musica-evento__icono">
+                                    <i class="fa-solid fa-door-open" aria-hidden="true"></i>
+                                </span>
+                                <div>
+                                    <span>Apertura de puertas</span>
+                                    <strong id="musica-apertura-puertas">Por confirmar</strong>
+                                </div>
+                            </article>
+
+                            <article
+                                class="detalle-musica-evento__dato"
+                                id="musica-dato-inicio"
+                            >
+                                <span class="detalle-musica-evento__icono">
+                                    <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                                </span>
+                                <div>
+                                    <span>Inicio</span>
+                                    <strong id="musica-hora-inicio">Por confirmar</strong>
+                                </div>
+                            </article>
+
+                            <article
+                                class="detalle-musica-evento__dato"
+                                id="musica-dato-fin"
+                            >
+                                <span class="detalle-musica-evento__icono">
+                                    <i class="fa-solid fa-flag-checkered" aria-hidden="true"></i>
+                                </span>
+                                <div>
+                                    <span>Fin aproximado</span>
+                                    <strong id="musica-hora-fin">Por confirmar</strong>
+                                </div>
+                            </article>
+
+                            <article
+                                class="detalle-musica-evento__dato"
+                                id="musica-dato-edad"
+                            >
+                                <span class="detalle-musica-evento__icono">
+                                    <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+                                </span>
+                                <div>
+                                    <span>Acceso</span>
+                                    <strong id="musica-edad-minima">Todos los públicos</strong>
+                                </div>
+                            </article>
+
+                            <article
+                                class="detalle-musica-evento__dato"
+                                id="musica-dato-entrada"
+                            >
+                                <span class="detalle-musica-evento__icono">
+                                    <i class="fa-solid fa-ticket" aria-hidden="true"></i>
+                                </span>
+                                <div>
+                                    <span>Entrada</span>
+                                    <strong id="musica-tipo-entrada">General</strong>
+                                </div>
+                            </article>
+
+                        </div>
+                    </section>
+
+                    <section
+                        class="bloque-detalle detalle-seccion-ancla"
+                        id="descripcion"
+                    >
+
+                        <span class="detalle-bloque-eyebrow">
+                            La experiencia
+                        </span>
+
+                        <h2 id="detalle-sobre-titulo">
+                            Sobre esta experiencia
+                        </h2>
 
                         <div id="detalle-descripcion">
-
-                        <p>
-                            Descubre uno de los conjuntos arqueológicos más
-                            importantes de la antigua Hispania romana en una
-                            visita guiada por Itálica.
-                        </p>
-
-                        <p>
-                            Durante el recorrido conocerás la historia de la
-                            ciudad, sus principales edificios, el anfiteatro y
-                            las antiguas viviendas decoradas con mosaicos.
-                        </p>
-
-                        <p>
-                            La actividad está pensada para personas interesadas
-                            en la historia, la arquitectura y el patrimonio de
-                            Sevilla. No es necesario tener conocimientos previos.
-                        </p>
-
+                            <p>
+                                Descubre uno de los conjuntos arqueológicos más
+                                importantes de la antigua Hispania romana en una
+                                visita guiada por Itálica.
+                            </p>
                         </div>
 
                         <button
@@ -508,24 +717,17 @@
                             class="descripcion-ampliada"
                             id="descripcion-ampliada"
                             aria-hidden="true"
-                        >
-                            <p>
-                                El recorrido incluye explicaciones sobre la
-                                fundación de Itálica, su evolución durante el
-                                Imperio romano y la importancia de personajes
-                                como Trajano y Adriano.
-                            </p>
-
-                            <p>
-                                Se recomienda llevar calzado cómodo, agua y
-                                protección solar, especialmente durante los
-                                meses de verano.
-                            </p>
-                        </div>
+                        ></div>
 
                     </section>
 
-                    <section class="bloque-detalle">
+                    <section
+                        class="bloque-detalle"
+                        id="bloque-detalle-incluye"
+                    >
+                        <span class="detalle-bloque-eyebrow">
+                            Información útil
+                        </span>
 
                         <h2>Qué incluye</h2>
 
@@ -533,56 +735,35 @@
                             class="lista-incluye"
                             id="detalle-incluye"
                             role="list"
-                        >
-
-                            <div role="listitem">
-                                <i class="fa-solid fa-check" aria-hidden="true"></i>
-                                Guía especializado
-                            </div>
-
-                            <div role="listitem">
-                                <i class="fa-solid fa-check" aria-hidden="true"></i>
-                                Entrada al recinto
-                            </div>
-
-                            <div role="listitem">
-                                <i class="fa-solid fa-check" aria-hidden="true"></i>
-                                Recorrido de aproximadamente 2 horas y media
-                            </div>
-
-                            <div role="listitem">
-                                <i class="fa-solid fa-check" aria-hidden="true"></i>
-                                Explicaciones históricas
-                            </div>
-
-                            <div
-                                class="no-incluido"
-                                role="listitem"
-                            >
-                                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                                Transporte hasta Santiponce
-                            </div>
-
-                            <div
-                                class="no-incluido"
-                                role="listitem"
-                            >
-                                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                                Comida o bebida
-                            </div>
-
-                        </div>
-
+                        ></div>
                     </section>
 
-                    <section class="bloque-detalle">
+                    <section
+                        class="bloque-detalle detalle-seccion-ancla"
+                        id="ubicacion"
+                    >
+                        <span class="detalle-bloque-eyebrow">
+                            Punto de encuentro
+                        </span>
 
                         <h2>Ubicación</h2>
 
-                        <p class="texto-suave" id="detalle-direccion">
-                            Conjunto Arqueológico de Itálica, avenida de
-                            Extremadura, Santiponce.
-                        </p>
+                        <div class="detalle-ubicacion__cabecera">
+
+                            <span class="detalle-ubicacion__icono">
+                                <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                            </span>
+
+                            <div>
+                                <strong>Cómo llegar al plan</strong>
+
+                                <p class="texto-suave" id="detalle-direccion">
+                                    Conjunto Arqueológico de Itálica, avenida de
+                                    Extremadura, Santiponce.
+                                </p>
+                            </div>
+
+                        </div>
 
                         <div
                             id="mapa-plan"
@@ -602,101 +783,46 @@
                             <i class="fa-solid fa-diamond-turn-right" aria-hidden="true"></i>
                             Cómo llegar
                         </a>
-
                     </section>
 
-                    <section class="bloque-detalle">
+                    <section
+                        class="bloque-detalle detalle-seccion-ancla"
+                        id="opiniones"
+                    >
 
                         <div class="cabecera-opiniones">
 
                             <div>
+                                <span class="detalle-bloque-eyebrow">
+                                    Comunidad Suralia
+                                </span>
+
                                 <h2>Opiniones</h2>
 
                                 <p>
                                     <i class="fa-solid fa-star" aria-hidden="true"></i>
                                     <strong id="opiniones-valoracion">4,8</strong>
-                                    · <span id="opiniones-total">37 valoraciones</span>
+                                    ·
+                                    <span id="opiniones-total">37 valoraciones</span>
                                 </p>
                             </div>
-
-                            <button type="button" class="boton-secundario">
-                                Ver todas
-                            </button>
 
                         </div>
 
                         <div
                             class="opiniones-grid"
-                            aria-label="Opiniones destacadas"
+                            id="opiniones-grid"
+                            aria-label="Opiniones del plan"
                         >
-
-                            <article class="opinion">
-
-                                <div class="opinion__usuario">
-
-                                    <div class="opinion__avatar">
-                                        LM
-                                    </div>
-
-                                    <div>
-                                        <strong>Laura M.</strong>
-                                        <span>Julio de 2026</span>
-                                    </div>
-
-                                </div>
-
-                                <div
-                                    class="opinion__estrellas"
-                                    aria-label="5 de 5 estrellas"
-                                >
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                </div>
-
+                            <div class="estado-vacio estado-vacio--pequeno">
+                                <span class="estado-vacio__icono">
+                                    <i class="fa-regular fa-comment-dots" aria-hidden="true"></i>
+                                </span>
+                                <h3>Cargando opiniones</h3>
                                 <p>
-                                    Una visita muy interesante. El guía explicó
-                                    todo de forma cercana y el recorrido se hizo
-                                    muy ameno.
+                                    Estamos consultando las valoraciones de esta experiencia.
                                 </p>
-
-                            </article>
-
-                            <article class="opinion">
-
-                                <div class="opinion__usuario">
-
-                                    <div class="opinion__avatar">
-                                        JC
-                                    </div>
-
-                                    <div>
-                                        <strong>Javier C.</strong>
-                                        <span>Junio de 2026</span>
-                                    </div>
-
-                                </div>
-
-                                <div
-                                    class="opinion__estrellas"
-                                    aria-label="4 de 5 estrellas"
-                                >
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    <i class="fa-regular fa-star" aria-hidden="true"></i>
-                                </div>
-
-                                <p>
-                                    Merece la pena para conocer mejor la historia
-                                    romana de Sevilla. Recomiendo llevar agua.
-                                </p>
-
-                            </article>
-
+                            </div>
                         </div>
 
                     </section>
@@ -705,10 +831,19 @@
 
                 <aside
                     class="reserva-plan"
+                    id="reservar"
                     aria-labelledby="titulo-reserva-plan"
                 >
 
-                    <div class="reserva-plan__tarjeta">
+                    <div
+                        class="reserva-plan__tarjeta"
+                        id="reserva-plan-tarjeta"
+                    >
+
+                        <div class="reserva-plan__etiqueta-superior" id="reserva-etiqueta-superior">
+                            <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                            Reserva tu plaza
+                        </div>
 
                         <div class="reserva-plan__precio">
 
@@ -719,7 +854,10 @@
                                 >
                                     Gratis
                                 </strong>
-                                <span>por persona</span>
+
+                                <span id="detalle-precio-unidad">
+                                    por persona
+                                </span>
                             </div>
 
                             <span>
@@ -744,7 +882,7 @@
                             <div class="campo-reserva">
 
                                 <label for="fecha-reserva">
-                                    Fecha
+                                    Elige fecha
                                 </label>
 
                                 <div>
@@ -754,16 +892,8 @@
                                         id="fecha-reserva"
                                         name="fecha"
                                     >
-                                        <option value="25-julio">
-                                            Sábado, 25 de julio
-                                        </option>
-
-                                        <option value="1-agosto">
-                                            Sábado, 1 de agosto
-                                        </option>
-
-                                        <option value="8-agosto">
-                                            Sábado, 8 de agosto
+                                        <option value="">
+                                            Cargando fechas...
                                         </option>
                                     </select>
                                 </div>
@@ -802,9 +932,7 @@
                                                 🙋
                                             </span>
 
-                                            <strong>
-                                                Voy solo
-                                            </strong>
+                                            <strong>Voy solo</strong>
                                         </span>
 
                                     </label>
@@ -825,9 +953,7 @@
                                                 👥
                                             </span>
 
-                                            <strong>
-                                                Voy acompañado
-                                            </strong>
+                                            <strong>Voy acompañado</strong>
                                         </span>
 
                                     </label>
@@ -866,17 +992,9 @@
                                         id="personas-reserva"
                                         name="personas"
                                     >
-                                        <option value="2">
-                                            2 personas
-                                        </option>
-
-                                        <option value="3">
-                                            3 personas
-                                        </option>
-
-                                        <option value="4">
-                                            4 personas
-                                        </option>
+                                        <option value="2">2 personas</option>
+                                        <option value="3">3 personas</option>
+                                        <option value="4">4 personas</option>
                                     </select>
                                 </div>
 
@@ -894,6 +1012,75 @@
                         <p class="reserva-plan__aviso">
                             No se realizará ningún cobro.
                         </p>
+
+                        <div
+                            class="reserva-externa-social oculto"
+                            id="reserva-externa-social"
+                            aria-live="polite"
+                        >
+                            <div class="reserva-externa-social__intro">
+                                <span
+                                    class="reserva-externa-social__icono"
+                                    aria-hidden="true"
+                                >
+                                    <i class="fa-solid fa-people-group"></i>
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        La entrada se compra fuera. La parte social se queda en Suralia.
+                                    </strong>
+
+                                    <p>
+                                        Dinos si vas solo o acompañado. Cuando ya tengas tu entrada, confírmala aquí para aparecer entre las personas que van y poder conectar con ellas.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div
+                                class="reserva-externa-estado"
+                                id="reserva-externa-estado"
+                                data-estado="sin-registro"
+                            >
+                                <span
+                                    class="reserva-externa-estado__icono"
+                                    id="reserva-externa-estado-icono"
+                                    aria-hidden="true"
+                                >
+                                    <i class="fa-regular fa-circle"></i>
+                                </span>
+
+                                <div>
+                                    <strong id="reserva-externa-estado-titulo">
+                                        Todavía no has confirmado asistencia
+                                    </strong>
+
+                                    <p id="reserva-externa-estado-texto">
+                                        Elige cómo vas y pulsa el botón de entradas para guardar tu intención de asistir.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <button
+                                type="button"
+                                class="boton-confirmar-entrada-externa"
+                                id="boton-confirmar-entrada-externa"
+                                hidden
+                            >
+                                <i class="fa-solid fa-ticket" aria-hidden="true"></i>
+                                Ya tengo mi entrada
+                            </button>
+                        </div>
+
+                        <div
+                            class="reserva-plan__plazas"
+                            aria-live="polite"
+                        >
+                            <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+                            <span id="estado-plazas-reserva">
+                                Selecciona una fecha para consultar las plazas.
+                            </span>
+                        </div>
 
                         <div
                             class="reserva-plan__desglose"
@@ -918,12 +1105,16 @@
 
                         </div>
 
-                        <div class="reserva-plan__plazas">
-
-                            <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                        <div class="reserva-plan__ventajas">
 
                             <span>
-                                Quedan pocas plazas para esta fecha
+                                <i class="fa-solid fa-check" aria-hidden="true"></i>
+                                Sin gastos de gestión
+                            </span>
+
+                            <span>
+                                <i class="fa-solid fa-shield-heart" aria-hidden="true"></i>
+                                Datos protegidos
                             </span>
 
                         </div>
@@ -935,11 +1126,12 @@
                         <i class="fa-solid fa-shield-heart" aria-hidden="true"></i>
 
                         <div>
-                            <strong>Reserva segura</strong>
+                            <strong id="seguridad-reserva-titulo">
+                                Reserva segura
+                            </strong>
 
-                            <p>
-                                Tus datos estarán protegidos durante todo
-                                el proceso.
+                            <p id="seguridad-reserva-texto">
+                                Tus datos estarán protegidos durante todo el proceso.
                             </p>
                         </div>
 
@@ -948,25 +1140,23 @@
                 </aside>
 
             </div>
-
         </section>
 
         <section
             class="planes-relacionados"
             aria-labelledby="titulo-planes-relacionados"
         >
-
             <div class="contenedor">
 
                 <div class="encabezado-seccion">
 
                     <div>
                         <span class="subtitulo">
-                            También puede interesarte
+                            Sigue descubriendo
                         </span>
 
                         <h2 id="titulo-planes-relacionados">
-                            Otros planes cercanos
+                            Otros planes que pueden gustarte
                         </h2>
                     </div>
 
@@ -981,173 +1171,60 @@
                 </div>
 
                 <div class="planes__grid">
-
                     <article class="tarjeta-plan">
-
                         <a
-                            href="detalle-plan.html?id=exposicion-contemporanea"
+                            href="planes.html"
                             class="tarjeta-plan__enlace"
-                            aria-label="Ver detalles de Exposición de arte contemporáneo"
+                            aria-label="Explorar más planes"
                         >
-
                             <div class="tarjeta-plan__imagen imagen-plan--exposicion">
-
-                                <span class="tarjeta-plan__precio">
-                                    Gratis
-                                </span>
-
+                                <span class="tarjeta-plan__precio">Gratis</span>
                             </div>
-
                             <div class="tarjeta-plan__contenido">
-
                                 <div class="tarjeta-plan__meta">
-
                                     <span>
                                         <i class="fa-regular fa-calendar" aria-hidden="true"></i>
-                                        Hasta el 10 de agosto
+                                        Próximamente
                                     </span>
-
                                 </div>
-
-                                <h3>
-                                    Exposición de arte contemporáneo
-                                </h3>
-
+                                <h3>Más experiencias en Suralia</h3>
                                 <p class="tarjeta-plan__ubicacion">
                                     <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                                    Centro de Sevilla
+                                    Sevilla
                                 </p>
-
                                 <div class="tarjeta-plan__pie">
-
-                                    <span>Cultura</span>
-
-                                    <strong>
-                                        4,5
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    </strong>
-
+                                    <span>Descubrir</span>
+                                    <strong>Nuevo</strong>
                                 </div>
-
                             </div>
-
                         </a>
-
                     </article>
-
-                    <article class="tarjeta-plan">
-
-                        <a
-                            href="detalle-poncho-k.html"
-                            class="tarjeta-plan__enlace"
-                            aria-label="Ver detalles de PONCHO K en Cartuja Center CITE"
-                        >
-
-                            <div class="tarjeta-plan__imagen imagen-plan--poncho-k">
-
-                                <span class="tarjeta-plan__precio">
-                                    25 €
-                                </span>
-
-                            </div>
-
-                            <div class="tarjeta-plan__contenido">
-
-                                <div class="tarjeta-plan__meta">
-
-                                    <span>
-                                        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
-                                        21 de noviembre
-                                    </span>
-
-                                </div>
-
-                                <h3>
-                                    PONCHO K - Cartuja Center CITE
-                                </h3>
-
-                                <p class="tarjeta-plan__ubicacion">
-                                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                                    Cartuja Center CITE
-                                </p>
-
-                                <div class="tarjeta-plan__pie">
-
-                                    <span>Música</span>
-
-                                    <strong>
-                                        4,8
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-                        </a>
-
-                    </article>
-
-                    <article class="tarjeta-plan">
-
-                        <a
-                            href="detalle-plan.html?id=tapas-triana"
-                            class="tarjeta-plan__enlace"
-                            aria-label="Ver detalles de Ruta de tapas por Triana"
-                        >
-
-                            <div class="tarjeta-plan__imagen imagen-plan--tapas">
-
-                                <span class="tarjeta-plan__precio">
-                                    25 €
-                                </span>
-
-                            </div>
-
-                            <div class="tarjeta-plan__contenido">
-
-                                <div class="tarjeta-plan__meta">
-
-                                    <span>
-                                        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
-                                        3 de agosto
-                                    </span>
-
-                                </div>
-
-                                <h3>
-                                    Ruta de tapas por Triana
-                                </h3>
-
-                                <p class="tarjeta-plan__ubicacion">
-                                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                                    Triana, Sevilla
-                                </p>
-
-                                <div class="tarjeta-plan__pie">
-
-                                    <span>Gastronomía</span>
-
-                                    <strong>
-                                        4,6
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-                        </a>
-
-                    </article>
-
                 </div>
 
             </div>
-
         </section>
 
     </main>
+
+    <div
+        class="reserva-movil-detalle"
+        id="barra-reserva-movil"
+        aria-label="Acceso rápido a la reserva"
+    >
+        <div class="reserva-movil-detalle__precio">
+            <span id="reserva-movil-etiqueta">Precio</span>
+            <strong id="reserva-movil-precio">Gratis</strong>
+            <small id="reserva-movil-fecha">Fecha por confirmar</small>
+        </div>
+
+        <button
+            type="button"
+            class="reserva-movil-detalle__boton"
+            id="boton-reserva-movil"
+        >
+            Ver disponibilidad
+        </button>
+    </div>
 
     <footer class="footer">
 

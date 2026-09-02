@@ -974,6 +974,14 @@ function mostrarPlanFinalizado() {
     seleccionar(
         ".planes-relacionados"
     )?.remove();
+
+    seleccionar(
+        "#detalle-navegacion"
+    )?.remove();
+
+    seleccionar(
+        "#barra-reserva-movil"
+    )?.remove();
 }
 
 
@@ -1023,6 +1031,8 @@ function mostrarPlanNoEncontrado() {
 
     seleccionar(".galeria-plan")?.remove();
     seleccionar(".planes-relacionados")?.remove();
+    seleccionar("#detalle-navegacion")?.remove();
+    seleccionar("#barra-reserva-movil")?.remove();
 }
 
 
@@ -1141,6 +1151,13 @@ const botonFavoritoPlan =
 let temporizadorNotificacion;
 let mapaPlan;
 let elementoQueAbrioModalImagen = null;
+
+/*
+   Estado social de los planes cuya entrada se compra fuera
+   de Suralia. Solo se usa cuando planes.enlace_reserva existe.
+*/
+let reservaExternaActual = null;
+let tokenConsultaReservaExterna = 0;
 
 
 /* =====================================================
@@ -3157,6 +3174,28 @@ function cargarFechasDisponiblesDetalle() {
                             )
                         }
                     </span>
+
+                    ${
+                        Number(
+                            disponibilidad.personasSolas ||
+                            0
+                        ) > 0
+                            ? `
+                                <span class="fecha-disponible-detalle__social">
+                                    <span aria-hidden="true">🙋</span>
+                                    ${
+                                        Number(
+                                            disponibilidad.personasSolas
+                                        ) === 1
+                                            ? "1 persona va sola"
+                                            : `${Number(
+                                                disponibilidad.personasSolas
+                                            )} personas van solas`
+                                    }
+                                </span>
+                            `
+                            : ""
+                    }
                 </span>
 
                 ${
@@ -3948,21 +3987,21 @@ function configurarTipoReserva() {
             planActual?.esMusica
         );
 
-    const camposReserva =
-        formularioReserva.querySelectorAll(
-            ".campo-reserva"
+    /*
+       En los planes externos YA NO ocultamos fecha ni "cómo vienes".
+       Esa información es precisamente la que permite a Suralia
+       construir la parte social aunque la entrada se compre fuera.
+    */
+    formularioReserva
+        .querySelectorAll(
+            ".campo-reserva, .campo-reserva--como-vienes"
+        )
+        .forEach(
+            (campo) =>
+                campo.classList.remove(
+                    "oculto"
+                )
         );
-
-    camposReserva.forEach(
-        (
-            campo
-        ) => {
-            campo.classList.toggle(
-                "oculto",
-                esExterna
-            );
-        }
-    );
 
     const tarjetaReserva =
         formularioReserva.closest(
@@ -3984,6 +4023,31 @@ function configurarTipoReserva() {
             ".reserva-plan__plazas"
         );
 
+    const ventajas =
+        tarjetaReserva?.querySelector(
+            ".reserva-plan__ventajas"
+        );
+
+    const bloqueSocialExterno =
+        seleccionar(
+            "#reserva-externa-social"
+        );
+
+    const etiquetaSuperior =
+        seleccionar(
+            "#reserva-etiqueta-superior"
+        );
+
+    const ayudaComoVienes =
+        seleccionar(
+            "#ayuda-como-vienes"
+        );
+
+    const etiquetaPersonas =
+        seleccionar(
+            "#etiqueta-personas-reserva"
+        );
+
     const seguridadTitulo =
         seleccionar(
             "#seguridad-reserva-titulo"
@@ -3995,45 +4059,54 @@ function configurarTipoReserva() {
         );
 
     if (esExterna) {
-        botonReservarPlan.innerHTML =
-            esMusica
-                ? `
-                    Comprar entradas
-                    <i
-                        class="fa-solid fa-arrow-up-right-from-square"
-                        aria-hidden="true"
-                    ></i>
-                `
-                : `
-                    Reservar en la web
-                    <i
-                        class="fa-solid fa-arrow-up-right-from-square"
-                        aria-hidden="true"
-                    ></i>
-                `;
+        bloqueSocialExterno?.classList.remove(
+            "oculto"
+        );
+
+        if (etiquetaSuperior) {
+            etiquetaSuperior.innerHTML = `
+                <i
+                    class="fa-solid fa-people-group"
+                    aria-hidden="true"
+                ></i>
+                Entradas externas · conecta aquí
+            `;
+        }
+
+        if (ayudaComoVienes) {
+            ayudaComoVienes.textContent =
+                "Esto se usa para ayudarte a encontrar gente con la que ir. La entrada se compra en la web externa.";
+        }
+
+        if (etiquetaPersonas) {
+            etiquetaPersonas.textContent =
+                "¿Cuántos vais en vuestro grupo?";
+        }
+
+        establecerTextoBotonReservaExterna(
+            "sin-registro"
+        );
 
         botonReservarPlan.setAttribute(
             "aria-label",
             esMusica
-                ? "Abrir la web externa de venta de entradas"
-                : "Abrir la web externa de entradas o reservas"
+                ? "Guardar cómo vas y abrir la web externa de entradas"
+                : "Guardar cómo vas y abrir la web externa de reserva"
         );
 
         if (aviso) {
             aviso.textContent =
-                esMusica
-                    ? "La compra de entradas se completará en la web externa del organizador."
-                    : "La reserva o compra se completará en la web externa del organizador.";
+                "Suralia guardará cómo vas para la parte social. La compra o reserva se completa fuera de Suralia.";
         }
 
         if (seguridadTitulo) {
             seguridadTitulo.textContent =
-                "Compra en la web oficial";
+                "Compra fuera, conecta en Suralia";
         }
 
         if (seguridadTexto) {
             seguridadTexto.textContent =
-                "Suralia te redirigirá al enlace facilitado por el organizador para completar el proceso.";
+                "Cuando ya tengas tu entrada, vuelve y confírmala para aparecer entre los asistentes y poder conectar con ellos.";
         }
 
         desglose?.classList.add(
@@ -4044,7 +4117,31 @@ function configurarTipoReserva() {
             "oculto"
         );
 
+        ventajas?.classList.add(
+            "oculto"
+        );
+
         return;
+    }
+
+    bloqueSocialExterno?.classList.add(
+        "oculto"
+    );
+
+    reservaExternaActual = null;
+
+    if (etiquetaSuperior) {
+        etiquetaSuperior.innerHTML = `
+            <i
+                class="fa-solid fa-bolt"
+                aria-hidden="true"
+            ></i>
+            ${
+                esMusica
+                    ? "Reserva tu entrada"
+                    : "Reserva tu plaza"
+            }
+        `;
     }
 
     botonReservarPlan.innerHTML =
@@ -4058,6 +4155,11 @@ function configurarTipoReserva() {
             ? "Reservar entrada en Suralia"
             : "Reservar plaza en Suralia"
     );
+
+    if (ayudaComoVienes) {
+        ayudaComoVienes.textContent =
+            "Podrás cambiarlo antes de reservar.";
+    }
 
     if (aviso) {
         aviso.textContent =
@@ -4085,6 +4187,1044 @@ function configurarTipoReserva() {
     plazas?.classList.remove(
         "oculto"
     );
+
+    ventajas?.classList.remove(
+        "oculto"
+    );
+}
+
+
+function establecerTextoBotonReservaExterna(
+    estado = "sin-registro"
+) {
+    if (
+        !botonReservarPlan ||
+        !planUsaReservaExterna()
+    ) {
+        return;
+    }
+
+    if (estado === "confirmada") {
+        botonReservarPlan.innerHTML = `
+            Abrir web de entradas
+            <i
+                class="fa-solid fa-arrow-up-right-from-square"
+                aria-hidden="true"
+            ></i>
+        `;
+
+        return;
+    }
+
+    if (estado === "pendiente_entrada") {
+        botonReservarPlan.innerHTML = `
+            Volver a la web de entradas
+            <i
+                class="fa-solid fa-arrow-up-right-from-square"
+                aria-hidden="true"
+            ></i>
+        `;
+
+        return;
+    }
+
+    botonReservarPlan.innerHTML =
+        planActual?.esMusica
+            ? `
+                Comprar entradas
+                <i
+                    class="fa-solid fa-arrow-up-right-from-square"
+                    aria-hidden="true"
+                ></i>
+            `
+            : `
+                Reservar en la web
+                <i
+                    class="fa-solid fa-arrow-up-right-from-square"
+                    aria-hidden="true"
+                ></i>
+            `;
+}
+
+
+function normalizarHoraFiltroReservaExterna(
+    valor
+) {
+    const hora =
+        normalizarHoraPlan(
+            valor
+        );
+
+    return hora
+        ? `${hora}:00`
+        : "";
+}
+
+
+function obtenerDatosPaseSeleccionadoReserva() {
+    const selectorFecha =
+        selectorFechaReserva ||
+        seleccionar(
+            "#fecha-reserva"
+        );
+
+    if (!selectorFecha) {
+        return null;
+    }
+
+    const fechaSeleccionada =
+        String(
+            selectorFecha.value ||
+            ""
+        ).trim();
+
+    const opcion =
+        selectorFecha.options[
+            selectorFecha.selectedIndex
+        ];
+
+    const fechaIso =
+        String(
+            opcion?.dataset?.fecha ||
+            fechaSeleccionada
+                .slice(
+                    0,
+                    10
+                ) ||
+            ""
+        ).trim();
+
+    const hora =
+        normalizarHoraPlan(
+            opcion?.dataset?.hora ||
+            planActual?.hora
+        );
+
+    return {
+        fechaSeleccionada,
+        fechaIso,
+        hora,
+        textoFecha:
+            opcion?.text ||
+            ""
+    };
+}
+
+
+function bloquearControlesSocialesExternos(
+    bloquear
+) {
+    opcionesVoySoloReserva.forEach(
+        (opcion) => {
+            opcion.disabled =
+                Boolean(
+                    bloquear
+                );
+        }
+    );
+
+    if (selectorPersonasReserva) {
+        selectorPersonasReserva.disabled =
+            Boolean(
+                bloquear
+            );
+    }
+}
+
+
+function restaurarControlesDesdeReservaExterna(
+    reserva
+) {
+    if (!reserva) {
+        return;
+    }
+
+    if (
+        typeof reserva.voy_solo ===
+        "boolean"
+    ) {
+        const radio =
+            document.querySelector(
+                `input[name="voy_solo"][value="${
+                    reserva.voy_solo
+                        ? "true"
+                        : "false"
+                }"]`
+            );
+
+        if (radio) {
+            radio.checked = true;
+        }
+    }
+
+    actualizarCampoPersonasSegunComoVienes();
+
+    if (
+        reserva.voy_solo === false &&
+        selectorPersonasReserva
+    ) {
+        const personas =
+            Math.max(
+                2,
+                Math.min(
+                    4,
+                    Number(
+                        reserva.personas ||
+                        2
+                    )
+                )
+            );
+
+        selectorPersonasReserva.value =
+            String(
+                personas
+            );
+    }
+}
+
+
+function pintarEstadoReservaExterna(
+    reserva,
+    modo = "normal"
+) {
+    const bloque =
+        seleccionar(
+            "#reserva-externa-social"
+        );
+
+    const estado =
+        seleccionar(
+            "#reserva-externa-estado"
+        );
+
+    const icono =
+        seleccionar(
+            "#reserva-externa-estado-icono"
+        );
+
+    const titulo =
+        seleccionar(
+            "#reserva-externa-estado-titulo"
+        );
+
+    const texto =
+        seleccionar(
+            "#reserva-externa-estado-texto"
+        );
+
+    const botonConfirmar =
+        seleccionar(
+            "#boton-confirmar-entrada-externa"
+        );
+
+    if (
+        !bloque ||
+        !planUsaReservaExterna()
+    ) {
+        return;
+    }
+
+    bloque.classList.remove(
+        "oculto"
+    );
+
+    reservaExternaActual =
+        reserva ||
+        null;
+
+    const estadoValor =
+        String(
+            reserva?.estado ||
+            (
+                modo === "sin-sesion"
+                    ? "sin-sesion"
+                    : "sin-registro"
+            )
+        );
+
+    if (estado) {
+        estado.dataset.estado =
+            estadoValor;
+    }
+
+    if (estadoValor === "confirmada") {
+        restaurarControlesDesdeReservaExterna(
+            reserva
+        );
+
+        bloquearControlesSocialesExternos(
+            true
+        );
+
+        if (icono) {
+            icono.innerHTML =
+                '<i class="fa-solid fa-circle-check"></i>';
+        }
+
+        if (titulo) {
+            titulo.textContent =
+                "Entrada confirmada en Suralia";
+        }
+
+        if (texto) {
+            texto.textContent =
+                reserva?.voy_solo === true
+                    ? "Ya apareces entre las personas que van. También podremos mostrarte gente que va sola a este mismo evento."
+                    : "Ya apareces entre las personas que van a este evento con tu grupo.";
+        }
+
+        if (botonConfirmar) {
+            botonConfirmar.hidden =
+                true;
+        }
+
+        establecerTextoBotonReservaExterna(
+            "confirmada"
+        );
+
+        actualizarBarraReservaMovil();
+
+        return;
+    }
+
+    bloquearControlesSocialesExternos(
+        false
+    );
+
+    if (estadoValor === "pendiente_entrada") {
+        restaurarControlesDesdeReservaExterna(
+            reserva
+        );
+
+        if (icono) {
+            icono.innerHTML =
+                '<i class="fa-solid fa-hourglass-half"></i>';
+        }
+
+        if (titulo) {
+            titulo.textContent =
+                "Entrada pendiente de confirmar";
+        }
+
+        if (texto) {
+            texto.textContent =
+                reserva?.voy_solo === true
+                    ? "Has indicado que vas solo. Cuando termines la compra, pulsa “Ya tengo mi entrada” para aparecer entre los asistentes."
+                    : "Has indicado que vas acompañado. Cuando tengáis las entradas, confirma aquí para aparecer entre los asistentes.";
+        }
+
+        if (botonConfirmar) {
+            botonConfirmar.hidden =
+                false;
+        }
+
+        establecerTextoBotonReservaExterna(
+            "pendiente_entrada"
+        );
+
+        actualizarBarraReservaMovil();
+
+        return;
+    }
+
+    if (botonConfirmar) {
+        botonConfirmar.hidden =
+            true;
+    }
+
+    if (estadoValor === "sin-sesion") {
+        if (icono) {
+            icono.innerHTML =
+                '<i class="fa-regular fa-user"></i>';
+        }
+
+        if (titulo) {
+            titulo.textContent =
+                "Inicia sesión para apuntarte con gente";
+        }
+
+        if (texto) {
+            texto.textContent =
+                "Podrás indicar si vas solo o acompañado y, cuando tengas tu entrada, confirmar que vas al evento.";
+        }
+    } else {
+        if (icono) {
+            icono.innerHTML =
+                '<i class="fa-regular fa-circle"></i>';
+        }
+
+        if (titulo) {
+            titulo.textContent =
+                "Todavía no has confirmado asistencia";
+        }
+
+        if (texto) {
+            texto.textContent =
+                "Elige cómo vas y pulsa el botón de entradas. Guardaremos tu intención de asistir antes de abrir la web externa.";
+        }
+    }
+
+    establecerTextoBotonReservaExterna(
+        "sin-registro"
+    );
+
+    actualizarBarraReservaMovil();
+}
+
+
+async function cargarEstadoReservaExternaSeleccionada() {
+    if (
+        !planUsaReservaExterna() ||
+        !planActual?.esPlanSupabase ||
+        !esUuidPlan(
+            planActual?.planId
+        )
+    ) {
+        return;
+    }
+
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente) {
+        return;
+    }
+
+    const pase =
+        obtenerDatosPaseSeleccionadoReserva();
+
+    if (
+        !pase?.fechaIso ||
+        !pase?.hora
+    ) {
+        pintarEstadoReservaExterna(
+            null
+        );
+
+        return;
+    }
+
+    const token =
+        ++tokenConsultaReservaExterna;
+
+    /*
+       Al cambiar de pase borramos inmediatamente el estado anterior.
+       Así nunca se puede confirmar por error la asistencia de otra fecha
+       mientras llega la consulta de Supabase.
+    */
+    pintarEstadoReservaExterna(
+        null
+    );
+
+    try {
+        const {
+            data: datosSesion,
+            error: errorSesion
+        } = await cliente.auth.getSession();
+
+        if (
+            token !==
+            tokenConsultaReservaExterna
+        ) {
+            return;
+        }
+
+        if (errorSesion) {
+            throw errorSesion;
+        }
+
+        const usuarioId =
+            datosSesion?.session?.user?.id;
+
+        if (!usuarioId) {
+            pintarEstadoReservaExterna(
+                null,
+                "sin-sesion"
+            );
+
+            return;
+        }
+
+        const {
+            data,
+            error
+        } = await cliente
+            .from(
+                "reservas"
+            )
+            .select(`
+                id,
+                estado,
+                personas,
+                voy_solo,
+                fecha,
+                hora,
+                created_at
+            `)
+            .eq(
+                "plan_id",
+                planActual.planId
+            )
+            .eq(
+                "usuario_id",
+                usuarioId
+            )
+            .eq(
+                "fecha",
+                pase.fechaIso
+            )
+            .eq(
+                "hora",
+                normalizarHoraFiltroReservaExterna(
+                    pase.hora
+                )
+            )
+            .in(
+                "estado",
+                [
+                    "pendiente_entrada",
+                    "confirmada"
+                ]
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            )
+            .limit(
+                1
+            )
+            .maybeSingle();
+
+        if (
+            token !==
+            tokenConsultaReservaExterna
+        ) {
+            return;
+        }
+
+        if (error) {
+            throw error;
+        }
+
+        pintarEstadoReservaExterna(
+            data ||
+            null
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo consultar tu estado en el evento externo:",
+            error
+        );
+
+        if (
+            token ===
+            tokenConsultaReservaExterna
+        ) {
+            pintarEstadoReservaExterna(
+                null
+            );
+        }
+    }
+}
+
+
+async function registrarAsistenciaExternaDetalle({
+    fechaIso,
+    hora,
+    numeroPersonas,
+    voySolo
+}) {
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente) {
+        throw new Error(
+            "No se ha podido conectar con Supabase."
+        );
+    }
+
+    const {
+        data: datosSesion,
+        error: errorSesion
+    } = await cliente.auth.getSession();
+
+    if (errorSesion) {
+        throw errorSesion;
+    }
+
+    if (!datosSesion?.session) {
+        throw new Error(
+            "Tu sesión ha caducado. Inicia sesión de nuevo."
+        );
+    }
+
+    const {
+        data,
+        error
+    } = await cliente.rpc(
+        "registrar_asistencia_externa",
+        {
+            p_plan_id:
+                planActual.planId,
+            p_fecha:
+                fechaIso,
+            p_hora:
+                hora,
+            p_personas:
+                numeroPersonas,
+            p_voy_solo:
+                voySolo
+        }
+    );
+
+    if (error) {
+        throw error;
+    }
+
+    const respuesta =
+        Array.isArray(
+            data
+        )
+            ? data[0]
+            : data;
+
+    if (
+        !respuesta ||
+        respuesta.ok !== true
+    ) {
+        throw new Error(
+            "No se ha podido guardar cómo vas al evento."
+        );
+    }
+
+    const reserva = {
+        id:
+            respuesta.reserva_id,
+        estado:
+            respuesta.estado,
+        personas:
+            Number(
+                respuesta.personas ||
+                numeroPersonas
+            ),
+        voy_solo:
+            typeof respuesta.voy_solo ===
+                "boolean"
+                ? respuesta.voy_solo
+                : voySolo
+    };
+
+    pintarEstadoReservaExterna(
+        reserva
+    );
+
+    return reserva;
+}
+
+
+function validarSeleccionReservaExterna() {
+    const sesionActual =
+        obtenerSesion();
+
+    if (!sesionActual?.conectado) {
+        sessionStorage.setItem(
+            "destinoDespuesLoginSuralia",
+            window.location.href
+        );
+
+        mostrarNotificacion(
+            "Inicia sesión para guardar cómo vas y conectar con otros asistentes."
+        );
+
+        setTimeout(
+            () => {
+                window.location.href =
+                    "login.html";
+            },
+            1200
+        );
+
+        return null;
+    }
+
+    const pase =
+        obtenerDatosPaseSeleccionadoReserva();
+
+    if (!pase?.fechaSeleccionada) {
+        marcarCampoReserva(
+            selectorFechaReserva,
+            true
+        );
+
+        mostrarNotificacion(
+            "Selecciona una fecha."
+        );
+
+        selectorFechaReserva?.focus();
+
+        return null;
+    }
+
+    if (!pase.fechaIso || !pase.hora) {
+        mostrarNotificacion(
+            "Este evento necesita una fecha y una hora válidas para apuntarte en Suralia."
+        );
+
+        return null;
+    }
+
+    marcarCampoReserva(
+        selectorFechaReserva,
+        false
+    );
+
+    const voySolo =
+        obtenerVoySoloReserva();
+
+    if (
+        typeof voySolo !==
+        "boolean"
+    ) {
+        marcarComoVienesInvalido(
+            true
+        );
+
+        mostrarNotificacion(
+            "Indica si vas solo o acompañado."
+        );
+
+        campoComoVienesReserva?.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+        return null;
+    }
+
+    marcarComoVienesInvalido(
+        false
+    );
+
+    const numeroPersonas =
+        voySolo
+            ? 1
+            : Number(
+                selectorPersonasReserva?.value
+            );
+
+    if (
+        voySolo === false &&
+        (
+            !Number.isInteger(
+                numeroPersonas
+            ) ||
+            numeroPersonas < 2 ||
+            numeroPersonas > 4
+        )
+    ) {
+        marcarCampoReserva(
+            selectorPersonasReserva,
+            true
+        );
+
+        mostrarNotificacion(
+            "Indica cuántos vais en total."
+        );
+
+        selectorPersonasReserva?.focus();
+
+        return null;
+    }
+
+    marcarCampoReserva(
+        selectorPersonasReserva,
+        false
+    );
+
+    return {
+        ...pase,
+        numeroPersonas,
+        voySolo,
+        sesionActual
+    };
+}
+
+
+async function procesarCompraReservaExterna() {
+    const seleccion =
+        validarSeleccionReservaExterna();
+
+    if (!seleccion) {
+        return;
+    }
+
+    let url;
+
+    try {
+        url = new URL(
+            String(
+                planActual.enlaceReserva ||
+                ""
+            ).trim()
+        );
+
+        if (
+            url.protocol !== "https:" &&
+            url.protocol !== "http:"
+        ) {
+            throw new Error(
+                "Protocolo no permitido."
+            );
+        }
+    } catch (error) {
+        console.error(
+            "El enlace externo de reserva no es válido:",
+            error
+        );
+
+        mostrarNotificacion(
+            "No se ha podido abrir la web de reservas."
+        );
+
+        return;
+    }
+
+    /*
+       Abrimos una pestaña vacía durante el gesto del usuario.
+       Así los navegadores no bloquean la web externa después
+       de esperar la respuesta de Supabase.
+    */
+    let ventanaExterna = null;
+
+    try {
+        ventanaExterna =
+            window.open(
+                "about:blank",
+                "_blank"
+            );
+
+        if (ventanaExterna) {
+            ventanaExterna.opener =
+                null;
+        }
+    } catch (error) {
+        ventanaExterna = null;
+    }
+
+    const textoAnterior =
+        botonReservarPlan?.innerHTML ||
+        "";
+
+    if (botonReservarPlan) {
+        botonReservarPlan.disabled =
+            true;
+
+        botonReservarPlan.textContent =
+            "Guardando cómo vas...";
+    }
+
+    try {
+        const reserva =
+            await registrarAsistenciaExternaDetalle({
+                fechaIso:
+                    seleccion.fechaIso,
+                hora:
+                    seleccion.hora,
+                numeroPersonas:
+                    seleccion.numeroPersonas,
+                voySolo:
+                    seleccion.voySolo
+            });
+
+        mostrarNotificacion(
+            reserva.estado === "confirmada"
+                ? "Tu asistencia ya estaba confirmada en Suralia."
+                : "Guardado. Cuando tengas tu entrada, vuelve y confírmala aquí."
+        );
+
+        if (ventanaExterna) {
+            ventanaExterna.location.replace(
+                url.href
+            );
+        } else {
+            window.location.href =
+                url.href;
+        }
+    } catch (error) {
+        try {
+            ventanaExterna?.close();
+        } catch (errorCerrar) {
+            // Nada que hacer.
+        }
+
+        console.error(
+            "No se pudo registrar la asistencia externa:",
+            error
+        );
+
+        mostrarNotificacion(
+            obtenerMensajeErrorReservaSupabase(
+                error
+            )
+        );
+    } finally {
+        if (botonReservarPlan) {
+            botonReservarPlan.disabled =
+                false;
+
+            if (reservaExternaActual?.estado) {
+                establecerTextoBotonReservaExterna(
+                    reservaExternaActual.estado
+                );
+            } else {
+                botonReservarPlan.innerHTML =
+                    textoAnterior;
+            }
+        }
+
+        actualizarBarraReservaMovil();
+    }
+}
+
+
+async function confirmarEntradaExternaActual() {
+    if (
+        !planUsaReservaExterna()
+    ) {
+        return;
+    }
+
+    if (
+        !reservaExternaActual?.id ||
+        reservaExternaActual.estado !==
+            "pendiente_entrada"
+    ) {
+        await cargarEstadoReservaExternaSeleccionada();
+    }
+
+    if (
+        !reservaExternaActual?.id ||
+        reservaExternaActual.estado !==
+            "pendiente_entrada"
+    ) {
+        mostrarNotificacion(
+            "Primero pulsa el botón de entradas para guardar que vas a este evento."
+        );
+
+        return;
+    }
+
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente) {
+        mostrarNotificacion(
+            "No se ha podido conectar con Supabase."
+        );
+
+        return;
+    }
+
+    const boton =
+        seleccionar(
+            "#boton-confirmar-entrada-externa"
+        );
+
+    const textoAnterior =
+        boton?.innerHTML ||
+        "";
+
+    if (boton) {
+        boton.disabled = true;
+        boton.textContent =
+            "Confirmando...";
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente.rpc(
+            "confirmar_entrada_externa",
+            {
+                p_reserva_id:
+                    reservaExternaActual.id
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        const respuesta =
+            Array.isArray(
+                data
+            )
+                ? data[0]
+                : data;
+
+        if (
+            !respuesta ||
+            respuesta.ok !== true
+        ) {
+            throw new Error(
+                "No se ha podido confirmar la entrada."
+            );
+        }
+
+        const confirmada = {
+            ...reservaExternaActual,
+            id:
+                respuesta.reserva_id ||
+                reservaExternaActual.id,
+            estado:
+                "confirmada",
+            personas:
+                Number(
+                    respuesta.personas ||
+                    reservaExternaActual.personas ||
+                    1
+                ),
+            voy_solo:
+                typeof respuesta.voy_solo ===
+                    "boolean"
+                    ? respuesta.voy_solo
+                    : reservaExternaActual.voy_solo
+        };
+
+        pintarEstadoReservaExterna(
+            confirmada
+        );
+
+        await cargarDisponibilidadGlobalPlan();
+
+        actualizarResumenSocialFechaSeleccionada();
+        cargarFechasDisponiblesDetalle();
+        actualizarBarraReservaMovil();
+
+        mostrarNotificacion(
+            "Entrada confirmada. Ya apareces entre las personas que van."
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo confirmar la entrada externa:",
+            error
+        );
+
+        mostrarNotificacion(
+            obtenerMensajeErrorReservaSupabase(
+                error
+            )
+        );
+
+        if (boton) {
+            boton.disabled = false;
+            boton.innerHTML =
+                textoAnterior;
+        }
+    }
 }
 
 
@@ -4161,6 +5301,8 @@ function actualizarDesgloseReserva() {
             "es-ES"
         )} €`
     );
+
+    actualizarBarraReservaMovil();
 }
 
 
@@ -4309,6 +5451,10 @@ selectorFechaReserva?.addEventListener(
 
         sincronizarFechaVisibleSeleccionada();
         actualizarDisponibilidadReservaSeleccionada();
+
+        if (planUsaReservaExterna()) {
+            void cargarEstadoReservaExternaSeleccionada();
+        }
     }
 );
 
@@ -4347,6 +5493,16 @@ opcionesVoySoloReserva.forEach(
 );
 
 actualizarCampoPersonasSegunComoVienes();
+
+const botonConfirmarEntradaExterna =
+    seleccionar(
+        "#boton-confirmar-entrada-externa"
+    );
+
+botonConfirmarEntradaExterna?.addEventListener(
+    "click",
+    confirmarEntradaExternaActual
+);
 
 
 async function crearReservaSupabaseDetalle({
@@ -4578,6 +5734,305 @@ function obtenerMensajeErrorReservaSupabase(
 }
 
 
+
+/* =====================================================
+   NAVEGACIÓN INTERNA Y RESERVA RÁPIDA EN MÓVIL
+===================================================== */
+
+let navegacionDetalleConfigurada =
+    false;
+
+
+function obtenerTextoFechaCortoReservaMovil() {
+    const opcion =
+        obtenerOpcionFechaSeleccionada();
+
+    if (
+        opcion?.fecha
+    ) {
+        const fecha =
+            new Date(
+                `${opcion.fecha}T00:00:00`
+            );
+
+        if (
+            !Number.isNaN(
+                fecha.getTime()
+            )
+        ) {
+            const textoFecha =
+                new Intl.DateTimeFormat(
+                    "es-ES",
+                    {
+                        day:
+                            "numeric",
+                        month:
+                            "short"
+                    }
+                ).format(
+                    fecha
+                );
+
+            return opcion.hora
+                ? `${textoFecha} · ${opcion.hora}`
+                : textoFecha;
+        }
+    }
+
+    return String(
+        planActual?.fechaPrincipal ||
+        "Fecha por confirmar"
+    );
+}
+
+
+function actualizarBarraReservaMovil() {
+    const barra =
+        seleccionar(
+            "#barra-reserva-movil"
+        );
+
+    if (
+        !barra ||
+        !planActual
+    ) {
+        return;
+    }
+
+    const precio =
+        seleccionar(
+            "#reserva-movil-precio"
+        );
+
+    const etiqueta =
+        seleccionar(
+            "#reserva-movil-etiqueta"
+        );
+
+    const fecha =
+        seleccionar(
+            "#reserva-movil-fecha"
+        );
+
+    const boton =
+        seleccionar(
+            "#boton-reserva-movil"
+        );
+
+    if (precio) {
+        precio.textContent =
+            formatearPrecio(
+                planActual.precio
+            );
+    }
+
+    if (etiqueta) {
+        etiqueta.textContent =
+            Number(
+                planActual.precio ||
+                0
+            ) > 0
+                ? (
+                    planActual.esMusica
+                        ? "Desde"
+                        : "Precio"
+                )
+                : "Precio";
+    }
+
+    if (fecha) {
+        fecha.textContent =
+            obtenerTextoFechaCortoReservaMovil();
+    }
+
+    if (boton) {
+        if (
+            planUsaReservaExterna()
+        ) {
+            if (
+                reservaExternaActual?.estado ===
+                "confirmada"
+            ) {
+                boton.textContent =
+                    "Ver entradas";
+            } else if (
+                reservaExternaActual?.estado ===
+                "pendiente_entrada"
+            ) {
+                boton.textContent =
+                    "Volver a entradas";
+            } else {
+                boton.textContent =
+                    planActual.esMusica
+                        ? "Comprar entradas"
+                        : "Reservar en la web";
+            }
+        } else {
+            boton.textContent =
+                planActual.esMusica
+                    ? "Reservar entrada"
+                    : "Ver disponibilidad";
+        }
+    }
+}
+
+
+function configurarNavegacionDetalle() {
+    if (
+        navegacionDetalleConfigurada
+    ) {
+        return;
+    }
+
+    navegacionDetalleConfigurada =
+        true;
+
+    const enlaces =
+        Array.from(
+            document.querySelectorAll(
+                "[data-detalle-ancla]"
+            )
+        );
+
+    const botonMovil =
+        seleccionar(
+            "#boton-reserva-movil"
+        );
+
+    botonMovil?.addEventListener(
+        "click",
+        () => {
+            const destino =
+                seleccionar(
+                    "#reserva-plan-tarjeta"
+                ) ||
+                formularioReserva;
+
+            destino?.scrollIntoView({
+                behavior:
+                    "smooth",
+                block:
+                    "start"
+            });
+        }
+    );
+
+    enlaces.forEach(
+        (
+            enlace
+        ) => {
+            enlace.addEventListener(
+                "click",
+                () => {
+                    enlaces.forEach(
+                        (
+                            otro
+                        ) =>
+                            otro.classList.remove(
+                                "activo"
+                            )
+                    );
+
+                    enlace.classList.add(
+                        "activo"
+                    );
+                }
+            );
+        }
+    );
+
+    if (
+        typeof IntersectionObserver ===
+        "undefined"
+    ) {
+        return;
+    }
+
+    const secciones =
+        enlaces
+            .map(
+                (
+                    enlace
+                ) =>
+                    document.querySelector(
+                        enlace.getAttribute(
+                            "href"
+                        )
+                    )
+            )
+            .filter(
+                Boolean
+            );
+
+    const observador =
+        new IntersectionObserver(
+            (
+                entradas
+            ) => {
+                const visibles =
+                    entradas
+                        .filter(
+                            (
+                                entrada
+                            ) =>
+                                entrada.isIntersecting
+                        )
+                        .sort(
+                            (
+                                a,
+                                b
+                            ) =>
+                                b.intersectionRatio -
+                                a.intersectionRatio
+                        );
+
+                const actual =
+                    visibles[0]?.target;
+
+                if (!actual) {
+                    return;
+                }
+
+                enlaces.forEach(
+                    (
+                        enlace
+                    ) => {
+                        const activo =
+                            enlace.getAttribute(
+                                "href"
+                            ) ===
+                            `#${actual.id}`;
+
+                        enlace.classList.toggle(
+                            "activo",
+                            activo
+                        );
+                    }
+                );
+            },
+            {
+                rootMargin:
+                    "-165px 0px -58% 0px",
+
+                threshold: [
+                    0.08,
+                    0.2,
+                    0.45
+                ]
+            }
+        );
+
+    secciones.forEach(
+        (
+            seccion
+        ) =>
+            observador.observe(
+                seccion
+            )
+    );
+}
+
+
 /* =====================================================
    RESERVAS
 ===================================================== */
@@ -4591,43 +6046,7 @@ if (formularioReserva) {
             if (
                 planUsaReservaExterna()
             ) {
-                const urlReserva =
-                    String(
-                        planActual.enlaceReserva ||
-                        ""
-                    ).trim();
-
-                try {
-                    const url =
-                        new URL(
-                            urlReserva
-                        );
-
-                    if (
-                        url.protocol !== "https:" &&
-                        url.protocol !== "http:"
-                    ) {
-                        throw new Error(
-                            "Protocolo no permitido."
-                        );
-                    }
-
-                    window.open(
-                        url.href,
-                        "_blank",
-                        "noopener,noreferrer"
-                    );
-                } catch (error) {
-                    console.error(
-                        "El enlace externo de reserva no es válido:",
-                        error
-                    );
-
-                    mostrarNotificacion(
-                        "No se ha podido abrir la web de reservas."
-                    );
-                }
-
+                await procesarCompraReservaExterna();
                 return;
             }
 
@@ -5690,7 +7109,14 @@ async function iniciarDetallePlan() {
         cargarFechasReserva();
         cargarMapa();
         configurarTipoReserva();
+
+        if (planUsaReservaExterna()) {
+            await cargarEstadoReservaExternaSeleccionada();
+        }
+
+        configurarNavegacionDetalle();
         actualizarDesgloseReserva();
+        actualizarBarraReservaMovil();
         actualizarBotonFavoritoDetalle();
         await cargarPlanesRelacionadosDinamicos();
 

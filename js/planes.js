@@ -43,6 +43,34 @@ const filtroPrimeraVez = document.querySelector(
     "#filtro-primera-vez"
 );
 
+const filtroAmbiente = document.querySelector(
+    "#filtro-ambiente"
+);
+
+const filtroGratisRapido = document.querySelector(
+    "#filtro-gratis-rapido"
+);
+
+const filtroNuevos = document.querySelector(
+    "#filtro-nuevos"
+);
+
+const filtroAnimo = document.querySelector(
+    "#filtro-animo"
+);
+
+const opcionesAnimoUnificado = Array.from(
+    document.querySelectorAll(
+        'input[name="animo-rapido"]'
+    )
+);
+
+const opcionesDistanciaUnificada = Array.from(
+    document.querySelectorAll(
+        'input[name="distancia-rapida"]'
+    )
+);
+
 const botonCercaDeMi = document.querySelector(
     "#boton-cerca-de-mi"
 );
@@ -86,6 +114,22 @@ const resultadosModoSuralia = document.querySelector(
 const sorprenderModoSuralia = document.querySelector(
     "#sorprendeme-modo-suralia"
 );
+
+/*
+    Modo Suralia reactivo:
+    después de generar la primera recomendación, cualquier cambio
+    en ánimo, fecha, presupuesto, compañía o distancia actualiza
+    automáticamente los planes sin volver a pulsar el botón.
+*/
+const opcionesInteractivasModoSuralia = Array.from(
+    document.querySelectorAll(
+        'input[name^="modo-suralia-"]'
+    )
+);
+
+let modoSuraliaEnUso = false;
+let temporizadorActualizacionModoSuralia = null;
+let secuenciaRecomendacionModoSuralia = 0;
 
 const botonesFiltroFecha = Array.from(
     document.querySelectorAll(
@@ -1337,18 +1381,20 @@ function formatearDistanciaTarjeta(distanciaKm) {
 
 
 function actualizarDistanciasTarjetas() {
+    const distanciaActiva =
+        Boolean(
+            filtroDistancia &&
+            filtroDistancia.value !== "todas" &&
+            Number(filtroDistancia.value) > 0
+        );
+
     const mostrarDistancias =
         Boolean(
             ubicacionUsuarioFiltro
         ) &&
         (
-            Number(
-                filtroDistancia?.value ||
-                0
-            ) >
-                0 ||
-            filtroOrden?.value ===
-                "cercania"
+            filtroOrden?.value === "cercania" ||
+            distanciaActiva
         );
 
     planes.forEach((tarjeta) => {
@@ -1424,20 +1470,77 @@ function cumpleFiltroDistancia(tarjeta) {
 }
 
 
+function planEsRecienPublicado(
+    fechaCreacion,
+    dias = 14
+) {
+    const fecha = new Date(
+        String(
+            fechaCreacion ||
+            ""
+        )
+    );
+
+    if (
+        Number.isNaN(
+            fecha.getTime()
+        )
+    ) {
+        return false;
+    }
+
+    const ahora =
+        new Date();
+
+    const diferenciaMs =
+        ahora.getTime() -
+        fecha.getTime();
+
+    if (diferenciaMs < 0) {
+        return true;
+    }
+
+    const limiteMs =
+        Number(dias || 14) *
+        24 *
+        60 *
+        60 *
+        1000;
+
+    return diferenciaMs <=
+        limiteMs;
+}
+
+
 function cumpleFiltroPrecio(
     precio,
     filtro
 ) {
+    const valor = Number(precio || 0);
+
     if (filtro === "gratis") {
-        return precio === 0;
+        return valor === 0;
     }
 
+    if (filtro === "hasta-20") {
+        return valor <= 20;
+    }
+
+    if (filtro === "hasta-50") {
+        return valor <= 50;
+    }
+
+    if (filtro === "mas-50") {
+        return valor > 50;
+    }
+
+    /* Compatibilidad con búsquedas guardadas antiguas. */
     if (filtro === "menos-20") {
-        return precio > 0 && precio < 20;
+        return valor > 0 && valor < 20;
     }
 
     if (filtro === "mas-20") {
-        return precio >= 20;
+        return valor >= 20;
     }
 
     return true;
@@ -1537,18 +1640,6 @@ function obtenerFiltrosActivosActuales() {
         });
     }
 
-    if (
-        filtroDistancia?.value &&
-        filtroDistancia.value !== "todas"
-    ) {
-        activos.push({
-            id: "distancia",
-            texto: textoOpcionSeleccionada(
-                filtroDistancia
-            )
-        });
-    }
-
     const fecha = obtenerEtiquetaFechaActiva();
 
     if (fecha) {
@@ -1568,7 +1659,49 @@ function obtenerFiltrosActivosActuales() {
     if (filtroPrimeraVez?.checked) {
         activos.push({
             id: "primera-vez",
-            texto: "Es mi primera vez"
+            texto: "Ideal para empezar"
+        });
+    }
+
+    if (filtroAmbiente?.checked) {
+        activos.push({
+            id: "ambiente",
+            texto: "Con ambiente"
+        });
+    }
+
+    if (filtroNuevos?.checked) {
+        activos.push({
+            id: "nuevos",
+            texto: "Recién publicados"
+        });
+    }
+
+    const etiquetasAnimo = {
+        social: "Conocer gente",
+        tranquilo: "Algo tranquilo",
+        diferente: "Algo diferente",
+        activo: "Moverme",
+        cultural: "Descubrir"
+    };
+
+    if (
+        filtroAnimo?.value &&
+        filtroAnimo.value !== "cualquiera"
+    ) {
+        activos.push({
+            id: "animo",
+            texto: etiquetasAnimo[filtroAnimo.value] || filtroAnimo.value
+        });
+    }
+
+    if (
+        filtroDistancia?.value &&
+        filtroDistancia.value !== "todas"
+    ) {
+        activos.push({
+            id: "distancia",
+            texto: `Hasta ${filtroDistancia.value} km`
         });
     }
 
@@ -1632,11 +1765,7 @@ function quitarFiltroActivo(id) {
 
         case "precio":
             filtroPrecio.value = "todos";
-            break;
-
-        case "distancia":
-            filtroDistancia.value = "todas";
-            actualizarEstadoUbicacionFiltro("");
+            actualizarEstadoFiltroGratisRapido();
             break;
 
         case "fecha":
@@ -1660,6 +1789,47 @@ function quitarFiltroActivo(id) {
             if (filtroPrimeraVez) {
                 filtroPrimeraVez.checked = false;
             }
+            break;
+
+        case "ambiente":
+            if (filtroAmbiente) {
+                filtroAmbiente.checked = false;
+            }
+            break;
+
+        case "nuevos":
+            if (filtroNuevos) {
+                filtroNuevos.checked = false;
+            }
+            break;
+
+        case "animo":
+            if (filtroAnimo) {
+                filtroAnimo.value = "cualquiera";
+            }
+
+            opcionesAnimoUnificado.forEach((opcion) => {
+                opcion.checked = opcion.value === "cualquiera";
+            });
+            break;
+
+        case "distancia":
+            if (filtroDistancia) {
+                filtroDistancia.value = "todas";
+            }
+
+            opcionesDistanciaUnificada.forEach((opcion) => {
+                opcion.checked = opcion.value === "todas";
+            });
+
+            actualizarEstadoUbicacionFiltro(
+                ubicacionUsuarioFiltro
+                    ? "Ubicación activada"
+                    : "",
+                ubicacionUsuarioFiltro
+                    ? "ok"
+                    : ""
+            );
             break;
     }
 
@@ -2681,12 +2851,18 @@ function renderizarRecomendacionesModoSuralia(
 
 async function recomendarModoSuralia(
     {
-        sorpresaTotal = false
+        sorpresaTotal = false,
+        desplazarResultados = true
     } = {}
 ) {
     if (!resultadosModoSuralia) {
         return;
     }
+
+    modoSuraliaEnUso = true;
+
+    const secuenciaActual =
+        ++secuenciaRecomendacionModoSuralia;
 
     const opciones =
         obtenerOpcionesModoSuralia();
@@ -2721,6 +2897,17 @@ async function recomendarModoSuralia(
 
             const disponible =
                 await solicitarUbicacionParaFiltro();
+
+            /*
+                Si el usuario cambia otra opción mientras el navegador
+                resuelve la ubicación, ignoramos esta recomendación vieja.
+            */
+            if (
+                secuenciaActual !==
+                secuenciaRecomendacionModoSuralia
+            ) {
+                return;
+            }
 
             if (!disponible) {
                 resultadosModoSuralia.innerHTML = `
@@ -2854,10 +3041,12 @@ async function recomendarModoSuralia(
             true
         );
 
-        resultadosModoSuralia.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest"
-        });
+        if (desplazarResultados) {
+            resultadosModoSuralia.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest"
+            });
+        }
 
         return;
     }
@@ -2900,10 +3089,12 @@ async function recomendarModoSuralia(
         false
     );
 
-    resultadosModoSuralia.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest"
-    });
+    if (desplazarResultados) {
+        resultadosModoSuralia.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+        });
+    }
 }
 
 
@@ -3108,7 +3299,6 @@ function aplicarFiltros() {
         !filtroMunicipio ||
         !filtroCategoria ||
         !filtroPrecio ||
-        !filtroDistancia ||
         !listaPlanes
     ) {
         return;
@@ -3136,6 +3326,20 @@ function aplicarFiltros() {
         Boolean(
             filtroPrimeraVez?.checked
         );
+
+    const soloPlanesConAmbiente =
+        Boolean(
+            filtroAmbiente?.checked
+        );
+
+    const soloPlanesNuevos =
+        Boolean(
+            filtroNuevos?.checked
+        );
+
+    const animoSeleccionado =
+        filtroAnimo?.value ||
+        "cualquiera";
 
     let planesVisibles = planes.filter(
         (plan) => {
@@ -3187,6 +3391,19 @@ function aplicarFiltros() {
                     )
                 );
 
+            const personasApuntadas =
+                Math.max(
+                    0,
+                    Number(
+                        plan.dataset.personasApuntadas ||
+                        0
+                    )
+                );
+
+            const creadoEn =
+                plan.dataset.creadoEn ||
+                "";
+
             const coincideTexto =
                 !textoBuscado ||
                 nombre.includes(textoBuscado) ||
@@ -3214,11 +3431,6 @@ function aplicarFiltros() {
                     precioSeleccionado
                 );
 
-            const coincideDistancia =
-                cumpleFiltroDistancia(
-                    plan
-                );
-
             const coincideFecha =
                 cumpleFiltroFechaPlan(
                     plan
@@ -3238,15 +3450,41 @@ function aplicarFiltros() {
                 !soloPlanesPrimeraVez ||
                 datosPlan.idealPrimeraVez;
 
+            const coincideAmbiente =
+                !soloPlanesConAmbiente ||
+                personasApuntadas >= 3;
+
+            const coincideNuevos =
+                !soloPlanesNuevos ||
+                planEsRecienPublicado(
+                    creadoEn,
+                    14
+                );
+
+            const coincideAnimo =
+                animoSeleccionado === "cualquiera" ||
+                categoriaAfinAnimo(
+                    categoria,
+                    animoSeleccionado
+                );
+
+            const coincideDistancia =
+                cumpleFiltroDistancia(
+                    plan
+                );
+
             return (
                 coincideTexto &&
                 coincideMunicipio &&
                 coincideCategoria &&
                 coincidePrecio &&
-                coincideDistancia &&
                 coincideFecha &&
                 coincideVoySolo &&
                 coincidePrimeraVez &&
+                coincideAmbiente &&
+                coincideNuevos &&
+                coincideAnimo &&
+                coincideDistancia &&
                 sigueDisponible
             );
         }
@@ -3312,14 +3550,6 @@ function limpiarFiltros(
         filtroPrecio.value = "todos";
     }
 
-    if (filtroDistancia) {
-        filtroDistancia.value = "todas";
-    }
-
-    actualizarEstadoUbicacionFiltro(
-        ""
-    );
-
     if (filtroOrden) {
         filtroOrden.value =
             "recomendados";
@@ -3336,6 +3566,47 @@ function limpiarFiltros(
         filtroPrimeraVez.checked =
             false;
     }
+
+    if (filtroAmbiente) {
+        filtroAmbiente.checked =
+            false;
+    }
+
+    if (filtroNuevos) {
+        filtroNuevos.checked =
+            false;
+    }
+
+    if (filtroAnimo) {
+        filtroAnimo.value =
+            "cualquiera";
+    }
+
+    opcionesAnimoUnificado.forEach((opcion) => {
+        opcion.checked =
+            opcion.value === "cualquiera";
+    });
+
+    if (filtroDistancia) {
+        filtroDistancia.value =
+            "todas";
+    }
+
+    opcionesDistanciaUnificada.forEach((opcion) => {
+        opcion.checked =
+            opcion.value === "todas";
+    });
+
+    actualizarEstadoUbicacionFiltro(
+        ubicacionUsuarioFiltro
+            ? "Ubicación activada"
+            : "",
+        ubicacionUsuarioFiltro
+            ? "ok"
+            : ""
+    );
+
+    actualizarEstadoFiltroGratisRapido();
 
     filtroFechaRapidaActual =
         "";
@@ -3416,37 +3687,11 @@ if (filtroMunicipio) {
     );
 }
 
-
-if (filtroDistancia) {
-    filtroDistancia.addEventListener(
+if (filtroCategoria) {
+    filtroCategoria.addEventListener(
         "change",
-        async () => {
-            const radio =
-                Number(
-                    filtroDistancia.value ||
-                    0
-                );
-
-            if (!radio) {
-                actualizarEstadoUbicacionFiltro(
-                    ""
-                );
-
-                actualizarDistanciasTarjetas();
-                aplicarFiltros();
-                return;
-            }
-
-            const ubicacionDisponible =
-                await solicitarUbicacionParaFiltro();
-
-            if (!ubicacionDisponible) {
-                filtroDistancia.value =
-                    "todas";
-                aplicarFiltros();
-                return;
-            }
-
+        () => {
+            fechaBuscadaDesdePortada = "";
             aplicarFiltros();
         }
     );
@@ -3474,6 +3719,10 @@ if (filtroOrden) {
             ) {
                 filtroOrden.value =
                     "recomendados";
+
+                mostrarNotificacion(
+                    "Necesitamos tu ubicación para ordenar por cercanía."
+                );
 
                 actualizarDistanciasTarjetas();
                 aplicarFiltros();
@@ -3512,36 +3761,145 @@ if (filtroPrimeraVez) {
 }
 
 
-botonCercaDeMi?.addEventListener(
-    "click",
-    async () => {
-        const disponible =
-            await solicitarUbicacionParaFiltro();
+function actualizarEstadoFiltroGratisRapido() {
+    if (!filtroGratisRapido) {
+        return;
+    }
 
-        if (!disponible) {
+    const activo =
+        filtroPrecio?.value ===
+        "gratis";
+
+    filtroGratisRapido.classList.toggle(
+        "filtro-experiencia--activo",
+        activo
+    );
+
+    filtroGratisRapido.setAttribute(
+        "aria-pressed",
+        String(activo)
+    );
+}
+
+
+if (filtroAmbiente) {
+    filtroAmbiente.addEventListener(
+        "change",
+        () => {
+            fechaBuscadaDesdePortada = "";
+            aplicarFiltros();
+        }
+    );
+}
+
+
+if (filtroNuevos) {
+    filtroNuevos.addEventListener(
+        "change",
+        () => {
+            fechaBuscadaDesdePortada = "";
+            aplicarFiltros();
+        }
+    );
+}
+
+
+filtroGratisRapido?.addEventListener(
+    "click",
+    () => {
+        if (!filtroPrecio) {
             return;
         }
 
-        if (
-            !filtroDistancia.value ||
-            filtroDistancia.value === "todas"
-        ) {
-            filtroDistancia.value = "15";
-        }
+        const activo =
+            filtroPrecio.value ===
+            "gratis";
 
-        if (filtroOrden) {
-            filtroOrden.value = "cercania";
-        }
+        filtroPrecio.value =
+            activo
+                ? "todos"
+                : "gratis";
 
-        actualizarEstadoUbicacionFiltro(
-            "Ubicación activada",
-            "ok"
-        );
-
-        actualizarDistanciasTarjetas();
+        fechaBuscadaDesdePortada = "";
+        actualizarEstadoFiltroGratisRapido();
         aplicarFiltros();
     }
 );
+
+
+filtroPrecio?.addEventListener(
+    "change",
+    () => {
+        actualizarEstadoFiltroGratisRapido();
+        aplicarFiltros();
+    }
+);
+
+opcionesAnimoUnificado.forEach((opcion) => {
+    opcion.addEventListener(
+        "change",
+        () => {
+            if (!opcion.checked || !filtroAnimo) {
+                return;
+            }
+
+            filtroAnimo.value = opcion.value;
+            fechaBuscadaDesdePortada = "";
+            aplicarFiltros();
+        }
+    );
+});
+
+opcionesDistanciaUnificada.forEach((opcion) => {
+    opcion.addEventListener(
+        "change",
+        async () => {
+            if (!opcion.checked || !filtroDistancia) {
+                return;
+            }
+
+            const valorAnterior =
+                filtroDistancia.value ||
+                "todas";
+
+            filtroDistancia.value =
+                opcion.value;
+
+            fechaBuscadaDesdePortada = "";
+
+            if (opcion.value === "todas") {
+                actualizarDistanciasTarjetas();
+                aplicarFiltros();
+                return;
+            }
+
+            const disponible =
+                await solicitarUbicacionParaFiltro();
+
+            if (!disponible) {
+                filtroDistancia.value =
+                    valorAnterior === "todas"
+                        ? "todas"
+                        : valorAnterior;
+
+                opcionesDistanciaUnificada.forEach((radio) => {
+                    radio.checked =
+                        radio.value === filtroDistancia.value;
+                });
+
+                actualizarDistanciasTarjetas();
+                aplicarFiltros();
+                return;
+            }
+
+            actualizarDistanciasTarjetas();
+            aplicarFiltros();
+        }
+    );
+});
+
+actualizarEstadoFiltroGratisRapido();
+
 
 
 listaFiltrosActivos?.addEventListener(
@@ -3598,6 +3956,42 @@ botonModoSuralia?.addEventListener(
         botonModoSuralia.classList.toggle(
             "activo",
             abrir
+        );
+    }
+);
+
+
+function programarActualizacionAutomaticaModoSuralia() {
+    /*
+        Antes de la primera búsqueda dejamos que el usuario configure
+        tranquilamente sus preferencias. Una vez hay recomendaciones,
+        el Modo Suralia pasa a ser completamente reactivo.
+    */
+    if (!modoSuraliaEnUso) {
+        return;
+    }
+
+    clearTimeout(
+        temporizadorActualizacionModoSuralia
+    );
+
+    temporizadorActualizacionModoSuralia =
+        setTimeout(
+            () => {
+                recomendarModoSuralia({
+                    desplazarResultados: false
+                });
+            },
+            120
+        );
+}
+
+
+opcionesInteractivasModoSuralia.forEach(
+    (opcion) => {
+        opcion.addEventListener(
+            "change",
+            programarActualizacionAutomaticaModoSuralia
         );
     }
 );
@@ -4022,6 +4416,26 @@ listaPlanes?.addEventListener(
 
 
 if (filtroTexto) {
+    let temporizadorBusquedaTexto = null;
+
+    filtroTexto.addEventListener(
+        "input",
+        () => {
+            clearTimeout(
+                temporizadorBusquedaTexto
+            );
+
+            temporizadorBusquedaTexto =
+                setTimeout(
+                    () => {
+                        fechaBuscadaDesdePortada = "";
+                        aplicarFiltros();
+                    },
+                    160
+                );
+        }
+    );
+
     filtroTexto.addEventListener(
         "keydown",
         (evento) => {
@@ -4534,6 +4948,10 @@ function crearTarjetaPlanSupabase(
             data-enlace="${enlace}"
             data-personas-apuntadas="${personasApuntadas}"
             data-personas-solas="${personasSolas}"
+            data-creado-en="${escaparHTMLPlanes(
+                plan.creado_en ||
+                ""
+            )}"
         >
 
             <a
@@ -4975,11 +5393,6 @@ cargarPlanesPublicadosSupabase();
             "#avisos-busqueda-guardada"
         );
 
-    const notaDistancia =
-        document.querySelector(
-            "#nota-distancia-busqueda"
-        );
-
     const lista =
         document.querySelector(
             "#lista-busquedas-guardadas"
@@ -5098,15 +5511,6 @@ cargarPlanesPublicadosSupabase();
             if (inputAvisos) {
                 inputAvisos.checked = true;
             }
-
-            if (notaDistancia) {
-                notaDistancia.hidden =
-                    !(
-                        filtroDistancia?.value &&
-                        filtroDistancia.value !==
-                            "todas"
-                    );
-            }
         }
     }
 
@@ -5154,6 +5558,20 @@ cargarPlanesPublicadosSupabase();
                 filtroDistancia?.value ||
                 "todas",
 
+            animo:
+                filtroAnimo?.value ||
+                "cualquiera",
+
+            ambiente:
+                Boolean(
+                    filtroAmbiente?.checked
+                ),
+
+            nuevos:
+                Boolean(
+                    filtroNuevos?.checked
+                ),
+
             fecha_rapida:
                 filtroFechaRapidaActual ||
                 "",
@@ -5187,7 +5605,10 @@ cargarPlanesPublicadosSupabase();
             filtros.municipio !== "todos" ||
             filtros.categoria !== "todas" ||
             filtros.precio !== "todos" ||
-            filtros.distancia !== "todas" ||
+            (filtros.distancia || "todas") !== "todas" ||
+            (filtros.animo || "cualquiera") !== "cualquiera" ||
+            filtros.ambiente ||
+            filtros.nuevos ||
             filtros.fecha_rapida ||
             filtros.fecha_personalizada ||
             filtros.voy_solo ||
@@ -5266,19 +5687,6 @@ cargarPlanesPublicadosSupabase();
             );
         }
 
-        if (
-            filtros.distancia &&
-            filtros.distancia !== "todas"
-        ) {
-            partes.push(
-                textoValorSelect(
-                    filtroDistancia,
-                    filtros.distancia
-                ) ||
-                `${filtros.distancia} km`
-            );
-        }
-
         if (filtros.fecha_rapida) {
             const etiquetas = {
                 hoy:
@@ -5320,6 +5728,18 @@ cargarPlanesPublicadosSupabase();
         if (filtros.primera_vez) {
             partes.push(
                 "Primera vez"
+            );
+        }
+
+        if (filtros.ambiente) {
+            partes.push(
+                "Con ambiente"
+            );
+        }
+
+        if (filtros.nuevos) {
+            partes.push(
+                "Recién publicados"
             );
         }
 
@@ -5841,6 +6261,24 @@ cargarPlanesPublicadosSupabase();
                 "todas";
         }
 
+        opcionesDistanciaUnificada.forEach((opcion) => {
+            opcion.checked =
+                opcion.value ===
+                (filtroDistancia?.value || "todas");
+        });
+
+        if (filtroAnimo) {
+            filtroAnimo.value =
+                filtros.animo ||
+                "cualquiera";
+        }
+
+        opcionesAnimoUnificado.forEach((opcion) => {
+            opcion.checked =
+                opcion.value ===
+                (filtroAnimo?.value || "cualquiera");
+        });
+
         if (filtroVoySolo) {
             filtroVoySolo.checked =
                 Boolean(
@@ -5852,6 +6290,20 @@ cargarPlanesPublicadosSupabase();
             filtroPrimeraVez.checked =
                 Boolean(
                     filtros.primera_vez
+                );
+        }
+
+        if (filtroAmbiente) {
+            filtroAmbiente.checked =
+                Boolean(
+                    filtros.ambiente
+                );
+        }
+
+        if (filtroNuevos) {
+            filtroNuevos.checked =
+                Boolean(
+                    filtros.nuevos
                 );
         }
 
@@ -5874,25 +6326,20 @@ cargarPlanesPublicadosSupabase();
         }
 
         actualizarEstadoFiltrosFecha();
+        actualizarEstadoFiltroGratisRapido();
 
         const necesitaUbicacion =
+            filtroOrden?.value === "cercania" ||
             (
                 filtroDistancia?.value &&
-                filtroDistancia.value !==
-                    "todas"
-            ) ||
-            filtroOrden?.value ===
-                "cercania";
+                filtroDistancia.value !== "todas"
+            );
 
         if (necesitaUbicacion) {
             const disponible =
                 await solicitarUbicacionParaFiltro();
 
             if (!disponible) {
-                if (filtroDistancia) {
-                    filtroDistancia.value =
-                        "todas";
-                }
 
                 if (
                     filtroOrden?.value ===
@@ -5900,6 +6347,18 @@ cargarPlanesPublicadosSupabase();
                 ) {
                     filtroOrden.value =
                         "recomendados";
+                }
+
+                if (
+                    filtroDistancia?.value &&
+                    filtroDistancia.value !== "todas"
+                ) {
+                    filtroDistancia.value = "todas";
+
+                    opcionesDistanciaUnificada.forEach((opcion) => {
+                        opcion.checked =
+                            opcion.value === "todas";
+                    });
                 }
             }
         }
