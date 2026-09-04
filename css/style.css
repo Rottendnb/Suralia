@@ -31646,3 +31646,523 @@ body.modal-post-plan-abierto {
         height: 150px !important;
     }
 }
+
+/* =====================================================
+   SURALIA · PERFIL V8
+   RESERVAS + ASISTENCIAS CON ENTRADA EXTERNA
+===================================================== */
+
+.reserva-perfil__etiquetas {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.reserva-estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.reserva-estado--entrada-pendiente {
+    background: rgba(255, 194, 71, 0.19) !important;
+    color: #806014 !important;
+}
+
+.reserva-estado--entrada-confirmada {
+    background: rgba(23, 102, 88, 0.12) !important;
+    color: var(--color-secundario, #093f36) !important;
+}
+
+.reserva-perfil__tipo-externo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border: 1px solid var(--color-borde);
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--color-texto-suave);
+    font-size: 0.67rem;
+    font-weight: 800;
+}
+
+.reserva-item--externa,
+.reserva-resumen--externa {
+    position: relative;
+}
+
+.reserva-item--entrada-pendiente,
+.reserva-resumen--entrada-pendiente {
+    border-color: rgba(255, 194, 71, 0.55) !important;
+}
+
+.reserva-perfil__social {
+    margin: 14px 0 4px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    border: 1px solid rgba(23, 102, 88, 0.13);
+    border-radius: 12px;
+    background: rgba(233, 244, 239, 0.58);
+}
+
+.reserva-perfil__social > span {
+    flex-shrink: 0;
+    color: var(--color-secundario);
+    font-size: 0.76rem;
+    font-weight: 800;
+}
+
+.reserva-perfil__social > small {
+    color: var(--color-texto-suave);
+    font-size: 0.68rem;
+    line-height: 1.55;
+    text-align: right;
+}
+
+.reserva-perfil__como-va {
+    color: var(--color-secundario) !important;
+    font-weight: 800;
+}
+
+.reserva-resumen__acciones {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.reserva-resumen__acciones .boton-ver-reserva {
+    margin-top: 0;
+}
+
+.boton-entrada-externa-perfil,
+.boton-confirmar-entrada-perfil {
+    min-height: 42px;
+    padding: 0 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 0.72rem;
+    font-weight: 800;
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background-color 0.18s ease;
+}
+
+.boton-entrada-externa-perfil {
+    border: 1px solid var(--color-borde);
+    background: #ffffff;
+    color: var(--color-secundario);
+}
+
+.boton-confirmar-entrada-perfil {
+    border: 1px solid var(--color-secundario);
+    background: var(--color-secundario);
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.boton-entrada-externa-perfil:hover,
+.boton-confirmar-entrada-perfil:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(5, 45, 39, 0.10);
+}
+
+.boton-confirmar-entrada-perfil:disabled {
+    opacity: 0.65;
+    cursor: wait;
+    transform: none;
+}
+
+@media (max-width: 760px) {
+    .reserva-perfil__social {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .reserva-perfil__social > small {
+        text-align: left;
+    }
+
+    .reserva-item__acciones,
+    .reserva-resumen__acciones {
+        align-items: stretch;
+    }
+
+    .reserva-item__acciones > a,
+    .reserva-item__acciones > button,
+    .reserva-resumen__acciones > a,
+    .reserva-resumen__acciones > button {
+        flex: 1 1 190px;
+    }
+}
+
+@media (max-width: 480px) {
+    .reserva-perfil__etiquetas {
+        align-items: flex-start;
+    }
+
+    .reserva-perfil__tipo-externo,
+    .reserva-estado {
+        font-size: 0.64rem;
+    }
+
+    .reserva-item__acciones > a,
+    .reserva-item__acciones > button,
+    .reserva-resumen__acciones > a,
+    .reserva-resumen__acciones > button {
+        width: 100%;
+        flex-basis: 100%;
+    }
+}
+
+/* =========================================================
+   SURALIA · ASISTENTES ANTES Y DESPUÉS DEL PLAN · V9
+   Añadir al FINAL de css/style.css
+========================================================= */
+
+/* El botón de un plan futuro se diferencia del post-plan. */
+.boton-conectar-post-plan--antes {
+    border-color: rgba(232, 93, 50, 0.28);
+    background: #fff4ef;
+    color: var(--color-principal);
+}
+
+.boton-conectar-post-plan--antes:hover {
+    border-color: rgba(232, 93, 50, 0.48);
+    background: #ffebe3;
+}
+
+/* Etiquetas sociales dentro de cada asistente. */
+.post-plan-persona__etiquetas {
+    margin-top: 0.36rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+
+.post-plan-persona__etiquetas .post-plan-persona__afinidad {
+    margin-top: 0;
+}
+
+.post-plan-persona__contexto {
+    width: fit-content;
+    min-height: 25px;
+    padding: 0 0.48rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    border-radius: 999px;
+    background: #eef5f2;
+    color: #42645b;
+    font-size: 0.51rem;
+    font-weight: 850;
+}
+
+.post-plan-persona__contexto i {
+    color: #4d7c70;
+}
+
+.post-plan-persona__contexto--solo {
+    background: #edf7f3;
+    color: #176658;
+}
+
+@media (max-width: 700px) {
+    .boton-conectar-post-plan,
+    .boton-conectar-post-plan--antes {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .post-plan-persona__etiquetas {
+        width: 100%;
+    }
+}
+
+/* =====================================================
+   SURALIA · FESTIVAL · ABONO GENERAL
+   Añadir al final de css/style.css
+===================================================== */
+
+.abono-festival-publicar {
+    margin-top: 18px;
+    padding: 18px;
+    border: 1px solid rgba(14, 65, 55, 0.12);
+    border-radius: 18px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfdfc 100%);
+}
+
+.abono-festival-publicar[hidden],
+.abono-festival-publicar__campos[hidden] {
+    display: none !important;
+}
+
+.abono-festival-publicar__cabecera {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.abono-festival-publicar__icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    border-radius: 12px;
+    background: rgba(255, 97, 65, 0.10);
+    font-size: 16px;
+}
+
+.abono-festival-publicar__cabecera strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 0.95rem;
+}
+
+.abono-festival-publicar__cabecera p {
+    margin: 0;
+    color: #66736f;
+    font-size: 0.84rem;
+    line-height: 1.5;
+}
+
+.abono-festival-publicar__opcion {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid rgba(14, 65, 55, 0.12);
+    border-radius: 14px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.abono-festival-publicar__opcion:hover {
+    border-color: rgba(255, 97, 65, 0.45);
+}
+
+.abono-festival-publicar__opcion input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.abono-festival-publicar__control {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    flex: 0 0 40px;
+    border-radius: 999px;
+    background: #dfe6e3;
+    transition: background 0.2s ease;
+}
+
+.abono-festival-publicar__control::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
+    transition: transform 0.2s ease;
+}
+
+.abono-festival-publicar__opcion input:checked + .abono-festival-publicar__control {
+    background: #ff6141;
+}
+
+.abono-festival-publicar__opcion input:checked + .abono-festival-publicar__control::after {
+    transform: translateX(18px);
+}
+
+.abono-festival-publicar__opcion input:focus-visible + .abono-festival-publicar__control {
+    outline: 3px solid rgba(255, 97, 65, 0.18);
+    outline-offset: 2px;
+}
+
+.abono-festival-publicar__opcion > span:last-child {
+    min-width: 0;
+}
+
+.abono-festival-publicar__opcion strong,
+.abono-festival-publicar__opcion small {
+    display: block;
+}
+
+.abono-festival-publicar__opcion strong {
+    margin-bottom: 2px;
+    font-size: 0.9rem;
+}
+
+.abono-festival-publicar__opcion small {
+    color: #72807c;
+    font-size: 0.78rem;
+    line-height: 1.45;
+}
+
+.abono-festival-publicar__campos {
+    padding-top: 14px;
+}
+
+.abono-festival-publicar__resumen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 74px;
+    padding: 11px 13px;
+    border-radius: 13px;
+    background: rgba(14, 65, 55, 0.055);
+}
+
+.abono-festival-publicar__resumen span {
+    margin-bottom: 2px;
+    color: #72807c;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.abono-festival-publicar__resumen strong {
+    font-size: 0.9rem;
+}
+
+.abono-festival-publicar__resumen small {
+    margin-top: 3px;
+    color: #72807c;
+    font-size: 0.74rem;
+    line-height: 1.4;
+}
+
+@media (max-width: 700px) {
+    .abono-festival-publicar {
+        padding: 14px;
+        border-radius: 15px;
+    }
+
+    .abono-festival-publicar__opcion {
+        align-items: flex-start;
+        padding: 12px;
+    }
+
+    .abono-festival-publicar__control {
+        margin-top: 2px;
+    }
+}
+/* =========================================================
+   SURALIA · V11 · ABONO GENERAL EN DETALLE DE FESTIVAL
+   Añadir al final de css/style.css
+========================================================= */
+
+#detalle-plan .fecha-disponible-detalle--abono {
+    border-color: rgba(232, 93, 50, 0.32);
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 247, 241, 0.98),
+            rgba(255, 255, 255, 0.98)
+        );
+}
+
+#detalle-plan .fecha-disponible-detalle--abono:hover,
+#detalle-plan .fecha-disponible-detalle--abono:focus-visible,
+#detalle-plan .fecha-disponible-detalle--abono.fecha-disponible-detalle--seleccionada {
+    border-color: var(--color-principal);
+    box-shadow: 0 10px 24px rgba(232, 93, 50, 0.11);
+}
+
+#detalle-plan .fecha-disponible-detalle--abono .fecha-disponible-detalle__icono {
+    background: rgba(232, 93, 50, 0.11);
+    color: var(--color-principal);
+}
+
+#detalle-plan .fecha-disponible-detalle--abono .fecha-disponible-detalle__contenido strong {
+    color: var(--color-principal);
+}
+
+#detalle-plan .fecha-disponible-detalle--abono .fecha-disponible-detalle__plazas {
+    font-weight: 750;
+}
+
+@media (max-width: 760px) {
+    #detalle-plan .fecha-disponible-detalle--abono {
+        padding: 13px;
+    }
+}
+
+/* =========================================================
+   SURALIA · V12 · ABONO GENERAL EN PERFIL + ASISTENTES
+   Añadir al FINAL de css/style.css
+========================================================= */
+
+.reserva-perfil__tipo-pase {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 27px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    border: 1px solid rgba(23, 102, 88, 0.15);
+    background: #f3f8f6;
+    color: #42645b;
+    font-size: 0.66rem;
+    font-weight: 850;
+}
+
+.reserva-perfil__tipo-pase--abono {
+    border-color: rgba(232, 93, 50, 0.24);
+    background: #fff2ec;
+    color: #b84b2b;
+}
+
+.reserva-perfil__tipo-pase--abono i {
+    color: var(--color-principal);
+}
+
+.post-plan-persona__pase {
+    width: fit-content;
+    min-height: 25px;
+    padding: 0 0.48rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    border-radius: 999px;
+    background: #f2f4f3;
+    color: #52645f;
+    font-size: 0.51rem;
+    font-weight: 850;
+}
+
+.post-plan-persona__pase--abono {
+    background: #fff0ea;
+    color: #b84b2b;
+}
+
+.post-plan-persona__pase--abono i {
+    color: var(--color-principal);
+}
+
+@media (max-width: 480px) {
+    .reserva-perfil__tipo-pase {
+        font-size: 0.63rem;
+    }
+}

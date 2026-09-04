@@ -149,242 +149,259 @@ function normalizarHoraPlan(
 }
 
 
-function crearFechasReservaSupabase(
-    plan
-) {
-    const resultado =
-        [];
+function obtenerAbonoGeneralPlan(plan) {
+    const detalles =
+        plan?.detalles_extra &&
+        typeof plan.detalles_extra === "object" &&
+        !Array.isArray(plan.detalles_extra)
+            ? plan.detalles_extra
+            : {};
 
-    const claves =
-        new Set();
+    const abono =
+        detalles.abono_general &&
+        typeof detalles.abono_general === "object" &&
+        !Array.isArray(detalles.abono_general)
+            ? detalles.abono_general
+            : null;
+
+    if (!abono || abono.activo !== true) {
+        return null;
+    }
+
+    const fechaInicio = String(abono.fecha_inicio || "").slice(0, 10);
+    const fechaFin = String(abono.fecha_fin || "").slice(0, 10);
+    const precio = Number(abono.precio);
+
+    if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(fechaInicio) ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(fechaFin) ||
+        fechaFin < fechaInicio ||
+        !Number.isFinite(precio) ||
+        precio < 0
+    ) {
+        return null;
+    }
+
+    return {
+        activo: true,
+        codigo: String(abono.codigo || "abono-general").trim() || "abono-general",
+        tipo: "abono_general",
+        nombre: String(abono.nombre || "Abono general").trim() || "Abono general",
+        fechaInicio,
+        fechaFin,
+        precio
+    };
+}
+
+
+function formatearPrecioPaseDetalle(precio) {
+    const valor = Number(precio || 0);
+
+    if (!Number.isFinite(valor) || valor <= 0) {
+        return "Gratis";
+    }
+
+    return `${valor
+        .toFixed(2)
+        .replace(".00", "")
+        .replace(".", ",")} €`;
+}
+
+
+function formatearRangoAbonoDetalle(fechaInicio, fechaFin) {
+    if (!fechaInicio || !fechaFin) {
+        return "Todos los días";
+    }
+
+    const inicio = new Date(`${fechaInicio}T00:00:00`);
+    const fin = new Date(`${fechaFin}T00:00:00`);
+
+    if (Number.isNaN(inicio.getTime()) || Number.isNaN(fin.getTime())) {
+        return "Todos los días";
+    }
+
+    if (fechaInicio === fechaFin) {
+        return formatearFechaDetalleSupabase(fechaInicio);
+    }
+
+    const mismoMes =
+        inicio.getFullYear() === fin.getFullYear() &&
+        inicio.getMonth() === fin.getMonth();
+
+    if (mismoMes) {
+        const mes = new Intl.DateTimeFormat("es-ES", { month: "long" }).format(fin);
+        return `${inicio.getDate()}–${fin.getDate()} de ${mes}`;
+    }
+
+    return `${formatearFechaDetalleSupabase(fechaInicio)} – ${formatearFechaDetalleSupabase(fechaFin)}`;
+}
+
+
+function crearFechasReservaSupabase(plan) {
+    const resultado = [];
+    const claves = new Set();
 
     const anadirFecha = (
         fechaValor,
         horaValor = "",
-        plazasValor = null
+        plazasValor = null,
+        precioValor = null
     ) => {
-        const fechaLimpia =
-            String(
-                fechaValor ||
-                ""
-            ).trim();
+        const fechaLimpia = String(fechaValor || "").trim();
+        const horaLimpia = normalizarHoraPlan(horaValor);
 
-        const horaLimpia =
-            normalizarHoraPlan(
-                horaValor
-            );
-
-        if (!fechaLimpia) {
+        if (!fechaLimpia || fechaPlanHaPasado(fechaLimpia)) {
             return;
         }
 
-        /*
-            Las fechas anteriores a hoy desaparecen del detalle
-            y nunca llegan al selector de reserva.
-        */
-        if (
-            fechaPlanHaPasado(
-                fechaLimpia
-            )
-        ) {
+        const clave = `${fechaLimpia}|${horaLimpia}`;
+
+        if (claves.has(clave)) {
             return;
         }
 
-        const clave =
-            `${fechaLimpia}|${horaLimpia}`;
+        claves.add(clave);
 
-        if (
-            claves.has(
-                clave
-            )
-        ) {
-            return;
-        }
+        const fechaTexto = formatearFechaDetalleSupabase(fechaLimpia);
+        const texto = horaLimpia
+            ? `${fechaTexto} · ${horaLimpia}`
+            : fechaTexto;
 
-        claves.add(
-            clave
-        );
-
-        const fechaTexto =
-            formatearFechaDetalleSupabase(
-                fechaLimpia
-            );
-
-        const texto =
-            horaLimpia
-                ? `${fechaTexto} · ${horaLimpia}`
-                : fechaTexto;
-
-        const plazasNumero =
-            Number(
-                plazasValor
-            );
+        const plazasNumero = Number(plazasValor);
+        const precioNumero = Number(precioValor);
 
         resultado.push({
-            valor:
-                horaLimpia
-                    ? `${fechaLimpia}T${horaLimpia}`
-                    : fechaLimpia,
-            fecha:
-                fechaLimpia,
-            hora:
-                horaLimpia,
+            valor: horaLimpia ? `${fechaLimpia}T${horaLimpia}` : fechaLimpia,
+            fecha: fechaLimpia,
+            fechaFin: fechaLimpia,
+            hora: horaLimpia,
             plazas:
-                Number.isFinite(
-                    plazasNumero
-                ) &&
-                plazasNumero > 0
-                    ? Math.floor(
-                        plazasNumero
-                    )
+                Number.isFinite(plazasNumero) && plazasNumero > 0
+                    ? Math.floor(plazasNumero)
                     : null,
+            precio:
+                Number.isFinite(precioNumero) && precioNumero >= 0
+                    ? precioNumero
+                    : Number(plan?.precio || 0),
+            tipoPase: "dia",
+            codigoPase: `dia:${fechaLimpia}|${horaLimpia}`,
+            esAbonoGeneral: false,
             texto
         });
     };
 
     if (plan?.fecha) {
-        anadirFecha(
-            plan.fecha,
-            plan.hora,
-            plan.plazas
-        );
+        anadirFecha(plan.fecha, plan.hora, plan.plazas, plan.precio);
     }
+
+    if (Array.isArray(plan?.fechas)) {
+        plan.fechas.forEach((item) => {
+            if (typeof item === "string") {
+                anadirFecha(item, plan.hora, null, plan.precio);
+                return;
+            }
+
+            anadirFecha(
+                item?.fecha,
+                item?.hora || plan.hora,
+                item?.plazas,
+                item?.precio ?? plan.precio
+            );
+        });
+    }
+
+    resultado.sort((a, b) => {
+        const claveA = `${a.fecha}T${a.hora || "00:00"}`;
+        const claveB = `${b.fecha}T${b.hora || "00:00"}`;
+        return claveA.localeCompare(claveB);
+    });
+
+    const abono = obtenerAbonoGeneralPlan(plan);
 
     if (
-        Array.isArray(
-            plan?.fechas
-        )
+        abono &&
+        !fechaPlanHaPasado(abono.fechaFin) &&
+        String(plan?.enlace_reserva || "").trim()
     ) {
-        plan.fechas.forEach(
-            (
-                item
-            ) => {
-                if (
-                    typeof item ===
-                    "string"
-                ) {
-                    anadirFecha(
-                        item,
-                        plan.hora,
-                        null
-                    );
+        const horaAncla =
+            resultado.find((item) => item.fecha === abono.fechaInicio)?.hora ||
+            normalizarHoraPlan(plan?.hora);
 
-                    return;
-                }
-
-                anadirFecha(
-                    item?.fecha,
-                    item?.hora ||
-                        plan.hora,
-                    item?.plazas
-                );
-            }
-        );
-    }
-
-    resultado.sort(
-        (
-            a,
-            b
-        ) => {
-            const claveA =
-                `${a.fecha}T${a.hora || "00:00"}`;
-
-            const claveB =
-                `${b.fecha}T${b.hora || "00:00"}`;
-
-            return claveA.localeCompare(
-                claveB
-            );
+        if (horaAncla) {
+            resultado.unshift({
+                valor: `abono:${abono.codigo}`,
+                fecha: abono.fechaInicio,
+                fechaFin: abono.fechaFin,
+                hora: horaAncla,
+                plazas: null,
+                precio: abono.precio,
+                tipoPase: "abono_general",
+                codigoPase: abono.codigo,
+                esAbonoGeneral: true,
+                texto: `🎟️ ${abono.nombre} · Todos los días · ${formatearPrecioPaseDetalle(abono.precio)}`
+            });
         }
-    );
+    }
 
     return resultado;
 }
 
 
-function normalizarOpcionFechaReserva(
-    item
-) {
-    if (
-        Array.isArray(
-            item
-        )
-    ) {
-        const valor =
-            String(
-                item[0] ||
-                ""
-            );
-
-        const texto =
-            String(
-                item[1] ||
-                valor
-            );
+function normalizarOpcionFechaReserva(item) {
+    if (Array.isArray(item)) {
+        const valor = String(item[0] || "");
+        const texto = String(item[1] || valor);
+        const fecha = /^\d{4}-\d{2}-\d{2}$/.test(valor)
+            ? valor
+            : (planActual?.fechaIso || valor);
+        const hora = normalizarHoraPlan(planActual?.hora);
 
         return {
             valor,
-            fecha:
-                /^\d{4}-\d{2}-\d{2}$/.test(
-                    valor
-                )
-                    ? valor
-                    : (
-                        planActual?.fechaIso ||
-                        valor
-                    ),
-            hora:
-                normalizarHoraPlan(
-                    planActual?.hora
-                ),
-            plazas:
-                null,
+            fecha,
+            fechaFin: fecha,
+            hora,
+            plazas: null,
+            precio: Number(planActual?.precio || 0),
+            tipoPase: "dia",
+            codigoPase: `dia:${fecha}|${hora}`,
+            esAbonoGeneral: false,
             texto
         };
     }
 
-    if (
-        item &&
-        typeof item ===
-            "object"
-    ) {
-        const plazasNumero =
-            Number(
-                item.plazas
-            );
+    if (item && typeof item === "object") {
+        const plazasNumero = Number(item.plazas);
+        const precioNumero = Number(item.precio);
+        const tipoPase = String(item.tipoPase || item.tipo_pase || "dia");
+        const fecha = String(item.fecha || "");
+        const hora = normalizarHoraPlan(item.hora);
 
         return {
-            valor:
-                String(
-                    item.valor ||
-                    item.fecha ||
-                    ""
-                ),
-            fecha:
-                String(
-                    item.fecha ||
-                    ""
-                ),
-            hora:
-                normalizarHoraPlan(
-                    item.hora
-                ),
+            valor: String(item.valor || item.fecha || ""),
+            fecha,
+            fechaFin: String(item.fechaFin || item.fecha_fin || fecha),
+            hora,
             plazas:
-                Number.isFinite(
-                    plazasNumero
-                ) &&
-                plazasNumero > 0
-                    ? Math.floor(
-                        plazasNumero
-                    )
+                Number.isFinite(plazasNumero) && plazasNumero > 0
+                    ? Math.floor(plazasNumero)
                     : null,
-            texto:
+            precio:
+                Number.isFinite(precioNumero) && precioNumero >= 0
+                    ? precioNumero
+                    : Number(planActual?.precio || 0),
+            tipoPase,
+            codigoPase:
                 String(
-                    item.texto ||
-                    item.fecha ||
-                    ""
-                )
+                    item.codigoPase ||
+                    item.codigo_pase ||
+                    (tipoPase === "abono_general"
+                        ? "abono-general"
+                        : `dia:${fecha}|${hora}`)
+                ),
+            esAbonoGeneral:
+                Boolean(item.esAbonoGeneral) || tipoPase === "abono_general",
+            texto: String(item.texto || item.fecha || "")
         };
     }
 
@@ -393,27 +410,24 @@ function normalizarOpcionFechaReserva(
 
 
 function obtenerOpcionesFechasReserva() {
-    const fechas =
-        Array.isArray(
-            planActual?.fechasReserva
-        )
-            ? planActual.fechasReserva
-            : [];
+    const fechas = Array.isArray(planActual?.fechasReserva)
+        ? planActual.fechasReserva
+        : [];
 
     return fechas
-        .map(
-            normalizarOpcionFechaReserva
-        )
-        .filter(
-            (
-                item
-            ) =>
-                item &&
-                item.valor &&
-                !fechaPlanHaPasado(
-                    item.fecha
-                )
-        );
+        .map(normalizarOpcionFechaReserva)
+        .filter((item) => {
+            if (!item || !item.valor) {
+                return false;
+            }
+
+            const fechaCaducidad =
+                item.tipoPase === "abono_general"
+                    ? (item.fechaFin || item.fecha)
+                    : item.fecha;
+
+            return !fechaPlanHaPasado(fechaCaducidad);
+        });
 }
 
 
@@ -2545,6 +2559,10 @@ function textoDisponibilidadFecha(
     opcion,
     paraReservaExterna = false
 ) {
+    if (opcion?.tipoPase === "abono_general") {
+        return "Acceso a todos los días";
+    }
+
     const disponibilidad =
         obtenerDisponibilidadOpcionFecha(
             opcion
@@ -2866,6 +2884,17 @@ function actualizarResumenSocialFechaSeleccionada() {
         return;
     }
 
+    if (opcion.tipoPase === "abono_general") {
+        contadorApuntadas.textContent =
+            "Abono válido para todos los días";
+
+        contadorSolas.textContent =
+            "Podrás conectar con asistentes de cada jornada";
+
+        bloqueVoySolo.hidden = false;
+        return;
+    }
+
     const disponibilidad =
         obtenerDisponibilidadOpcionFecha(
             opcion
@@ -2956,7 +2985,6 @@ function sincronizarFechaVisibleSeleccionada() {
                 elemento
             ) => {
                 const estaSeleccionada =
-                    !planUsaReservaExterna() &&
                     String(
                         elemento.dataset.fechaReservaValor ||
                         ""
@@ -3077,11 +3105,7 @@ function cargarFechasDisponiblesDetalle() {
             opcion
         ) => {
             const elemento =
-                document.createElement(
-                    planUsaReservaExterna()
-                        ? "div"
-                        : "button"
-                );
+                document.createElement("button");
 
             if (
                 elemento.tagName ===
@@ -3097,7 +3121,11 @@ function cargarFechasDisponiblesDetalle() {
             }
 
             elemento.className =
-                "fecha-disponible-detalle";
+                `fecha-disponible-detalle${
+                    opcion.tipoPase === "abono_general"
+                        ? " fecha-disponible-detalle--abono"
+                        : ""
+                }`;
 
             elemento.dataset.fechaReservaValor =
                 opcion.valor;
@@ -3108,9 +3136,11 @@ function cargarFechasDisponiblesDetalle() {
             );
 
             const fechaTexto =
-                formatearFechaDetalleSupabase(
-                    opcion.fecha
-                );
+                opcion.tipoPase === "abono_general"
+                    ? "Abono general · Todos los días"
+                    : formatearFechaDetalleSupabase(
+                        opcion.fecha
+                    );
 
             const esReservaExterna =
                 planUsaReservaExterna();
@@ -3141,7 +3171,11 @@ function cargarFechasDisponiblesDetalle() {
             elemento.innerHTML = `
                 <span class="fecha-disponible-detalle__icono">
                     <i
-                        class="fa-regular fa-calendar"
+                        class="fa-solid ${
+                            opcion.tipoPase === "abono_general"
+                                ? "fa-ticket"
+                                : "fa-calendar"
+                        }"
                         aria-hidden="true"
                     ></i>
                 </span>
@@ -3157,8 +3191,17 @@ function cargarFechasDisponiblesDetalle() {
                             aria-hidden="true"
                         ></i>
                         ${
-                            opcion.hora ||
-                            "Hora por confirmar"
+                            opcion.tipoPase === "abono_general"
+                                ? `${formatearRangoAbonoDetalle(
+                                    opcion.fecha,
+                                    opcion.fechaFin
+                                )} · ${formatearPrecioPaseDetalle(
+                                    opcion.precio
+                                )}`
+                                : (
+                                    opcion.hora ||
+                                    "Hora por confirmar"
+                                )
                         }
                     </span>
 
@@ -3176,6 +3219,7 @@ function cargarFechasDisponiblesDetalle() {
                     </span>
 
                     ${
+                        opcion.tipoPase !== "abono_general" &&
                         Number(
                             disponibilidad.personasSolas ||
                             0
@@ -3198,19 +3242,13 @@ function cargarFechasDisponiblesDetalle() {
                     }
                 </span>
 
-                ${
-                    esReservaExterna
-                        ? ""
-                        : `
-                            <span class="fecha-disponible-detalle__accion">
-                                ${
-                                    agotado
-                                        ? "Agotado"
-                                        : "Elegir"
-                                }
-                            </span>
-                        `
-                }
+                <span class="fecha-disponible-detalle__accion">
+                    ${
+                        agotado
+                            ? "Agotado"
+                            : "Elegir"
+                    }
+                </span>
             `;
 
             if (
@@ -3319,6 +3357,20 @@ function cargarFechasReserva() {
             opcion.dataset.plazas =
                 item.plazas ??
                 "";
+
+            opcion.dataset.tipoPase =
+                item.tipoPase || "dia";
+
+            opcion.dataset.codigoPase =
+                item.codigoPase || "";
+
+            opcion.dataset.precioPase =
+                Number.isFinite(Number(item.precio))
+                    ? String(item.precio)
+                    : "";
+
+            opcion.dataset.fechaFin =
+                item.fechaFin || item.fecha || "";
 
             if (
                 !planUsaReservaExterna()
@@ -4264,49 +4316,59 @@ function normalizarHoraFiltroReservaExterna(
 function obtenerDatosPaseSeleccionadoReserva() {
     const selectorFecha =
         selectorFechaReserva ||
-        seleccionar(
-            "#fecha-reserva"
-        );
+        seleccionar("#fecha-reserva");
 
     if (!selectorFecha) {
         return null;
     }
 
-    const fechaSeleccionada =
-        String(
-            selectorFecha.value ||
-            ""
-        ).trim();
+    const fechaSeleccionada = String(selectorFecha.value || "").trim();
+    const opcion = selectorFecha.options[selectorFecha.selectedIndex];
 
-    const opcion =
-        selectorFecha.options[
-            selectorFecha.selectedIndex
-        ];
+    const tipoPase = String(opcion?.dataset?.tipoPase || "dia");
+    const codigoPase = String(
+        opcion?.dataset?.codigoPase ||
+        (tipoPase === "abono_general"
+            ? "abono-general"
+            : "")
+    ).trim();
 
-    const fechaIso =
-        String(
-            opcion?.dataset?.fecha ||
-            fechaSeleccionada
-                .slice(
-                    0,
-                    10
-                ) ||
-            ""
-        ).trim();
+    const fechaIso = String(
+        opcion?.dataset?.fecha ||
+        fechaSeleccionada.slice(0, 10) ||
+        ""
+    ).trim();
 
-    const hora =
-        normalizarHoraPlan(
-            opcion?.dataset?.hora ||
-            planActual?.hora
-        );
+    const fechaFin = String(
+        opcion?.dataset?.fechaFin ||
+        fechaIso ||
+        ""
+    ).trim();
+
+    const hora = normalizarHoraPlan(
+        opcion?.dataset?.hora ||
+        planActual?.hora
+    );
+
+    const precioPase = Number(opcion?.dataset?.precioPase);
 
     return {
         fechaSeleccionada,
         fechaIso,
+        fechaFin,
         hora,
-        textoFecha:
-            opcion?.text ||
-            ""
+        tipoPase,
+        codigoPase:
+            codigoPase ||
+            (tipoPase === "dia"
+                ? `dia:${fechaIso}|${hora}`
+                : "abono-general"),
+        precioPase:
+            Number.isFinite(precioPase) && precioPase >= 0
+                ? precioPase
+                : Number(planActual?.precio || 0),
+        esAbonoGeneral: tipoPase === "abono_general",
+        textoFecha: opcion?.text || ""
     };
 }
 
@@ -4417,6 +4479,9 @@ function pintarEstadoReservaExterna(
             "#boton-confirmar-entrada-externa"
         );
 
+    const paseActual =
+        obtenerDatosPaseSeleccionadoReserva();
+
     if (
         !bloque ||
         !planUsaReservaExterna()
@@ -4463,7 +4528,9 @@ function pintarEstadoReservaExterna(
 
         if (titulo) {
             titulo.textContent =
-                "Entrada confirmada en Suralia";
+                paseActual?.tipoPase === "abono_general"
+                    ? "Abono general confirmado en Suralia"
+                    : "Entrada confirmada en Suralia";
         }
 
         if (texto) {
@@ -4503,7 +4570,9 @@ function pintarEstadoReservaExterna(
 
         if (titulo) {
             titulo.textContent =
-                "Entrada pendiente de confirmar";
+                paseActual?.tipoPase === "abono_general"
+                    ? "Abono general pendiente de confirmar"
+                    : "Entrada pendiente de confirmar";
         }
 
         if (texto) {
@@ -4576,56 +4645,32 @@ async function cargarEstadoReservaExternaSeleccionada() {
     if (
         !planUsaReservaExterna() ||
         !planActual?.esPlanSupabase ||
-        !esUuidPlan(
-            planActual?.planId
-        )
+        !esUuidPlan(planActual?.planId)
     ) {
         return;
     }
 
-    const cliente =
-        window.clienteSupabase;
+    const cliente = window.clienteSupabase;
 
     if (!cliente) {
         return;
     }
 
-    const pase =
-        obtenerDatosPaseSeleccionadoReserva();
+    const pase = obtenerDatosPaseSeleccionadoReserva();
 
-    if (
-        !pase?.fechaIso ||
-        !pase?.hora
-    ) {
-        pintarEstadoReservaExterna(
-            null
-        );
-
+    if (!pase?.codigoPase) {
+        pintarEstadoReservaExterna(null);
         return;
     }
 
-    const token =
-        ++tokenConsultaReservaExterna;
-
-    /*
-       Al cambiar de pase borramos inmediatamente el estado anterior.
-       Así nunca se puede confirmar por error la asistencia de otra fecha
-       mientras llega la consulta de Supabase.
-    */
-    pintarEstadoReservaExterna(
-        null
-    );
+    const token = ++tokenConsultaReservaExterna;
+    pintarEstadoReservaExterna(null);
 
     try {
-        const {
-            data: datosSesion,
-            error: errorSesion
-        } = await cliente.auth.getSession();
+        const { data: datosSesion, error: errorSesion } =
+            await cliente.auth.getSession();
 
-        if (
-            token !==
-            tokenConsultaReservaExterna
-        ) {
+        if (token !== tokenConsultaReservaExterna) {
             return;
         }
 
@@ -4633,25 +4678,15 @@ async function cargarEstadoReservaExternaSeleccionada() {
             throw errorSesion;
         }
 
-        const usuarioId =
-            datosSesion?.session?.user?.id;
+        const usuarioId = datosSesion?.session?.user?.id;
 
         if (!usuarioId) {
-            pintarEstadoReservaExterna(
-                null,
-                "sin-sesion"
-            );
-
+            pintarEstadoReservaExterna(null, "sin-sesion");
             return;
         }
 
-        const {
-            data,
-            error
-        } = await cliente
-            .from(
-                "reservas"
-            )
+        let consulta = cliente
+            .from("reservas")
             .select(`
                 id,
                 estado,
@@ -4659,72 +4694,71 @@ async function cargarEstadoReservaExternaSeleccionada() {
                 voy_solo,
                 fecha,
                 hora,
+                tipo_pase,
+                codigo_pase,
                 created_at
             `)
-            .eq(
-                "plan_id",
-                planActual.planId
-            )
-            .eq(
-                "usuario_id",
-                usuarioId
-            )
-            .eq(
-                "fecha",
-                pase.fechaIso
-            )
-            .eq(
-                "hora",
-                normalizarHoraFiltroReservaExterna(
-                    pase.hora
-                )
-            )
-            .in(
-                "estado",
-                [
-                    "pendiente_entrada",
-                    "confirmada"
-                ]
-            )
-            .order(
-                "created_at",
-                {
-                    ascending: false
-                }
-            )
-            .limit(
-                1
-            )
-            .maybeSingle();
+            .eq("plan_id", planActual.planId)
+            .eq("usuario_id", usuarioId)
+            .eq("codigo_pase", pase.codigoPase)
+            .in("estado", ["pendiente_entrada", "confirmada"])
+            .order("created_at", { ascending: false })
+            .limit(1);
 
-        if (
-            token !==
-            tokenConsultaReservaExterna
-        ) {
-            return;
-        }
+        let { data, error } = await consulta.maybeSingle();
 
         if (error) {
             throw error;
         }
 
-        pintarEstadoReservaExterna(
-            data ||
-            null
-        );
+        /*
+           Compatibilidad con asistencias externas creadas antes de V11:
+           los pases por día antiguos todavía no tenían codigo_pase.
+        */
+        if (!data && pase.tipoPase === "dia" && pase.fechaIso && pase.hora) {
+            const resultadoLegacy = await cliente
+                .from("reservas")
+                .select(`
+                    id,
+                    estado,
+                    personas,
+                    voy_solo,
+                    fecha,
+                    hora,
+                    tipo_pase,
+                    codigo_pase,
+                    created_at
+                `)
+                .eq("plan_id", planActual.planId)
+                .eq("usuario_id", usuarioId)
+                .is("codigo_pase", null)
+                .eq("fecha", pase.fechaIso)
+                .eq("hora", normalizarHoraFiltroReservaExterna(pase.hora))
+                .in("estado", ["pendiente_entrada", "confirmada"])
+                .order("created_at", { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
+            if (resultadoLegacy.error) {
+                throw resultadoLegacy.error;
+            }
+
+            data = resultadoLegacy.data;
+        }
+
+        if (token !== tokenConsultaReservaExterna) {
+            return;
+        }
+
+        pintarEstadoReservaExterna(data || null);
     } catch (error) {
         console.error(
             "No se pudo consultar tu estado en el evento externo:",
             error
         );
 
-        if (
-            token ===
-            tokenConsultaReservaExterna
-        ) {
-            pintarEstadoReservaExterna(
-                null
-            );
+        if (token === tokenConsultaReservaExterna) {
+            pintarEstadoReservaExterna(null);
         }
     }
 }
@@ -4733,49 +4767,36 @@ async function cargarEstadoReservaExternaSeleccionada() {
 async function registrarAsistenciaExternaDetalle({
     fechaIso,
     hora,
+    tipoPase,
     numeroPersonas,
     voySolo
 }) {
-    const cliente =
-        window.clienteSupabase;
+    const cliente = window.clienteSupabase;
 
     if (!cliente) {
-        throw new Error(
-            "No se ha podido conectar con Supabase."
-        );
+        throw new Error("No se ha podido conectar con Supabase.");
     }
 
-    const {
-        data: datosSesion,
-        error: errorSesion
-    } = await cliente.auth.getSession();
+    const { data: datosSesion, error: errorSesion } =
+        await cliente.auth.getSession();
 
     if (errorSesion) {
         throw errorSesion;
     }
 
     if (!datosSesion?.session) {
-        throw new Error(
-            "Tu sesión ha caducado. Inicia sesión de nuevo."
-        );
+        throw new Error("Tu sesión ha caducado. Inicia sesión de nuevo.");
     }
 
-    const {
-        data,
-        error
-    } = await cliente.rpc(
-        "registrar_asistencia_externa",
+    const { data, error } = await cliente.rpc(
+        "registrar_asistencia_externa_pase",
         {
-            p_plan_id:
-                planActual.planId,
-            p_fecha:
-                fechaIso,
-            p_hora:
-                hora,
-            p_personas:
-                numeroPersonas,
-            p_voy_solo:
-                voySolo
+            p_plan_id: planActual.planId,
+            p_tipo_pase: tipoPase || "dia",
+            p_fecha: fechaIso || null,
+            p_hora: hora || null,
+            p_personas: numeroPersonas,
+            p_voy_solo: voySolo
         }
     );
 
@@ -4783,43 +4804,25 @@ async function registrarAsistenciaExternaDetalle({
         throw error;
     }
 
-    const respuesta =
-        Array.isArray(
-            data
-        )
-            ? data[0]
-            : data;
+    const respuesta = Array.isArray(data) ? data[0] : data;
 
-    if (
-        !respuesta ||
-        respuesta.ok !== true
-    ) {
-        throw new Error(
-            "No se ha podido guardar cómo vas al evento."
-        );
+    if (!respuesta || respuesta.ok !== true) {
+        throw new Error("No se ha podido guardar cómo vas al evento.");
     }
 
     const reserva = {
-        id:
-            respuesta.reserva_id,
-        estado:
-            respuesta.estado,
-        personas:
-            Number(
-                respuesta.personas ||
-                numeroPersonas
-            ),
+        id: respuesta.reserva_id,
+        estado: respuesta.estado,
+        personas: Number(respuesta.personas || numeroPersonas),
         voy_solo:
-            typeof respuesta.voy_solo ===
-                "boolean"
+            typeof respuesta.voy_solo === "boolean"
                 ? respuesta.voy_solo
-                : voySolo
+                : voySolo,
+        tipo_pase: respuesta.tipo_pase || tipoPase || "dia",
+        codigo_pase: respuesta.codigo_pase || ""
     };
 
-    pintarEstadoReservaExterna(
-        reserva
-    );
-
+    pintarEstadoReservaExterna(reserva);
     return reserva;
 }
 
@@ -4867,7 +4870,10 @@ function validarSeleccionReservaExterna() {
         return null;
     }
 
-    if (!pase.fechaIso || !pase.hora) {
+    if (
+        pase.tipoPase !== "abono_general" &&
+        (!pase.fechaIso || !pase.hora)
+    ) {
         mostrarNotificacion(
             "Este evento necesita una fecha y una hora válidas para apuntarte en Suralia."
         );
@@ -5032,6 +5038,8 @@ async function procesarCompraReservaExterna() {
                     seleccion.fechaIso,
                 hora:
                     seleccion.hora,
+                tipoPase:
+                    seleccion.tipoPase,
                 numeroPersonas:
                     seleccion.numeroPersonas,
                 voySolo:
@@ -5267,9 +5275,13 @@ function actualizarDesgloseReserva() {
     const numeroPersonas =
         obtenerNumeroPersonasReserva();
 
+    const paseSeleccionado =
+        obtenerDatosPaseSeleccionadoReserva();
+
     const precioUnitario =
         Number(
-            planActual.precio ||
+            paseSeleccionado?.precioPase ??
+            planActual.precio ??
             0
         );
 

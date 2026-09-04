@@ -3502,15 +3502,29 @@ function obtenerFechaLocalISOReservaPerfil() {
 function reservaYaRealizadaPerfil(
     reserva
 ) {
+    const esAbono =
+        String(
+            reserva?.tipoPase ||
+            reserva?.tipo_pase ||
+            ""
+        ) === "abono_general";
+
     const fecha =
         String(
-            reserva?.fechaIso ||
-            reserva?.fecha ||
-            ""
-        ).slice(
-            0,
-            10
-        );
+            esAbono
+                ? (
+                    reserva?.fechaFinAbono ||
+                    reserva?.fecha_fin_abono ||
+                    reserva?.fechaIso ||
+                    reserva?.fecha ||
+                    ""
+                )
+                : (
+                    reserva?.fechaIso ||
+                    reserva?.fecha ||
+                    ""
+                )
+        ).slice(0, 10);
 
     if (
         !/^\d{4}-\d{2}-\d{2}$/.test(
@@ -3520,10 +3534,6 @@ function reservaYaRealizadaPerfil(
         return false;
     }
 
-    /*
-        Una reserva de HOY sigue considerándose activa.
-        Solo pasa a "Realizada" a partir del día siguiente.
-    */
     return (
         fecha <
         obtenerFechaLocalISOReservaPerfil()
@@ -4607,6 +4617,269 @@ function construirUbicacionReservaPlan(
         "Ubicación pendiente";
 }
 
+function esAbonoGeneralReservaPerfil(
+    reserva
+) {
+    return String(
+        reserva?.tipoPase ||
+        reserva?.tipo_pase ||
+        ""
+    ) === "abono_general";
+}
+
+function formatearRangoFechasAbonoPerfil(
+    fechaInicio,
+    fechaFin
+) {
+    const inicio = String(fechaInicio || "").slice(0, 10);
+    const fin = String(fechaFin || "").slice(0, 10);
+
+    if (
+        !/^\d{4}-\d{2}-\d{2}$/.test(inicio) ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(fin)
+    ) {
+        return formatearFechaReservaPerfil(inicio || fin);
+    }
+
+    if (inicio === fin) {
+        return formatearFechaReservaPerfil(inicio);
+    }
+
+    const fechaInicioObj = new Date(`${inicio}T00:00:00`);
+    const fechaFinObj = new Date(`${fin}T00:00:00`);
+
+    if (
+        Number.isNaN(fechaInicioObj.getTime()) ||
+        Number.isNaN(fechaFinObj.getTime())
+    ) {
+        return `${inicio} – ${fin}`;
+    }
+
+    if (
+        fechaInicioObj.getFullYear() === fechaFinObj.getFullYear() &&
+        fechaInicioObj.getMonth() === fechaFinObj.getMonth()
+    ) {
+        const mesAnio = new Intl.DateTimeFormat(
+            "es-ES",
+            {
+                month: "long",
+                year: "numeric"
+            }
+        ).format(fechaFinObj);
+
+        return `${fechaInicioObj.getDate()}–${fechaFinObj.getDate()} de ${mesAnio}`;
+    }
+
+    return `${formatearFechaReservaPerfil(inicio)} – ${formatearFechaReservaPerfil(fin)}`;
+}
+
+function obtenerFechaTextoReservaPerfil(
+    reserva
+) {
+    if (esAbonoGeneralReservaPerfil(reserva)) {
+        return formatearRangoFechasAbonoPerfil(
+            reserva?.fechaInicioAbono || reserva?.fecha || "",
+            reserva?.fechaFinAbono || reserva?.fecha || ""
+        );
+    }
+
+    return reserva?.fechaTexto || reserva?.fecha || "Fecha pendiente";
+}
+
+function obtenerHoraTextoReservaPerfil(
+    reserva
+) {
+    if (esAbonoGeneralReservaPerfil(reserva)) {
+        return "Todos los días";
+    }
+
+    return reserva?.hora || "Hora pendiente";
+}
+
+function obtenerEtiquetaPaseReservaPerfil(
+    reserva
+) {
+    if (esAbonoGeneralReservaPerfil(reserva)) {
+        return {
+            texto: "Abono general",
+            clase: "reserva-perfil__tipo-pase--abono",
+            icono: "fa-solid fa-ticket"
+        };
+    }
+
+    if (esReservaExternaPerfil(reserva)) {
+        return {
+            texto: "Entrada de un día",
+            clase: "reserva-perfil__tipo-pase--dia",
+            icono: "fa-regular fa-calendar"
+        };
+    }
+
+    return null;
+}
+
+function esReservaExternaPerfil(
+    reserva
+) {
+    return Boolean(
+        reserva?.esReservaExterna ||
+        String(
+            reserva?.enlaceReservaExterna ||
+            ""
+        ).trim()
+    );
+}
+
+
+function esReservaPendienteEntradaPerfil(
+    reserva
+) {
+    return (
+        String(
+            reserva?.estado ||
+            ""
+        ) ===
+        "pendiente_entrada"
+    );
+}
+
+
+function obtenerEnlaceReservaExternaSeguroPerfil(
+    reserva
+) {
+    const valor =
+        String(
+            reserva?.enlaceReservaExterna ||
+            ""
+        ).trim();
+
+    if (!valor) {
+        return "";
+    }
+
+    try {
+        const url =
+            new URL(
+                valor
+            );
+
+        if (
+            url.protocol !== "https:" &&
+            url.protocol !== "http:"
+        ) {
+            return "";
+        }
+
+        return url.href;
+    } catch (error) {
+        return "";
+    }
+}
+
+
+function obtenerEstadoVisualReservaPerfil(
+    reserva
+) {
+    const externa =
+        esReservaExternaPerfil(
+            reserva
+        );
+
+    const pendiente =
+        esReservaPendienteEntradaPerfil(
+            reserva
+        );
+
+    const realizada =
+        reservaYaRealizadaPerfil(
+            reserva
+        );
+
+    if (pendiente) {
+        return {
+            texto:
+                realizada
+                    ? "Entrada sin confirmar"
+                    : "Entrada pendiente",
+            clase:
+                "reserva-estado--entrada-pendiente",
+            icono:
+                "fa-solid fa-ticket"
+        };
+    }
+
+    if (externa) {
+        return {
+            texto:
+                realizada
+                    ? "Asistencia realizada"
+                    : "Entrada confirmada",
+            clase:
+                realizada
+                    ? "reserva-estado--realizada"
+                    : "reserva-estado--entrada-confirmada",
+            icono:
+                realizada
+                    ? "fa-solid fa-calendar-check"
+                    : "fa-solid fa-circle-check"
+        };
+    }
+
+    return {
+        texto:
+            realizada
+                ? "Realizada"
+                : "Confirmada",
+        clase:
+            realizada
+                ? "reserva-estado--realizada"
+                : "",
+        icono:
+            realizada
+                ? "fa-solid fa-calendar-check"
+                : "fa-solid fa-circle-check"
+    };
+}
+
+
+function obtenerTextoComoVaReservaPerfil(
+    reserva
+) {
+    const personas =
+        Math.max(
+            1,
+            Number(
+                reserva?.personas ||
+                1
+            )
+        );
+
+    if (
+        reserva?.voySolo === true ||
+        reserva?.voy_solo === true
+    ) {
+        return "🙋 Vas solo";
+    }
+
+    if (
+        reserva?.voySolo === false ||
+        reserva?.voy_solo === false
+    ) {
+        return `👥 Vais ${personas} ${
+            personas === 1
+                ? "persona"
+                : "personas"
+        }`;
+    }
+
+    return `${personas} ${
+        personas === 1
+            ? "persona"
+            : "personas"
+    }`;
+}
+
+
 
 async function cargarReservasSupabasePerfil() {
     const cliente =
@@ -4664,6 +4937,9 @@ async function cargarReservasSupabasePerfil() {
                     precio_unitario,
                     precio_total,
                     estado,
+                    voy_solo,
+                    tipo_pase,
+                    codigo_pase,
                     created_at
                 `
             )
@@ -4671,9 +4947,12 @@ async function cargarReservasSupabasePerfil() {
                 "usuario_id",
                 usuario.id
             )
-            .eq(
+            .in(
                 "estado",
-                "confirmada"
+                [
+                    "confirmada",
+                    "pendiente_entrada"
+                ]
             )
             .order(
                 "fecha",
@@ -4740,6 +5019,8 @@ async function cargarReservasSupabasePerfil() {
                         provincia,
                         imagen_url,
                         precio,
+                        enlace_reserva,
+                        detalles_extra,
                         estado
                     `
                 )
@@ -4819,6 +5100,46 @@ async function cargarReservasSupabasePerfil() {
                             )
                         );
 
+                    const enlaceReservaExterna =
+                        String(
+                            plan?.enlace_reserva ||
+                            ""
+                        ).trim();
+
+                    const tipoPase =
+                        String(
+                            reserva.tipo_pase ||
+                            ""
+                        ).trim() || null;
+
+                    const codigoPase =
+                        String(
+                            reserva.codigo_pase ||
+                            ""
+                        ).trim() || null;
+
+                    const abonoGeneral =
+                        plan?.detalles_extra?.abono_general ||
+                        null;
+
+                    const fechaInicioAbono =
+                        tipoPase === "abono_general"
+                            ? String(
+                                abonoGeneral?.fecha_inicio ||
+                                reserva.fecha ||
+                                ""
+                            ).slice(0, 10)
+                            : null;
+
+                    const fechaFinAbono =
+                        tipoPase === "abono_general"
+                            ? String(
+                                abonoGeneral?.fecha_fin ||
+                                reserva.fecha ||
+                                ""
+                            ).slice(0, 10)
+                            : null;
+
                     return {
                         id:
                             String(
@@ -4868,6 +5189,25 @@ async function cargarReservasSupabasePerfil() {
 
                         personas,
 
+                        voySolo:
+                            typeof reserva.voy_solo ===
+                                "boolean"
+                                ? reserva.voy_solo
+                                : null,
+
+                        voy_solo:
+                            typeof reserva.voy_solo ===
+                                "boolean"
+                                ? reserva.voy_solo
+                                : null,
+
+                        tipoPase,
+                        tipo_pase: tipoPase,
+                        codigoPase,
+                        codigo_pase: codigoPase,
+                        fechaInicioAbono,
+                        fechaFinAbono,
+
                         precio:
                             precioUnitario,
 
@@ -4878,6 +5218,13 @@ async function cargarReservasSupabasePerfil() {
                         estado:
                             reserva.estado ||
                             "confirmada",
+
+                        esReservaExterna:
+                            Boolean(
+                                enlaceReservaExterna
+                            ),
+
+                        enlaceReservaExterna,
 
                         enlace:
                             `detalle-plan.html?id=${encodeURIComponent(
@@ -4899,17 +5246,12 @@ async function cargarReservasSupabasePerfil() {
         reservasSupabaseCargadas =
             true;
 
-        /*
-           En cuanto Supabase se carga correctamente,
-           eliminamos las copias temporales que pudiera
-           haber dejado detalle-plan.js en localStorage.
-        */
         limpiarCopiaLocalReservaSupabase();
 
         mostrarReservasPerfil();
     } catch (error) {
         console.error(
-            "No se pudieron cargar las reservas desde Supabase:",
+            "No se pudieron cargar las reservas y asistencias desde Supabase:",
             error
         );
 
@@ -4919,7 +5261,7 @@ async function cargarReservasSupabasePerfil() {
         mostrarReservasPerfil();
 
         mostrarNotificacion(
-            "No se han podido cargar tus reservas."
+            "No se han podido cargar tus reservas y asistencias."
         );
     }
 }
@@ -4955,10 +5297,6 @@ function obtenerReservasUsuario() {
                         return false;
                     }
 
-                    /*
-                       Los UUID pertenecen al nuevo sistema.
-                       Supabase es la única fuente válida para ellos.
-                    */
                     return !esIdUuidPerfil(
                         obtenerIdPlanReserva(
                             reserva
@@ -4973,8 +5311,15 @@ function obtenerReservasUsuario() {
     ]
         .filter(
             (reserva) =>
-                reserva.estado ===
-                "confirmada"
+                [
+                    "confirmada",
+                    "pendiente_entrada"
+                ].includes(
+                    String(
+                        reserva.estado ||
+                        ""
+                    )
+                )
         )
         .sort(
             (
@@ -5052,15 +5397,16 @@ function crearProximaReservaHTML(
 
     const fecha =
         escaparHTML(
-            reserva.fechaTexto ||
-            reserva.fecha ||
-            "Fecha pendiente"
+            obtenerFechaTextoReservaPerfil(
+                reserva
+            )
         );
 
     const hora =
         escaparHTML(
-            reserva.hora ||
-            "Hora pendiente"
+            obtenerHoraTextoReservaPerfil(
+                reserva
+            )
         );
 
     const ubicacion =
@@ -5090,8 +5436,50 @@ function crearProximaReservaHTML(
             )
         );
 
+    const externa =
+        esReservaExternaPerfil(
+            reserva
+        );
+
+    const pendiente =
+        esReservaPendienteEntradaPerfil(
+            reserva
+        );
+
+    const estadoVisual =
+        obtenerEstadoVisualReservaPerfil(
+            reserva
+        );
+
+    const enlaceEntrada =
+        escaparHTML(
+            obtenerEnlaceReservaExternaSeguroPerfil(
+                reserva
+            )
+        );
+
+    const comoVa =
+        escaparHTML(
+            obtenerTextoComoVaReservaPerfil(
+                reserva
+            )
+        );
+
+    const paseVisual =
+        obtenerEtiquetaPaseReservaPerfil(
+            reserva
+        );
+
     return `
-        <article class="reserva-resumen">
+        <article class="reserva-resumen ${
+            externa
+                ? "reserva-resumen--externa"
+                : ""
+        } ${
+            pendiente
+                ? "reserva-resumen--entrada-pendiente"
+                : ""
+        }">
 
             <div class="reserva-resumen__imagen">
                 <img
@@ -5106,9 +5494,34 @@ function crearProximaReservaHTML(
 
             <div class="reserva-resumen__contenido">
 
-                <span class="reserva-estado">
-                    Confirmada
-                </span>
+                <div class="reserva-perfil__etiquetas">
+                    <span class="reserva-estado ${estadoVisual.clase}">
+                        <i class="${estadoVisual.icono}" aria-hidden="true"></i>
+                        ${estadoVisual.texto}
+                    </span>
+
+                    ${
+                        externa
+                            ? `
+                                <span class="reserva-perfil__tipo-externo">
+                                    <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                                    Entrada externa
+                                </span>
+                            `
+                            : ""
+                    }
+
+                    ${
+                        paseVisual
+                            ? `
+                                <span class="reserva-perfil__tipo-pase ${paseVisual.clase}">
+                                    <i class="${paseVisual.icono}" aria-hidden="true"></i>
+                                    ${paseVisual.texto}
+                                </span>
+                            `
+                            : ""
+                    }
+                </div>
 
                 <h3>${titulo}</h3>
 
@@ -5132,6 +5545,16 @@ function crearProximaReservaHTML(
                     }
                 </p>
 
+                ${
+                    externa
+                        ? `
+                            <p class="reserva-perfil__como-va">
+                                ${comoVa}
+                            </p>
+                        `
+                        : ""
+                }
+
                 <p>
                     <i class="fa-solid fa-location-dot"></i>
                     ${ubicacion}
@@ -5141,19 +5564,62 @@ function crearProximaReservaHTML(
                     <i class="fa-solid fa-euro-sign"></i>
                     ${precioTotal}
                     ${
-                        precioTotal !==
-                            "Gratis"
-                            ? " total"
-                            : ""
+                        externa
+                            ? " precio indicado"
+                            : (
+                                precioTotal !== "Gratis"
+                                    ? " total"
+                                    : ""
+                            )
                     }
                 </p>
 
-                <a
-                    href="${enlace}"
-                    class="boton-ver-reserva"
-                >
-                    Ver actividad
-                </a>
+                <div class="reserva-resumen__acciones">
+                    <a
+                        href="${enlace}"
+                        class="boton-ver-reserva"
+                    >
+                        Ver actividad
+                    </a>
+
+                    ${
+                        externa && enlaceEntrada
+                            ? `
+                                <a
+                                    href="${enlaceEntrada}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="boton-entrada-externa-perfil"
+                                >
+                                    <i class="fa-solid fa-ticket" aria-hidden="true"></i>
+                                    ${
+                                        pendiente
+                                            ? "Volver a entradas"
+                                            : "Web de entradas"
+                                    }
+                                </a>
+                            `
+                            : ""
+                    }
+
+                    ${
+                        pendiente
+                            ? `
+                                <button
+                                    type="button"
+                                    class="boton-confirmar-entrada-perfil"
+                                    data-confirmar-entrada-perfil="${escaparHTML(
+                                        reserva.id ||
+                                        ""
+                                    )}"
+                                >
+                                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                                    Ya tengo mi entrada
+                                </button>
+                            `
+                            : ""
+                    }
+                </div>
 
             </div>
 
@@ -5191,15 +5657,16 @@ function crearReservaHTML(
 
     const fecha =
         escaparHTML(
-            reserva.fechaTexto ||
-            reserva.fecha ||
-            "Fecha pendiente"
+            obtenerFechaTextoReservaPerfil(
+                reserva
+            )
         );
 
     const hora =
         escaparHTML(
-            reserva.hora ||
-            "Hora pendiente"
+            obtenerHoraTextoReservaPerfil(
+                reserva
+            )
         );
 
     const ubicacion =
@@ -5233,6 +5700,40 @@ function crearReservaHTML(
 
     const realizada =
         reservaYaRealizadaPerfil(
+            reserva
+        );
+
+    const externa =
+        esReservaExternaPerfil(
+            reserva
+        );
+
+    const pendiente =
+        esReservaPendienteEntradaPerfil(
+            reserva
+        );
+
+    const estadoVisual =
+        obtenerEstadoVisualReservaPerfil(
+            reserva
+        );
+
+    const enlaceEntrada =
+        escaparHTML(
+            obtenerEnlaceReservaExternaSeguroPerfil(
+                reserva
+            )
+        );
+
+    const comoVa =
+        escaparHTML(
+            obtenerTextoComoVaReservaPerfil(
+                reserva
+            )
+        );
+
+    const paseVisual =
+        obtenerEtiquetaPaseReservaPerfil(
             reserva
         );
 
@@ -5270,11 +5771,24 @@ function crearReservaHTML(
             `
             : "";
 
+    const puedeConfirmarEntrada =
+        externa &&
+        pendiente &&
+        !realizada;
+
     return `
         <article
             class="reserva-item ${
                 realizada
                     ? "reserva-item--realizada"
+                    : ""
+            } ${
+                externa
+                    ? "reserva-item--externa"
+                    : ""
+            } ${
+                pendiente
+                    ? "reserva-item--entrada-pendiente"
                     : ""
             }"
             data-reserva-id="${idReserva}"
@@ -5296,17 +5810,34 @@ function crearReservaHTML(
                 <div class="reserva-item__superior">
 
                     <div>
-                        <span class="reserva-estado ${
-                            realizada
-                                ? "reserva-estado--realizada"
-                                : ""
-                        }">
+                        <div class="reserva-perfil__etiquetas">
+                            <span class="reserva-estado ${estadoVisual.clase}">
+                                <i class="${estadoVisual.icono}" aria-hidden="true"></i>
+                                ${estadoVisual.texto}
+                            </span>
+
                             ${
-                                realizada
-                                    ? "Realizada"
-                                    : "Confirmada"
+                                externa
+                                    ? `
+                                        <span class="reserva-perfil__tipo-externo">
+                                            <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                                            Entrada externa
+                                        </span>
+                                    `
+                                    : ""
                             }
-                        </span>
+
+                            ${
+                                paseVisual
+                                    ? `
+                                        <span class="reserva-perfil__tipo-pase ${paseVisual.clase}">
+                                            <i class="${paseVisual.icono}" aria-hidden="true"></i>
+                                            ${paseVisual.texto}
+                                        </span>
+                                    `
+                                    : ""
+                            }
+                        </div>
 
                         <h3>${titulo}</h3>
                     </div>
@@ -5314,6 +5845,23 @@ function crearReservaHTML(
                     ${estrellasGuardadas}
 
                 </div>
+
+                ${
+                    externa
+                        ? `
+                            <div class="reserva-perfil__social">
+                                <span>${comoVa}</span>
+                                <small>
+                                    ${
+                                        pendiente
+                                            ? "Confirma tu entrada para aparecer entre las personas que van."
+                                            : "Tu asistencia ya cuenta en la parte social de Suralia."
+                                    }
+                                </small>
+                            </div>
+                        `
+                        : ""
+                }
 
                 <div class="reserva-item__datos">
 
@@ -5346,10 +5894,13 @@ function crearReservaHTML(
                         <i class="fa-solid fa-euro-sign"></i>
                         ${precioTotal}
                         ${
-                            precioTotal !==
-                                "Gratis"
-                                ? " total"
-                                : ""
+                            externa
+                                ? " precio indicado"
+                                : (
+                                    precioTotal !== "Gratis"
+                                        ? " total"
+                                        : ""
+                                )
                         }
                     </span>
 
@@ -5363,6 +5914,41 @@ function crearReservaHTML(
                     >
                         Ver actividad
                     </a>
+
+                    ${
+                        externa && enlaceEntrada
+                            ? `
+                                <a
+                                    href="${enlaceEntrada}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="boton-entrada-externa-perfil"
+                                >
+                                    <i class="fa-solid fa-ticket" aria-hidden="true"></i>
+                                    ${
+                                        pendiente
+                                            ? "Volver a entradas"
+                                            : "Web de entradas"
+                                    }
+                                </a>
+                            `
+                            : ""
+                    }
+
+                    ${
+                        puedeConfirmarEntrada
+                            ? `
+                                <button
+                                    type="button"
+                                    class="boton-confirmar-entrada-perfil"
+                                    data-confirmar-entrada-perfil="${idReserva}"
+                                >
+                                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                                    Ya tengo mi entrada
+                                </button>
+                            `
+                            : ""
+                    }
 
                     ${
                         puedeValorar
@@ -5389,8 +5975,13 @@ function crearReservaHTML(
                                     type="button"
                                     class="boton-cancelar-reserva"
                                     data-reserva-id="${idReserva}"
+                                    data-reserva-externa="${externa ? "true" : "false"}"
                                 >
-                                    Cancelar reserva
+                                    ${
+                                        externa
+                                            ? "Ya no voy"
+                                            : "Cancelar reserva"
+                                    }
                                 </button>
                             `
                             : ""
@@ -5442,10 +6033,10 @@ function mostrarReservasPerfil() {
                     <i class="fa-regular fa-calendar"></i>
                 </span>
 
-                <h3>No tienes reservas</h3>
+                <h3>No tienes reservas ni asistencias</h3>
 
                 <p>
-                    Encuentra un plan y reserva tu próxima experiencia.
+                    Reserva un plan o indica que vas a un evento para empezar.
                 </p>
 
                 <a
@@ -5489,10 +6080,10 @@ function mostrarReservasPerfil() {
                     <i class="fa-regular fa-calendar-check"></i>
                 </span>
 
-                <h3>No tienes próximas reservas</h3>
+                <h3>No tienes próximas actividades</h3>
 
                 <p>
-                    Tus experiencias anteriores siguen disponibles abajo para que puedas valorarlas.
+                    Tus experiencias anteriores siguen disponibles abajo para que puedas valorarlas y conectar con asistentes.
                 </p>
 
                 <a
@@ -5515,6 +6106,7 @@ function mostrarReservasPerfil() {
 
     activarBotonesCancelarReserva();
     activarBotonesValorarReserva();
+    activarBotonesConfirmarEntradaExternaPerfil();
 }
 
 function activarBotonesCancelarReserva() {
@@ -5537,12 +6129,162 @@ function activarBotonesCancelarReserva() {
                         tipoCancelacionReservaPendiente =
                             "usuario";
 
+                        const esExterna =
+                            boton.dataset
+                                .reservaExterna ===
+                            "true";
+
+                        const tituloModal =
+                            document.querySelector(
+                                "#titulo-modal-cancelacion"
+                            );
+
+                        const descripcionModal =
+                            document.querySelector(
+                                "#descripcion-modal-cancelacion"
+                            );
+
+                        if (tituloModal) {
+                            tituloModal.textContent =
+                                esExterna
+                                    ? "¿Ya no vas a este evento?"
+                                    : "¿Cancelar esta reserva?";
+                        }
+
+                        if (descripcionModal) {
+                            descripcionModal.textContent =
+                                esExterna
+                                    ? "Tu asistencia dejará de aparecer en Suralia. Esto no cancela una entrada comprada en la web externa."
+                                    : "La reserva se cancelará y las plazas volverán a estar disponibles.";
+                        }
+
                         elementoQueAbrioModalCancelacion =
                             abrirModalAccesible(
                                 modalCancelacion,
                                 mantenerReserva,
                                 boton
                             );
+                    }
+                );
+            }
+        );
+}
+
+
+async function confirmarEntradaExternaPerfil(
+    reservaId,
+    boton
+) {
+    const cliente =
+        window.clienteSupabase;
+
+    if (
+        !cliente ||
+        !reservaId
+    ) {
+        mostrarNotificacion(
+            "No se ha podido confirmar la entrada."
+        );
+
+        return;
+    }
+
+    const contenidoOriginal =
+        boton?.innerHTML ||
+        "";
+
+    if (boton) {
+        boton.disabled =
+            true;
+
+        boton.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+            Confirmando
+        `;
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente.rpc(
+            "confirmar_entrada_externa",
+            {
+                p_reserva_id:
+                    reservaId
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        const respuesta =
+            Array.isArray(data)
+                ? data[0]
+                : data;
+
+        if (
+            !respuesta ||
+            respuesta.ok !== true
+        ) {
+            throw new Error(
+                "No se ha podido confirmar la entrada."
+            );
+        }
+
+        await cargarReservasSupabasePerfil();
+
+        mostrarNotificacion(
+            "Entrada confirmada. Ya apareces entre las personas que van."
+        );
+    } catch (error) {
+        console.error(
+            "No se pudo confirmar la entrada desde el perfil:",
+            error
+        );
+
+        mostrarNotificacion(
+            String(
+                error?.message ||
+                "No se ha podido confirmar la entrada."
+            )
+                .replace(
+                    /\s+CONTEXT:.*$/i,
+                    ""
+                )
+                .trim()
+        );
+
+        if (boton) {
+            boton.disabled =
+                false;
+
+            boton.innerHTML =
+                contenidoOriginal;
+        }
+    }
+}
+
+
+function activarBotonesConfirmarEntradaExternaPerfil() {
+    document
+        .querySelectorAll(
+            "[data-confirmar-entrada-perfil]"
+        )
+        .forEach(
+            (boton) => {
+                boton.addEventListener(
+                    "click",
+                    () => {
+                        confirmarEntradaExternaPerfil(
+                            String(
+                                boton.dataset
+                                    .confirmarEntradaPerfil ||
+                                ""
+                            ),
+                            boton
+                        );
                     }
                 );
             }

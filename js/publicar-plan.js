@@ -43,6 +43,14 @@ const aperturaPuertasMusica = document.querySelector("#plan-apertura-puertas");
 const horaFinMusica = document.querySelector("#plan-hora-fin");
 const edadMinimaMusica = document.querySelector("#plan-edad-minima");
 const tipoEntradaMusica = document.querySelector("#plan-tipo-entrada");
+
+/* Festival · abono general */
+const bloqueAbonoFestival = document.querySelector("#bloque-abono-festival");
+const ofreceAbonoGeneral = document.querySelector("#plan-ofrece-abono-general");
+const camposAbonoGeneral = document.querySelector("#campos-abono-general");
+const precioAbonoGeneral = document.querySelector("#plan-precio-abono-general");
+const resumenAbonoFestival = document.querySelector("#resumen-abono-festival");
+const errorAbonoFestival = document.querySelector("#error-plan-abono-general");
 const campoDificultad = document.querySelector("#campo-plan-dificultad");
 const etiquetaTituloPlan = document.querySelector("#etiqueta-plan-titulo");
 const etiquetaDescripcionPlan = document.querySelector("#etiqueta-plan-descripcion");
@@ -456,6 +464,7 @@ botonAnadirFecha?.addEventListener("click", () => {
     );
 
     fila?.querySelector("[data-fecha-adicional]")?.focus();
+    actualizarResumenAbonoFestival();
 });
 
 listaFechasPlan?.addEventListener("click", (evento) => {
@@ -472,15 +481,21 @@ listaFechasPlan?.addEventListener("click", (evento) => {
     }
 
     actualizarBotonAnadirFecha();
+    actualizarResumenAbonoFestival();
 });
 
 listaFechasPlan?.addEventListener("input", () => {
     if (errorFechasPlan) {
         errorFechasPlan.textContent = "";
     }
+
+    actualizarResumenAbonoFestival();
 });
 
-fecha?.addEventListener("change", actualizarLimitesFechasAdicionales);
+fecha?.addEventListener("change", () => {
+    actualizarLimitesFechasAdicionales();
+    actualizarResumenAbonoFestival();
+});
 
 /* =====================================================
    MODO CONCIERTO / FESTIVAL
@@ -488,6 +503,146 @@ fecha?.addEventListener("change", actualizarLimitesFechasAdicionales);
 
 function esPlanMusical() {
     return categoria?.value === "musica";
+}
+
+function esFestivalMusical() {
+    return (
+        esPlanMusical() &&
+        String(tipoEventoMusica?.value || "")
+            .trim()
+            .toLowerCase() === "festival"
+    );
+}
+
+function obtenerDiasFestivalOrdenados() {
+    const fechasValidas = obtenerFechasFormulario()
+        .filter((item) => /^\d{4}-\d{2}-\d{2}$/.test(String(item?.fecha || "")))
+        .sort((a, b) => {
+            const fechaA = `${a.fecha}T${a.hora || "00:00"}`;
+            const fechaB = `${b.fecha}T${b.hora || "00:00"}`;
+            return fechaA.localeCompare(fechaB);
+        });
+
+    const fechasUnicas = [];
+    const vistas = new Set();
+
+    fechasValidas.forEach((item) => {
+        if (vistas.has(item.fecha)) {
+            return;
+        }
+
+        vistas.add(item.fecha);
+        fechasUnicas.push(item);
+    });
+
+    return fechasUnicas;
+}
+
+function formatearRangoAbonoFestival() {
+    const dias = obtenerDiasFestivalOrdenados();
+
+    if (dias.length < 2) {
+        return "Añade al menos dos días al festival";
+    }
+
+    const primera = new Date(`${dias[0].fecha}T00:00:00`);
+    const ultima = new Date(`${dias[dias.length - 1].fecha}T00:00:00`);
+
+    if (
+        Number.isNaN(primera.getTime()) ||
+        Number.isNaN(ultima.getTime())
+    ) {
+        return "Todos los días del festival";
+    }
+
+    const mismoMes =
+        primera.getFullYear() === ultima.getFullYear() &&
+        primera.getMonth() === ultima.getMonth();
+
+    if (mismoMes) {
+        const mesAnio = new Intl.DateTimeFormat("es-ES", {
+            month: "long",
+            year: "numeric"
+        }).format(ultima);
+
+        return `${primera.getDate()}–${ultima.getDate()} de ${mesAnio}`;
+    }
+
+    const formato = new Intl.DateTimeFormat("es-ES", {
+        day: "numeric",
+        month: "short"
+    });
+
+    return `${formato.format(primera)} – ${formato.format(ultima)}`;
+}
+
+function actualizarResumenAbonoFestival() {
+    if (resumenAbonoFestival) {
+        resumenAbonoFestival.textContent =
+            formatearRangoAbonoFestival();
+    }
+}
+
+function actualizarBloqueAbonoFestival() {
+    const mostrar = esFestivalMusical();
+
+    if (bloqueAbonoFestival) {
+        bloqueAbonoFestival.hidden = !mostrar;
+    }
+
+    if (!mostrar) {
+        if (ofreceAbonoGeneral) {
+            ofreceAbonoGeneral.checked = false;
+        }
+
+        if (camposAbonoGeneral) {
+            camposAbonoGeneral.hidden = true;
+        }
+
+        if (errorAbonoFestival) {
+            errorAbonoFestival.textContent = "";
+        }
+
+        precioAbonoGeneral?.setAttribute(
+            "aria-invalid",
+            "false"
+        );
+
+        return;
+    }
+
+    if (camposAbonoGeneral) {
+        camposAbonoGeneral.hidden =
+            !Boolean(ofreceAbonoGeneral?.checked);
+    }
+
+    actualizarResumenAbonoFestival();
+}
+
+function obtenerAbonoGeneralFormulario() {
+    if (
+        !esFestivalMusical() ||
+        !ofreceAbonoGeneral?.checked
+    ) {
+        return null;
+    }
+
+    const dias = obtenerDiasFestivalOrdenados();
+
+    if (dias.length < 2) {
+        return null;
+    }
+
+    return {
+        activo: true,
+        codigo: "abono-general",
+        tipo: "abono_general",
+        nombre: "Abono general",
+        incluye_todos_los_dias: true,
+        fecha_inicio: dias[0].fecha,
+        fecha_fin: dias[dias.length - 1].fecha,
+        precio: Number(precioAbonoGeneral?.value || 0)
+    };
 }
 
 function limpiarErroresMusica() {
@@ -540,6 +695,7 @@ function actualizarModoPublicacion() {
         limpiarErroresMusica();
     }
 
+    actualizarBloqueAbonoFestival();
     actualizarVistaPrevia();
 }
 
@@ -564,11 +720,46 @@ function obtenerDetallesExtraFormulario() {
         apertura_puertas: aperturaPuertasMusica?.value || null,
         hora_fin: horaFinMusica?.value || null,
         edad_minima: edadMinimaMusica?.value || "Todos los públicos",
-        tipo_entrada: tipoEntradaMusica?.value || "General"
+        tipo_entrada: tipoEntradaMusica?.value || "General",
+        abono_general: obtenerAbonoGeneralFormulario()
     };
 }
 
 categoria?.addEventListener("change", actualizarModoPublicacion);
+
+tipoEventoMusica?.addEventListener("change", () => {
+    actualizarBloqueAbonoFestival();
+    actualizarVistaPrevia();
+});
+
+ofreceAbonoGeneral?.addEventListener("change", () => {
+    if (camposAbonoGeneral) {
+        camposAbonoGeneral.hidden =
+            !ofreceAbonoGeneral.checked;
+    }
+
+    if (errorAbonoFestival) {
+        errorAbonoFestival.textContent = "";
+    }
+
+    precioAbonoGeneral?.setAttribute(
+        "aria-invalid",
+        "false"
+    );
+
+    actualizarResumenAbonoFestival();
+});
+
+precioAbonoGeneral?.addEventListener("input", () => {
+    if (errorAbonoFestival) {
+        errorAbonoFestival.textContent = "";
+    }
+
+    precioAbonoGeneral.setAttribute(
+        "aria-invalid",
+        "false"
+    );
+});
 
 [
     tipoEventoMusica,
@@ -1950,9 +2141,11 @@ formularioPublicar?.addEventListener("submit", async (evento) => {
     limpiarError(ubicacion, "error-plan-ubicacion");
     limpiarError(precio, "error-plan-precio");
     limpiarError(enlaceReserva, "error-plan-enlace-reserva");
+    limpiarError(precioAbonoGeneral, "error-plan-abono-general");
     limpiarErroresMusica();
 
     if (errorFechasPlan) errorFechasPlan.textContent = "";
+    if (errorAbonoFestival) errorAbonoFestival.textContent = "";
     if (errorCoordenadas) errorCoordenadas.textContent = "";
     mapaPublicarPlan?.setAttribute("aria-invalid", "false");
 
@@ -1999,6 +2192,36 @@ formularioPublicar?.addEventListener("submit", async (evento) => {
                 "Indica el artista, grupo, DJ o cartel del evento."
             );
             formularioValido = false;
+        }
+
+        if (
+            esFestivalMusical() &&
+            ofreceAbonoGeneral?.checked
+        ) {
+            const diasFestival =
+                obtenerDiasFestivalOrdenados();
+
+            if (diasFestival.length < 2) {
+                if (errorAbonoFestival) {
+                    errorAbonoFestival.textContent =
+                        "Para ofrecer un abono general, añade al menos dos días distintos al festival.";
+                }
+
+                formularioValido = false;
+            }
+
+            if (
+                precioAbonoGeneral?.value === "" ||
+                Number(precioAbonoGeneral?.value) < 0
+            ) {
+                mostrarError(
+                    precioAbonoGeneral,
+                    "error-plan-abono-general",
+                    "Introduce el precio del abono general. Usa 0 si es gratuito."
+                );
+
+                formularioValido = false;
+            }
         }
     }
 
@@ -2239,6 +2462,20 @@ function cargarBorradorParaEditar() {
         tipoEntradaMusica.value = detallesExtraBorrador.tipo_entrada || "General";
     }
 
+    const abonoGeneralBorrador =
+        detallesExtraBorrador.abono_general ||
+        null;
+
+    if (ofreceAbonoGeneral) {
+        ofreceAbonoGeneral.checked =
+            abonoGeneralBorrador?.activo === true;
+    }
+
+    if (precioAbonoGeneral) {
+        precioAbonoGeneral.value =
+            abonoGeneralBorrador?.precio ?? "";
+    }
+
     actualizarModoPublicacion();
 
     if (descripcion) descripcion.value = borrador.descripcion || "";
@@ -2246,6 +2483,7 @@ function cargarBorradorParaEditar() {
     if (hora) hora.value = borrador.hora || "";
 
     cargarFechasAdicionalesBorrador(borrador.fechas || []);
+    actualizarResumenAbonoFestival();
 
     if (duracion) duracion.value = borrador.duracion || "";
     if (plazas) plazas.value = borrador.plazas || "";
@@ -2340,6 +2578,8 @@ function cargarBorradorParaEditar() {
     horaFinMusica,
     edadMinimaMusica,
     tipoEntradaMusica,
+    ofreceAbonoGeneral,
+    precioAbonoGeneral,
     idealPrimeraVez,
     imagen,
     imagen2,
@@ -2352,6 +2592,8 @@ function cargarBorradorParaEditar() {
 cargarBorradorParaEditar();
 inicializarMapaPublicar();
 actualizarModoPublicacion();
+actualizarBloqueAbonoFestival();
+actualizarResumenAbonoFestival();
 
 if (
     !latitudPlan?.value &&

@@ -226,7 +226,7 @@
 
                         <p class="bloque-musica-publicar__ayuda">
                             <i class="fa-regular fa-lightbulb" aria-hidden="true"></i>
-                            Para un festival de varios días, utiliza “Añadir otra fecha” para registrar cada jornada o pase.
+                            Para un festival de varios días, utiliza “Añadir otra fecha” para registrar cada jornada. Después podrás activar un abono general para todos los días.
                         </p>
                     </div>
 
@@ -285,6 +285,96 @@
                         </div>
                         <div class="fechas-adicionales-publicar__lista" id="lista-fechas-plan" aria-live="polite"></div>
                         <small class="mensaje-error" id="error-plan-fechas" aria-live="polite"></small>
+                    </div>
+
+                    <!-- FESTIVAL · ABONO GENERAL PARA TODOS LOS DÍAS -->
+                    <div
+                        class="abono-festival-publicar"
+                        id="bloque-abono-festival"
+                        hidden
+                    >
+                        <div class="abono-festival-publicar__cabecera">
+                            <span class="abono-festival-publicar__icono" aria-hidden="true">
+                                <i class="fa-solid fa-ticket"></i>
+                            </span>
+
+                            <div>
+                                <strong>Abono general del festival</strong>
+                                <p>
+                                    Permite añadir una entrada válida para todas las jornadas del festival,
+                                    además de las entradas de cada día.
+                                </p>
+                            </div>
+                        </div>
+
+                        <label class="abono-festival-publicar__opcion" for="plan-ofrece-abono-general">
+                            <input
+                                type="checkbox"
+                                id="plan-ofrece-abono-general"
+                                name="ofrece_abono_general"
+                            >
+
+                            <span class="abono-festival-publicar__control" aria-hidden="true"></span>
+
+                            <span>
+                                <strong>Ofrecer abono para todos los días</strong>
+                                <small>
+                                    En el detalle aparecerá como “🎟️ Abono general · Todos los días”.
+                                </small>
+                            </span>
+                        </label>
+
+                        <div
+                            class="abono-festival-publicar__campos"
+                            id="campos-abono-general"
+                            hidden
+                        >
+                            <div class="formulario-doble">
+
+                                <div class="campo-formulario">
+                                    <label for="plan-precio-abono-general">
+                                        Precio del abono
+                                    </label>
+
+                                    <div class="campo-formulario__control">
+                                        <i class="fa-solid fa-euro-sign" aria-hidden="true"></i>
+
+                                        <input
+                                            type="number"
+                                            id="plan-precio-abono-general"
+                                            name="precio_abono_general"
+                                            inputmode="decimal"
+                                            min="0"
+                                            max="9999"
+                                            step="0.01"
+                                            placeholder="Ejemplo: 60"
+                                            aria-describedby="error-plan-abono-general"
+                                        >
+                                    </div>
+                                </div>
+
+                                <div class="abono-festival-publicar__resumen">
+                                    <span>
+                                        Incluye
+                                    </span>
+
+                                    <strong id="resumen-abono-festival">
+                                        Añade al menos dos días al festival
+                                    </strong>
+
+                                    <small>
+                                        Las fechas se calculan automáticamente a partir de las jornadas que hayas añadido.
+                                    </small>
+                                </div>
+
+                            </div>
+
+                            <small
+                                class="mensaje-error"
+                                id="error-plan-abono-general"
+                                aria-live="polite"
+                            ></small>
+                        </div>
                     </div>
 
                     <div class="formulario-doble">

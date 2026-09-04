@@ -1,5 +1,5 @@
 /* =========================================================
-   SURALIA · CONEXIONES DESPUÉS DEL PLAN
+   SURALIA · CONEXIONES ENTRE ASISTENTES · PASES + ABONO GENERAL · V12
    Archivo: js/conexiones-post-plan.js
 
    Se carga DESPUÉS de js/perfil.js.
@@ -12,16 +12,17 @@
     const SELECTOR_LISTA_RESERVAS =
         "#lista-reservas-perfil";
 
-    const SELECTOR_RESERVA_REALIZADA =
-        ".reserva-item.reserva-item--realizada[data-reserva-id]";
+    const SELECTOR_RESERVA_CONFIRMADA =
+        ".reserva-item[data-reserva-id]";
 
     const claseModal =
         "modal-post-plan";
 
     let usuarioActual = null;
-    let reservasRealizadas = [];
+    let reservasConfirmadas = [];
     let reservasPorId = new Map();
     let observadorReservas = null;
+    let temporizadorSincronizacionReservas = null;
 
 
     function escaparHTMLPostPlan(
@@ -62,6 +63,31 @@
             ).padStart(2, "0");
 
         return `${anio}-${mes}-${dia}`;
+    }
+
+
+    function reservaEsPasadaPostPlan(
+        reserva
+    ) {
+        const fecha =
+            String(
+                reserva?.fecha_fin_evento ||
+                reserva?.fecha ||
+                ""
+            ).slice(0, 10);
+
+        if (
+            !/^\d{4}-\d{2}-\d{2}$/.test(
+                fecha
+            )
+        ) {
+            return false;
+        }
+
+        return (
+            fecha <
+            obtenerFechaHoyISO()
+        );
     }
 
 
@@ -157,7 +183,7 @@
     }
 
 
-    async function cargarReservasRealizadasPostPlan() {
+    async function cargarReservasConfirmadasPlan() {
         const cliente =
             window.clienteSupabase;
 
@@ -178,7 +204,9 @@
                 plan_id,
                 fecha,
                 hora,
-                estado
+                estado,
+                tipo_pase,
+                codigo_pase
             `)
             .eq(
                 "usuario_id",
@@ -188,22 +216,16 @@
                 "estado",
                 "confirmada"
             )
-            .lt(
-                "fecha",
-                obtenerFechaHoyISO()
-            )
             .order(
                 "fecha",
                 {
-                    ascending:
-                        false
+                    ascending: false
                 }
             )
             .order(
                 "hora",
                 {
-                    ascending:
-                        false
+                    ascending: false
                 }
             );
 
@@ -211,27 +233,94 @@
             throw error;
         }
 
-        reservasRealizadas =
+        reservasConfirmadas =
             Array.isArray(data)
                 ? data
                 : [];
 
+        const idsPlanes = [
+            ...new Set(
+                reservasConfirmadas
+                    .map((reserva) =>
+                        String(reserva.plan_id || "")
+                    )
+                    .filter(Boolean)
+            )
+        ];
+
+        let planesPorId =
+            new Map();
+
+        if (idsPlanes.length > 0) {
+            const {
+                data: planes,
+                error: errorPlanes
+            } = await cliente
+                .from("planes")
+                .select(`
+                    id,
+                    detalles_extra
+                `)
+                .in(
+                    "id",
+                    idsPlanes
+                );
+
+            if (errorPlanes) {
+                throw errorPlanes;
+            }
+
+            planesPorId = new Map(
+                (Array.isArray(planes) ? planes : [])
+                    .map((plan) => [
+                        String(plan.id),
+                        plan
+                    ])
+            );
+        }
+
         reservasPorId =
             new Map(
-                reservasRealizadas.map(
-                    (reserva) => [
-                        String(
-                            reserva.id
-                        ),
-                        {
-                            ...reserva,
+                reservasConfirmadas.map(
+                    (reserva) => {
+                        const plan =
+                            planesPorId.get(
+                                String(reserva.plan_id || "")
+                            ) || null;
 
-                            hora:
-                                normalizarHoraPostPlan(
-                                    reserva.hora
-                                )
-                        }
-                    ]
+                        const abono =
+                            plan?.detalles_extra?.abono_general ||
+                            null;
+
+                        const tipoPase =
+                            String(
+                                reserva.tipo_pase ||
+                                "dia"
+                            );
+
+                        return [
+                            String(reserva.id),
+                            {
+                                ...reserva,
+                                tipo_pase: tipoPase,
+                                hora:
+                                    normalizarHoraPostPlan(
+                                        reserva.hora
+                                    ),
+                                fecha_fin_evento:
+                                    tipoPase === "abono_general"
+                                        ? String(
+                                            abono?.fecha_fin ||
+                                            reserva.fecha ||
+                                            ""
+                                        ).slice(0, 10)
+                                        : String(
+                                            reserva.fecha ||
+                                            ""
+                                        ).slice(0, 10)
+                            }
+                        ];
+                    }
                 )
             );
     }
@@ -245,23 +334,38 @@
                 "button"
             );
 
+        const esPasada =
+            reservaEsPasadaPostPlan(
+                reserva
+            );
+
         boton.type =
             "button";
 
         boton.className =
-            "boton-conectar-post-plan";
+            esPasada
+                ? "boton-conectar-post-plan"
+                : "boton-conectar-post-plan boton-conectar-post-plan--antes";
 
         boton.dataset.reservaPostPlan =
             String(reserva.id);
 
         boton.innerHTML = `
             <i
-                class="fa-solid fa-user-group"
+                class="fa-solid ${
+                    esPasada
+                        ? "fa-user-group"
+                        : "fa-people-group"
+                }"
                 aria-hidden="true"
             ></i>
 
             <span>
-                Conectar con asistentes
+                ${
+                    esPasada
+                        ? "Conectar con asistentes"
+                        : "Conocer asistentes"
+                }
             </span>
         `;
 
@@ -272,7 +376,7 @@
     function inyectarBotonesPostPlan() {
         document
             .querySelectorAll(
-                SELECTOR_RESERVA_REALIZADA
+                SELECTOR_RESERVA_CONFIRMADA
             )
             .forEach(
                 (tarjeta) => {
@@ -367,16 +471,19 @@
                         </span>
 
                         <div>
-                            <span class="modal-post-plan__eyebrow">
-                                Sigue la conexión
+                            <span
+                                class="modal-post-plan__eyebrow"
+                                id="eyebrow-modal-post-plan"
+                            >
+                                Personas del plan
                             </span>
 
                             <h2 id="titulo-modal-post-plan">
-                                Personas que estuvieron contigo
+                                Personas que también participan
                             </h2>
 
                             <p id="texto-modal-post-plan">
-                                El plan terminó, pero quizá la gente que conociste merezca quedarse.
+                                Solo aparecen personas confirmadas del mismo día y hora.
                             </p>
                         </div>
                     </div>
@@ -498,11 +605,11 @@
 
                 <div>
                     <strong>
-                        Buscando a las personas del plan...
+                        Buscando personas del mismo pase...
                     </strong>
 
                     <p>
-                        Solo mostramos asistentes del mismo día y hora.
+                        Solo mostramos asistencias confirmadas del mismo día y hora.
                     </p>
                 </div>
             </div>
@@ -673,6 +780,63 @@
     }
 
 
+    function reservaEsAbonoGeneralPostPlan(
+        reserva
+    ) {
+        return String(
+            reserva?.tipo_pase ||
+            ""
+        ) === "abono_general";
+    }
+
+
+    function textoPaseActualPostPlan(
+        reserva
+    ) {
+        if (
+            reservaEsAbonoGeneralPostPlan(
+                reserva
+            )
+        ) {
+            return "Abono general · Todos los días";
+        }
+
+        return `Entrada del día · ${String(
+            reserva?.fecha ||
+            ""
+        )} · ${String(
+            reserva?.hora ||
+            ""
+        )}`;
+    }
+
+
+    function etiquetaPaseAsistentePostPlan(
+        asistente
+    ) {
+        if (
+            String(
+                asistente?.tipo_pase ||
+                ""
+            ) === "abono_general"
+        ) {
+            return `
+                <span class="post-plan-persona__pase post-plan-persona__pase--abono">
+                    <i class="fa-solid fa-ticket" aria-hidden="true"></i>
+                    Abono general
+                </span>
+            `;
+        }
+
+        return `
+            <span class="post-plan-persona__pase">
+                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                Entrada del día
+            </span>
+        `;
+    }
+
+
     function renderizarAsistentesPostPlan(
         asistentes,
         reserva,
@@ -688,15 +852,59 @@
                 "#texto-modal-post-plan"
             );
 
+        const tituloModal =
+            document.querySelector(
+                "#titulo-modal-post-plan"
+            );
+
+        const eyebrowModal =
+            document.querySelector(
+                "#eyebrow-modal-post-plan"
+            );
+
         if (!contenido) {
             return;
         }
 
+        const esPasada =
+            reservaEsPasadaPostPlan(
+                reserva
+            );
+
+        if (eyebrowModal) {
+            eyebrowModal.textContent =
+                esPasada
+                    ? "Sigue la conexión"
+                    : "Antes del plan";
+        }
+
+        if (tituloModal) {
+            tituloModal.textContent =
+                esPasada
+                    ? "Personas que estuvieron contigo"
+                    : "Personas que también van";
+        }
+
         if (texto) {
-            texto.textContent =
-                tituloPlan
-                    ? `Coincidisteis en “${tituloPlan}”. Solo aparecen personas del mismo pase.`
-                    : "Solo aparecen personas que participaron en el mismo día y hora.";
+            if (esPasada) {
+                texto.textContent =
+                    tituloPlan
+                        ? reservaEsAbonoGeneralPostPlan(reserva)
+                            ? `Coincidisteis en “${tituloPlan}”. Tu abono conecta con asistentes de cualquiera de los días del festival.`
+                            : `Coincidisteis en “${tituloPlan}”. Aparecen personas de este día y quienes tenían abono general.`
+                        : reservaEsAbonoGeneralPostPlan(reserva)
+                            ? "Tu abono conecta con asistentes de cualquiera de los días del festival."
+                            : "Aparecen personas de este día y quienes tenían abono general.";
+            } else {
+                texto.textContent =
+                    tituloPlan
+                        ? reservaEsAbonoGeneralPostPlan(reserva)
+                            ? `También van a “${tituloPlan}”. Con tu abono puedes conocer a personas de cualquiera de sus días.`
+                            : `También van a “${tituloPlan}” este día o tienen abono general.`
+                        : reservaEsAbonoGeneralPostPlan(reserva)
+                            ? "Con tu abono puedes conocer personas confirmadas de cualquiera de los días."
+                            : "Aparecen personas confirmadas de este día y quienes tienen abono general.";
+            }
         }
 
         if (
@@ -715,7 +923,11 @@
                         </strong>
 
                         <p>
-                            Puede que fueras la única persona con perfil público o que los demás asistentes no estén disponibles para conectar.
+                            ${
+                                reservaEsPasadaPostPlan(reserva)
+                                    ? "Puede que fueras la única persona con perfil público o que los demás asistentes no estén disponibles para conectar."
+                                    : "Todavía no hay otras personas confirmadas con perfil público para este mismo pase."
+                            }
                         </p>
                     </div>
                 </div>
@@ -744,11 +956,9 @@
                         aria-hidden="true"
                     ></i>
                     ${escaparHTMLPostPlan(
-                        reserva.fecha
-                    )}
-                    ·
-                    ${escaparHTMLPostPlan(
-                        reserva.hora
+                        textoPaseActualPostPlan(
+                            reserva
+                        )
                     )}
                 </span>
             </div>
@@ -802,21 +1012,47 @@
                                                 ${localidad}
                                             </p>
 
-                                            ${
-                                                comunes
-                                                    ? `
-                                                        <span class="post-plan-persona__afinidad">
-                                                            <i
-                                                                class="fa-solid fa-sparkles"
-                                                                aria-hidden="true"
-                                                            ></i>
-                                                            ${escaparHTMLPostPlan(
-                                                                comunes
-                                                            )}
-                                                        </span>
-                                                    `
-                                                    : ""
-                                            }
+                                            <div class="post-plan-persona__etiquetas">
+                                                ${etiquetaPaseAsistentePostPlan(
+                                                    asistente
+                                                )}
+
+                                                ${
+                                                    asistente.voy_solo === true
+                                                        ? `
+                                                            <span class="post-plan-persona__contexto post-plan-persona__contexto--solo">
+                                                                🙋 Va solo
+                                                            </span>
+                                                        `
+                                                        : asistente.voy_solo === false
+                                                            ? `
+                                                                <span class="post-plan-persona__contexto">
+                                                                    <i
+                                                                        class="fa-solid fa-user-group"
+                                                                        aria-hidden="true"
+                                                                    ></i>
+                                                                    Va acompañado
+                                                                </span>
+                                                            `
+                                                            : ""
+                                                }
+
+                                                ${
+                                                    comunes
+                                                        ? `
+                                                            <span class="post-plan-persona__afinidad">
+                                                                <i
+                                                                    class="fa-solid fa-sparkles"
+                                                                    aria-hidden="true"
+                                                                ></i>
+                                                                ${escaparHTMLPostPlan(
+                                                                    comunes
+                                                                )}
+                                                            </span>
+                                                        `
+                                                        : ""
+                                                }
+                                            </div>
                                         </div>
 
                                         <div class="post-plan-persona__acciones">
@@ -889,16 +1125,10 @@
                 data,
                 error
             } = await cliente.rpc(
-                "obtener_asistentes_post_plan",
+                "obtener_asistentes_plan_pase",
                 {
-                    plan_buscado:
-                        reserva.plan_id,
-
-                    fecha_buscada:
-                        reserva.fecha,
-
-                    hora_buscada:
-                        reserva.hora
+                    p_reserva_id:
+                        reserva.id
                 }
             );
 
@@ -994,19 +1224,13 @@
                 data,
                 error
             } = await cliente.rpc(
-                "solicitar_conexion_post_plan",
+                "solicitar_conexion_asistente_pase",
                 {
+                    p_reserva_id:
+                        reserva.id,
+
                     usuario_destino:
-                        otroUsuarioId,
-
-                    plan_buscado:
-                        reserva.plan_id,
-
-                    fecha_buscada:
-                        reserva.fecha,
-
-                    hora_buscada:
-                        reserva.hora
+                        otroUsuarioId
                 }
             );
 
@@ -1181,7 +1405,7 @@
 
         const tarjeta =
             document.querySelector(
-                `${SELECTOR_RESERVA_REALIZADA}[data-reserva-id="${CSS.escape(
+                `${SELECTOR_RESERVA_CONFIRMADA}[data-reserva-id="${CSS.escape(
                     reservaId
                 )}"]`
             );
@@ -1287,6 +1511,32 @@
     }
 
 
+    async function sincronizarReservasConfirmadasPlan() {
+        try {
+            await cargarReservasConfirmadasPlan();
+            inyectarBotonesPostPlan();
+        } catch (error) {
+            console.error(
+                "No se pudieron sincronizar los asistentes confirmados:",
+                error
+            );
+        }
+    }
+
+
+    function programarSincronizacionReservasPlan() {
+        clearTimeout(
+            temporizadorSincronizacionReservas
+        );
+
+        temporizadorSincronizacionReservas =
+            setTimeout(
+                sincronizarReservasConfirmadasPlan,
+                180
+            );
+    }
+
+
     function observarListaReservasPostPlan() {
         const lista =
             document.querySelector(
@@ -1300,7 +1550,7 @@
         observadorReservas =
             new MutationObserver(
                 () => {
-                    inyectarBotonesPostPlan();
+                    programarSincronizacionReservasPlan();
                 }
             );
 
@@ -1326,7 +1576,7 @@
                 return;
             }
 
-            await cargarReservasRealizadasPostPlan();
+            await cargarReservasConfirmadasPlan();
 
             activarEventosPostPlan();
             observarListaReservasPostPlan();
@@ -1341,14 +1591,14 @@
             [350, 900, 1700].forEach(
                 (espera) => {
                     setTimeout(
-                        inyectarBotonesPostPlan,
+                        sincronizarReservasConfirmadasPlan,
                         espera
                     );
                 }
             );
         } catch (error) {
             console.error(
-                "No se pudo iniciar Conexiones después del plan:",
+                "No se pudo iniciar Conexiones entre asistentes:",
                 error
             );
         }
