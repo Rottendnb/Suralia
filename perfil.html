@@ -2146,6 +2146,60 @@
     </div>
 </section>
     
+
+    <!-- =========================================================
+         VISOR GRANDE DE FOTOGRAFÍAS DEL PERFIL
+    ========================================================== -->
+
+    <div
+        class="modal-visor-foto-perfil"
+        id="modal-visor-foto-perfil"
+        hidden
+        aria-hidden="true"
+    >
+        <div
+            class="modal-visor-foto-perfil__fondo"
+            id="fondo-visor-foto-perfil"
+        ></div>
+
+        <section
+            class="modal-visor-foto-perfil__contenido"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="titulo-visor-foto-perfil"
+        >
+            <button
+                type="button"
+                class="modal-visor-foto-perfil__cerrar"
+                id="cerrar-visor-foto-perfil"
+                aria-label="Cerrar visor de fotografía"
+            >
+                <i
+                    class="fa-solid fa-xmark"
+                    aria-hidden="true"
+                ></i>
+            </button>
+
+            <h3
+                class="modal-visor-foto-perfil__titulo"
+                id="titulo-visor-foto-perfil"
+            >
+                Fotografía del perfil
+            </h3>
+
+            <div
+                class="modal-visor-foto-perfil__imagen-wrap"
+            >
+                <img
+                    id="imagen-visor-foto-perfil"
+                    class="modal-visor-foto-perfil__imagen"
+                    src=""
+                    alt="Fotografía del perfil"
+                >
+            </div>
+        </section>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/datos-planes.js"></script>
