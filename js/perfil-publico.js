@@ -45,6 +45,178 @@ if (
 }
 
 
+/* =====================================================
+   HELPER COMÚN DE FOTOS DE PERFIL
+===================================================== */
+
+function asegurarHelperFotosPerfilSuralia() {
+    if (window.SuraliaFotosPerfil) {
+        return Promise.resolve(
+            window.SuraliaFotosPerfil
+        );
+    }
+
+    if (
+        window.promesaHelperFotosPerfilSuralia
+    ) {
+        return window
+            .promesaHelperFotosPerfilSuralia;
+    }
+
+    window.promesaHelperFotosPerfilSuralia =
+        new Promise(
+            (
+                resolve,
+                reject
+            ) => {
+                const src =
+                    new URL(
+                        "js/fotos-perfil.js",
+                        document.baseURI
+                    ).href;
+
+                let script =
+                    Array.from(
+                        document.scripts
+                    ).find(
+                        (item) =>
+                            item.src ===
+                            src
+                    );
+
+                const resolver =
+                    () => {
+                        if (
+                            window
+                                .SuraliaFotosPerfil
+                        ) {
+                            resolve(
+                                window
+                                    .SuraliaFotosPerfil
+                            );
+                        } else {
+                            reject(
+                                new Error(
+                                    "El helper de fotos de perfil no se ha podido iniciar."
+                                )
+                            );
+                        }
+                    };
+
+                if (script) {
+                    script.addEventListener(
+                        "load",
+                        resolver,
+                        {
+                            once:
+                                true
+                        }
+                    );
+
+                    script.addEventListener(
+                        "error",
+                        () => {
+                            reject(
+                                new Error(
+                                    "No se pudo cargar js/fotos-perfil.js."
+                                )
+                            );
+                        },
+                        {
+                            once:
+                                true
+                        }
+                    );
+
+                    window.setTimeout(
+                        () => {
+                            if (
+                                window
+                                    .SuraliaFotosPerfil
+                            ) {
+                                resolver();
+                            }
+                        },
+                        0
+                    );
+
+                    return;
+                }
+
+                script =
+                    document.createElement(
+                        "script"
+                    );
+
+                script.src =
+                    src;
+
+                script.async =
+                    true;
+
+                script.dataset
+                    .suraliaFotosPerfil =
+                    "true";
+
+                script.addEventListener(
+                    "load",
+                    resolver,
+                    {
+                        once:
+                            true
+                    }
+                );
+
+                script.addEventListener(
+                    "error",
+                    () => {
+                        reject(
+                            new Error(
+                                "No se pudo cargar js/fotos-perfil.js."
+                            )
+                        );
+                    },
+                    {
+                        once:
+                            true
+                    }
+                );
+
+                document.head.appendChild(
+                    script
+                );
+            }
+        );
+
+    return window
+        .promesaHelperFotosPerfilSuralia;
+}
+
+
+function esAvatarInternoFotosPerfil(
+    valor = ""
+) {
+    if (
+        window.SuraliaFotosPerfil
+    ) {
+        return window
+            .SuraliaFotosPerfil
+            .esUrlInterna(
+                valor
+            );
+    }
+
+    return /\/storage\/v1\/object\/(?:public|sign|authenticated)\/fotos-perfil\//i
+        .test(
+            String(
+                valor ||
+                ""
+            )
+        );
+}
+
+
+
 const perfilCarga =
     document.querySelector(
         "#perfil-publico-carga"
@@ -316,14 +488,13 @@ async function cargarUsuarioHeaderPerfilPublico() {
         );
     }
 
-    /*
-       Primero muestra inmediatamente la imagen guardada
-       para evitar que aparezcan las iniciales mientras carga.
-    */
     if (
         usuarioLocal.avatarTipo ===
             "imagen" &&
-        usuarioLocal.avatarValor
+        usuarioLocal.avatarValor &&
+        !esAvatarInternoFotosPerfil(
+            usuarioLocal.avatarValor
+        )
     ) {
         mostrarImagen(
             usuarioLocal.avatarValor
@@ -340,6 +511,9 @@ async function cargarUsuarioHeaderPerfilPublico() {
     }
 
     try {
+        const helperFotos =
+            await asegurarHelperFotosPerfilSuralia();
+
         const {
             data: datosSesion,
             error: errorSesion
@@ -377,6 +551,31 @@ async function cargarUsuarioHeaderPerfilPublico() {
             throw errorPerfil;
         }
 
+        const {
+            data: fotoPrincipalStorage,
+            error: errorFotoStorage
+        } = await cliente
+            .from("fotos_perfil")
+            .select(
+                `
+                    foto_url,
+                    ruta_storage
+                `
+            )
+            .eq(
+                "usuario_id",
+                usuarioAutenticado.id
+            )
+            .eq(
+                "es_principal",
+                true
+            )
+            .maybeSingle();
+
+        if (errorFotoStorage) {
+            throw errorFotoStorage;
+        }
+
         if (
             perfilConectado?.nombre_visible
         ) {
@@ -384,28 +583,55 @@ async function cargarUsuarioHeaderPerfilPublico() {
                 perfilConectado.nombre_visible;
         }
 
-        if (
-            perfilConectado?.foto_principal_url
-        ) {
+        const fotoBase =
+            fotoPrincipalStorage?.foto_url ||
+            perfilConectado?.foto_principal_url ||
+            "";
+
+        const fotoVisual =
+            await helperFotos.obtenerUrl({
+                rutaStorage:
+                    fotoPrincipalStorage?.ruta_storage ||
+                    "",
+
+                fotoUrl:
+                    fotoBase
+            });
+
+        if (fotoVisual) {
             mostrarImagen(
-                perfilConectado.foto_principal_url
+                fotoVisual
             );
-
-            const usuarioActualizado = {
-                ...usuarioLocal,
-                avatarTipo:
-                    "imagen",
-                avatarValor:
-                    perfilConectado.foto_principal_url
-            };
-
-            localStorage.setItem(
-                "usuarioSuralia",
-                JSON.stringify(
-                    usuarioActualizado
-                )
-            );
+        } else {
+            mostrarIniciales();
         }
+
+        const fotoPersistible =
+            helperFotos.esUrlExterna(
+                perfilConectado?.foto_principal_url ||
+                ""
+            )
+                ? perfilConectado.foto_principal_url
+                : "";
+
+        const usuarioActualizado = {
+            ...usuarioLocal,
+
+            avatarTipo:
+                fotoPersistible
+                    ? "imagen"
+                    : "",
+
+            avatarValor:
+                fotoPersistible
+        };
+
+        localStorage.setItem(
+            "usuarioSuralia",
+            JSON.stringify(
+                usuarioActualizado
+            )
+        );
     } catch (error) {
         console.error(
             "No se pudo cargar el avatar del usuario conectado:",
@@ -413,7 +639,6 @@ async function cargarUsuarioHeaderPerfilPublico() {
         );
     }
 }
-
 
 const textosBusca = {
     amistades:
@@ -791,9 +1016,17 @@ function mostrarGaleria(
                 boton.addEventListener(
                     "click",
                     () => {
+                        const imagen =
+                            boton.querySelector(
+                                "img"
+                            );
+
                         abrirFotoPublica(
+                            imagen?.currentSrc ||
+                            imagen?.src ||
                             boton.dataset
-                                .fotoPublica
+                                .fotoPublica ||
+                            ""
                         );
                     }
                 );
@@ -1666,6 +1899,91 @@ function limitarFocoModal(
 }
 
 
+
+async function prepararFotosPerfilPublico(
+    datos
+) {
+    if (!datos) {
+        return datos;
+    }
+
+    try {
+        const helperFotos =
+            await asegurarHelperFotosPerfilSuralia();
+
+        const fotoPrincipalOriginal =
+            String(
+                datos?.foto_principal ||
+                ""
+            ).trim();
+
+        const fotoPrincipalVisual =
+            fotoPrincipalOriginal
+                ? await helperFotos.obtenerUrl({
+                    fotoUrl:
+                        fotoPrincipalOriginal
+                })
+                : "";
+
+        const fotosOriginales =
+            Array.isArray(
+                datos?.fotos
+            )
+                ? datos.fotos
+                : [];
+
+        const fotosVisuales =
+            await Promise.all(
+                fotosOriginales.map(
+                    async (
+                        foto
+                    ) => {
+                        const urlOriginal =
+                            String(
+                                foto?.url ||
+                                ""
+                            ).trim();
+
+                        const urlVisual =
+                            urlOriginal
+                                ? await helperFotos.obtenerUrl({
+                                    fotoUrl:
+                                        urlOriginal
+                                })
+                                : "";
+
+                        return {
+                            ...foto,
+
+                            url:
+                                urlVisual ||
+                                urlOriginal
+                        };
+                    }
+                )
+            );
+
+        return {
+            ...datos,
+
+            foto_principal:
+                fotoPrincipalVisual ||
+                fotoPrincipalOriginal,
+
+            fotos:
+                fotosVisuales
+        };
+    } catch (error) {
+        console.warn(
+            "No se pudieron preparar las URLs temporales del perfil público:",
+            error
+        );
+
+        return datos;
+    }
+}
+
+
 function mostrarPerfil(
     datos
 ) {
@@ -1904,8 +2222,13 @@ async function cargarPerfilPublico() {
             );
         }
 
+        const datosVisuales =
+            await prepararFotosPerfilPublico(
+                data
+            );
+
         mostrarPerfil(
-            data
+            datosVisuales
         );
 
         try {
@@ -2225,18 +2548,36 @@ document.addEventListener(
 );
 
 
+
+async function iniciarPerfilPublicoSuralia() {
+    try {
+        await asegurarHelperFotosPerfilSuralia();
+    } catch (error) {
+        console.warn(
+            "El helper de fotos de perfil no está disponible todavía:",
+            error
+        );
+    }
+
+    await Promise.all([
+        cargarUsuarioHeaderPerfilPublico(),
+        cargarPerfilPublico()
+    ]);
+}
+
+
 if (
     document.readyState ===
     "loading"
 ) {
     document.addEventListener(
         "DOMContentLoaded",
-        () => {
-            cargarUsuarioHeaderPerfilPublico();
-            cargarPerfilPublico();
+        iniciarPerfilPublicoSuralia,
+        {
+            once:
+                true
         }
     );
 } else {
-    cargarUsuarioHeaderPerfilPublico();
-    cargarPerfilPublico();
+    iniciarPerfilPublicoSuralia();
 }

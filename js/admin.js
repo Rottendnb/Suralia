@@ -177,6 +177,230 @@ let botonQueAbrioModalRechazo =
 
 
 /* =====================================================
+   HELPER COMÚN DE FOTOS DE PERFIL
+===================================================== */
+
+function asegurarHelperFotosPerfilSuralia() {
+    if (window.SuraliaFotosPerfil) {
+        return Promise.resolve(
+            window.SuraliaFotosPerfil
+        );
+    }
+
+    if (
+        window.promesaHelperFotosPerfilSuralia
+    ) {
+        return window
+            .promesaHelperFotosPerfilSuralia;
+    }
+
+    window.promesaHelperFotosPerfilSuralia =
+        new Promise(
+            (
+                resolve,
+                reject
+            ) => {
+                const src =
+                    new URL(
+                        "js/fotos-perfil.js",
+                        document.baseURI
+                    ).href;
+
+                let script =
+                    Array.from(
+                        document.scripts
+                    ).find(
+                        (item) =>
+                            item.src ===
+                            src
+                    );
+
+                const resolver =
+                    () => {
+                        if (
+                            window.SuraliaFotosPerfil
+                        ) {
+                            resolve(
+                                window.SuraliaFotosPerfil
+                            );
+                        } else {
+                            reject(
+                                new Error(
+                                    "El helper de fotos de perfil no se ha podido iniciar."
+                                )
+                            );
+                        }
+                    };
+
+                if (script) {
+                    script.addEventListener(
+                        "load",
+                        resolver,
+                        {
+                            once:
+                                true
+                        }
+                    );
+
+                    script.addEventListener(
+                        "error",
+                        () => {
+                            reject(
+                                new Error(
+                                    "No se pudo cargar js/fotos-perfil.js."
+                                )
+                            );
+                        },
+                        {
+                            once:
+                                true
+                        }
+                    );
+
+                    window.setTimeout(
+                        () => {
+                            if (
+                                window.SuraliaFotosPerfil
+                            ) {
+                                resolver();
+                            }
+                        },
+                        0
+                    );
+
+                    return;
+                }
+
+                script =
+                    document.createElement(
+                        "script"
+                    );
+
+                script.src =
+                    src;
+
+                script.async =
+                    true;
+
+                script.dataset
+                    .suraliaFotosPerfil =
+                    "true";
+
+                script.addEventListener(
+                    "load",
+                    resolver,
+                    {
+                        once:
+                            true
+                    }
+                );
+
+                script.addEventListener(
+                    "error",
+                    () => {
+                        reject(
+                            new Error(
+                                "No se pudo cargar js/fotos-perfil.js."
+                            )
+                        );
+                    },
+                    {
+                        once:
+                            true
+                    }
+                );
+
+                document.head.appendChild(
+                    script
+                );
+            }
+        );
+
+    return window
+        .promesaHelperFotosPerfilSuralia;
+}
+
+
+async function prepararFotoPerfilAdmin(
+    registro
+) {
+    if (!registro) {
+        return registro;
+    }
+
+    const fotoOriginal =
+        String(
+            registro?.foto_principal_url ||
+            ""
+        ).trim();
+
+    if (!fotoOriginal) {
+        return {
+            ...registro,
+            foto_principal_url_visual:
+                ""
+        };
+    }
+
+    try {
+        const helperFotos =
+            await asegurarHelperFotosPerfilSuralia();
+
+        const fotoVisual =
+            await helperFotos.obtenerUrl({
+                fotoUrl:
+                    fotoOriginal
+            });
+
+        return {
+            ...registro,
+
+            /*
+               Esta URL es solo de presentación.
+               No se guarda en Supabase ni en localStorage.
+            */
+            foto_principal_url_visual:
+                fotoVisual ||
+                ""
+        };
+    } catch (error) {
+        console.warn(
+            "No se pudo preparar una foto de perfil del panel admin:",
+            error
+        );
+
+        /*
+           Compatibilidad temporal mientras fotos-perfil
+           continúe siendo público.
+        */
+        return {
+            ...registro,
+            foto_principal_url_visual:
+                fotoOriginal
+        };
+    }
+}
+
+
+async function prepararFotosPerfilAdmin(
+    registros
+) {
+    const lista =
+        Array.isArray(
+            registros
+        )
+            ? registros
+            : [];
+
+    return await Promise.all(
+        lista.map(
+            prepararFotoPerfilAdmin
+        )
+    );
+}
+
+
+/* =====================================================
    FUNCIONES GENERALES
 ===================================================== */
 
@@ -502,7 +726,7 @@ function crearPlanPendienteHTML(
 
     const fotoAutor =
         escaparHTML(
-            plan.foto_principal_url ||
+            plan.foto_principal_url_visual ||
             ""
         );
 
@@ -819,9 +1043,11 @@ async function cargarPlanesPendientesAdmin() {
         }
 
         planesPendientesAdmin =
-            Array.isArray(data)
-                ? data
-                : [];
+            await prepararFotosPerfilAdmin(
+                Array.isArray(data)
+                    ? data
+                    : []
+            );
 
         mostrarPlanesPendientes();
     } catch (error) {
@@ -1798,7 +2024,7 @@ function crearUsuarioAdminHTML(
 
     const foto =
         escaparHTML(
-            usuario.foto_principal_url ||
+            usuario.foto_principal_url_visual ||
             ""
         );
 
@@ -2053,9 +2279,11 @@ async function cargarUsuariosAdmin() {
         }
 
         usuariosAdmin =
-            Array.isArray(data)
-                ? data
-                : [];
+            await prepararFotosPerfilAdmin(
+                Array.isArray(data)
+                    ? data
+                    : []
+            );
 
         mostrarUsuariosAdmin();
     } catch (error) {
@@ -2270,6 +2498,11 @@ async function obtenerUrlSelfie(
 async function prepararVerificacion(
     verificacion
 ) {
+    const verificacionConFoto =
+        await prepararFotoPerfilAdmin(
+            verificacion
+        );
+
     try {
         const selfieUrl =
             await obtenerUrlSelfie(
@@ -2277,7 +2510,7 @@ async function prepararVerificacion(
             );
 
         return {
-            ...verificacion,
+            ...verificacionConFoto,
             selfie_url_temporal:
                 selfieUrl
         };
@@ -2288,13 +2521,12 @@ async function prepararVerificacion(
         );
 
         return {
-            ...verificacion,
+            ...verificacionConFoto,
             selfie_url_temporal:
                 ""
         };
     }
 }
-
 
 function crearVerificacionHTML(
     verificacion
@@ -2312,7 +2544,7 @@ function crearVerificacionHTML(
 
     const fotoPerfil =
         escaparHTML(
-            verificacion.foto_principal_url ||
+            verificacion.foto_principal_url_visual ||
             ""
         );
 
@@ -2874,6 +3106,15 @@ confirmarRechazoVerificacion?.addEventListener(
 ===================================================== */
 
 async function protegerPanelAdministracion() {
+    try {
+        await asegurarHelperFotosPerfilSuralia();
+    } catch (error) {
+        console.warn(
+            "El helper de fotos de perfil no está disponible todavía:",
+            error
+        );
+    }
+
     const cliente =
         window.clienteSupabase;
 

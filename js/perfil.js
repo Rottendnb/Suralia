@@ -106,6 +106,51 @@ migrarPonchoKAntiguoEnLocalStorage();
 const usuarioGuardado =
     leerDatoLocal("usuarioSuralia", {});
 
+/*
+   La URL firmada de la foto principal solo vive en memoria.
+   Nunca debe guardarse en localStorage.
+*/
+let avatarPerfilTemporal = "";
+
+function esUrlInternaFotosPerfilPerfil(
+    valor = ""
+) {
+    const texto =
+        String(
+            valor ||
+            ""
+        ).trim();
+
+    return /\/storage\/v1\/object\/(?:public|sign|authenticated)\/fotos-perfil\//i
+        .test(
+            texto
+        );
+}
+
+/*
+   Limpia una referencia antigua al bucket fotos-perfil que
+   pudiera haber quedado guardada antes de hacer el bucket privado.
+   Las fotos externas (por ejemplo Google) se conservan.
+*/
+if (
+    usuarioGuardado.avatarTipo ===
+        "imagen" &&
+    esUrlInternaFotosPerfilPerfil(
+        usuarioGuardado.avatarValor
+    )
+) {
+    usuarioGuardado.avatarTipo =
+        "";
+
+    usuarioGuardado.avatarValor =
+        "";
+
+    guardarDatoLocal(
+        "usuarioSuralia",
+        usuarioGuardado
+    );
+}
+
 const sesionGuardada =
     leerDatoLocal("sesionSuralia", null);
 
@@ -276,22 +321,35 @@ function aplicarAvatar(elemento) {
     elemento.style.backgroundImage = "";
     elemento.textContent = "";
 
-    if (
-        usuarioGuardado.avatarTipo === "imagen" &&
-        usuarioGuardado.avatarValor
-    ) {
+    const avatarExternoPersistido =
+        (
+            usuarioGuardado.avatarTipo ===
+                "imagen" &&
+            usuarioGuardado.avatarValor &&
+            !esUrlInternaFotosPerfilPerfil(
+                usuarioGuardado.avatarValor
+            )
+        )
+            ? usuarioGuardado.avatarValor
+            : "";
+
+    const avatarVisual =
+        avatarPerfilTemporal ||
+        avatarExternoPersistido;
+
+    if (avatarVisual) {
         elemento.classList.add(
             "avatar--imagen"
         );
 
         elemento.style.backgroundImage =
-            `url("${usuarioGuardado.avatarValor}")`;
+            `url("${avatarVisual}")`;
 
         return;
     }
 
-
-    elemento.textContent = iniciales;
+    elemento.textContent =
+        iniciales;
 }
 
 function cargarDatosUsuario() {
@@ -402,10 +460,30 @@ function cambiarSeccion(
             );
     }
 
+    /*
+       El menú principal ahora está agrupado:
+       - Favoritos y Publicados pertenecen a "Mis planes".
+       - Afinidades pertenece a "Social".
+
+       Las secciones internas siguen existiendo exactamente igual,
+       pero el usuario ve solo cinco accesos principales.
+    */
+    const seccionMenuActiva = {
+        favoritos:
+            "reservas",
+
+        publicados:
+            "reservas",
+
+        afinidades:
+            "conexiones"
+    }[nombreSeccion] ||
+        nombreSeccion;
+
     botonesMenuPerfil.forEach((boton) => {
         const esActivo =
             boton.dataset.seccion ===
-            nombreSeccion;
+            seccionMenuActiva;
 
         boton.classList.toggle(
             "activo",
@@ -704,32 +782,6 @@ const botonAnadirFotos =
 const errorFotosPerfil =
     document.querySelector(
         "#error-fotos-perfil"
-    );
-
-
-const modalVisorFotoPerfil =
-    document.querySelector(
-        "#modal-visor-foto-perfil"
-    );
-
-const fondoVisorFotoPerfil =
-    document.querySelector(
-        "#fondo-visor-foto-perfil"
-    );
-
-const imagenVisorFotoPerfil =
-    document.querySelector(
-        "#imagen-visor-foto-perfil"
-    );
-
-const tituloVisorFotoPerfil =
-    document.querySelector(
-        "#titulo-visor-foto-perfil"
-    );
-
-const botonCerrarVisorFotoPerfil =
-    document.querySelector(
-        "#cerrar-visor-foto-perfil"
     );
 
 const BUCKET_FOTOS_PERFIL =
@@ -1288,199 +1340,22 @@ async function obtenerUsuarioGaleria() {
 }
 
 
-
-function obtenerElementosVisorFotoPerfil() {
-    return {
-        modal:
-            document.querySelector(
-                "#modal-visor-foto-perfil"
-            ),
-
-        fondo:
-            document.querySelector(
-                "#fondo-visor-foto-perfil"
-            ),
-
-        imagen:
-            document.querySelector(
-                "#imagen-visor-foto-perfil"
-            ),
-
-        titulo:
-            document.querySelector(
-                "#titulo-visor-foto-perfil"
-            ),
-
-        cerrar:
-            document.querySelector(
-                "#cerrar-visor-foto-perfil"
-            )
-    };
-}
-
-
-function abrirVisorFotoPerfil(
-    url,
-    textoAlt = "Fotografía del perfil"
-) {
-    const {
-        modal,
-        imagen,
-        titulo,
-        cerrar
-    } = obtenerElementosVisorFotoPerfil();
-
-    if (
-        !modal ||
-        !imagen ||
-        !url
-    ) {
-        console.warn(
-            "No se ha encontrado el visor de fotografías en perfil.html."
-        );
-
-        return;
-    }
-
-    imagen.src =
-        url;
-
-    imagen.alt =
-        textoAlt;
-
-    if (titulo) {
-        titulo.textContent =
-            "Fotografía del perfil";
-    }
-
-    modal.hidden =
-        false;
-
-    modal.setAttribute(
-        "aria-hidden",
-        "false"
-    );
-
-    document.body.classList.add(
-        "modal-abierta"
-    );
-
-    cerrar?.focus();
-}
-
-
-function cerrarVisorFotoPerfil() {
-    const {
-        modal,
-        imagen
-    } = obtenerElementosVisorFotoPerfil();
-
-    if (!modal) {
-        return;
-    }
-
-    modal.hidden =
-        true;
-
-    modal.setAttribute(
-        "aria-hidden",
-        "true"
-    );
-
-    if (imagen) {
-        imagen.src =
-            "";
-
-        imagen.alt =
-            "Fotografía del perfil";
-    }
-
-    document.body.classList.remove(
-        "modal-abierta"
-    );
-}
-
-
-/*
-   Delegación de eventos:
-   funciona aunque el HTML del modal esté colocado
-   después de perfil.js justo antes de </body>.
-*/
-document.addEventListener(
-    "click",
-    (evento) => {
-        const botonCerrar =
-            evento.target.closest(
-                "#cerrar-visor-foto-perfil"
-            );
-
-        if (botonCerrar) {
-            cerrarVisorFotoPerfil();
-            return;
-        }
-
-        if (
-            evento.target.matches(
-                "#fondo-visor-foto-perfil"
-            )
-        ) {
-            cerrarVisorFotoPerfil();
-        }
-    }
-);
-
-
-document.addEventListener(
-    "keydown",
-    (evento) => {
-        if (evento.key !== "Escape") {
-            return;
-        }
-
-        const modal =
-            document.querySelector(
-                "#modal-visor-foto-perfil"
-            );
-
-        if (
-            modal &&
-            !modal.hidden
-        ) {
-            cerrarVisorFotoPerfil();
-        }
-    }
-);
-
-
 function crearFotoGaleriaHTML(
     foto
 ) {
     const id =
         Number(foto.id);
 
-    const urlReal =
-        foto.url_visual ||
-        foto.foto_url ||
-        "";
-
     const url =
         escaparAtributoHTML(
-            urlReal
+            foto.url_visual ||
+            foto.foto_url ||
+            ""
         );
 
     const esPrincipal =
         Boolean(
             foto.es_principal
-        );
-
-    const textoAlt =
-        esPrincipal
-            ? "Fotografía principal del perfil"
-            : "Fotografía de la galería del perfil";
-
-    const altEscapado =
-        escaparAtributoHTML(
-            textoAlt
         );
 
     return `
@@ -1493,21 +1368,15 @@ function crearFotoGaleriaHTML(
             data-foto-id="${id}"
         >
 
-            <button
-                type="button"
-                class="foto-perfil-item__imagen-boton"
-                data-ver-foto="${id}"
-                data-url-foto="${url}"
-                data-alt-foto="${altEscapado}"
-                aria-label="Abrir fotografía"
+            <img
+                src="${url}"
+                alt="${
+                    esPrincipal
+                        ? "Fotografía principal del perfil"
+                        : "Fotografía de la galería del perfil"
+                }"
+                loading="lazy"
             >
-                <img
-                    class="foto-perfil-item__imagen"
-                    src="${url}"
-                    alt="${altEscapado}"
-                    loading="lazy"
-                >
-            </button>
 
             ${
                 esPrincipal
@@ -1568,6 +1437,7 @@ function crearFotoGaleriaHTML(
         </article>
     `;
 }
+
 
 function mostrarGaleriaPerfil() {
     const total =
@@ -1703,17 +1573,68 @@ async function cargarGaleriaPerfil() {
                     foto.es_principal
             );
 
-        if (principal?.foto_url) {
-            usuarioGuardado.avatarTipo =
-                "imagen";
+        if (principal) {
+            const fotoVisual =
+                String(
+                    principal.url_visual ||
+                    ""
+                ).trim();
 
+            const fotoPersistible =
+                (
+                    principal.foto_url &&
+                    !esUrlInternaFotosPerfilPerfil(
+                        principal.foto_url
+                    )
+                )
+                    ? principal.foto_url
+                    : "";
+
+            avatarPerfilTemporal =
+                fotoVisual;
+
+            usuarioGuardado.avatarTipo =
+                (
+                    fotoVisual ||
+                    fotoPersistible
+                )
+                    ? "imagen"
+                    : "";
+
+            /*
+               Las URLs del bucket fotos-perfil no se guardan
+               en localStorage. Una foto externa estable sí puede
+               conservarse como hasta ahora.
+            */
             usuarioGuardado.avatarValor =
-                principal.foto_url;
+                fotoPersistible;
 
             guardarDatoLocal(
                 "usuarioSuralia",
                 usuarioGuardado
             );
+
+            cargarDatosUsuario();
+        } else {
+            avatarPerfilTemporal =
+                "";
+
+            if (
+                esUrlInternaFotosPerfilPerfil(
+                    usuarioGuardado.avatarValor
+                )
+            ) {
+                usuarioGuardado.avatarTipo =
+                    "";
+
+                usuarioGuardado.avatarValor =
+                    "";
+
+                guardarDatoLocal(
+                    "usuarioSuralia",
+                    usuarioGuardado
+                );
+            }
 
             cargarDatosUsuario();
         }
@@ -1734,7 +1655,8 @@ async function cargarGaleriaPerfil() {
 
 async function sincronizarFotoPrincipal(
     usuarioId,
-    fotoUrl
+    fotoUrl,
+    fotoUrlVisual = ""
 ) {
     const {
         error
@@ -1745,6 +1667,11 @@ async function sincronizarFotoPrincipal(
                 usuario_id:
                     usuarioId,
 
+                /*
+                   Se mantiene la referencia estable existente en BD.
+                   En un bucket privado esta URL sirve como referencia
+                   de ruta para el helper, no como URL pública accesible.
+                */
                 foto_principal_url:
                     fotoUrl,
 
@@ -1761,13 +1688,32 @@ async function sincronizarFotoPrincipal(
         throw error;
     }
 
+    const fotoPersistible =
+        (
+            fotoUrl &&
+            !esUrlInternaFotosPerfilPerfil(
+                fotoUrl
+            )
+        )
+            ? fotoUrl
+            : "";
+
+    avatarPerfilTemporal =
+        String(
+            fotoUrlVisual ||
+            ""
+        ).trim();
+
     usuarioGuardado.avatarTipo =
-        fotoUrl
+        (
+            avatarPerfilTemporal ||
+            fotoPersistible
+        )
             ? "imagen"
             : "";
 
     usuarioGuardado.avatarValor =
-        fotoUrl || "";
+        fotoPersistible;
 
     guardarDatoLocal(
         "usuarioSuralia",
@@ -1776,7 +1722,6 @@ async function sincronizarFotoPrincipal(
 
     cargarDatosUsuario();
 }
-
 
 async function subirUnaFotoGaleria(
     archivo,
@@ -1964,7 +1909,9 @@ async function subirFotosGaleria(
         if (esPrimeraFoto) {
             await sincronizarFotoPrincipal(
                 usuario.id,
-                fotoCreada.foto_url
+                fotoCreada.foto_url,
+                fotoCreada.url_visual ||
+                ""
             );
         }
 
@@ -2073,7 +2020,9 @@ async function hacerFotoPrincipal(
 
     await sincronizarFotoPrincipal(
         usuario.id,
-        fotoElegida.foto_url
+        fotoElegida.foto_url,
+        fotoElegida.url_visual ||
+        ""
     );
 
     mostrarGaleriaPerfil();
@@ -2263,36 +2212,6 @@ function cerrarMenusFotos() {
 
 
 function activarEventosGaleria() {
-    document
-        .querySelectorAll(
-            "[data-ver-foto]"
-        )
-        .forEach(
-            (boton) => {
-                boton.addEventListener(
-                    "click",
-                    () => {
-                        const imagen =
-                            boton.querySelector(
-                                ".foto-perfil-item__imagen"
-                            );
-
-                        abrirVisorFotoPerfil(
-                            imagen?.currentSrc ||
-                            imagen?.src ||
-                            boton.dataset
-                                .urlFoto ||
-                            "",
-                            imagen?.alt ||
-                            boton.dataset
-                                .altFoto ||
-                            "Fotografía del perfil"
-                        );
-                    }
-                );
-            }
-        );
-
     document
         .querySelectorAll(
             "[data-menu-foto]"

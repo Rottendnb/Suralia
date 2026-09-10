@@ -32433,3 +32433,953 @@ body.modal-abierta {
         max-height: 74vh;
     }
 }
+
+/* ========================================================================
+   SURALIA · PERFIL COMPACTO Y PROFESIONAL · V1
+   Integrado al final del style.css completo.
+   Estas reglas sobrescriben únicamente la presentación del perfil.
+======================================================================== */
+
+/* =========================================================
+   SURALIA · PERFIL COMPACTO Y PROFESIONAL · V1
+   Archivo: css/perfil-compacto.css
+
+   Este archivo se carga DESPUÉS de css/style.css.
+   Solo reorganiza y compacta la página de perfil.
+========================================================= */
+
+/* =====================================================
+   CABECERA DEL PERFIL
+===================================================== */
+
+.cabecera-perfil {
+    padding: 34px 0;
+    border-bottom: 1px solid rgba(23, 61, 54, 0.08);
+    background:
+        linear-gradient(
+            120deg,
+            #fffaf4 0%,
+            #f5f9f6 100%
+        );
+}
+
+.cabecera-perfil__contenido {
+    gap: 24px;
+}
+
+.perfil-identidad {
+    gap: 16px;
+    min-width: 0;
+}
+
+.perfil-identidad__avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 21px;
+    font-size: 18px;
+    box-shadow: 0 12px 30px rgba(23, 61, 54, 0.11);
+}
+
+.perfil-identidad h1 {
+    margin: 3px 0 2px;
+    font-size: clamp(27px, 3vw, 36px);
+    letter-spacing: -0.035em;
+}
+
+.perfil-identidad p {
+    overflow: hidden;
+    max-width: 500px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cabecera-perfil__acciones {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-shrink: 0;
+}
+
+.boton-editar-perfil,
+.boton-cerrar-sesion {
+    min-height: 42px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 11px;
+    font-size: 11px;
+    font-weight: 800;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.boton-editar-perfil {
+    border: 1px solid rgba(23, 61, 54, 0.13);
+    background: #ffffff;
+    color: var(--color-secundario);
+}
+
+.boton-editar-perfil:hover {
+    border-color: rgba(232, 93, 50, 0.35);
+    color: var(--color-principal);
+    transform: translateY(-1px);
+}
+
+.boton-cerrar-sesion {
+    border-color: rgba(179, 61, 61, 0.16);
+}
+
+.boton-cerrar-sesion:hover {
+    background: #fff7f7;
+    transform: translateY(-1px);
+}
+
+
+/* =====================================================
+   ESTRUCTURA GENERAL
+===================================================== */
+
+.perfil {
+    padding: 38px 0 82px;
+    background: #f7f8f6;
+}
+
+.perfil__grid {
+    grid-template-columns: 228px minmax(0, 1fr);
+    gap: 28px;
+}
+
+.perfil-contenido {
+    min-width: 0;
+}
+
+
+/* =====================================================
+   MENÚ PRINCIPAL · SOLO 5 ACCESOS
+===================================================== */
+
+.perfil-menu {
+    position: sticky;
+    top: 96px;
+    z-index: 20;
+    padding: 10px;
+    gap: 4px;
+    border: 1px solid rgba(23, 61, 54, 0.09);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 10px 30px rgba(23, 61, 54, 0.055);
+}
+
+.perfil-menu__cabecera {
+    padding: 8px 10px 12px;
+    margin-bottom: 2px;
+    border-bottom: 1px solid rgba(23, 61, 54, 0.07);
+}
+
+.perfil-menu__cabecera span,
+.perfil-menu__cabecera small {
+    display: block;
+}
+
+.perfil-menu__cabecera span {
+    color: var(--color-secundario);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.perfil-menu__cabecera small {
+    margin-top: 2px;
+    color: var(--color-texto-suave);
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+.perfil-menu__enlace {
+    position: relative;
+    z-index: 21;
+    width: 100%;
+    min-height: 57px;
+    padding: 8px 9px;
+    gap: 10px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    color: #687671;
+    text-align: left;
+}
+
+.perfil-menu__enlace:hover {
+    border-color: rgba(23, 61, 54, 0.08);
+    background: #f8faf8;
+    color: var(--color-secundario);
+    transform: none;
+}
+
+.perfil-menu__enlace.activo,
+body:has(#seccion-favoritos.activa)
+    .perfil-menu__enlace[data-grupo-principal="planes"],
+body:has(#seccion-publicados.activa)
+    .perfil-menu__enlace[data-grupo-principal="planes"],
+body:has(#seccion-afinidades.activa)
+    .perfil-menu__enlace[data-grupo-principal="social"] {
+    border-color: rgba(232, 93, 50, 0.14);
+    background: rgba(232, 93, 50, 0.075);
+    color: var(--color-principal);
+}
+
+.perfil-menu__icono {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: rgba(23, 61, 54, 0.055);
+    color: var(--color-secundario);
+    font-size: 13px;
+}
+
+.perfil-menu__enlace.activo .perfil-menu__icono,
+body:has(#seccion-favoritos.activa)
+    .perfil-menu__enlace[data-grupo-principal="planes"]
+    .perfil-menu__icono,
+body:has(#seccion-publicados.activa)
+    .perfil-menu__enlace[data-grupo-principal="planes"]
+    .perfil-menu__icono,
+body:has(#seccion-afinidades.activa)
+    .perfil-menu__enlace[data-grupo-principal="social"]
+    .perfil-menu__icono {
+    background: rgba(232, 93, 50, 0.12);
+    color: var(--color-principal);
+}
+
+.perfil-menu__texto {
+    min-width: 0;
+    flex: 1;
+    display: block;
+}
+
+.perfil-menu__texto strong,
+.perfil-menu__texto small {
+    display: block;
+}
+
+.perfil-menu__texto strong {
+    color: inherit;
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.perfil-menu__texto small {
+    margin-top: 2px;
+    color: #8a9692;
+    font-size: 8.5px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.perfil-menu__contador {
+    min-width: 23px;
+    height: 23px;
+    padding: 0 6px;
+    flex-shrink: 0;
+    font-size: 9px;
+}
+
+
+/* =====================================================
+   SUBMENÚS INTERNOS
+===================================================== */
+
+.perfil-submenu {
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 0 22px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    overflow-x: auto;
+    border: 1px solid rgba(23, 61, 54, 0.09);
+    border-radius: 13px;
+    background: #ffffff;
+    box-shadow: 0 6px 20px rgba(23, 61, 54, 0.035);
+    scrollbar-width: none;
+}
+
+.perfil-submenu::-webkit-scrollbar {
+    display: none;
+}
+
+.perfil-submenu__enlace {
+    min-height: 36px;
+    padding: 0 12px;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: #6c7975;
+    font: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        background-color 0.18s ease,
+        color 0.18s ease;
+}
+
+.perfil-submenu__enlace:hover {
+    background: #f4f7f5;
+    color: var(--color-secundario);
+}
+
+body:has(#seccion-reservas.activa)
+    .perfil-submenu__enlace[data-ir-seccion="reservas"],
+body:has(#seccion-favoritos.activa)
+    .perfil-submenu__enlace[data-ir-seccion="favoritos"],
+body:has(#seccion-publicados.activa)
+    .perfil-submenu__enlace[data-ir-seccion="publicados"],
+body:has(#seccion-conexiones.activa)
+    .perfil-submenu__enlace[data-ir-seccion="conexiones"],
+body:has(#seccion-afinidades.activa)
+    .perfil-submenu__enlace[data-ir-seccion="afinidades"] {
+    background: var(--color-secundario);
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   CABECERAS DE SECCIÓN
+===================================================== */
+
+.perfil-seccion__cabecera {
+    margin-bottom: 22px;
+    align-items: center;
+}
+
+.perfil-seccion__cabecera h2 {
+    margin: 3px 0 2px;
+    font-size: clamp(26px, 3vw, 31px);
+    letter-spacing: -0.03em;
+}
+
+.perfil-seccion__cabecera p {
+    max-width: 620px;
+    font-size: 11px;
+}
+
+.perfil-seccion__cabecera .subtitulo {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+}
+
+
+/* =====================================================
+   RESUMEN
+===================================================== */
+
+#seccion-resumen .perfil-estadisticas {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 11px;
+}
+
+.perfil-estadisticas {
+    gap: 11px;
+}
+
+.perfil-estadisticas article {
+    min-width: 0;
+    padding: 15px;
+    gap: 11px;
+    border-radius: 14px;
+    box-shadow: 0 5px 18px rgba(23, 61, 54, 0.025);
+}
+
+.perfil-estadistica-enlace {
+    cursor: pointer;
+    transition:
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.perfil-estadistica-enlace:hover {
+    border-color: rgba(232, 93, 50, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 9px 22px rgba(23, 61, 54, 0.06);
+}
+
+.perfil-estadisticas__icono {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    border-radius: 11px;
+}
+
+.perfil-estadisticas__icono i {
+    position: static !important;
+    top: auto !important;
+    margin: 0 !important;
+    transform: none !important;
+    line-height: 1 !important;
+}
+
+.perfil-estadisticas strong {
+    font-size: 20px;
+    line-height: 1.1;
+}
+
+.perfil-estadisticas article div span {
+    margin-top: 3px;
+    font-size: 8.5px;
+    line-height: 1.35;
+}
+
+.perfil-bloque {
+    margin-top: 18px;
+    padding: 21px;
+    border-radius: 16px;
+    box-shadow: 0 5px 18px rgba(23, 61, 54, 0.025);
+}
+
+.perfil-bloque__cabecera {
+    margin-bottom: 17px;
+}
+
+.perfil-bloque__cabecera h3 {
+    font-size: 17px;
+}
+
+.perfil-bloque__cabecera p {
+    font-size: 10px;
+}
+
+
+/* =====================================================
+   RESERVAS / ACTIVIDAD
+===================================================== */
+
+.lista-reservas {
+    gap: 13px;
+}
+
+.reserva-item {
+    grid-template-columns: 165px minmax(0, 1fr);
+    gap: 17px;
+    padding: 13px;
+    border-radius: 16px;
+    box-shadow: 0 5px 18px rgba(23, 61, 54, 0.025);
+}
+
+.reserva-item__imagen {
+    border-radius: 12px;
+}
+
+.reserva-item__imagen img {
+    min-height: 160px;
+}
+
+.reserva-item h3 {
+    margin-top: 7px;
+    font-size: 18px;
+}
+
+.reserva-item__datos {
+    margin: 13px 0;
+    gap: 10px 15px;
+    font-size: 10px;
+}
+
+.reserva-item__acciones {
+    gap: 8px;
+}
+
+.reserva-item__acciones > * {
+    min-height: 38px;
+}
+
+.reserva-resumen {
+    grid-template-columns: 180px 1fr;
+    border-radius: 15px;
+}
+
+.reserva-resumen__imagen {
+    min-height: 175px;
+}
+
+.reserva-resumen__contenido {
+    padding: 19px;
+}
+
+
+/* =====================================================
+   FAVORITOS / PUBLICADOS / AFINIDADES
+===================================================== */
+
+.perfil-favoritos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.perfil-favoritos .tarjeta-plan__imagen {
+    height: 180px;
+}
+
+.lista-publicaciones,
+.lista-afinidades {
+    gap: 14px;
+}
+
+.publicacion-item {
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 18px;
+    padding: 14px;
+    border-radius: 16px;
+}
+
+.publicacion-item__imagen,
+.publicacion-item__imagen img {
+    min-height: 165px;
+}
+
+.afinidad-item {
+    grid-template-columns: minmax(175px, 220px) 1fr;
+    border-radius: 16px;
+    box-shadow: 0 7px 22px rgba(24, 52, 39, 0.055);
+}
+
+.afinidad-item__imagen {
+    min-height: 200px;
+}
+
+.afinidad-item__contenido {
+    gap: 12px;
+    padding: 20px;
+}
+
+
+/* =====================================================
+   SOCIAL / CONEXIONES
+===================================================== */
+
+#seccion-conexiones .perfil-estadisticas {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+#seccion-conexiones .perfil-bloque {
+    margin-top: 14px;
+    padding: 19px;
+}
+
+.conexion-item {
+    padding: 14px;
+    gap: 13px;
+    border-radius: 14px;
+}
+
+.conexion-item__avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+}
+
+.conexion-item__contenido h4 {
+    font-size: 13px;
+}
+
+.conexion-item__acciones {
+    gap: 7px;
+}
+
+
+/* =====================================================
+   ESTADOS VACÍOS
+===================================================== */
+
+.estado-vacio {
+    padding: 46px 22px;
+    border-radius: 18px;
+}
+
+.estado-vacio__icono {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 15px;
+    border-radius: 17px;
+    font-size: 21px;
+}
+
+.estado-vacio h3 {
+    font-size: 18px;
+}
+
+.estado-vacio p {
+    margin: 7px auto 17px;
+    font-size: 11px;
+}
+
+
+/* =====================================================
+   MI PERFIL
+===================================================== */
+
+#seccion-datos {
+    max-width: 940px;
+}
+
+#seccion-datos .galeria-perfil,
+#seccion-datos .verificacion-perfil,
+#seccion-datos .formulario-perfil {
+    border-radius: 17px;
+    box-shadow: 0 6px 22px rgba(23, 61, 54, 0.035);
+}
+
+#seccion-datos .galeria-perfil,
+#seccion-datos .verificacion-perfil {
+    padding: 22px;
+}
+
+#seccion-datos .formulario-perfil {
+    max-width: none;
+    padding: 24px;
+}
+
+#seccion-datos .grupo-seleccion-social {
+    padding: 18px;
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 1050px) {
+
+    .perfil {
+        padding-top: 24px;
+    }
+
+    .perfil__grid {
+        grid-template-columns: 1fr;
+        gap: 23px;
+    }
+
+    .perfil-menu {
+        position: sticky;
+        top: 86px;
+        z-index: 30;
+        width: 100%;
+        margin: 0;
+        padding: 7px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        flex-direction: row;
+        gap: 4px;
+        border-radius: 15px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .perfil-menu::-webkit-scrollbar {
+        display: none;
+    }
+
+    .perfil-menu__cabecera {
+        display: none;
+    }
+
+    .perfil-menu__enlace {
+        width: auto;
+        min-width: 132px;
+        min-height: 48px;
+        flex: 0 0 auto;
+        padding: 6px 9px;
+    }
+
+    .perfil-menu__icono {
+        width: 32px;
+        height: 32px;
+        flex-basis: 32px;
+        border-radius: 10px;
+    }
+
+    .perfil-menu__texto small {
+        display: none;
+    }
+
+    .perfil-menu__texto strong {
+        font-size: 10px;
+        white-space: nowrap;
+    }
+
+    #seccion-resumen .perfil-estadisticas {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .perfil-favoritos {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+/* =====================================================
+   MÓVIL
+===================================================== */
+
+@media (max-width: 760px) {
+
+    .cabecera-perfil {
+        padding: 23px 0;
+    }
+
+    .cabecera-perfil__contenido {
+        width: min(92%, var(--ancho-maximo));
+        align-items: center;
+        flex-direction: row;
+        gap: 15px;
+    }
+
+    .perfil-identidad {
+        min-width: 0;
+        flex: 1;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .perfil-identidad__avatar {
+        width: 58px;
+        height: 58px;
+        border-radius: 17px;
+        font-size: 15px;
+    }
+
+    .perfil-identidad .subtitulo {
+        font-size: 8px;
+    }
+
+    .perfil-identidad h1 {
+        overflow: hidden;
+        max-width: 100%;
+        font-size: 22px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .perfil-identidad p {
+        max-width: 58vw;
+        font-size: 10px;
+    }
+
+    .cabecera-perfil__acciones {
+        gap: 6px;
+    }
+
+    .boton-editar-perfil {
+        width: 40px;
+        min-height: 40px;
+        padding: 0;
+        font-size: 0;
+    }
+
+    .boton-editar-perfil i {
+        font-size: 13px;
+    }
+
+    .boton-cerrar-sesion {
+        width: 40px;
+        min-height: 40px;
+        padding: 0;
+        font-size: 0;
+    }
+
+    .boton-cerrar-sesion i {
+        font-size: 13px;
+    }
+
+    .perfil {
+        padding: 18px 0 60px;
+    }
+
+    .perfil__grid {
+        width: min(94%, var(--ancho-maximo));
+        gap: 18px;
+    }
+
+    .perfil-menu {
+        top: 82px;
+    }
+
+    .perfil-menu__enlace {
+        min-width: 105px;
+        min-height: 46px;
+    }
+
+    .perfil-menu__contador {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        min-width: 19px;
+        height: 19px;
+        font-size: 8px;
+    }
+
+    .perfil-submenu {
+        width: 100%;
+        margin-bottom: 18px;
+    }
+
+    .perfil-submenu__enlace {
+        flex: 1 0 auto;
+        min-height: 35px;
+        padding: 0 10px;
+        font-size: 9px;
+    }
+
+    .perfil-seccion__cabecera {
+        margin-bottom: 17px;
+    }
+
+    .perfil-seccion__cabecera h2 {
+        font-size: 24px;
+    }
+
+    #seccion-resumen .perfil-estadisticas,
+    .perfil-estadisticas,
+    #seccion-conexiones .perfil-estadisticas {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+    }
+
+    .perfil-estadisticas article {
+        padding: 12px;
+    }
+
+    .perfil-estadisticas__icono {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+    }
+
+    .perfil-estadisticas strong {
+        font-size: 18px;
+    }
+
+    .perfil-bloque {
+        padding: 16px;
+    }
+
+    .reserva-resumen,
+    .reserva-item,
+    .publicacion-item,
+    .afinidad-item {
+        grid-template-columns: 1fr;
+    }
+
+    .reserva-item {
+        gap: 13px;
+    }
+
+    .reserva-item__imagen img,
+    .reserva-resumen__imagen {
+        height: 180px;
+        min-height: 180px;
+    }
+
+    .reserva-item__superior {
+        gap: 10px;
+    }
+
+    .perfil-favoritos {
+        grid-template-columns: 1fr;
+    }
+
+    .perfil-favoritos .tarjeta-plan__imagen {
+        height: 200px;
+    }
+
+    .afinidad-item__imagen {
+        min-height: 190px;
+        max-height: 220px;
+    }
+
+    #seccion-datos .galeria-perfil,
+    #seccion-datos .verificacion-perfil,
+    #seccion-datos .formulario-perfil {
+        padding: 17px;
+    }
+
+    .estado-vacio {
+        padding: 36px 18px;
+    }
+}
+
+
+/* =====================================================
+   MÓVIL PEQUEÑO
+===================================================== */
+
+@media (max-width: 480px) {
+
+    .cabecera-perfil__contenido {
+        width: 94%;
+    }
+
+    .perfil-identidad__avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 15px;
+    }
+
+    .perfil-identidad h1 {
+        font-size: 19px;
+    }
+
+    .perfil-identidad p {
+        max-width: 50vw;
+    }
+
+    .perfil-menu__enlace {
+        min-width: 96px;
+        padding-inline: 7px;
+    }
+
+    .perfil-menu__icono {
+        width: 30px;
+        height: 30px;
+        flex-basis: 30px;
+    }
+
+    .perfil-submenu__enlace i {
+        display: none;
+    }
+
+    #seccion-resumen .perfil-estadisticas,
+    .perfil-estadisticas,
+    #seccion-conexiones .perfil-estadisticas {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .perfil-estadisticas article {
+        gap: 9px;
+        padding: 11px;
+    }
+
+    .perfil-estadisticas article div span {
+        font-size: 8px;
+    }
+
+    .perfil-bloque__cabecera {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+}

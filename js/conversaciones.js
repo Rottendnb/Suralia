@@ -245,6 +245,178 @@ function leerDatoLocal(clave, alternativa = null) {
     }
 }
 
+
+/* =========================================
+   HELPER COMÚN DE FOTOS DE PERFIL
+========================================= */
+
+function asegurarHelperFotosPerfilSuralia() {
+    if (window.SuraliaFotosPerfil) {
+        return Promise.resolve(
+            window.SuraliaFotosPerfil
+        );
+    }
+
+    if (
+        window.promesaHelperFotosPerfilSuralia
+    ) {
+        return window
+            .promesaHelperFotosPerfilSuralia;
+    }
+
+    window.promesaHelperFotosPerfilSuralia =
+        new Promise(
+            (
+                resolve,
+                reject
+            ) => {
+                const src =
+                    new URL(
+                        "js/fotos-perfil.js",
+                        document.baseURI
+                    ).href;
+
+                let script =
+                    Array.from(
+                        document.scripts
+                    ).find(
+                        (item) =>
+                            item.src ===
+                            src
+                    );
+
+                const resolver =
+                    () => {
+                        if (
+                            window
+                                .SuraliaFotosPerfil
+                        ) {
+                            resolve(
+                                window
+                                    .SuraliaFotosPerfil
+                            );
+                        } else {
+                            reject(
+                                new Error(
+                                    "El helper de fotos de perfil no se ha podido iniciar."
+                                )
+                            );
+                        }
+                    };
+
+                if (script) {
+                    script.addEventListener(
+                        "load",
+                        resolver,
+                        {
+                            once:
+                                true
+                        }
+                    );
+
+                    script.addEventListener(
+                        "error",
+                        () => {
+                            reject(
+                                new Error(
+                                    "No se pudo cargar js/fotos-perfil.js."
+                                )
+                            );
+                        },
+                        {
+                            once:
+                                true
+                        }
+                    );
+
+                    window.setTimeout(
+                        () => {
+                            if (
+                                window
+                                    .SuraliaFotosPerfil
+                            ) {
+                                resolver();
+                            }
+                        },
+                        0
+                    );
+
+                    return;
+                }
+
+                script =
+                    document.createElement(
+                        "script"
+                    );
+
+                script.src =
+                    src;
+
+                script.async =
+                    true;
+
+                script.dataset
+                    .suraliaFotosPerfil =
+                    "true";
+
+                script.addEventListener(
+                    "load",
+                    resolver,
+                    {
+                        once:
+                            true
+                    }
+                );
+
+                script.addEventListener(
+                    "error",
+                    () => {
+                        reject(
+                            new Error(
+                                "No se pudo cargar js/fotos-perfil.js."
+                            )
+                        );
+                    },
+                    {
+                        once:
+                            true
+                    }
+                );
+
+                document.head.appendChild(
+                    script
+                );
+            }
+        );
+
+    return window
+        .promesaHelperFotosPerfilSuralia;
+}
+
+
+function esAvatarInternoFotosPerfil(
+    valor = ""
+) {
+    if (
+        window.SuraliaFotosPerfil
+    ) {
+        return window
+            .SuraliaFotosPerfil
+            .esUrlInterna(
+                valor
+            );
+    }
+
+    return /\/storage\/v1\/object\/(?:public|sign|authenticated)\/fotos-perfil\//i
+        .test(
+            String(
+                valor ||
+                ""
+            )
+        );
+}
+
+
 const carga = document.querySelector("#conversaciones-carga");
 const errorBloque = document.querySelector("#conversaciones-error");
 const errorTexto = document.querySelector("#conversaciones-error-texto");
@@ -338,60 +510,202 @@ function formatearFecha(fecha) {
 }
 
 async function cargarHeader() {
-    const avatar = document.querySelector("#avatar-header");
-    const nombre = document.querySelector("#nombre-header");
-    if (!avatar || !nombre) return;
+    const avatar =
+        document.querySelector(
+            "#avatar-header"
+        );
 
-    const local = leerDatoLocal("usuarioSuralia", {}) || {};
-    nombre.textContent = local.nombre || "Mi perfil";
+    const nombre =
+        document.querySelector(
+            "#nombre-header"
+        );
 
-    function mostrarIniciales() {
-        const iniciales = `${(local.nombre || "S").charAt(0)}${(local.apellidos || "").charAt(0)}`
-            .toUpperCase()
-            .trim() || "SU";
-
-        avatar.textContent = iniciales;
-        avatar.style.backgroundImage = "";
-        avatar.classList.remove("avatar--imagen", "usuario-header__avatar--imagen");
+    if (
+        !avatar ||
+        !nombre
+    ) {
+        return;
     }
 
-    function mostrarImagen(url) {
+    const local =
+        leerDatoLocal(
+            "usuarioSuralia",
+            {}
+        ) || {};
+
+    nombre.textContent =
+        local.nombre ||
+        "Mi perfil";
+
+    function mostrarIniciales() {
+        const iniciales =
+            `${(local.nombre || "S").charAt(0)}${(local.apellidos || "").charAt(0)}`
+                .toUpperCase()
+                .trim() ||
+            "SU";
+
+        avatar.textContent =
+            iniciales;
+
+        avatar.style.backgroundImage =
+            "";
+
+        avatar.classList.remove(
+            "avatar--imagen",
+            "usuario-header__avatar--imagen"
+        );
+    }
+
+    function mostrarImagen(
+        url
+    ) {
         if (!url) {
             mostrarIniciales();
             return;
         }
 
-        avatar.textContent = "";
-        avatar.style.backgroundImage = `url("${url}")`;
-        avatar.style.backgroundPosition = "center";
-        avatar.style.backgroundSize = "cover";
-        avatar.style.backgroundRepeat = "no-repeat";
-        avatar.classList.add("avatar--imagen", "usuario-header__avatar--imagen");
+        avatar.textContent =
+            "";
+
+        avatar.style.backgroundImage =
+            `url("${url}")`;
+
+        avatar.style.backgroundPosition =
+            "center";
+
+        avatar.style.backgroundSize =
+            "cover";
+
+        avatar.style.backgroundRepeat =
+            "no-repeat";
+
+        avatar.classList.add(
+            "avatar--imagen",
+            "usuario-header__avatar--imagen"
+        );
     }
 
-    if (local.avatarTipo === "imagen" && local.avatarValor) {
-        mostrarImagen(local.avatarValor);
+    /*
+       Desde localStorage solo reutilizamos una URL estable.
+       Las URLs del bucket fotos-perfil pueden caducar o
+       dejar de ser públicas cuando termine la migración.
+    */
+    if (
+        local.avatarTipo ===
+            "imagen" &&
+        local.avatarValor &&
+        !esAvatarInternoFotosPerfil(
+            local.avatarValor
+        )
+    ) {
+        mostrarImagen(
+            local.avatarValor
+        );
     } else {
         mostrarIniciales();
     }
 
     try {
-        const cliente = window.clienteSupabase;
-        const { data: sesion } = await cliente.auth.getSession();
-        const usuario = sesion.session?.user;
-        if (!usuario) return;
+        const cliente =
+            window.clienteSupabase;
 
-        const { data: perfil, error } = await cliente
+        if (!cliente?.auth) {
+            return;
+        }
+
+        const helperFotos =
+            await asegurarHelperFotosPerfilSuralia();
+
+        const {
+            data: sesion,
+            error: errorSesion
+        } = await cliente.auth.getSession();
+
+        if (errorSesion) {
+            throw errorSesion;
+        }
+
+        const usuario =
+            sesion.session?.user;
+
+        if (!usuario) {
+            return;
+        }
+
+        const {
+            data: perfil,
+            error
+        } = await cliente
             .from("perfiles_sociales")
-            .select("nombre_visible,foto_principal_url")
-            .eq("usuario_id", usuario.id)
+            .select(
+                "nombre_visible,foto_principal_url"
+            )
+            .eq(
+                "usuario_id",
+                usuario.id
+            )
             .maybeSingle();
 
-        if (error) throw error;
-        if (perfil?.nombre_visible) nombre.textContent = perfil.nombre_visible;
-        if (perfil?.foto_principal_url) mostrarImagen(perfil.foto_principal_url);
+        if (error) {
+            throw error;
+        }
+
+        const {
+            data: fotoPrincipalStorage,
+            error: errorFotoStorage
+        } = await cliente
+            .from("fotos_perfil")
+            .select(
+                "foto_url,ruta_storage"
+            )
+            .eq(
+                "usuario_id",
+                usuario.id
+            )
+            .eq(
+                "es_principal",
+                true
+            )
+            .maybeSingle();
+
+        if (errorFotoStorage) {
+            throw errorFotoStorage;
+        }
+
+        if (
+            perfil?.nombre_visible
+        ) {
+            nombre.textContent =
+                perfil.nombre_visible;
+        }
+
+        const fotoBase =
+            fotoPrincipalStorage?.foto_url ||
+            perfil?.foto_principal_url ||
+            "";
+
+        const fotoVisual =
+            await helperFotos.obtenerUrl({
+                rutaStorage:
+                    fotoPrincipalStorage?.ruta_storage ||
+                    "",
+
+                fotoUrl:
+                    fotoBase
+            });
+
+        if (fotoVisual) {
+            mostrarImagen(
+                fotoVisual
+            );
+        } else {
+            mostrarIniciales();
+        }
     } catch (error) {
-        console.error("No se pudo cargar el header:", error);
+        console.error(
+            "No se pudo cargar el header:",
+            error
+        );
     }
 }
 
@@ -417,12 +731,118 @@ function mostrarError(mensaje) {
     if (errorTexto) errorTexto.textContent = mensaje;
 }
 
-function avatarPerfil(perfil) {
-    if (perfil?.foto_principal_url) {
-        return `<img src="${escaparHTML(perfil.foto_principal_url)}" alt="">`;
+function avatarPerfil(
+    perfil
+) {
+    const fotoVisual =
+        perfil?.foto_principal_url_visual ||
+        "";
+
+    if (fotoVisual) {
+        return `
+            <img
+                src="${escaparHTML(
+                    fotoVisual
+                )}"
+                alt=""
+            >
+        `;
     }
 
-    return escaparHTML((perfil?.nombre_visible || "S").charAt(0).toUpperCase());
+    return escaparHTML(
+        (
+            perfil?.nombre_visible ||
+            "S"
+        )
+            .charAt(0)
+            .toUpperCase()
+    );
+}
+
+
+async function prepararPerfilesConversaciones(
+    perfiles
+) {
+    const listaPerfiles =
+        Array.isArray(
+            perfiles
+        )
+            ? perfiles
+            : [];
+
+    if (
+        listaPerfiles.length ===
+        0
+    ) {
+        return [];
+    }
+
+    try {
+        const helperFotos =
+            await asegurarHelperFotosPerfilSuralia();
+
+        return await Promise.all(
+            listaPerfiles.map(
+                async (
+                    perfil
+                ) => {
+                    const fotoOriginal =
+                        String(
+                            perfil?.foto_principal_url ||
+                            ""
+                        ).trim();
+
+                    if (!fotoOriginal) {
+                        return {
+                            ...perfil,
+                            foto_principal_url_visual:
+                                ""
+                        };
+                    }
+
+                    const fotoVisual =
+                        await helperFotos.obtenerUrl({
+                            fotoUrl:
+                                fotoOriginal
+                        });
+
+                    return {
+                        ...perfil,
+
+                        /*
+                           Esta propiedad solo vive en memoria.
+                           No se escribe en Supabase ni en
+                           localStorage.
+                        */
+                        foto_principal_url_visual:
+                            fotoVisual ||
+                            ""
+                    };
+                }
+            )
+        );
+    } catch (error) {
+        console.warn(
+            "No se pudieron preparar los avatares de las conversaciones:",
+            error
+        );
+
+        /*
+           Durante la migración el bucket sigue siendo público.
+           Conservamos la URL anterior solo como fallback visual.
+        */
+        return listaPerfiles.map(
+            (
+                perfil
+            ) => ({
+                ...perfil,
+
+                foto_principal_url_visual:
+                    perfil?.foto_principal_url ||
+                    ""
+            })
+        );
+    }
 }
 
 function normalizarTextoConversacion(
@@ -1302,9 +1722,23 @@ async function cargarConversaciones() {
         if (perfilesRes.error) throw perfilesRes.error;
         if (mensajesRes.error) throw mensajesRes.error;
 
-        const perfiles = new Map(
-            (perfilesRes.data || []).map(p => [p.usuario_id, p])
-        );
+        const perfilesPreparados =
+            await prepararPerfilesConversaciones(
+                perfilesRes.data ||
+                []
+            );
+
+        const perfiles =
+            new Map(
+                perfilesPreparados.map(
+                    (
+                        perfil
+                    ) => [
+                        perfil.usuario_id,
+                        perfil
+                    ]
+                )
+            );
 
         const mensajes = new Map();
 
@@ -2051,6 +2485,8 @@ async function iniciar() {
     actualizarBotonNotificaciones();
 
     try {
+        await asegurarHelperFotosPerfilSuralia();
+
         await Promise.all([
             cargarHeader(),
             cargarConversaciones()

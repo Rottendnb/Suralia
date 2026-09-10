@@ -73,6 +73,172 @@ const clienteAuth =
 
 
 /* =====================================================
+   HELPER COMÚN DE FOTOS DE PERFIL
+===================================================== */
+
+function asegurarHelperFotosPerfilSuralia() {
+    if (window.SuraliaFotosPerfil) {
+        return Promise.resolve(
+            window.SuraliaFotosPerfil
+        );
+    }
+
+    if (
+        window.promesaHelperFotosPerfilSuralia
+    ) {
+        return window
+            .promesaHelperFotosPerfilSuralia;
+    }
+
+    window.promesaHelperFotosPerfilSuralia =
+        new Promise(
+            (
+                resolve,
+                reject
+            ) => {
+                const src =
+                    new URL(
+                        "js/fotos-perfil.js",
+                        document.baseURI
+                    ).href;
+
+                let script =
+                    Array.from(
+                        document.scripts
+                    ).find(
+                        (item) =>
+                            item.src ===
+                            src
+                    );
+
+                const resolver =
+                    () => {
+                        if (
+                            window
+                                .SuraliaFotosPerfil
+                        ) {
+                            resolve(
+                                window
+                                    .SuraliaFotosPerfil
+                            );
+                        } else {
+                            reject(
+                                new Error(
+                                    "El helper de fotos de perfil no se ha podido iniciar."
+                                )
+                            );
+                        }
+                    };
+
+                if (script) {
+                    /*
+                       Si ya estaba cargado correctamente,
+                       la comprobación inicial habría devuelto
+                       el helper. Si todavía está cargando,
+                       esperamos su evento load.
+                    */
+                    script.addEventListener(
+                        "load",
+                        resolver,
+                        {
+                            once:
+                                true
+                        }
+                    );
+
+                    script.addEventListener(
+                        "error",
+                        () => {
+                            reject(
+                                new Error(
+                                    "No se pudo cargar js/fotos-perfil.js."
+                                )
+                            );
+                        },
+                        {
+                            once:
+                                true
+                        }
+                    );
+
+                    return;
+                }
+
+                script =
+                    document.createElement(
+                        "script"
+                    );
+
+                script.src =
+                    src;
+
+                script.async =
+                    true;
+
+                script.dataset
+                    .suraliaFotosPerfil =
+                    "true";
+
+                script.addEventListener(
+                    "load",
+                    resolver,
+                    {
+                        once:
+                            true
+                    }
+                );
+
+                script.addEventListener(
+                    "error",
+                    () => {
+                        reject(
+                            new Error(
+                                "No se pudo cargar js/fotos-perfil.js."
+                            )
+                        );
+                    },
+                    {
+                        once:
+                            true
+                    }
+                );
+
+                document.head.appendChild(
+                    script
+                );
+            }
+        );
+
+    return window
+        .promesaHelperFotosPerfilSuralia;
+}
+
+
+function esAvatarInternoFotosPerfil(
+    valor = ""
+) {
+    if (
+        window.SuraliaFotosPerfil
+    ) {
+        return window
+            .SuraliaFotosPerfil
+            .esUrlInterna(
+                valor
+            );
+    }
+
+    return /\/storage\/v1\/object\/(?:public|sign|authenticated)\/fotos-perfil\//i
+        .test(
+            String(
+                valor ||
+                ""
+            )
+        );
+}
+
+
+
+/* =====================================================
    NOTIFICACIONES
 ===================================================== */
 
@@ -332,7 +498,10 @@ function guardarSesionSuralia(
         mismoUsuario &&
         usuarioAnterior.avatarTipo ===
             "imagen" &&
-        usuarioAnterior.avatarValor;
+        usuarioAnterior.avatarValor &&
+        !esAvatarInternoFotosPerfil(
+            usuarioAnterior.avatarValor
+        );
 
     const avatarValor =
         conservarFotoAnterior
@@ -1769,4 +1938,18 @@ function traducirErrorSupabase(
    INICIALIZACIÓN
 ===================================================== */
 
-comprobarSesionActiva();
+async function iniciarAuthSuralia() {
+    try {
+        await asegurarHelperFotosPerfilSuralia();
+    } catch (error) {
+        console.warn(
+            "El helper de fotos de perfil no está disponible todavía:",
+            error
+        );
+    }
+
+    await comprobarSesionActiva();
+}
+
+
+iniciarAuthSuralia();

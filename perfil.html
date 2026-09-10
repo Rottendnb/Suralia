@@ -47,6 +47,11 @@
         rel="stylesheet"
         href="css/style.css"
     >
+
+    <link
+        rel="stylesheet"
+        href="css/perfil-compacto.css"
+    >
 </head>
 
 <body>
@@ -161,7 +166,7 @@
                     <div>
 
                         <span class="subtitulo">
-                            Mi cuenta
+                            Mi Suralia
                         </span>
 
                         <h1 id="nombre-perfil">
@@ -176,14 +181,27 @@
 
                 </div>
 
-                <button
-                    type="button"
-                    class="boton-cerrar-sesion"
-                    id="boton-cerrar-sesion"
-                >
-                    <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
-                    Cerrar sesión
-                </button>
+                <div class="cabecera-perfil__acciones">
+
+                    <button
+                        type="button"
+                        class="boton-editar-perfil"
+                        data-ir-seccion="datos"
+                    >
+                        <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
+                        Editar perfil
+                    </button>
+
+                    <button
+                        type="button"
+                        class="boton-cerrar-sesion"
+                        id="boton-cerrar-sesion"
+                    >
+                        <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+                        Salir
+                    </button>
+
+                </div>
 
             </div>
 
@@ -197,14 +215,19 @@
 
             <div class="contenedor perfil__grid">
 
-                <!-- MENÚ LATERAL -->
+                <!-- MENÚ LATERAL COMPACTO -->
 
                 <aside
                     class="perfil-menu"
-                    aria-label="Secciones del perfil"
+                    aria-label="Mi Suralia"
                     role="tablist"
                     aria-orientation="vertical"
                 >
+
+                    <div class="perfil-menu__cabecera">
+                        <span>Mi Suralia</span>
+                        <small>Todo tu espacio en un mismo sitio</small>
+                    </div>
 
                     <button
                         type="button"
@@ -215,62 +238,53 @@
                         aria-selected="true"
                         tabindex="0"
                     >
-                        <i class="fa-solid fa-house" aria-hidden="true"></i>
-                        Resumen
+                        <span class="perfil-menu__icono">
+                            <i class="fa-solid fa-house" aria-hidden="true"></i>
+                        </span>
+
+                        <span class="perfil-menu__texto">
+                            <strong>Inicio</strong>
+                            <small>Resumen de tu actividad</small>
+                        </span>
                     </button>
 
                     <button
                         type="button"
                         class="perfil-menu__enlace"
                         data-seccion="reservas"
+                        data-grupo-principal="planes"
                         role="tab"
                         aria-controls="seccion-reservas"
                         aria-selected="false"
                         tabindex="-1"
                     >
-                        <i class="fa-solid fa-ticket" aria-hidden="true"></i>
-                        Reservas y asistencias
-                    </button>
+                        <span class="perfil-menu__icono">
+                            <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+                        </span>
 
-                    <button
-                        type="button"
-                        class="perfil-menu__enlace"
-                        data-seccion="favoritos"
-                        role="tab"
-                        aria-controls="seccion-favoritos"
-                        aria-selected="false"
-                        tabindex="-1"
-                    >
-                        <i class="fa-regular fa-heart" aria-hidden="true"></i>
-                        Favoritos
-                    </button>
-
-                    <button
-                        type="button"
-                        class="perfil-menu__enlace"
-                        data-seccion="afinidades"
-                        role="tab"
-                        aria-controls="seccion-afinidades"
-                        aria-selected="false"
-                        tabindex="-1"
-                    >
-                        <i class="fa-solid fa-user-group" aria-hidden="true"></i>
-                        Afinidades
+                        <span class="perfil-menu__texto">
+                            <strong>Mis planes</strong>
+                            <small>Reservas, guardados y publicados</small>
+                        </span>
                     </button>
 
                     <button
                         type="button"
                         class="perfil-menu__enlace"
                         data-seccion="conexiones"
+                        data-grupo-principal="social"
                         role="tab"
                         aria-controls="seccion-conexiones"
                         aria-selected="false"
                         tabindex="-1"
                     >
-                        <i class="fa-solid fa-link" aria-hidden="true"></i>
+                        <span class="perfil-menu__icono">
+                            <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+                        </span>
 
                         <span class="perfil-menu__texto">
-                            Conexiones
+                            <strong>Social</strong>
+                            <small>Conexiones y afinidades</small>
                         </span>
                     </button>
 
@@ -278,10 +292,13 @@
                         class="perfil-menu__enlace"
                         href="conversaciones.html"
                     >
-                        <i class="fa-regular fa-comments" aria-hidden="true"></i>
+                        <span class="perfil-menu__icono">
+                            <i class="fa-regular fa-comments" aria-hidden="true"></i>
+                        </span>
 
                         <span class="perfil-menu__texto">
-                            Mensajes
+                            <strong>Mensajes</strong>
+                            <small>Tus conversaciones</small>
                         </span>
 
                         <span
@@ -296,27 +313,20 @@
                     <button
                         type="button"
                         class="perfil-menu__enlace"
-                        data-seccion="publicados"
-                        role="tab"
-                        aria-controls="seccion-publicados"
-                        aria-selected="false"
-                        tabindex="-1"
-                    >
-                        <i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>
-                        Planes publicados
-                    </button>
-
-                    <button
-                        type="button"
-                        class="perfil-menu__enlace"
                         data-seccion="datos"
                         role="tab"
                         aria-controls="seccion-datos"
                         aria-selected="false"
                         tabindex="-1"
                     >
-                        <i class="fa-regular fa-user" aria-hidden="true"></i>
-                        Datos personales
+                        <span class="perfil-menu__icono">
+                            <i class="fa-regular fa-user" aria-hidden="true"></i>
+                        </span>
+
+                        <span class="perfil-menu__texto">
+                            <strong>Mi perfil</strong>
+                            <small>Fotos, datos y privacidad</small>
+                        </span>
                     </button>
 
                 </aside>
@@ -342,7 +352,7 @@
                             <div>
 
                                 <span class="subtitulo">
-                                    Panel personal
+                                    Tu espacio
                                 </span>
 
                                 <h2>
@@ -353,8 +363,7 @@
                                 </h2>
 
                                 <p>
-                                    Aquí puedes consultar tu actividad reciente
-                                    en Suralia.
+                                    Lo importante de tu cuenta, de un vistazo.
                                 </p>
 
                             </div>
@@ -504,20 +513,53 @@
                         aria-hidden="true"
                     >
 
-                        <div class="perfil-seccion__cabecera">
+                        
+                        <nav
+                            class="perfil-submenu"
+                            aria-label="Mis planes"
+                        >
+                            <button
+                                type="button"
+                                class="perfil-submenu__enlace"
+                                data-ir-seccion="reservas"
+                            >
+                                <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+                                Actividad
+                            </button>
+
+                            <button
+                                type="button"
+                                class="perfil-submenu__enlace"
+                                data-ir-seccion="favoritos"
+                            >
+                                <i class="fa-regular fa-heart" aria-hidden="true"></i>
+                                Guardados
+                            </button>
+
+                            <button
+                                type="button"
+                                class="perfil-submenu__enlace"
+                                data-ir-seccion="publicados"
+                            >
+                                <i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>
+                                Publicados
+                            </button>
+                        </nav>
+
+<div class="perfil-seccion__cabecera">
 
                             <div>
 
                                 <span class="subtitulo">
-                                    Mis actividades
+                                    Mis planes
                                 </span>
 
                                 <h2>
-                                    Reservas y asistencias
+                                    Actividad
                                 </h2>
 
                                 <p>
-                                    Gestiona tus reservas y los eventos a los que vas.
+                                    Tus próximas reservas y los planes en los que participas.
                                 </p>
 
                             </div>
@@ -569,20 +611,53 @@
                         aria-hidden="true"
                     >
 
-                        <div class="perfil-seccion__cabecera">
+                        
+                        <nav
+                            class="perfil-submenu"
+                            aria-label="Mis planes"
+                        >
+                            <button
+                                type="button"
+                                class="perfil-submenu__enlace"
+                                data-ir-seccion="reservas"
+                            >
+                                <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+                                Actividad
+                            </button>
+
+                            <button
+                                type="button"
+                                class="perfil-submenu__enlace"
+                                data-ir-seccion="favoritos"
+                            >
+                                <i class="fa-regular fa-heart" aria-hidden="true"></i>
+                                Guardados
+                            </button>
+
+                            <button
+                                type="button"
+                                class="perfil-submenu__enlace"
+                                data-ir-seccion="publicados"
+                            >
+                                <i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>
+                                Publicados
+                            </button>
+                        </nav>
+
+<div class="perfil-seccion__cabecera">
 
                             <div>
 
                                 <span class="subtitulo">
-                                    Guardados
+                                    Mis planes
                                 </span>
 
                                 <h2>
-                                    Planes favoritos
+                                    Guardados
                                 </h2>
 
                                 <p>
-                                    Actividades que has guardado para más adelante.
+                                    Planes que quieres tener a mano para más adelante.
                                 </p>
 
                             </div>
@@ -635,21 +710,52 @@
                         aria-hidden="true"
                     >
 
-                        <div class="perfil-seccion__cabecera">
+                        
+                        <nav
+                            class="perfil-submenu"
+                            aria-label="Área social"
+                        >
+                            <button
+                                type="button"
+                                class="perfil-submenu__enlace"
+                                data-ir-seccion="conexiones"
+                            >
+                                <i class="fa-solid fa-link" aria-hidden="true"></i>
+                                Conexiones
+                            </button>
+
+                            <button
+                                type="button"
+                                class="perfil-submenu__enlace"
+                                data-ir-seccion="afinidades"
+                            >
+                                <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+                                Afinidades
+                            </button>
+
+                            <a
+                                class="perfil-submenu__enlace"
+                                href="conversaciones.html"
+                            >
+                                <i class="fa-regular fa-comments" aria-hidden="true"></i>
+                                Mensajes
+                            </a>
+                        </nav>
+
+<div class="perfil-seccion__cabecera">
 
                             <div>
 
                                 <span class="subtitulo">
-                                    Conecta con otras personas
+                                    Social
                                 </span>
 
                                 <h2>
-                                    Mis afinidades
+                                    Afinidades
                                 </h2>
 
                                 <p>
-                                    Planes en los que has indicado que te gustaría
-                                    conocer a otras personas con intereses parecidos.
+                                    Personas y planes con intereses parecidos a los tuyos.
                                 </p>
 
                             </div>
@@ -707,12 +813,44 @@
                         aria-hidden="true"
                     >
 
-                        <div class="perfil-seccion__cabecera">
+                        
+                        <nav
+                            class="perfil-submenu"
+                            aria-label="Área social"
+                        >
+                            <button
+                                type="button"
+                                class="perfil-submenu__enlace"
+                                data-ir-seccion="conexiones"
+                            >
+                                <i class="fa-solid fa-link" aria-hidden="true"></i>
+                                Conexiones
+                            </button>
+
+                            <button
+                                type="button"
+                                class="perfil-submenu__enlace"
+                                data-ir-seccion="afinidades"
+                            >
+                                <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+                                Afinidades
+                            </button>
+
+                            <a
+                                class="perfil-submenu__enlace"
+                                href="conversaciones.html"
+                            >
+                                <i class="fa-regular fa-comments" aria-hidden="true"></i>
+                                Mensajes
+                            </a>
+                        </nav>
+
+<div class="perfil-seccion__cabecera">
 
                             <div>
 
                                 <span class="subtitulo">
-                                    Tu red en Suralia
+                                    Social
                                 </span>
 
                                 <h2>
@@ -720,7 +858,7 @@
                                 </h2>
 
                                 <p>
-                                    Gestiona tus solicitudes y las personas con las que has conectado.
+                                    Solicitudes y personas con las que ya has conectado.
                                 </p>
 
                             </div>
@@ -931,21 +1069,53 @@
                         aria-hidden="true"
                     >
 
-                        <div class="perfil-seccion__cabecera">
+                        
+                        <nav
+                            class="perfil-submenu"
+                            aria-label="Mis planes"
+                        >
+                            <button
+                                type="button"
+                                class="perfil-submenu__enlace"
+                                data-ir-seccion="reservas"
+                            >
+                                <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+                                Actividad
+                            </button>
+
+                            <button
+                                type="button"
+                                class="perfil-submenu__enlace"
+                                data-ir-seccion="favoritos"
+                            >
+                                <i class="fa-regular fa-heart" aria-hidden="true"></i>
+                                Guardados
+                            </button>
+
+                            <button
+                                type="button"
+                                class="perfil-submenu__enlace"
+                                data-ir-seccion="publicados"
+                            >
+                                <i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>
+                                Publicados
+                            </button>
+                        </nav>
+
+<div class="perfil-seccion__cabecera">
 
                             <div>
 
                                 <span class="subtitulo">
-                                    Organizador
+                                    Mis planes
                                 </span>
 
                                 <h2>
-                                    Planes publicados
+                                    Publicados
                                 </h2>
 
                                 <p>
-                                    Gestiona tus actividades, publicaciones
-                                    pendientes y borradores.
+                                    Tus planes publicados, pendientes y borradores.
                                 </p>
 
                             </div>
@@ -1048,15 +1218,15 @@
                             <div>
 
                                 <span class="subtitulo">
-                                    Configuración
+                                    Tu cuenta
                                 </span>
 
                                 <h2>
-                                    Datos personales
+                                    Mi perfil
                                 </h2>
 
                                 <p>
-                                    Actualiza la información asociada a tu cuenta.
+                                    Fotos, información personal, intereses y privacidad.
                                 </p>
 
                             </div>

@@ -20,6 +20,152 @@ let planActual = null;
 
 
 /* =====================================================
+   HELPER COMÚN DE FOTOS DE PERFIL
+===================================================== */
+
+function asegurarHelperFotosPerfilSuralia() {
+    if (window.SuraliaFotosPerfil) {
+        return Promise.resolve(
+            window.SuraliaFotosPerfil
+        );
+    }
+
+    if (
+        window.promesaHelperFotosPerfilSuralia
+    ) {
+        return window
+            .promesaHelperFotosPerfilSuralia;
+    }
+
+    window.promesaHelperFotosPerfilSuralia =
+        new Promise(
+            (
+                resolve,
+                reject
+            ) => {
+                const src =
+                    new URL(
+                        "js/fotos-perfil.js",
+                        document.baseURI
+                    ).href;
+
+                let script =
+                    Array.from(
+                        document.scripts
+                    ).find(
+                        (item) =>
+                            item.src ===
+                            src
+                    );
+
+                const resolver =
+                    () => {
+                        if (
+                            window.SuraliaFotosPerfil
+                        ) {
+                            resolve(
+                                window.SuraliaFotosPerfil
+                            );
+                        } else {
+                            reject(
+                                new Error(
+                                    "El helper de fotos de perfil no se ha podido iniciar."
+                                )
+                            );
+                        }
+                    };
+
+                if (script) {
+                    script.addEventListener(
+                        "load",
+                        resolver,
+                        {
+                            once:
+                                true
+                        }
+                    );
+
+                    script.addEventListener(
+                        "error",
+                        () => {
+                            reject(
+                                new Error(
+                                    "No se pudo cargar js/fotos-perfil.js."
+                                )
+                            );
+                        },
+                        {
+                            once:
+                                true
+                        }
+                    );
+
+                    window.setTimeout(
+                        () => {
+                            if (
+                                window.SuraliaFotosPerfil
+                            ) {
+                                resolver();
+                            }
+                        },
+                        0
+                    );
+
+                    return;
+                }
+
+                script =
+                    document.createElement(
+                        "script"
+                    );
+
+                script.src =
+                    src;
+
+                script.async =
+                    true;
+
+                script.dataset
+                    .suraliaFotosPerfil =
+                    "true";
+
+                script.addEventListener(
+                    "load",
+                    resolver,
+                    {
+                        once:
+                            true
+                    }
+                );
+
+                script.addEventListener(
+                    "error",
+                    () => {
+                        reject(
+                            new Error(
+                                "No se pudo cargar js/fotos-perfil.js."
+                            )
+                        );
+                    },
+                    {
+                        once:
+                            true
+                    }
+                );
+
+                document.head.appendChild(
+                    script
+                );
+            }
+        );
+
+    return window
+        .promesaHelperFotosPerfilSuralia;
+}
+
+
+
+/* =====================================================
    PLANES PUBLICADOS DESDE SUPABASE
 ===================================================== */
 
@@ -431,6 +577,69 @@ function obtenerOpcionesFechasReserva() {
 }
 
 
+
+async function prepararFotoOrganizadorDetalle(
+    perfil
+) {
+    if (!perfil) {
+        return perfil;
+    }
+
+    const fotoOriginal =
+        String(
+            perfil?.foto_principal_url ||
+            ""
+        ).trim();
+
+    if (!fotoOriginal) {
+        return {
+            ...perfil,
+            foto_principal_url_visual:
+                ""
+        };
+    }
+
+    try {
+        const helperFotos =
+            await asegurarHelperFotosPerfilSuralia();
+
+        const fotoVisual =
+            await helperFotos.obtenerUrl({
+                fotoUrl:
+                    fotoOriginal
+            });
+
+        return {
+            ...perfil,
+
+            /*
+               La URL firmada solo se usa para pintar esta página.
+               No se guarda en Supabase ni en localStorage.
+            */
+            foto_principal_url_visual:
+                fotoVisual ||
+                ""
+        };
+    } catch (error) {
+        console.warn(
+            "No se pudo preparar la foto del organizador:",
+            error
+        );
+
+        /*
+           Compatibilidad temporal mientras fotos-perfil
+           todavía siga siendo un bucket público.
+        */
+        return {
+            ...perfil,
+
+            foto_principal_url_visual:
+                fotoOriginal
+        };
+    }
+}
+
+
 function crearPlanDetalleDesdeSupabase(plan, perfil) {
     const nombreOrganizador =
         perfil?.nombre_visible ||
@@ -828,7 +1037,8 @@ function crearPlanDetalleDesdeSupabase(plan, perfil) {
 
         esPlanSupabase: true,
         fotoOrganizador:
-            perfil?.foto_principal_url || "",
+            perfil?.foto_principal_url_visual ||
+            "",
 
         esMusica,
         detallesExtra,
@@ -929,9 +1139,14 @@ async function cargarPlanSupabaseDetalle() {
         }
     }
 
+    const perfilPreparado =
+        await prepararFotoOrganizadorDetalle(
+            perfil
+        );
+
     return crearPlanDetalleDesdeSupabase(
         plan,
-        perfil
+        perfilPreparado
     );
 }
 
@@ -7072,6 +7287,8 @@ window.addEventListener(
 
 async function iniciarDetallePlan() {
     try {
+        await asegurarHelperFotosPerfilSuralia();
+
         if (
             esUuidPlan(
                 planIdUrl

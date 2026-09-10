@@ -25,6 +25,242 @@
     let temporizadorSincronizacionReservas = null;
 
 
+    /* =========================================================
+       HELPER COMÚN DE FOTOS DE PERFIL
+    ========================================================= */
+
+    function asegurarHelperFotosPerfilSuralia() {
+        if (window.SuraliaFotosPerfil) {
+            return Promise.resolve(
+                window.SuraliaFotosPerfil
+            );
+        }
+
+        if (
+            window.promesaHelperFotosPerfilSuralia
+        ) {
+            return window
+                .promesaHelperFotosPerfilSuralia;
+        }
+
+        window.promesaHelperFotosPerfilSuralia =
+            new Promise(
+                (
+                    resolve,
+                    reject
+                ) => {
+                    const src =
+                        new URL(
+                            "js/fotos-perfil.js",
+                            document.baseURI
+                        ).href;
+
+                    let script =
+                        Array.from(
+                            document.scripts
+                        ).find(
+                            (item) =>
+                                item.src ===
+                                src
+                        );
+
+                    const resolver =
+                        () => {
+                            if (
+                                window
+                                    .SuraliaFotosPerfil
+                            ) {
+                                resolve(
+                                    window
+                                        .SuraliaFotosPerfil
+                                );
+                            } else {
+                                reject(
+                                    new Error(
+                                        "El helper de fotos de perfil no se ha podido iniciar."
+                                    )
+                                );
+                            }
+                        };
+
+                    if (script) {
+                        script.addEventListener(
+                            "load",
+                            resolver,
+                            {
+                                once:
+                                    true
+                            }
+                        );
+
+                        script.addEventListener(
+                            "error",
+                            () => {
+                                reject(
+                                    new Error(
+                                        "No se pudo cargar js/fotos-perfil.js."
+                                    )
+                                );
+                            },
+                            {
+                                once:
+                                    true
+                            }
+                        );
+
+                        window.setTimeout(
+                            () => {
+                                if (
+                                    window
+                                        .SuraliaFotosPerfil
+                                ) {
+                                    resolver();
+                                }
+                            },
+                            0
+                        );
+
+                        return;
+                    }
+
+                    script =
+                        document.createElement(
+                            "script"
+                        );
+
+                    script.src =
+                        src;
+
+                    script.async =
+                        true;
+
+                    script.dataset
+                        .suraliaFotosPerfil =
+                        "true";
+
+                    script.addEventListener(
+                        "load",
+                        resolver,
+                        {
+                            once:
+                                true
+                        }
+                    );
+
+                    script.addEventListener(
+                        "error",
+                        () => {
+                            reject(
+                                new Error(
+                                    "No se pudo cargar js/fotos-perfil.js."
+                                )
+                            );
+                        },
+                        {
+                            once:
+                                true
+                        }
+                    );
+
+                    document.head.appendChild(
+                        script
+                    );
+                }
+            );
+
+        return window
+            .promesaHelperFotosPerfilSuralia;
+    }
+
+
+    async function prepararFotosAsistentesPostPlan(
+        asistentes
+    ) {
+        const lista =
+            Array.isArray(
+                asistentes
+            )
+                ? asistentes
+                : [];
+
+        if (
+            lista.length ===
+            0
+        ) {
+            return [];
+        }
+
+        try {
+            const helperFotos =
+                await asegurarHelperFotosPerfilSuralia();
+
+            return await Promise.all(
+                lista.map(
+                    async (
+                        asistente
+                    ) => {
+                        const fotoOriginal =
+                            String(
+                                asistente?.foto_principal_url ||
+                                ""
+                            ).trim();
+
+                        if (!fotoOriginal) {
+                            return {
+                                ...asistente,
+
+                                foto_principal_url_visual:
+                                    ""
+                            };
+                        }
+
+                        const fotoVisual =
+                            await helperFotos.obtenerUrl({
+                                fotoUrl:
+                                    fotoOriginal
+                            });
+
+                        return {
+                            ...asistente,
+
+                            /*
+                               Esta URL solo se usa para pintar
+                               el modal actual. No se guarda en
+                               Supabase ni en localStorage.
+                            */
+                            foto_principal_url_visual:
+                                fotoVisual ||
+                                ""
+                        };
+                    }
+                )
+            );
+        } catch (error) {
+            console.warn(
+                "No se pudieron preparar las fotos de los asistentes:",
+                error
+            );
+
+            /*
+               Compatibilidad temporal mientras el bucket
+               fotos-perfil continúe siendo público.
+            */
+            return lista.map(
+                (
+                    asistente
+                ) => ({
+                    ...asistente,
+
+                    foto_principal_url_visual:
+                        asistente?.foto_principal_url ||
+                        ""
+                })
+            );
+        }
+    }
+
+
+
     function escaparHTMLPostPlan(
         valor = ""
     ) {
@@ -628,7 +864,7 @@
 
         const foto =
             escaparHTMLPostPlan(
-                asistente.foto_principal_url ||
+                asistente.foto_principal_url_visual ||
                 ""
             );
 
@@ -1136,10 +1372,15 @@
                 throw error;
             }
 
+            const asistentesPreparados =
+                await prepararFotosAsistentesPostPlan(
+                    Array.isArray(data)
+                        ? data
+                        : []
+                );
+
             renderizarAsistentesPostPlan(
-                Array.isArray(data)
-                    ? data
-                    : [],
+                asistentesPreparados,
                 reserva,
                 tituloPlan
             );
@@ -1569,6 +1810,8 @@
 
     async function iniciarConexionesPostPlan() {
         try {
+            await asegurarHelperFotosPerfilSuralia();
+
             usuarioActual =
                 await obtenerUsuarioActualPostPlan();
 
