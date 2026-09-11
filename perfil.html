@@ -336,7 +336,7 @@
                 <div class="perfil-contenido">
 
                     <!-- =================================================
-                         RESUMEN
+                         RESUMEN · INICIO PROFESIONAL V2
                     ================================================== -->
 
                     <section
@@ -347,155 +347,426 @@
                         aria-hidden="false"
                     >
 
-                        <div class="perfil-seccion__cabecera">
+                        <!-- TARJETA PERSONAL -->
 
-                            <div>
+                        <section
+                            class="perfil-inicio__identidad"
+                            aria-label="Resumen de mi perfil"
+                        >
 
-                                <span class="subtitulo">
-                                    Tu espacio
-                                </span>
+                            <div class="perfil-inicio__identidad-principal">
 
-                                <h2>
-                                    Hola,
-                                    <span id="saludo-usuario">
-                                        Fernando
+                                <div
+                                    class="perfil-inicio__avatar"
+                                    id="avatar-inicio"
+                                    aria-hidden="true"
+                                >
+                                    SU
+                                </div>
+
+                                <div class="perfil-inicio__identidad-texto">
+
+                                    <span class="perfil-inicio__eyebrow">
+                                        Mi Suralia
                                     </span>
-                                </h2>
 
-                                <p>
-                                    Lo importante de tu cuenta, de un vistazo.
-                                </p>
+                                    <h2>
+                                        Hola,
+                                        <span id="saludo-usuario">
+                                            Usuario
+                                        </span>
+                                    </h2>
+
+                                    <div class="perfil-inicio__meta">
+
+                                        <span>
+                                            <i
+                                                class="fa-solid fa-location-dot"
+                                                aria-hidden="true"
+                                            ></i>
+
+                                            <span id="localidad-inicio">
+                                                Añade tu localidad
+                                            </span>
+                                        </span>
+
+                                        <span
+                                            class="perfil-inicio__verificacion perfil-inicio__verificacion--sin-verificar"
+                                            id="estado-verificacion-inicio"
+                                        >
+                                            <i
+                                                class="fa-solid fa-shield-halved"
+                                                aria-hidden="true"
+                                            ></i>
+
+                                            Sin verificar
+                                        </span>
+
+                                    </div>
+
+                                    <div
+                                        class="perfil-inicio__intereses"
+                                        id="intereses-inicio"
+                                        aria-label="Intereses principales"
+                                    >
+                                        <span class="perfil-inicio__interes-vacio">
+                                            Añade tus intereses para conectar mejor.
+                                        </span>
+                                    </div>
+
+                                </div>
 
                             </div>
 
-                        </div>
+                            <div class="perfil-inicio__identidad-acciones">
 
-                        <div class="perfil-estadisticas">
+                                <a
+                                    href="#datos"
+                                    class="perfil-inicio__boton-secundario oculto"
+                                    id="enlace-perfil-publico-inicio"
+                                >
+                                    <i
+                                        class="fa-regular fa-eye"
+                                        aria-hidden="true"
+                                    ></i>
 
-                            <article
-                                class="perfil-estadistica-enlace"
-                                data-ir-seccion="reservas"
-                                role="button"
-                                tabindex="0"
-                                aria-label="Abrir mis reservas"
-                            >
-
-                                <span class="perfil-estadisticas__icono">
-                                    <i class="fa-solid fa-ticket" aria-hidden="true"></i>
-                                </span>
-
-                                <div>
-                                    <strong id="contador-reservas-perfil" aria-live="polite">
-                                        0
-                                    </strong>
-
-                                    <span>
-                                        Planes en tu perfil
-                                    </span>
-                                </div>
-
-                            </article>
-
-                            <article
-                                class="perfil-estadistica-enlace"
-                                data-ir-seccion="favoritos"
-                                role="button"
-                                tabindex="0"
-                                aria-label="Abrir mis planes favoritos"
-                            >
-
-                                <span class="perfil-estadisticas__icono">
-                                    <i class="fa-solid fa-heart" aria-hidden="true"></i>
-                                </span>
-
-                                <div>
-                                    <strong id="contador-favoritos-perfil" aria-live="polite">
-                                        0
-                                    </strong>
-
-                                    <span>
-                                        Planes favoritos
-                                    </span>
-                                </div>
-
-                            </article>
-
-                            <article
-                                class="perfil-estadistica-enlace"
-                                data-ir-seccion="reservas"
-                                role="button"
-                                tabindex="0"
-                                aria-label="Abrir mis reservas y planes realizados"
-                            >
-
-                                <span class="perfil-estadisticas__icono">
-                                    <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
-                                </span>
-
-                                <div>
-                                    <strong id="contador-planes-realizados" aria-live="polite">
-                                        0
-                                    </strong>
-
-                                    <span>
-                                        Planes realizados
-                                    </span>
-                                </div>
-
-                            </article>
-
-                            <article
-                                class="perfil-estadistica-enlace"
-                                data-ir-seccion="afinidades"
-                                role="button"
-                                tabindex="0"
-                                aria-label="Abrir mis afinidades"
-                            >
-
-                                <span class="perfil-estadisticas__icono">
-                                    <i class="fa-solid fa-user-group" aria-hidden="true"></i>
-                                </span>
-
-                                <div>
-                                    <strong id="contador-afinidades-perfil" aria-live="polite">
-                                        0
-                                    </strong>
-
-                                    <span>
-                                        Afinidades activas
-                                    </span>
-                                </div>
-
-                            </article>
-
-                        </div>
-
-                        <div class="perfil-bloque">
-
-                            <div class="perfil-bloque__cabecera">
-
-                                <div>
-                                    <h3>
-                                        Próxima actividad
-                                    </h3>
-
-                                    <p>
-                                        Tu siguiente reserva o evento en Suralia.
-                                    </p>
-                                </div>
+                                    Ver perfil público
+                                </a>
 
                                 <button
                                     type="button"
-                                    class="enlace-ver-seccion"
-                                    data-ir-seccion="reservas"
+                                    class="perfil-inicio__boton-principal"
+                                    data-ir-seccion="datos"
                                 >
-                                    Ver actividades
-                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                                    <i
+                                        class="fa-regular fa-pen-to-square"
+                                        aria-hidden="true"
+                                    ></i>
+
+                                    Editar perfil
                                 </button>
 
                             </div>
 
-                            <div id="proxima-reserva-perfil" aria-live="polite" aria-atomic="false"></div>
+                        </section>
+
+
+                        <!-- CONTADORES IMPORTANTES -->
+
+                        <section
+                            class="perfil-inicio__metricas"
+                            aria-label="Resumen de actividad"
+                        >
+
+                            <article
+                                class="perfil-inicio__metrica"
+                                data-ir-seccion="reservas"
+                                role="button"
+                                tabindex="0"
+                                aria-label="Abrir mis planes"
+                            >
+                                <span class="perfil-inicio__metrica-icono">
+                                    <i
+                                        class="fa-solid fa-calendar-check"
+                                        aria-hidden="true"
+                                    ></i>
+                                </span>
+
+                                <div>
+                                    <strong
+                                        id="contador-reservas-perfil"
+                                        aria-live="polite"
+                                    >
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        Actividades
+                                    </span>
+                                </div>
+                            </article>
+
+                            <article
+                                class="perfil-inicio__metrica"
+                                data-ir-seccion="favoritos"
+                                role="button"
+                                tabindex="0"
+                                aria-label="Abrir mis planes guardados"
+                            >
+                                <span class="perfil-inicio__metrica-icono">
+                                    <i
+                                        class="fa-regular fa-heart"
+                                        aria-hidden="true"
+                                    ></i>
+                                </span>
+
+                                <div>
+                                    <strong
+                                        id="contador-favoritos-perfil"
+                                        aria-live="polite"
+                                    >
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        Guardados
+                                    </span>
+                                </div>
+                            </article>
+
+                            <article
+                                class="perfil-inicio__metrica"
+                                data-ir-seccion="conexiones"
+                                role="button"
+                                tabindex="0"
+                                aria-label="Abrir mis conexiones"
+                            >
+                                <span class="perfil-inicio__metrica-icono">
+                                    <i
+                                        class="fa-solid fa-user-group"
+                                        aria-hidden="true"
+                                    ></i>
+                                </span>
+
+                                <div>
+                                    <strong
+                                        id="contador-conexiones-inicio"
+                                        aria-live="polite"
+                                    >
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        Conexiones
+                                    </span>
+                                </div>
+                            </article>
+
+                            <a
+                                class="perfil-inicio__metrica"
+                                href="conversaciones.html"
+                                aria-label="Abrir mis mensajes"
+                            >
+                                <span class="perfil-inicio__metrica-icono">
+                                    <i
+                                        class="fa-regular fa-comments"
+                                        aria-hidden="true"
+                                    ></i>
+                                </span>
+
+                                <div>
+                                    <strong
+                                        id="contador-mensajes-inicio"
+                                        aria-live="polite"
+                                    >
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        Mensajes
+                                    </span>
+                                </div>
+                            </a>
+
+                        </section>
+
+
+                        <!-- CONTENIDO PRINCIPAL DEL INICIO -->
+
+                        <div class="perfil-inicio__grid">
+
+                            <!-- PRÓXIMO PLAN -->
+
+                            <section class="perfil-inicio__panel">
+
+                                <div class="perfil-inicio__panel-cabecera">
+
+                                    <div>
+
+                                        <span class="perfil-inicio__panel-kicker">
+                                            Tu agenda
+                                        </span>
+
+                                        <h3>
+                                            Próxima actividad
+                                        </h3>
+
+                                        <p>
+                                            Lo siguiente que tienes previsto en Suralia.
+                                        </p>
+
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        class="perfil-inicio__enlace"
+                                        data-ir-seccion="reservas"
+                                    >
+                                        Ver mis planes
+
+                                        <i
+                                            class="fa-solid fa-arrow-right"
+                                            aria-hidden="true"
+                                        ></i>
+                                    </button>
+
+                                </div>
+
+                                <div
+                                    class="perfil-inicio__proxima"
+                                    id="proxima-reserva-perfil"
+                                    aria-live="polite"
+                                    aria-atomic="false"
+                                ></div>
+
+                            </section>
+
+
+                            <!-- PENDIENTES + ACCIONES -->
+
+                            <aside class="perfil-inicio__lateral">
+
+                                <section class="perfil-inicio__panel perfil-inicio__panel--pendientes">
+
+                                    <div class="perfil-inicio__panel-cabecera perfil-inicio__panel-cabecera--simple">
+
+                                        <div>
+
+                                            <span class="perfil-inicio__panel-kicker">
+                                                Para ti
+                                            </span>
+
+                                            <h3>
+                                                Pendiente
+                                            </h3>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div
+                                        class="perfil-inicio__pendientes"
+                                        id="resumen-pendientes-inicio"
+                                        aria-live="polite"
+                                    >
+                                        <div class="perfil-inicio__todo-bien">
+                                            <span>
+                                                <i
+                                                    class="fa-solid fa-check"
+                                                    aria-hidden="true"
+                                                ></i>
+                                            </span>
+
+                                            <div>
+                                                <strong>
+                                                    Todo al día
+                                                </strong>
+
+                                                <small>
+                                                    No tienes nada pendiente ahora mismo.
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </section>
+
+
+                                <section class="perfil-inicio__panel perfil-inicio__panel--acciones">
+
+                                    <div class="perfil-inicio__panel-cabecera perfil-inicio__panel-cabecera--simple">
+
+                                        <div>
+                                            <span class="perfil-inicio__panel-kicker">
+                                                Accesos rápidos
+                                            </span>
+
+                                            <h3>
+                                                ¿Qué quieres hacer?
+                                            </h3>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="perfil-inicio__acciones-rapidas">
+
+                                        <a href="planes.html">
+                                            <span>
+                                                <i
+                                                    class="fa-solid fa-compass"
+                                                    aria-hidden="true"
+                                                ></i>
+                                            </span>
+
+                                            <div>
+                                                <strong>
+                                                    Explorar planes
+                                                </strong>
+
+                                                <small>
+                                                    Descubre algo nuevo
+                                                </small>
+                                            </div>
+
+                                            <i
+                                                class="fa-solid fa-chevron-right"
+                                                aria-hidden="true"
+                                            ></i>
+                                        </a>
+
+                                        <a href="publicar-plan.html">
+                                            <span>
+                                                <i
+                                                    class="fa-solid fa-plus"
+                                                    aria-hidden="true"
+                                                ></i>
+                                            </span>
+
+                                            <div>
+                                                <strong>
+                                                    Publicar un plan
+                                                </strong>
+
+                                                <small>
+                                                    Organiza una actividad
+                                                </small>
+                                            </div>
+
+                                            <i
+                                                class="fa-solid fa-chevron-right"
+                                                aria-hidden="true"
+                                            ></i>
+                                        </a>
+
+                                        <a href="conversaciones.html">
+                                            <span>
+                                                <i
+                                                    class="fa-regular fa-comments"
+                                                    aria-hidden="true"
+                                                ></i>
+                                            </span>
+
+                                            <div>
+                                                <strong>
+                                                    Mensajes
+                                                </strong>
+
+                                                <small>
+                                                    Continúa tus conversaciones
+                                                </small>
+                                            </div>
+
+                                            <i
+                                                class="fa-solid fa-chevron-right"
+                                                aria-hidden="true"
+                                            ></i>
+                                        </a>
+
+                                    </div>
+
+                                </section>
+
+                            </aside>
 
                         </div>
 
@@ -2338,35 +2609,95 @@
             aria-modal="true"
             aria-labelledby="titulo-visor-foto-perfil"
         >
-            <button
-                type="button"
-                class="modal-visor-foto-perfil__cerrar"
-                id="cerrar-visor-foto-perfil"
-                aria-label="Cerrar visor de fotografía"
-            >
-                <i
-                    class="fa-solid fa-xmark"
-                    aria-hidden="true"
-                ></i>
-            </button>
+            <div class="modal-visor-foto-perfil__barra">
 
-            <h3
-                class="modal-visor-foto-perfil__titulo"
-                id="titulo-visor-foto-perfil"
-            >
-                Fotografía del perfil
-            </h3>
+                <div>
+                    <h3
+                        class="modal-visor-foto-perfil__titulo"
+                        id="titulo-visor-foto-perfil"
+                    >
+                        Fotografía del perfil
+                    </h3>
+
+                    <span
+                        class="modal-visor-foto-perfil__contador"
+                        id="contador-visor-foto-perfil"
+                        aria-live="polite"
+                    >
+                        1 / 1
+                    </span>
+                </div>
+
+                <button
+                    type="button"
+                    class="modal-visor-foto-perfil__cerrar"
+                    id="cerrar-visor-foto-perfil"
+                    aria-label="Cerrar visor de fotografía"
+                >
+                    <i
+                        class="fa-solid fa-xmark"
+                        aria-hidden="true"
+                    ></i>
+                </button>
+
+            </div>
 
             <div
                 class="modal-visor-foto-perfil__imagen-wrap"
+                id="zona-visor-foto-perfil"
             >
+
+                <button
+                    type="button"
+                    class="modal-visor-foto-perfil__navegacion modal-visor-foto-perfil__navegacion--anterior"
+                    id="foto-perfil-anterior"
+                    aria-label="Ver fotografía anterior"
+                >
+                    <i
+                        class="fa-solid fa-chevron-left"
+                        aria-hidden="true"
+                    ></i>
+                </button>
+
                 <img
                     id="imagen-visor-foto-perfil"
                     class="modal-visor-foto-perfil__imagen"
                     src=""
                     alt="Fotografía del perfil"
                 >
+
+                <button
+                    type="button"
+                    class="modal-visor-foto-perfil__navegacion modal-visor-foto-perfil__navegacion--siguiente"
+                    id="foto-perfil-siguiente"
+                    aria-label="Ver fotografía siguiente"
+                >
+                    <i
+                        class="fa-solid fa-chevron-right"
+                        aria-hidden="true"
+                    ></i>
+                </button>
+
             </div>
+
+            <p class="modal-visor-foto-perfil__ayuda">
+                <span>
+                    <i
+                        class="fa-solid fa-arrow-left"
+                        aria-hidden="true"
+                    ></i>
+                    <i
+                        class="fa-solid fa-arrow-right"
+                        aria-hidden="true"
+                    ></i>
+                    Usa las flechas para cambiar de foto
+                </span>
+
+                <span>
+                    Esc para cerrar
+                </span>
+            </p>
+
         </section>
     </div>
 

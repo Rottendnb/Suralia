@@ -374,6 +374,9 @@ function cargarDatosUsuario() {
     const avatarPerfil =
         document.querySelector("#avatar-perfil");
 
+    const avatarInicio =
+        document.querySelector("#avatar-inicio");
+
     const avatarPreview =
         document.querySelector("#avatar-preview");
 
@@ -415,6 +418,7 @@ function cargarDatosUsuario() {
 
     aplicarAvatar(avatarHeader);
     aplicarAvatar(avatarPerfil);
+    aplicarAvatar(avatarInicio);
     aplicarAvatar(avatarPreview);
 
     if (perfilNombre) {
@@ -1340,6 +1344,436 @@ async function obtenerUsuarioGaleria() {
 }
 
 
+let indiceVisorFotoPerfil =
+    0;
+
+let posicionTactilInicialVisor =
+    null;
+
+
+function obtenerFotosOrdenadasVisor() {
+    return [
+        ...fotosPerfil
+    ].sort(
+        (fotoA, fotoB) =>
+            Number(
+                fotoA.posicion
+            ) -
+            Number(
+                fotoB.posicion
+            )
+    );
+}
+
+
+function obtenerElementosVisorFotoPerfil() {
+    return {
+        modal:
+            document.querySelector(
+                "#modal-visor-foto-perfil"
+            ),
+
+        fondo:
+            document.querySelector(
+                "#fondo-visor-foto-perfil"
+            ),
+
+        imagen:
+            document.querySelector(
+                "#imagen-visor-foto-perfil"
+            ),
+
+        titulo:
+            document.querySelector(
+                "#titulo-visor-foto-perfil"
+            ),
+
+        contador:
+            document.querySelector(
+                "#contador-visor-foto-perfil"
+            ),
+
+        cerrar:
+            document.querySelector(
+                "#cerrar-visor-foto-perfil"
+            ),
+
+        anterior:
+            document.querySelector(
+                "#foto-perfil-anterior"
+            ),
+
+        siguiente:
+            document.querySelector(
+                "#foto-perfil-siguiente"
+            ),
+
+        zona:
+            document.querySelector(
+                "#zona-visor-foto-perfil"
+            )
+    };
+}
+
+
+function actualizarVisorFotoPerfil() {
+    const fotos =
+        obtenerFotosOrdenadasVisor();
+
+    const {
+        imagen,
+        titulo,
+        contador,
+        anterior,
+        siguiente
+    } = obtenerElementosVisorFotoPerfil();
+
+    if (
+        !imagen ||
+        fotos.length === 0
+    ) {
+        return;
+    }
+
+    if (
+        indiceVisorFotoPerfil < 0
+    ) {
+        indiceVisorFotoPerfil =
+            fotos.length - 1;
+    }
+
+    if (
+        indiceVisorFotoPerfil >=
+        fotos.length
+    ) {
+        indiceVisorFotoPerfil =
+            0;
+    }
+
+    const foto =
+        fotos[
+            indiceVisorFotoPerfil
+        ];
+
+    const url =
+        String(
+            foto.url_visual ||
+            foto.foto_url ||
+            ""
+        ).trim();
+
+    const textoAlt =
+        foto.es_principal
+            ? "Fotografía principal del perfil"
+            : `Fotografía ${
+                indiceVisorFotoPerfil + 1
+            } del perfil`;
+
+    imagen.src =
+        url;
+
+    imagen.alt =
+        textoAlt;
+
+    if (titulo) {
+        titulo.textContent =
+            foto.es_principal
+                ? "Fotografía principal"
+                : "Fotografía del perfil";
+    }
+
+    if (contador) {
+        contador.textContent =
+            `${
+                indiceVisorFotoPerfil + 1
+            } / ${fotos.length}`;
+    }
+
+    const hayVarias =
+        fotos.length > 1;
+
+    if (anterior) {
+        anterior.hidden =
+            !hayVarias;
+    }
+
+    if (siguiente) {
+        siguiente.hidden =
+            !hayVarias;
+    }
+}
+
+
+function abrirVisorFotoPerfil(
+    fotoId
+) {
+    const fotos =
+        obtenerFotosOrdenadasVisor();
+
+    const {
+        modal,
+        cerrar
+    } = obtenerElementosVisorFotoPerfil();
+
+    if (
+        !modal ||
+        fotos.length === 0
+    ) {
+        return;
+    }
+
+    const indiceEncontrado =
+        fotos.findIndex(
+            (foto) =>
+                Number(
+                    foto.id
+                ) ===
+                Number(
+                    fotoId
+                )
+        );
+
+    indiceVisorFotoPerfil =
+        indiceEncontrado >= 0
+            ? indiceEncontrado
+            : 0;
+
+    actualizarVisorFotoPerfil();
+
+    modal.hidden =
+        false;
+
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    document.body.classList.add(
+        "modal-abierta"
+    );
+
+    cerrar?.focus();
+}
+
+
+function cerrarVisorFotoPerfil() {
+    const {
+        modal,
+        imagen
+    } = obtenerElementosVisorFotoPerfil();
+
+    if (!modal) {
+        return;
+    }
+
+    modal.hidden =
+        true;
+
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+    if (imagen) {
+        imagen.src =
+            "";
+
+        imagen.alt =
+            "Fotografía del perfil";
+    }
+
+    document.body.classList.remove(
+        "modal-abierta"
+    );
+
+    posicionTactilInicialVisor =
+        null;
+}
+
+
+function cambiarFotoVisor(
+    direccion
+) {
+    const fotos =
+        obtenerFotosOrdenadasVisor();
+
+    if (
+        fotos.length <= 1
+    ) {
+        return;
+    }
+
+    indiceVisorFotoPerfil +=
+        direccion;
+
+    actualizarVisorFotoPerfil();
+}
+
+
+document.addEventListener(
+    "click",
+    (evento) => {
+        if (
+            evento.target.closest(
+                "#cerrar-visor-foto-perfil"
+            )
+        ) {
+            cerrarVisorFotoPerfil();
+            return;
+        }
+
+        if (
+            evento.target.matches(
+                "#fondo-visor-foto-perfil"
+            )
+        ) {
+            cerrarVisorFotoPerfil();
+            return;
+        }
+
+        if (
+            evento.target.closest(
+                "#foto-perfil-anterior"
+            )
+        ) {
+            cambiarFotoVisor(
+                -1
+            );
+
+            return;
+        }
+
+        if (
+            evento.target.closest(
+                "#foto-perfil-siguiente"
+            )
+        ) {
+            cambiarFotoVisor(
+                1
+            );
+        }
+    }
+);
+
+
+document.addEventListener(
+    "keydown",
+    (evento) => {
+        const {
+            modal
+        } = obtenerElementosVisorFotoPerfil();
+
+        if (
+            !modal ||
+            modal.hidden
+        ) {
+            return;
+        }
+
+        if (
+            evento.key ===
+            "Escape"
+        ) {
+            cerrarVisorFotoPerfil();
+            return;
+        }
+
+        if (
+            evento.key ===
+            "ArrowLeft"
+        ) {
+            evento.preventDefault();
+
+            cambiarFotoVisor(
+                -1
+            );
+
+            return;
+        }
+
+        if (
+            evento.key ===
+            "ArrowRight"
+        ) {
+            evento.preventDefault();
+
+            cambiarFotoVisor(
+                1
+            );
+        }
+    }
+);
+
+
+document.addEventListener(
+    "touchstart",
+    (evento) => {
+        const zona =
+            evento.target.closest(
+                "#zona-visor-foto-perfil"
+            );
+
+        if (
+            !zona ||
+            evento.touches.length !==
+                1
+        ) {
+            return;
+        }
+
+        posicionTactilInicialVisor =
+            evento.touches[0]
+                .clientX;
+    },
+    {
+        passive: true
+    }
+);
+
+
+document.addEventListener(
+    "touchend",
+    (evento) => {
+        if (
+            posicionTactilInicialVisor ===
+                null ||
+            evento.changedTouches.length !==
+                1
+        ) {
+            return;
+        }
+
+        const posicionFinal =
+            evento.changedTouches[0]
+                .clientX;
+
+        const diferencia =
+            posicionFinal -
+            posicionTactilInicialVisor;
+
+        posicionTactilInicialVisor =
+            null;
+
+        if (
+            Math.abs(
+                diferencia
+            ) < 45
+        ) {
+            return;
+        }
+
+        cambiarFotoVisor(
+            diferencia > 0
+                ? -1
+                : 1
+        );
+    },
+    {
+        passive: true
+    }
+);
+
+
 function crearFotoGaleriaHTML(
     foto
 ) {
@@ -1358,6 +1792,16 @@ function crearFotoGaleriaHTML(
             foto.es_principal
         );
 
+    const textoAlt =
+        esPrincipal
+            ? "Fotografía principal del perfil"
+            : "Fotografía de la galería del perfil";
+
+    const altEscapado =
+        escaparAtributoHTML(
+            textoAlt
+        );
+
     return `
         <article
             class="foto-perfil-item ${
@@ -1368,15 +1812,19 @@ function crearFotoGaleriaHTML(
             data-foto-id="${id}"
         >
 
-            <img
-                src="${url}"
-                alt="${
-                    esPrincipal
-                        ? "Fotografía principal del perfil"
-                        : "Fotografía de la galería del perfil"
-                }"
-                loading="lazy"
+            <button
+                type="button"
+                class="foto-perfil-item__imagen-boton"
+                data-ver-foto="${id}"
+                aria-label="Abrir fotografía en grande"
             >
+                <img
+                    class="foto-perfil-item__imagen"
+                    src="${url}"
+                    alt="${altEscapado}"
+                    loading="lazy"
+                >
+            </button>
 
             ${
                 esPrincipal
@@ -1437,7 +1885,6 @@ function crearFotoGaleriaHTML(
         </article>
     `;
 }
-
 
 function mostrarGaleriaPerfil() {
     const total =
@@ -2214,6 +2661,24 @@ function cerrarMenusFotos() {
 function activarEventosGaleria() {
     document
         .querySelectorAll(
+            "[data-ver-foto]"
+        )
+        .forEach(
+            (boton) => {
+                boton.addEventListener(
+                    "click",
+                    () => {
+                        abrirVisorFotoPerfil(
+                            boton.dataset
+                                .verFoto
+                        );
+                    }
+                );
+            }
+        );
+
+    document
+        .querySelectorAll(
             "[data-menu-foto]"
         )
         .forEach(
@@ -2598,6 +3063,52 @@ function actualizarEstadoVisualVerificacion(
 
     estadoVerificacionPerfil.className =
         `verificacion-perfil__estado verificacion-perfil__estado--${estado || "sin-verificar"}`;
+
+    const estadoInicio =
+        document.querySelector(
+            "#estado-verificacion-inicio"
+        );
+
+    if (estadoInicio) {
+        const estadoSeguro =
+            estado ||
+            "sin_verificar";
+
+        estadoInicio.className =
+            `perfil-inicio__verificacion perfil-inicio__verificacion--${estadoSeguro.replace(
+                /_/g,
+                "-"
+            )}`;
+
+        estadoInicio.innerHTML = "";
+
+        const icono =
+            document.createElement(
+                "i"
+            );
+
+        icono.className =
+            estadoSeguro ===
+                "verificado"
+                ? "fa-solid fa-circle-check"
+                : "fa-solid fa-shield-halved";
+
+        icono.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+        estadoInicio.appendChild(
+            icono
+        );
+
+        estadoInicio.append(
+            ` ${
+                textos[estadoSeguro] ||
+                textos.sin_verificar
+            }`
+        );
+    }
 }
 
 
@@ -3136,6 +3647,126 @@ async function obtenerUsuarioPerfilSocial() {
 }
 
 
+function actualizarPerfilInicioSocial(
+    perfil = {}
+) {
+    const localidadInicio =
+        document.querySelector(
+            "#localidad-inicio"
+        );
+
+    const interesesInicio =
+        document.querySelector(
+            "#intereses-inicio"
+        );
+
+    const enlacePerfilPublico =
+        document.querySelector(
+            "#enlace-perfil-publico-inicio"
+        );
+
+    if (localidadInicio) {
+        localidadInicio.textContent =
+            String(
+                perfil.localidad ||
+                ""
+            ).trim() ||
+            "Añade tu localidad";
+    }
+
+    if (interesesInicio) {
+        const etiquetas = {
+            senderismo: "Senderismo",
+            musica: "Música",
+            gastronomia: "Gastronomía",
+            deporte: "Deporte",
+            viajes: "Viajes",
+            cultura: "Cultura",
+            cine: "Cine",
+            fotografia: "Fotografía",
+            naturaleza: "Naturaleza",
+            fiestas: "Fiestas"
+        };
+
+        const intereses =
+            Array.isArray(
+                perfil.intereses
+            )
+                ? perfil.intereses
+                    .filter(Boolean)
+                    .slice(0, 4)
+                : [];
+
+        interesesInicio.innerHTML = "";
+
+        if (intereses.length === 0) {
+            const vacio =
+                document.createElement(
+                    "span"
+                );
+
+            vacio.className =
+                "perfil-inicio__interes-vacio";
+
+            vacio.textContent =
+                "Añade tus intereses para conectar mejor.";
+
+            interesesInicio.appendChild(
+                vacio
+            );
+        } else {
+            intereses.forEach(
+                (interes) => {
+                    const etiqueta =
+                        document.createElement(
+                            "span"
+                        );
+
+                    etiqueta.className =
+                        "perfil-inicio__interes";
+
+                    etiqueta.textContent =
+                        etiquetas[interes] ||
+                        String(interes);
+
+                    interesesInicio.appendChild(
+                        etiqueta
+                    );
+                }
+            );
+        }
+    }
+
+    if (enlacePerfilPublico) {
+        const perfilPublicoId =
+            String(
+                perfil.perfil_publico_id ||
+                ""
+            ).trim();
+
+        if (perfilPublicoId) {
+            enlacePerfilPublico.href =
+                `perfil-publico.html?id=${encodeURIComponent(
+                    perfilPublicoId
+                )}`;
+
+            enlacePerfilPublico
+                .classList.remove(
+                    "oculto"
+                );
+        } else {
+            enlacePerfilPublico.href =
+                "#datos";
+
+            enlacePerfilPublico
+                .classList.add(
+                    "oculto"
+                );
+        }
+    }
+}
+
+
 async function cargarPerfilSocial() {
     const cliente =
         obtenerClientePerfilSocial();
@@ -3165,6 +3796,7 @@ async function cargarPerfilSocial() {
                 `
                     nombre_visible,
                     foto_principal_url,
+                    perfil_publico_id,
                     fecha_nacimiento,
                     localidad,
                     ocupacion,
@@ -3187,9 +3819,17 @@ async function cargarPerfilSocial() {
         }
 
         if (!data) {
+            actualizarPerfilInicioSocial(
+                {}
+            );
+
             actualizarContadorDescripcion();
             return;
         }
+
+        actualizarPerfilInicioSocial(
+            data
+        );
 
         if (perfilFechaNacimiento) {
             perfilFechaNacimiento.value =
@@ -8713,6 +9353,175 @@ function mostrarNotificacionNavegador(
 }
 
 
+function actualizarContadoresInicioSocial() {
+    const conexionesInicio =
+        document.querySelector(
+            "#contador-conexiones-inicio"
+        );
+
+    const mensajesInicio =
+        document.querySelector(
+            "#contador-mensajes-inicio"
+        );
+
+    if (conexionesInicio) {
+        conexionesInicio.textContent =
+            String(
+                contadorConexionesAceptadas
+                    ?.textContent ||
+                "0"
+            );
+    }
+
+    if (mensajesInicio) {
+        mensajesInicio.textContent =
+            String(
+                totalMensajesPendientes ||
+                0
+            );
+    }
+}
+
+
+function actualizarResumenPendientesInicio() {
+    const contenedor =
+        document.querySelector(
+            "#resumen-pendientes-inicio"
+        );
+
+    if (!contenedor) {
+        return;
+    }
+
+    const solicitudes =
+        Math.max(
+            0,
+            Number(
+                contadorSolicitudesRecibidas
+                    ?.textContent
+            ) ||
+            0
+        );
+
+    const mensajes =
+        Math.max(
+            0,
+            Number(
+                totalMensajesPendientes
+            ) ||
+            0
+        );
+
+    contenedor.innerHTML = "";
+
+    if (
+        solicitudes === 0 &&
+        mensajes === 0
+    ) {
+        contenedor.innerHTML = `
+            <div class="perfil-inicio__todo-bien">
+                <span>
+                    <i
+                        class="fa-solid fa-check"
+                        aria-hidden="true"
+                    ></i>
+                </span>
+
+                <div>
+                    <strong>
+                        Todo al día
+                    </strong>
+
+                    <small>
+                        No tienes nada pendiente ahora mismo.
+                    </small>
+                </div>
+            </div>
+        `;
+
+        return;
+    }
+
+    if (solicitudes > 0) {
+        const plural =
+            solicitudes === 1
+                ? "solicitud nueva"
+                : "solicitudes nuevas";
+
+        contenedor.insertAdjacentHTML(
+            "beforeend",
+            `
+                <a
+                    class="perfil-inicio__pendiente"
+                    href="#conexiones"
+                >
+                    <span class="perfil-inicio__pendiente-icono">
+                        <i
+                            class="fa-solid fa-user-plus"
+                            aria-hidden="true"
+                        ></i>
+                    </span>
+
+                    <div>
+                        <strong>
+                            ${solicitudes} ${plural}
+                        </strong>
+
+                        <small>
+                            Revisa quién quiere conectar contigo.
+                        </small>
+                    </div>
+
+                    <i
+                        class="fa-solid fa-chevron-right"
+                        aria-hidden="true"
+                    ></i>
+                </a>
+            `
+        );
+    }
+
+    if (mensajes > 0) {
+        const plural =
+            mensajes === 1
+                ? "mensaje pendiente"
+                : "mensajes pendientes";
+
+        contenedor.insertAdjacentHTML(
+            "beforeend",
+            `
+                <a
+                    class="perfil-inicio__pendiente"
+                    href="conversaciones.html"
+                >
+                    <span class="perfil-inicio__pendiente-icono">
+                        <i
+                            class="fa-regular fa-comments"
+                            aria-hidden="true"
+                        ></i>
+                    </span>
+
+                    <div>
+                        <strong>
+                            ${mensajes} ${plural}
+                        </strong>
+
+                        <small>
+                            Continúa tus conversaciones.
+                        </small>
+                    </div>
+
+                    <i
+                        class="fa-solid fa-chevron-right"
+                        aria-hidden="true"
+                    ></i>
+                </a>
+            `
+        );
+    }
+}
+
+
 /* =========================================
    NOTIFICACIONES DE MENSAJES PENDIENTES
 ========================================= */
@@ -8751,6 +9560,9 @@ function actualizarContadorMensajesPendientes(
                 : "mensajes pendientes"
         }`
     );
+
+    actualizarContadoresInicioSocial();
+    actualizarResumenPendientesInicio();
 }
 
 
@@ -10052,6 +10864,9 @@ async function cargarConexionesPerfil() {
             contadorConexionesAceptadas.textContent =
                 String(aceptadasConPerfil.length);
         }
+
+        actualizarContadoresInicioSocial();
+        actualizarResumenPendientesInicio();
 
         actualizarBloqueConexiones(
             listaSolicitudesRecibidas,
