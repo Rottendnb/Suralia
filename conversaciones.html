@@ -1,114 +1,492 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Consulta tus conversaciones privadas en Suralia.">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Gestiona tus conversaciones privadas en Suralia."
+    >
+
     <title>Mensajes | Suralia</title>
-    <link rel="icon" type="image/png" href="img/suralia-favicon.png?v=10">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="img/suralia-favicon.png?v=10"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
 </head>
+
 <body>
+
     <header class="header">
+
         <div class="contenedor header__contenido">
-            <a href="index.html" class="logo" aria-label="Página de inicio de Suralia">
-                <img src="img/suralia-logo.png" alt="Suralia" class="logo__imagen" width="1138" height="392">
+
+            <a
+                href="index.html"
+                class="logo"
+                aria-label="Página de inicio de Suralia"
+            >
+                <img
+                    src="img/suralia-logo.png"
+                    alt="Suralia"
+                    class="logo__imagen"
+                    width="1138"
+                    height="392"
+                >
             </a>
 
-            <nav class="navegacion" id="navegacion" aria-label="Navegación principal">
-                <a href="planes.html">Explorar planes</a>
-                <a href="perfil.html#conexiones">Mis conexiones</a>
-                <a href="publicar-plan.html" class="enlace-publicar">
-                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+
+            <nav
+                class="navegacion"
+                id="navegacion"
+                aria-label="Navegación principal"
+            >
+                <a href="planes.html">
+                    Explorar planes
+                </a>
+
+                <a href="perfil.html#conexiones">
+                    Mis conexiones
+                </a>
+
+                <a
+                    href="publicar-plan.html"
+                    class="enlace-publicar"
+                >
+                    <i
+                        class="fa-solid fa-plus"
+                        aria-hidden="true"
+                    ></i>
+
                     Publicar un plan
                 </a>
             </nav>
 
+
             <div class="header__acciones">
-                <a href="perfil.html" class="usuario-header" aria-label="Abrir mi perfil">
-                    <span class="usuario-header__avatar" id="avatar-header">SU</span>
-                    <span id="nombre-header">Mi perfil</span>
+
+                <a
+                    href="perfil.html"
+                    class="usuario-header"
+                    aria-label="Abrir mi perfil"
+                >
+                    <span
+                        class="usuario-header__avatar"
+                        id="avatar-header"
+                    >
+                        SU
+                    </span>
+
+                    <span id="nombre-header">
+                        Mi perfil
+                    </span>
                 </a>
 
-                <button class="boton-menu" id="boton-menu" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="navegacion">
-                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                <button
+                    class="boton-menu"
+                    id="boton-menu"
+                    type="button"
+                    aria-label="Abrir menú"
+                    aria-expanded="false"
+                    aria-controls="navegacion"
+                >
+                    <i
+                        class="fa-solid fa-bars"
+                        aria-hidden="true"
+                    ></i>
                 </button>
+
             </div>
+
         </div>
+
     </header>
 
-    <main class="conversaciones-pagina">
-        <div class="contenedor">
-            <div class="conversaciones-cabecera">
-                <div>
-                    <span class="subtitulo">Comunicación</span>
-                    <h1>Mensajes</h1>
-                    <p>Consulta tus conversaciones y continúa organizando planes con tus conexiones.</p>
+
+    <main class="conversaciones-app">
+
+        <div class="contenedor conversaciones-app__layout">
+
+            <!-- =================================================
+                 MENÚ MI SURALIA
+            ================================================== -->
+
+            <aside
+                class="mensajes-app-menu"
+                aria-label="Mi Suralia"
+            >
+
+                <div class="mensajes-app-menu__cabecera">
+
+                    <span class="subtitulo">
+                        Mi Suralia
+                    </span>
+
+                    <strong>
+                        Tu espacio
+                    </strong>
+
                 </div>
 
-                <div class="conversaciones-cabecera__acciones">
 
-                    <button
-                        type="button"
-                        class="conversaciones-cabecera__enlace"
-                        id="boton-notificaciones-navegador"
+                <nav class="mensajes-app-menu__nav">
+
+                    <a
+                        href="perfil.html#resumen"
+                        class="mensajes-app-menu__enlace"
                     >
-                        <i
-                            class="fa-regular fa-bell"
-                            aria-hidden="true"
-                        ></i>
+                        <span class="mensajes-app-menu__icono">
+                            <i
+                                class="fa-solid fa-house"
+                                aria-hidden="true"
+                            ></i>
+                        </span>
 
-                        Activar avisos
-                    </button>
-
-                    <a href="perfil.html#conexiones" class="conversaciones-cabecera__enlace">
-                        <i class="fa-solid fa-user-group" aria-hidden="true"></i>
-                        Ver conexiones
+                        <span>
+                            <strong>Inicio</strong>
+                            <small>Resumen de tu actividad</small>
+                        </span>
                     </a>
 
-                </div>
-            </div>
 
-            <section class="conversaciones-carga" id="conversaciones-carga" aria-live="polite">
-                <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
-                <p>Cargando conversaciones...</p>
+                    <a
+                        href="perfil.html#reservas"
+                        class="mensajes-app-menu__enlace"
+                    >
+                        <span class="mensajes-app-menu__icono">
+                            <i
+                                class="fa-regular fa-calendar-check"
+                                aria-hidden="true"
+                            ></i>
+                        </span>
+
+                        <span>
+                            <strong>Mis planes</strong>
+                            <small>Próximos, guardados y creados</small>
+                        </span>
+                    </a>
+
+
+                    <a
+                        href="perfil.html#conexiones"
+                        class="mensajes-app-menu__enlace"
+                    >
+                        <span class="mensajes-app-menu__icono">
+                            <i
+                                class="fa-solid fa-user-group"
+                                aria-hidden="true"
+                            ></i>
+                        </span>
+
+                        <span>
+                            <strong>Social</strong>
+                            <small>Conexiones y afinidades</small>
+                        </span>
+                    </a>
+
+
+                    <a
+                        href="conversaciones.html"
+                        class="mensajes-app-menu__enlace activo"
+                        aria-current="page"
+                    >
+                        <span class="mensajes-app-menu__icono">
+                            <i
+                                class="fa-regular fa-comments"
+                                aria-hidden="true"
+                            ></i>
+                        </span>
+
+                        <span>
+                            <strong>Mensajes</strong>
+                            <small>Tus conversaciones</small>
+                        </span>
+                    </a>
+
+
+                    <a
+                        href="perfil.html#datos"
+                        class="mensajes-app-menu__enlace"
+                    >
+                        <span class="mensajes-app-menu__icono">
+                            <i
+                                class="fa-regular fa-user"
+                                aria-hidden="true"
+                            ></i>
+                        </span>
+
+                        <span>
+                            <strong>Mi perfil</strong>
+                            <small>Perfil, fotos y privacidad</small>
+                        </span>
+                    </a>
+
+                </nav>
+
+            </aside>
+
+
+            <!-- =================================================
+                 BANDEJA DE CONVERSACIONES
+            ================================================== -->
+
+            <section class="conversaciones-app__contenido">
+
+                <header class="conversaciones-hero">
+
+                    <div class="conversaciones-hero__texto">
+
+                        <span class="subtitulo">
+                            Mensajes
+                        </span>
+
+                        <h1>
+                            Tus conversaciones
+                        </h1>
+
+                        <p>
+                            Continúa hablando con tus conexiones,
+                            encuentra mensajes pendientes y mantén
+                            ordenada tu bandeja.
+                        </p>
+
+                    </div>
+
+
+                    <div class="conversaciones-hero__acciones">
+
+                        <a
+                            href="perfil.html#conexiones"
+                            class="conversaciones-cabecera__enlace"
+                        >
+                            <i
+                                class="fa-solid fa-user-group"
+                                aria-hidden="true"
+                            ></i>
+
+                            Ver conexiones
+                        </a>
+
+                        <button
+                            type="button"
+                            class="conversaciones-cabecera__enlace"
+                            id="boton-notificaciones-navegador"
+                        >
+                            <i
+                                class="fa-regular fa-bell"
+                                aria-hidden="true"
+                            ></i>
+
+                            Activar avisos
+                        </button>
+
+                    </div>
+
+                </header>
+
+
+                <section class="conversaciones-panel">
+
+                    <div class="conversaciones-panel__cabecera">
+
+                        <div>
+
+                            <span class="conversaciones-panel__kicker">
+                                Bandeja
+                            </span>
+
+                            <h2>
+                                Conversaciones
+                            </h2>
+
+                            <p>
+                                Busca por nombre o utiliza los filtros
+                                para encontrar rápidamente una conversación.
+                            </p>
+
+                        </div>
+
+                        <span class="conversaciones-panel__estado">
+                            <i
+                                class="fa-solid fa-shield-halved"
+                                aria-hidden="true"
+                            ></i>
+
+                            Privadas
+                        </span>
+
+                    </div>
+
+
+                    <div class="conversaciones-panel__contenido">
+
+                        <!-- El buscador y los filtros los inserta conversaciones.js
+                             justo antes de #conversaciones-lista. -->
+
+                        <section
+                            class="conversaciones-carga conversaciones-estado conversaciones-estado--carga"
+                            id="conversaciones-carga"
+                            aria-live="polite"
+                        >
+                            <span class="conversaciones-estado__icono">
+                                <i
+                                    class="fa-solid fa-spinner fa-spin"
+                                    aria-hidden="true"
+                                ></i>
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Cargando tus conversaciones
+                                </strong>
+
+                                <p>
+                                    Estamos preparando tu bandeja...
+                                </p>
+
+                            </div>
+                        </section>
+
+
+                        <section
+                            class="conversaciones-error conversaciones-estado conversaciones-estado--error oculto"
+                            id="conversaciones-error"
+                            role="alert"
+                        >
+
+                            <span class="conversaciones-estado__icono">
+                                <i
+                                    class="fa-regular fa-circle-xmark"
+                                    aria-hidden="true"
+                                ></i>
+                            </span>
+
+                            <h3>
+                                No hemos podido cargar tus conversaciones
+                            </h3>
+
+                            <p id="conversaciones-error-texto">
+                                Inténtalo de nuevo dentro de unos instantes.
+                            </p>
+
+                            <button
+                                type="button"
+                                class="boton-auth"
+                                onclick="window.location.reload()"
+                            >
+                                Volver a intentar
+                            </button>
+
+                        </section>
+
+
+                        <section
+                            class="conversaciones-vacio conversaciones-estado conversaciones-estado--vacio oculto"
+                            id="conversaciones-vacio"
+                        >
+
+                            <span class="conversaciones-estado__icono">
+                                <i
+                                    class="fa-regular fa-comments"
+                                    aria-hidden="true"
+                                ></i>
+                            </span>
+
+                            <span class="subtitulo">
+                                Tu bandeja está vacía
+                            </span>
+
+                            <h3>
+                                Todavía no tienes conversaciones
+                            </h3>
+
+                            <p>
+                                Cuando conectes con alguien podrás empezar
+                                una conversación desde su perfil o desde
+                                tu sección Social.
+                            </p>
+
+                            <a
+                                href="perfil.html#conexiones"
+                                class="boton-auth"
+                            >
+                                Ir a mis conexiones
+                            </a>
+
+                        </section>
+
+
+                        <div
+                            class="conversaciones-lista conversaciones-lista--profesional oculto"
+                            id="conversaciones-lista"
+                            aria-live="polite"
+                            aria-atomic="false"
+                        ></div>
+
+                    </div>
+
+                </section>
+
             </section>
 
-            <section class="conversaciones-error oculto" id="conversaciones-error" role="alert">
-                <i class="fa-regular fa-circle-xmark" aria-hidden="true"></i>
-                <h2>No se han podido cargar los mensajes</h2>
-                <p id="conversaciones-error-texto">Inténtalo de nuevo más tarde.</p>
-            </section>
-
-            <section class="conversaciones-vacio oculto" id="conversaciones-vacio">
-                <i class="fa-regular fa-comments" aria-hidden="true"></i>
-                <h2>Todavía no tienes conversaciones</h2>
-                <p>Abre una conexión aceptada y pulsa <strong>Enviar mensaje</strong>.</p>
-                <a href="perfil.html#conexiones" class="boton-auth">Ir a mis conexiones</a>
-            </section>
-
-            <section class="conversaciones-lista oculto" id="conversaciones-lista" aria-label="Lista de conversaciones"></section>
         </div>
+
     </main>
 
+
+    <!-- =================================================
+         MODAL ELIMINAR CONVERSACIÓN
+    ================================================== -->
+
     <div
-        class="modal-seguridad-perfil"
+        class="modal-conversacion"
         id="modal-eliminar-conversacion"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="titulo-modal-eliminar-conversacion"
-        aria-describedby="texto-modal-eliminar-conversacion"
         aria-hidden="true"
+        aria-labelledby="titulo-modal-eliminar-conversacion"
     >
-        <div class="modal-seguridad-perfil__panel">
+
+        <div class="modal-conversacion__contenido">
 
             <button
                 type="button"
-                class="modal-seguridad-perfil__cerrar"
+                class="modal-conversacion__cerrar"
                 id="cerrar-modal-eliminar-conversacion"
                 aria-label="Cerrar"
             >
@@ -118,35 +496,38 @@
                 ></i>
             </button>
 
-            <span class="modal-seguridad-perfil__icono">
+
+            <span class="modal-conversacion__icono">
                 <i
                     class="fa-regular fa-trash-can"
                     aria-hidden="true"
                 ></i>
             </span>
 
+
             <h2 id="titulo-modal-eliminar-conversacion">
-                ¿Eliminar esta conversación?
+                ¿Quitar conversación?
             </h2>
 
             <p id="texto-modal-eliminar-conversacion">
-                La conversación desaparecerá de tu bandeja, pero no se borrará
-                para la otra persona. Si recibes un mensaje nuevo, volverá a aparecer.
+                La conversación desaparecerá de tu bandeja,
+                pero no se borrará para la otra persona.
             </p>
 
-            <div class="modal-seguridad-perfil__acciones">
+
+            <div class="modal-conversacion__acciones">
 
                 <button
                     type="button"
-                    class="modal-seguridad-perfil__boton-secundario"
+                    class="modal-conversacion__boton modal-conversacion__boton--secundario"
                     id="cancelar-eliminar-conversacion"
                 >
-                    Mantener conversación
+                    Cancelar
                 </button>
 
                 <button
                     type="button"
-                    class="modal-seguridad-perfil__boton-peligro"
+                    class="modal-conversacion__boton modal-conversacion__boton--peligro"
                     id="confirmar-eliminar-conversacion"
                 >
                     <i
@@ -154,18 +535,22 @@
                         aria-hidden="true"
                     ></i>
 
-                    Eliminar de mi bandeja
+                    Quitar
                 </button>
 
             </div>
 
         </div>
+
     </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/main.js"></script>
     <script src="js/conversaciones.js"></script>
     <script src="js/cookies.js"></script>
+
 </body>
+
 </html>

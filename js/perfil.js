@@ -505,6 +505,17 @@ function cambiarSeccion(
                 ? "0"
                 : "-1"
         );
+
+        if (esActivo) {
+            boton.setAttribute(
+                "aria-current",
+                "page"
+            );
+        } else {
+            boton.removeAttribute(
+                "aria-current"
+            );
+        }
     });
 
     seccionesPerfil.forEach((seccion) => {
@@ -579,6 +590,29 @@ function cambiarSeccion(
             behavior: "smooth",
             block: "start"
         });
+
+        /*
+           En móvil el menú principal funciona como una banda horizontal.
+           Al cambiar de sección mantenemos visible el acceso activo.
+        */
+        if (
+            window.matchMedia(
+                "(max-width: 760px)"
+            ).matches
+        ) {
+            const botonActivo =
+                botonesMenuPerfil.find(
+                    (boton) =>
+                        boton.dataset.seccion ===
+                        seccionMenuActiva
+                );
+
+            botonActivo?.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+                inline: "center"
+            });
+        }
     }
 }
 
@@ -3600,6 +3634,159 @@ botonEnviarVerificacion?.addEventListener(
    PERFIL SOCIAL
 ========================================= */
 
+/* =========================================================
+   MI PERFIL · NAVEGACIÓN INTERNA V2.9
+========================================================= */
+
+const botonesPanelMiPerfil =
+    Array.from(
+        document.querySelectorAll(
+            "[data-panel-mi-perfil]"
+        )
+    );
+
+const formularioMiPerfil =
+    document.querySelector(
+        "#formulario-perfil"
+    );
+
+const panelesFormularioMiPerfil =
+    Array.from(
+        document.querySelectorAll(
+            "[data-mi-perfil-form-panel]"
+        )
+    );
+
+const panelFotosMiPerfil =
+    document.querySelector(
+        "[data-mi-perfil-panel-fotos]"
+    );
+
+let panelMiPerfilActivo =
+    "perfil";
+
+
+function cambiarPanelMiPerfil(
+    panel
+) {
+    const panelValido =
+        [
+            "perfil",
+            "fotos",
+            "intereses",
+            "privacidad"
+        ].includes(
+            panel
+        )
+            ? panel
+            : "perfil";
+
+    panelMiPerfilActivo =
+        panelValido;
+
+    botonesPanelMiPerfil.forEach(
+        (boton) => {
+            const activo =
+                boton.dataset
+                    .panelMiPerfil ===
+                panelValido;
+
+            boton.classList.toggle(
+                "activo",
+                activo
+            );
+
+            if (activo) {
+                boton.setAttribute(
+                    "aria-current",
+                    "page"
+                );
+            } else {
+                boton.removeAttribute(
+                    "aria-current"
+                );
+            }
+        }
+    );
+
+    const mostrandoFotos =
+        panelValido ===
+        "fotos";
+
+    if (formularioMiPerfil) {
+        formularioMiPerfil
+            .classList.toggle(
+                "mi-perfil-formulario--oculto",
+                mostrandoFotos
+            );
+
+        formularioMiPerfil.setAttribute(
+            "aria-hidden",
+            String(
+                mostrandoFotos
+            )
+        );
+    }
+
+    if (panelFotosMiPerfil) {
+        panelFotosMiPerfil
+            .classList.toggle(
+                "activo",
+                mostrandoFotos
+            );
+
+        panelFotosMiPerfil.setAttribute(
+            "aria-hidden",
+            String(
+                !mostrandoFotos
+            )
+        );
+    }
+
+    panelesFormularioMiPerfil.forEach(
+        (panelFormulario) => {
+            const activo =
+                !mostrandoFotos &&
+                panelFormulario.dataset
+                    .miPerfilFormPanel ===
+                    panelValido;
+
+            panelFormulario.classList.toggle(
+                "activo",
+                activo
+            );
+
+            panelFormulario.setAttribute(
+                "aria-hidden",
+                String(
+                    !activo
+                )
+            );
+        }
+    );
+}
+
+
+botonesPanelMiPerfil.forEach(
+    (boton) => {
+        boton.addEventListener(
+            "click",
+            () => {
+                cambiarPanelMiPerfil(
+                    boton.dataset
+                        .panelMiPerfil
+                );
+            }
+        );
+    }
+);
+
+
+cambiarPanelMiPerfil(
+    panelMiPerfilActivo
+);
+
+
 function obtenerClientePerfilSocial() {
     return window.clienteSupabase || null;
 }
@@ -3698,6 +3885,11 @@ function actualizarPerfilInicioSocial(
             "#enlace-perfil-publico-inicio"
         );
 
+    const enlacePerfilPublicoMiPerfil =
+        document.querySelector(
+            "#enlace-perfil-publico-mi-perfil"
+        );
+
     if (localidadInicio) {
         localidadInicio.textContent =
             String(
@@ -3770,33 +3962,38 @@ function actualizarPerfilInicioSocial(
         }
     }
 
-    if (enlacePerfilPublico) {
-        const perfilPublicoId =
-            String(
-                perfil.perfil_publico_id ||
-                ""
-            ).trim();
+    const perfilPublicoId =
+        String(
+            perfil.perfil_publico_id ||
+            ""
+        ).trim();
 
-        if (perfilPublicoId) {
-            enlacePerfilPublico.href =
-                `perfil-publico.html?id=${encodeURIComponent(
-                    perfilPublicoId
-                )}`;
+    [
+        enlacePerfilPublico,
+        enlacePerfilPublicoMiPerfil
+    ]
+        .filter(Boolean)
+        .forEach(
+            (enlace) => {
+                if (perfilPublicoId) {
+                    enlace.href =
+                        `perfil-publico.html?id=${encodeURIComponent(
+                            perfilPublicoId
+                        )}`;
 
-            enlacePerfilPublico
-                .classList.remove(
-                    "oculto"
-                );
-        } else {
-            enlacePerfilPublico.href =
-                "#datos";
+                    enlace.classList.remove(
+                        "oculto"
+                    );
+                } else {
+                    enlace.href =
+                        "#datos";
 
-            enlacePerfilPublico
-                .classList.add(
-                    "oculto"
-                );
-        }
-    }
+                    enlace.classList.add(
+                        "oculto"
+                    );
+                }
+            }
+        );
 }
 
 

@@ -37967,3 +37967,3761 @@ div > span {
     }
 
 }
+/* ========================================================================
+   SURALIA · MI PERFIL V2.9
+   Perfil / Fotos / Intereses / Privacidad.
+======================================================================== */
+
+#seccion-datos {
+    max-width: 1040px;
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.mi-perfil-hero {
+    margin-bottom: 12px;
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    border: 1px solid rgba(23, 61, 54, 0.08);
+    border-radius: 18px;
+    background:
+        radial-gradient(
+            circle at 91% 8%,
+            rgba(232, 93, 50, 0.09),
+            transparent 34%
+        ),
+        linear-gradient(
+            125deg,
+            #ffffff 0%,
+            #fffaf5 60%,
+            #f5f9f6 100%
+        );
+    box-shadow: 0 8px 26px rgba(23, 61, 54, 0.04);
+}
+
+.mi-perfil-hero__texto {
+    min-width: 0;
+}
+
+.mi-perfil-hero h2 {
+    margin: 3px 0 5px;
+    color: var(--color-secundario);
+    font-size: 25px;
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+}
+
+.mi-perfil-hero p {
+    max-width: 650px;
+    margin: 0;
+    color: var(--color-texto-suave);
+    font-size: 9.5px;
+    line-height: 1.65;
+}
+
+.mi-perfil-hero__boton {
+    min-height: 38px;
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    flex: 0 0 auto;
+    border: 1px solid rgba(23, 61, 54, 0.11);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.84);
+    color: var(--color-secundario);
+    font-size: 9px;
+    font-weight: 800;
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        background-color 0.18s ease;
+}
+
+.mi-perfil-hero__boton:hover {
+    transform: translateY(-1px);
+    border-color: rgba(232, 93, 50, 0.28);
+    background: #ffffff;
+}
+
+
+/* =====================================================
+   NAVEGACIÓN INTERNA
+===================================================== */
+
+.mi-perfil-nav {
+    margin-bottom: 14px;
+    padding: 5px;
+    display: grid;
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0, 1fr)
+        );
+    gap: 5px;
+    border: 1px solid rgba(23, 61, 54, 0.075);
+    border-radius: 14px;
+    background: #f7f9f7;
+}
+
+.mi-perfil-nav__boton {
+    min-width: 0;
+    min-height: 55px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: #687670;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        color 0.18s ease,
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease;
+}
+
+.mi-perfil-nav__boton:hover {
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--color-secundario);
+}
+
+.mi-perfil-nav__boton.activo {
+    border-color: rgba(232, 93, 50, 0.14);
+    background: #ffffff;
+    color: var(--color-secundario);
+    box-shadow: 0 3px 10px rgba(23, 61, 54, 0.045);
+}
+
+.mi-perfil-nav__icono {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    border-radius: 10px;
+    background: rgba(23, 61, 54, 0.055);
+    color: #66736e;
+    line-height: 1;
+}
+
+.mi-perfil-nav__icono i {
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    transform: none !important;
+}
+
+.mi-perfil-nav__boton.activo
+.mi-perfil-nav__icono {
+    background: rgba(232, 93, 50, 0.09);
+    color: var(--color-principal);
+}
+
+.mi-perfil-nav__boton strong,
+.mi-perfil-nav__boton small {
+    display: block;
+}
+
+.mi-perfil-nav__boton strong {
+    font-size: 9px;
+    line-height: 1.2;
+}
+
+.mi-perfil-nav__boton small {
+    margin-top: 2px;
+    overflow: hidden;
+    color: #8b9692;
+    font-size: 7px;
+    font-weight: 600;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   PANELES
+===================================================== */
+
+.mi-perfil-form-panel,
+.mi-perfil-fotos-panel {
+    display: none;
+}
+
+.mi-perfil-form-panel.activo,
+.mi-perfil-fotos-panel.activo {
+    display: block;
+}
+
+.mi-perfil-formulario--oculto {
+    display: none !important;
+}
+
+.mi-perfil-formulario {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.mi-perfil-panel-cabecera {
+    margin-bottom: 10px;
+    padding: 17px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border: 1px solid rgba(23, 61, 54, 0.075);
+    border-radius: 15px;
+    background: #ffffff;
+}
+
+.mi-perfil-panel-cabecera h3 {
+    margin: 2px 0 4px;
+    color: var(--color-secundario);
+    font-size: 15px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+.mi-perfil-panel-cabecera p {
+    max-width: 680px;
+    margin: 0;
+    color: var(--color-texto-suave);
+    font-size: 8.7px;
+    line-height: 1.55;
+}
+
+.mi-perfil-panel-cabecera__icono {
+    width: 43px;
+    height: 43px;
+    min-width: 43px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 13px;
+    background: rgba(232, 93, 50, 0.08);
+    color: var(--color-principal);
+    font-size: 13px;
+    line-height: 1;
+}
+
+.mi-perfil-panel-cabecera__icono i {
+    position: static !important;
+    inset: auto !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+
+/* =====================================================
+   FORMULARIO
+===================================================== */
+
+.mi-perfil-tarjeta-formulario {
+    padding: 20px;
+    border: 1px solid rgba(23, 61, 54, 0.08);
+    border-radius: 17px;
+    background: #ffffff;
+    box-shadow: 0 5px 20px rgba(23, 61, 54, 0.025);
+}
+
+#seccion-datos
+.mi-perfil-tarjeta-formulario
+.campo-formulario {
+    margin-bottom: 14px;
+}
+
+#seccion-datos
+.mi-perfil-tarjeta-formulario
+.campo-formulario:last-child {
+    margin-bottom: 0;
+}
+
+#seccion-datos
+.mi-perfil-tarjeta-formulario
+textarea {
+    min-height: 122px;
+}
+
+
+/* =====================================================
+   INTERESES
+===================================================== */
+
+.mi-perfil-tarjeta-formulario--intereses {
+    display: grid;
+    gap: 12px;
+}
+
+#seccion-datos
+.mi-perfil-tarjeta-formulario--intereses
+.grupo-seleccion-social {
+    margin: 0;
+    padding: 16px;
+    border: 1px solid rgba(23, 61, 54, 0.075);
+    border-radius: 13px;
+    background: #fbfcfb;
+}
+
+#seccion-datos
+.mi-perfil-tarjeta-formulario--intereses
+.grupo-seleccion-social legend {
+    padding: 0 5px;
+    color: var(--color-secundario);
+    font-size: 10px;
+    font-weight: 800;
+}
+
+#seccion-datos
+.mi-perfil-tarjeta-formulario--intereses
+.grupo-seleccion-social > p {
+    margin: 0 0 10px;
+    color: var(--color-texto-suave);
+    font-size: 8px;
+}
+
+#seccion-datos
+.mi-perfil-tarjeta-formulario--intereses
+.opciones-sociales {
+    gap: 7px;
+}
+
+
+/* =====================================================
+   PRIVACIDAD
+===================================================== */
+
+.mi-perfil-tarjeta-formulario--privacidad {
+    display: grid;
+    gap: 12px;
+}
+
+#seccion-datos
+.mi-perfil-tarjeta-formulario--privacidad
+.preferencias-privacidad-social {
+    margin: 0;
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+    gap: 10px;
+}
+
+#seccion-datos
+.mi-perfil-tarjeta-formulario--privacidad
+.interruptor-social {
+    min-height: 95px;
+    margin: 0;
+    padding: 15px;
+    align-items: flex-start;
+    border: 1px solid rgba(23, 61, 54, 0.075);
+    border-radius: 13px;
+    background: #fbfcfb;
+}
+
+.mi-perfil-privacidad-aviso {
+    padding: 11px 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    border: 1px solid rgba(232, 93, 50, 0.10);
+    border-radius: 11px;
+    background: #fffaf6;
+}
+
+.mi-perfil-privacidad-aviso > span {
+    width: 29px;
+    height: 29px;
+    min-width: 29px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    background: rgba(232, 93, 50, 0.09);
+    color: var(--color-principal);
+    font-size: 9px;
+}
+
+.mi-perfil-privacidad-aviso strong,
+.mi-perfil-privacidad-aviso p {
+    display: block;
+}
+
+.mi-perfil-privacidad-aviso strong {
+    color: var(--color-secundario);
+    font-size: 8.5px;
+}
+
+.mi-perfil-privacidad-aviso p {
+    margin: 2px 0 0;
+    color: var(--color-texto-suave);
+    font-size: 7.7px;
+    line-height: 1.45;
+}
+
+
+/* =====================================================
+   GUARDAR
+===================================================== */
+
+.mi-perfil-guardar {
+    margin-top: 10px;
+    padding: 11px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    border: 1px solid rgba(23, 61, 54, 0.075);
+    border-radius: 13px;
+    background: #f8faf8;
+}
+
+.mi-perfil-guardar__texto {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--color-texto-suave);
+    font-size: 7.8px;
+    line-height: 1.35;
+}
+
+.mi-perfil-guardar__texto i {
+    color: #528269;
+}
+
+#seccion-datos
+.mi-perfil-guardar
+.boton-guardar-perfil {
+    width: auto;
+    min-width: 145px;
+    margin: 0;
+    flex: 0 0 auto;
+}
+
+
+/* =====================================================
+   FOTOS
+===================================================== */
+
+#seccion-datos
+.mi-perfil-fotos-panel
+.galeria-perfil,
+#seccion-datos
+.mi-perfil-fotos-panel
+.verificacion-perfil {
+    margin-top: 10px;
+    border: 1px solid rgba(23, 61, 54, 0.08);
+    border-radius: 17px;
+    background: #ffffff;
+    box-shadow: 0 5px 20px rgba(23, 61, 54, 0.025);
+}
+
+#seccion-datos
+.mi-perfil-fotos-panel
+.galeria-perfil {
+    margin-top: 0;
+}
+
+#seccion-datos
+.mi-perfil-fotos-panel
+.galeria-perfil__cabecera,
+#seccion-datos
+.mi-perfil-fotos-panel
+.verificacion-perfil__cabecera {
+    gap: 16px;
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 900px) {
+
+    .mi-perfil-nav {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+    #seccion-datos
+    .mi-perfil-tarjeta-formulario--privacidad
+    .preferencias-privacidad-social {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* =====================================================
+   MÓVIL
+===================================================== */
+
+@media (max-width: 640px) {
+
+    .mi-perfil-hero {
+        padding: 17px;
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 13px;
+    }
+
+    .mi-perfil-hero h2 {
+        font-size: 22px;
+    }
+
+    .mi-perfil-hero__boton {
+        width: 100%;
+    }
+
+    .mi-perfil-nav {
+        padding: 4px;
+        display: flex;
+        gap: 4px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .mi-perfil-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .mi-perfil-nav__boton {
+        min-width: 132px;
+        flex: 0 0 132px;
+    }
+
+    .mi-perfil-panel-cabecera {
+        padding: 15px;
+    }
+
+    .mi-perfil-panel-cabecera__icono {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+    }
+
+    .mi-perfil-tarjeta-formulario {
+        padding: 15px;
+    }
+
+    #seccion-datos
+    .mi-perfil-tarjeta-formulario
+    .formulario-doble {
+        grid-template-columns: 1fr;
+    }
+
+    .mi-perfil-guardar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    #seccion-datos
+    .mi-perfil-guardar
+    .boton-guardar-perfil {
+        width: 100%;
+        min-width: 0;
+    }
+
+}
+
+
+/* =====================================================
+   MÓVIL PEQUEÑO
+===================================================== */
+
+@media (max-width: 430px) {
+
+    .mi-perfil-nav__boton {
+        min-width: 122px;
+        flex-basis: 122px;
+    }
+
+    .mi-perfil-nav__boton small {
+        display: none;
+    }
+
+    .mi-perfil-nav__boton {
+        min-height: 48px;
+    }
+
+}
+/* ========================================================================
+   SURALIA · PERFIL · PULIDO GLOBAL V3.0
+   Cierre visual de Inicio / Mis planes / Social / Mi perfil.
+======================================================================== */
+
+.perfil-contenido {
+    --perfil-radio-grande: 18px;
+    --perfil-radio-medio: 14px;
+    --perfil-borde-global: rgba(23, 61, 54, 0.08);
+    --perfil-sombra-suave: 0 8px 26px rgba(23, 61, 54, 0.04);
+    --perfil-sombra-hover: 0 10px 26px rgba(23, 61, 54, 0.055);
+}
+
+
+/* =====================================================
+   RITMO GENERAL
+===================================================== */
+
+.perfil-contenido
+.perfil-seccion.activa {
+    animation: perfilEntradaSuave 0.18s ease both;
+}
+
+@keyframes perfilEntradaSuave {
+    from {
+        opacity: 0.86;
+        transform: translateY(2px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#seccion-resumen,
+#seccion-reservas,
+#seccion-favoritos,
+#seccion-publicados,
+#seccion-conexiones,
+#seccion-afinidades,
+#seccion-datos {
+    scroll-margin-top: 104px;
+}
+
+
+/* =====================================================
+   MENÚ PRINCIPAL
+===================================================== */
+
+.perfil-menu__enlace {
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.perfil-menu__enlace.activo {
+    box-shadow:
+        inset 3px 0 0 var(--color-principal),
+        0 3px 11px rgba(23, 61, 54, 0.035);
+}
+
+.perfil-menu__icono {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+}
+
+.perfil-menu__icono i {
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    transform: none !important;
+}
+
+.perfil-menu__enlace strong {
+    line-height: 1.2;
+}
+
+.perfil-menu__enlace small {
+    line-height: 1.35;
+}
+
+
+/* =====================================================
+   HEROES Y CABECERAS · MISMO LENGUAJE
+===================================================== */
+
+.perfil-inicio__identidad,
+.mis-planes-hero,
+.afinidades-descubre-hero,
+.perfil-social-cabecera,
+.mi-perfil-hero,
+.mis-planes-cabecera-seccion {
+    border-color: var(--perfil-borde-global);
+    border-radius: var(--perfil-radio-grande);
+    box-shadow: var(--perfil-sombra-suave);
+}
+
+.perfil-inicio__identidad,
+.mis-planes-hero,
+.afinidades-descubre-hero,
+.perfil-social-cabecera,
+.mi-perfil-hero {
+    min-height: 116px;
+}
+
+
+/* =====================================================
+   BOTONES DE CABECERA · CONSISTENCIA
+===================================================== */
+
+.perfil-inicio__acciones a,
+.perfil-inicio__acciones button,
+.mis-planes-hero__boton,
+.afinidades-descubre-hero__boton,
+.perfil-social-cabecera__boton,
+.mi-perfil-hero__boton {
+    min-height: 38px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.perfil-inicio__acciones i,
+.mis-planes-hero__boton i,
+.afinidades-descubre-hero__boton i,
+.perfil-social-cabecera__boton i,
+.mi-perfil-hero__boton i {
+    position: static !important;
+    inset: auto !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+
+/* =====================================================
+   TARJETAS Y BLOQUES
+===================================================== */
+
+.perfil-bloque,
+.mis-planes-bloque,
+.perfil-social-bloque,
+.mi-perfil-tarjeta-formulario,
+.mi-perfil-panel-cabecera,
+.mi-perfil-fotos-panel .galeria-perfil,
+.mi-perfil-fotos-panel .verificacion-perfil {
+    border-color: var(--perfil-borde-global);
+}
+
+.reserva-item,
+.publicacion-item,
+.conexion-item,
+.persona-afinidad--descubre,
+.afinidad-item--descubre,
+#seccion-favoritos .tarjeta-plan {
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.reserva-item:hover,
+.publicacion-item:hover,
+.conexion-item:hover,
+.persona-afinidad--descubre:hover,
+.afinidad-item--descubre:hover,
+#seccion-favoritos .tarjeta-plan:hover {
+    transform: translateY(-1px);
+    border-color: rgba(232, 93, 50, 0.18);
+    box-shadow: var(--perfil-sombra-hover);
+}
+
+
+/* =====================================================
+   ESTADOS VACÍOS · SISTEMA ÚNICO
+===================================================== */
+
+.perfil-contenido
+.estado-vacio {
+    border-radius: var(--perfil-radio-medio);
+}
+
+.perfil-contenido
+.estado-vacio__icono {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+}
+
+.perfil-contenido
+.estado-vacio__icono i {
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    transform: none !important;
+}
+
+.perfil-contenido
+.estado-vacio h3 {
+    color: var(--color-secundario);
+    letter-spacing: -0.015em;
+}
+
+.perfil-contenido
+.estado-vacio p {
+    color: var(--color-texto-suave);
+    line-height: 1.55;
+}
+
+
+/* =====================================================
+   CONTADORES · ICONOS CENTRADOS GLOBALMENTE
+===================================================== */
+
+.perfil-estadisticas__icono,
+.perfil-social-resumen__icono,
+.afinidades-descubre-resumen__icono,
+.mis-planes-resumen__icono {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    text-align: center !important;
+    line-height: 1 !important;
+}
+
+.perfil-estadisticas__icono i,
+.perfil-social-resumen__icono i,
+.afinidades-descubre-resumen__icono i,
+.mis-planes-resumen__icono i {
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    transform: none !important;
+}
+
+
+/* =====================================================
+   SUBMENÚS · CONSISTENCIA
+===================================================== */
+
+.perfil-submenu {
+    margin-bottom: 14px;
+}
+
+.perfil-submenu__enlace {
+    position: relative;
+}
+
+.perfil-submenu__enlace.activo::after {
+    content: "";
+    position: absolute;
+    left: 11px;
+    right: 11px;
+    bottom: 3px;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--color-principal);
+    opacity: 0.85;
+}
+
+
+/* =====================================================
+   FOCO / ACCESIBILIDAD
+===================================================== */
+
+.perfil-contenido
+button:focus-visible,
+.perfil-contenido
+a:focus-visible,
+.perfil-menu__enlace:focus-visible,
+.mi-perfil-nav__boton:focus-visible {
+    outline: 2px solid rgba(232, 93, 50, 0.72);
+    outline-offset: 2px;
+}
+
+.perfil-contenido
+input:focus-visible,
+.perfil-contenido
+textarea:focus-visible,
+.perfil-contenido
+select:focus-visible {
+    outline: 2px solid rgba(232, 93, 50, 0.42);
+    outline-offset: 1px;
+}
+
+
+/* =====================================================
+   TEXTO · PEQUEÑO AJUSTE DE LEGIBILIDAD
+===================================================== */
+
+.perfil-contenido
+.subtitulo {
+    letter-spacing: 0.065em;
+}
+
+.perfil-contenido
+p {
+    text-wrap: pretty;
+}
+
+.perfil-contenido
+h2,
+.perfil-contenido
+h3,
+.perfil-contenido
+h4 {
+    text-wrap: balance;
+}
+
+
+/* =====================================================
+   MÓVIL · MENÚ PRINCIPAL MÁS LIMPIO
+===================================================== */
+
+@media (max-width: 760px) {
+
+    .perfil-menu {
+        position: sticky;
+        top: 68px;
+        width: 100%;
+        padding: 5px;
+        display: flex;
+        align-items: stretch;
+        gap: 4px;
+        overflow-x: auto;
+        border-radius: 13px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .perfil-menu::-webkit-scrollbar {
+        display: none;
+    }
+
+    .perfil-menu__cabecera {
+        display: none;
+    }
+
+    .perfil-menu__enlace {
+        width: auto;
+        min-width: 112px;
+        min-height: 48px;
+        flex: 0 0 112px;
+        padding: 7px 8px;
+        gap: 7px;
+        border-radius: 9px;
+    }
+
+    .perfil-menu__enlace.activo {
+        box-shadow:
+            inset 0 -3px 0 var(--color-principal),
+            0 3px 9px rgba(23, 61, 54, 0.035);
+    }
+
+    .perfil-menu__icono {
+        width: 31px;
+        height: 31px;
+        min-width: 31px;
+        flex-basis: 31px;
+        border-radius: 9px;
+    }
+
+    .perfil-menu__enlace strong {
+        font-size: 8.5px;
+    }
+
+    .perfil-menu__enlace small {
+        display: none;
+    }
+
+    .perfil-contenido {
+        margin-top: 10px;
+    }
+
+    #seccion-resumen,
+    #seccion-reservas,
+    #seccion-favoritos,
+    #seccion-publicados,
+    #seccion-conexiones,
+    #seccion-afinidades,
+    #seccion-datos {
+        scroll-margin-top: 128px;
+    }
+
+}
+
+
+/* =====================================================
+   MÓVIL · ESPACIADO Y ACCIONES
+===================================================== */
+
+@media (max-width: 640px) {
+
+    .perfil-inicio__identidad,
+    .mis-planes-hero,
+    .afinidades-descubre-hero,
+    .perfil-social-cabecera,
+    .mi-perfil-hero {
+        min-height: 0;
+    }
+
+    .perfil-contenido
+    .estado-vacio {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .perfil-contenido
+    .boton-auth,
+    .perfil-contenido
+    .boton-principal-pequeno {
+        min-height: 38px;
+    }
+
+}
+
+
+/* =====================================================
+   MÓVIL PEQUEÑO
+===================================================== */
+
+@media (max-width: 430px) {
+
+    .perfil-menu__enlace {
+        min-width: 104px;
+        flex-basis: 104px;
+    }
+
+    .perfil-menu__icono {
+        width: 29px;
+        height: 29px;
+        min-width: 29px;
+        flex-basis: 29px;
+    }
+
+}
+
+
+/* =====================================================
+   REDUCIR MOVIMIENTO SI EL SISTEMA LO SOLICITA
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .perfil-contenido *,
+    .perfil-menu *,
+    .mi-perfil-nav * {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+}
+/* ========================================================================
+   SURALIA · MENSAJES.HTML · V1 PROFESIONAL
+   Integra Mensajes dentro del lenguaje visual de "Mi Suralia".
+======================================================================== */
+
+.mensajes-app {
+    padding-top: 28px;
+    padding-bottom: 52px;
+    background:
+        linear-gradient(
+            180deg,
+            #f8faf8 0%,
+            #ffffff 340px
+        );
+}
+
+.mensajes-app__layout {
+    display: grid;
+    grid-template-columns: 215px minmax(0, 1fr);
+    align-items: start;
+    gap: 18px;
+}
+
+
+/* =====================================================
+   MENÚ MI SURALIA
+===================================================== */
+
+.mensajes-app-menu {
+    position: sticky;
+    top: 92px;
+    padding: 11px;
+    border: 1px solid rgba(23, 61, 54, 0.08);
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 8px 26px rgba(23, 61, 54, 0.04);
+}
+
+.mensajes-app-menu__cabecera {
+    padding: 8px 9px 11px;
+    border-bottom: 1px solid rgba(23, 61, 54, 0.07);
+}
+
+.mensajes-app-menu__cabecera strong {
+    display: block;
+    margin-top: 2px;
+    color: var(--color-secundario);
+    font-size: 13px;
+}
+
+.mensajes-app-menu__nav {
+    padding-top: 8px;
+    display: grid;
+    gap: 4px;
+}
+
+.mensajes-app-menu__enlace {
+    min-width: 0;
+    min-height: 51px;
+    padding: 7px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    color: #687670;
+    transition:
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.mensajes-app-menu__enlace:hover {
+    background: #f8faf8;
+    color: var(--color-secundario);
+}
+
+.mensajes-app-menu__enlace.activo {
+    border-color: rgba(232, 93, 50, 0.13);
+    background: #fffaf6;
+    color: var(--color-secundario);
+    box-shadow:
+        inset 3px 0 0 var(--color-principal),
+        0 3px 10px rgba(23, 61, 54, 0.035);
+}
+
+.mensajes-app-menu__icono {
+    width: 33px;
+    height: 33px;
+    min-width: 33px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    border-radius: 10px;
+    background: rgba(23, 61, 54, 0.055);
+    color: #617069;
+    line-height: 1 !important;
+}
+
+.mensajes-app-menu__icono i {
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    transform: none !important;
+}
+
+.mensajes-app-menu__enlace.activo
+.mensajes-app-menu__icono {
+    background: rgba(232, 93, 50, 0.09);
+    color: var(--color-principal);
+}
+
+.mensajes-app-menu__enlace strong,
+.mensajes-app-menu__enlace small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mensajes-app-menu__enlace strong {
+    color: inherit;
+    font-size: 8.7px;
+    line-height: 1.2;
+}
+
+.mensajes-app-menu__enlace small {
+    margin-top: 2px;
+    color: #929c98;
+    font-size: 6.8px;
+    font-weight: 600;
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   CONTENIDO
+===================================================== */
+
+.mensajes-app__contenido {
+    min-width: 0;
+}
+
+.mensajes-app__superior {
+    margin-bottom: 12px;
+    padding: 18px 20px;
+    border: 1px solid rgba(23, 61, 54, 0.08);
+    border-radius: 16px;
+    background:
+        radial-gradient(
+            circle at 92% 12%,
+            rgba(232, 93, 50, 0.08),
+            transparent 28%
+        ),
+        #ffffff;
+    box-shadow: 0 8px 26px rgba(23, 61, 54, 0.04);
+}
+
+.mensajes-volver--profesional {
+    margin: 0 0 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #687670;
+    font-size: 8px;
+    font-weight: 800;
+}
+
+.mensajes-volver--profesional:hover {
+    color: var(--color-principal);
+}
+
+.mensajes-app__titulo h1 {
+    margin: 3px 0 4px;
+    color: var(--color-secundario);
+    font-size: 23px;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+}
+
+.mensajes-app__titulo p {
+    max-width: 620px;
+    margin: 0;
+    color: var(--color-texto-suave);
+    font-size: 8.8px;
+    line-height: 1.55;
+}
+
+
+/* =====================================================
+   CARGA / ERROR
+===================================================== */
+
+.mensajes-carga--app,
+.mensajes-error--app {
+    min-height: 180px;
+    padding: 26px;
+    border: 1px solid rgba(23, 61, 54, 0.08);
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 8px 26px rgba(23, 61, 54, 0.04);
+}
+
+.mensajes-carga--app {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    text-align: left;
+}
+
+.mensajes-carga__icono,
+.mensajes-error__icono {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 13px;
+    background: rgba(232, 93, 50, 0.08);
+    color: var(--color-principal);
+    line-height: 1;
+}
+
+.mensajes-carga--app strong {
+    display: block;
+    color: var(--color-secundario);
+    font-size: 10px;
+}
+
+.mensajes-carga--app p {
+    margin: 2px 0 0;
+    color: var(--color-texto-suave);
+    font-size: 8px;
+}
+
+.mensajes-error--app {
+    text-align: center;
+}
+
+.mensajes-error--app
+.mensajes-error__icono {
+    margin: 0 auto 10px;
+}
+
+.mensajes-error--app h2 {
+    margin: 0;
+    color: var(--color-secundario);
+    font-size: 16px;
+}
+
+.mensajes-error--app p {
+    max-width: 520px;
+    margin: 6px auto 14px;
+    color: var(--color-texto-suave);
+    font-size: 8.5px;
+}
+
+
+/* =====================================================
+   CONTENEDOR DEL CHAT
+===================================================== */
+
+.chat-suralia--app {
+    min-width: 0;
+    height: min(690px, calc(100vh - 142px));
+    min-height: 560px;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    overflow: hidden;
+    border: 1px solid rgba(23, 61, 54, 0.09);
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 12px 34px rgba(23, 61, 54, 0.055);
+}
+
+
+/* =====================================================
+   CABECERA CHAT
+===================================================== */
+
+.chat-suralia--app
+.chat-suralia__cabecera {
+    position: relative;
+    z-index: 6;
+    min-height: 76px;
+    padding: 12px 15px;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(23, 61, 54, 0.075);
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff 0%,
+            #fbfcfb 100%
+        );
+}
+
+.chat-suralia--app
+.chat-suralia__avatar {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden;
+    border-radius: 15px;
+    background: #edf2ef;
+    color: #62716b;
+    box-shadow: 0 4px 12px rgba(23, 61, 54, 0.07);
+}
+
+.chat-suralia--app
+.chat-suralia__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.chat-suralia--app
+.chat-suralia__identidad {
+    min-width: 0;
+}
+
+.chat-suralia--app
+.chat-suralia__identidad > span {
+    display: block;
+    margin-bottom: 2px;
+    color: #98a19d;
+    font-size: 6.8px;
+    font-weight: 800;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+}
+
+.chat-suralia--app
+.chat-suralia__titulo-estado {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px 8px;
+}
+
+.chat-suralia--app
+#chat-nombre {
+    margin: 0;
+    overflow: hidden;
+    color: var(--color-secundario);
+    font-size: 13px;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.chat-suralia--app
+.chat-suralia__en-linea {
+    font-size: 7px;
+    font-weight: 800;
+}
+
+.chat-suralia--app
+.chat-suralia__ver-perfil {
+    min-height: 34px;
+    padding: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1px solid rgba(23, 61, 54, 0.10);
+    border-radius: 9px;
+    background: #ffffff;
+    color: var(--color-secundario);
+    font-size: 7.5px;
+    font-weight: 800;
+    transition:
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        color 0.18s ease;
+}
+
+.chat-suralia--app
+.chat-suralia__ver-perfil:hover {
+    border-color: rgba(232, 93, 50, 0.22);
+    color: var(--color-principal);
+}
+
+
+/* =====================================================
+   LISTA DE MENSAJES
+===================================================== */
+
+.chat-suralia--app
+.chat-suralia__mensajes {
+    min-height: 0;
+    padding: 17px 17px 19px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background:
+        radial-gradient(
+            circle at 15% 10%,
+            rgba(23, 61, 54, 0.025),
+            transparent 32%
+        ),
+        #f8faf8;
+    scrollbar-width: thin;
+    scrollbar-color:
+        rgba(23, 61, 54, 0.18)
+        transparent;
+}
+
+.chat-suralia--app
+.chat-suralia__mensajes::-webkit-scrollbar {
+    width: 7px;
+}
+
+.chat-suralia--app
+.chat-suralia__mensajes::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(23, 61, 54, 0.16);
+}
+
+.chat-suralia--app
+.chat-suralia__vacio {
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.chat-suralia--app
+.chat-suralia__vacio > i {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 9px;
+    display: grid;
+    place-items: center;
+    border-radius: 15px;
+    background: rgba(232, 93, 50, 0.08);
+    color: var(--color-principal);
+    font-size: 15px;
+}
+
+.chat-suralia--app
+.chat-suralia__vacio h2 {
+    margin: 0;
+    color: var(--color-secundario);
+    font-size: 13px;
+}
+
+.chat-suralia--app
+.chat-suralia__vacio p {
+    margin: 4px 0 0;
+    color: var(--color-texto-suave);
+    font-size: 8px;
+}
+
+
+/* =====================================================
+   BURBUJAS · PULIDO SIN TOCAR LÓGICA
+===================================================== */
+
+.chat-suralia--app
+.chat-mensaje__burbuja {
+    box-shadow: 0 3px 10px rgba(23, 61, 54, 0.035);
+}
+
+.chat-suralia--app
+.chat-mensaje--propio
+.chat-mensaje__burbuja {
+    box-shadow: 0 4px 12px rgba(232, 93, 50, 0.08);
+}
+
+.chat-suralia--app
+.chat-mensaje__acciones {
+    opacity: 0.82;
+    transition: opacity 0.18s ease;
+}
+
+.chat-suralia--app
+.chat-mensaje:hover
+.chat-mensaje__acciones {
+    opacity: 1;
+}
+
+
+/* =====================================================
+   ESCRIBIENDO
+===================================================== */
+
+.chat-suralia--app
+.chat-suralia__estado-escritura {
+    z-index: 5;
+    margin: 0;
+    padding: 7px 15px;
+    border-top: 1px solid rgba(23, 61, 54, 0.05);
+    background: #ffffff;
+    color: #72807a;
+    font-size: 7.4px;
+}
+
+
+/* =====================================================
+   FORMULARIO FIJO ABAJO DEL CHAT
+===================================================== */
+
+.chat-suralia--app
+.chat-suralia__formulario {
+    position: relative !important;
+    z-index: 7;
+    margin: 0 !important;
+    padding: 10px 12px !important;
+    display: grid !important;
+    grid-template-columns:
+        42px
+        minmax(0, 1fr)
+        42px !important;
+    align-items: end !important;
+    gap: 7px !important;
+    border-top: 1px solid rgba(23, 61, 54, 0.08);
+    background: #ffffff;
+    box-shadow: 0 -7px 18px rgba(23, 61, 54, 0.025);
+}
+
+.chat-suralia--app
+.chat-suralia__adjuntar-imagen,
+.chat-suralia--app
+.chat-suralia__formulario
+button[type="submit"] {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 11px !important;
+    line-height: 1 !important;
+}
+
+.chat-suralia--app
+.chat-suralia__adjuntar-imagen {
+    border: 1px solid rgba(23, 61, 54, 0.10);
+    background: #f7f9f7;
+    color: #5f6e68;
+}
+
+.chat-suralia--app
+.chat-suralia__formulario
+button[type="submit"] {
+    border: 1px solid var(--color-principal);
+    background: var(--color-principal);
+    color: #ffffff;
+}
+
+.chat-suralia--app
+.chat-suralia__formulario
+button[type="submit"]:not(:disabled):hover {
+    background: var(--color-principal-oscuro);
+}
+
+.chat-suralia--app
+.chat-suralia__formulario textarea {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 42px !important;
+    max-height: 132px !important;
+    margin: 0 !important;
+    padding: 10px 12px !important;
+    resize: none !important;
+    overflow-y: auto !important;
+    border: 1px solid rgba(23, 61, 54, 0.12);
+    border-radius: 12px !important;
+    background: #f8faf8;
+    color: var(--color-texto);
+    font-family: inherit;
+    font-size: 8.7px;
+    line-height: 1.45;
+}
+
+.chat-suralia--app
+.chat-suralia__formulario textarea:focus {
+    outline: 2px solid rgba(232, 93, 50, 0.16);
+    outline-offset: 0;
+    border-color: rgba(232, 93, 50, 0.36);
+    background: #ffffff;
+}
+
+.chat-suralia--app
+.chat-suralia__adjuntar-imagen i,
+.chat-suralia--app
+.chat-suralia__formulario
+button[type="submit"] i {
+    position: static !important;
+    inset: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    transform: none !important;
+}
+
+
+/* =====================================================
+   VISTA PREVIA / MENÚ IMAGEN / SUBIDA
+===================================================== */
+
+.chat-suralia--app
+.chat-suralia__vista-previa-imagen {
+    left: 12px !important;
+    bottom: calc(100% + 8px) !important;
+    width: 122px !important;
+    padding: 5px !important;
+    border-radius: 12px;
+    box-shadow: 0 10px 26px rgba(23, 61, 54, 0.12);
+}
+
+.chat-suralia--app
+.chat-suralia__menu-imagen {
+    z-index: 20;
+    border: 1px solid rgba(23, 61, 54, 0.09);
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 12px 28px rgba(23, 61, 54, 0.12);
+}
+
+.chat-suralia--app
+.chat-suralia__subida {
+    grid-column: 1 / -1;
+}
+
+
+/* =====================================================
+   ACCESIBILIDAD
+===================================================== */
+
+.mensajes-app
+button:focus-visible,
+.mensajes-app
+a:focus-visible,
+.mensajes-app
+textarea:focus-visible {
+    outline: 2px solid rgba(232, 93, 50, 0.68);
+    outline-offset: 2px;
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 900px) {
+
+    .mensajes-app__layout {
+        grid-template-columns: 175px minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .mensajes-app-menu__enlace small {
+        display: none;
+    }
+
+    .chat-suralia--app {
+        height: min(680px, calc(100vh - 136px));
+    }
+
+}
+
+
+/* =====================================================
+   MÓVIL
+===================================================== */
+
+@media (max-width: 760px) {
+
+    .mensajes-app {
+        padding-top: 10px;
+        padding-bottom: 20px;
+    }
+
+    .mensajes-app__layout {
+        display: block;
+    }
+
+    .mensajes-app-menu {
+        position: sticky;
+        top: 68px;
+        z-index: 30;
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 5px;
+        overflow-x: auto;
+        border-radius: 13px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .mensajes-app-menu::-webkit-scrollbar {
+        display: none;
+    }
+
+    .mensajes-app-menu__cabecera {
+        display: none;
+    }
+
+    .mensajes-app-menu__nav {
+        width: max-content;
+        padding: 0;
+        display: flex;
+        gap: 4px;
+    }
+
+    .mensajes-app-menu__enlace {
+        width: 112px;
+        min-width: 112px;
+        min-height: 48px;
+        flex: 0 0 112px;
+        padding: 7px 8px;
+        gap: 7px;
+    }
+
+    .mensajes-app-menu__enlace.activo {
+        box-shadow:
+            inset 0 -3px 0 var(--color-principal),
+            0 3px 9px rgba(23, 61, 54, 0.035);
+    }
+
+    .mensajes-app-menu__icono {
+        width: 31px;
+        height: 31px;
+        min-width: 31px;
+    }
+
+    .mensajes-app-menu__enlace small {
+        display: none;
+    }
+
+    .mensajes-app__superior {
+        padding: 14px 15px;
+    }
+
+    .mensajes-app__titulo h1 {
+        font-size: 20px;
+    }
+
+    .chat-suralia--app {
+        height: calc(100dvh - 214px);
+        min-height: 500px;
+        border-radius: 15px;
+    }
+
+    .chat-suralia--app
+    .chat-suralia__cabecera {
+        min-height: 68px;
+        padding: 9px 10px;
+        grid-template-columns: 43px minmax(0, 1fr) auto;
+    }
+
+    .chat-suralia--app
+    .chat-suralia__avatar {
+        width: 43px;
+        height: 43px;
+        min-width: 43px;
+        border-radius: 13px;
+    }
+
+    .chat-suralia--app
+    .chat-suralia__ver-perfil {
+        width: 35px;
+        height: 35px;
+        min-height: 35px;
+        padding: 0;
+        border-radius: 10px;
+        font-size: 0;
+    }
+
+    .chat-suralia--app
+    .chat-suralia__ver-perfil i {
+        font-size: 11px;
+    }
+
+    .chat-suralia--app
+    .chat-suralia__mensajes {
+        padding: 13px 10px 15px;
+    }
+
+    .chat-suralia--app
+    .chat-suralia__formulario {
+        grid-template-columns:
+            40px
+            minmax(0, 1fr)
+            40px !important;
+        gap: 5px !important;
+        padding: 8px !important;
+    }
+
+    .chat-suralia--app
+    .chat-suralia__adjuntar-imagen,
+    .chat-suralia--app
+    .chat-suralia__formulario
+    button[type="submit"] {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+    }
+
+    .chat-suralia--app
+    .chat-suralia__formulario textarea {
+        min-height: 40px !important;
+        padding: 9px 10px !important;
+    }
+
+}
+
+
+/* =====================================================
+   MÓVIL PEQUEÑO
+===================================================== */
+
+@media (max-width: 430px) {
+
+    .mensajes-app-menu__enlace {
+        width: 104px;
+        min-width: 104px;
+        flex-basis: 104px;
+    }
+
+    .mensajes-app-menu__icono {
+        width: 29px;
+        height: 29px;
+        min-width: 29px;
+    }
+
+    .mensajes-app__superior {
+        display: none;
+    }
+
+    .chat-suralia--app {
+        height: calc(100dvh - 139px);
+        min-height: 470px;
+    }
+
+    .chat-suralia--app
+    #chat-nombre {
+        max-width: 150px;
+        font-size: 11.5px;
+    }
+
+}
+
+
+/* =====================================================
+   REDUCIR MOVIMIENTO
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .mensajes-app *,
+    .mensajes-app-menu * {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+}
+/* ========================================================================
+   SURALIA · CONVERSACIONES.HTML · V1 PROFESIONAL
+   Mismo módulo visual que mensajes.html.
+======================================================================== */
+
+.conversaciones-app {
+    padding-top: 28px;
+    padding-bottom: 52px;
+    background:
+        linear-gradient(
+            180deg,
+            #f8faf8 0%,
+            #ffffff 360px
+        );
+}
+
+.conversaciones-app__layout {
+    display: grid;
+    grid-template-columns: 215px minmax(0, 1fr);
+    align-items: start;
+    gap: 18px;
+}
+
+.conversaciones-app__contenido {
+    min-width: 0;
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.conversaciones-hero {
+    margin-bottom: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    border: 1px solid rgba(23, 61, 54, 0.08);
+    border-radius: 18px;
+    background:
+        radial-gradient(
+            circle at 91% 12%,
+            rgba(232, 93, 50, 0.09),
+            transparent 30%
+        ),
+        linear-gradient(
+            125deg,
+            #ffffff 0%,
+            #fffaf6 62%,
+            #f6f9f7 100%
+        );
+    box-shadow: 0 8px 26px rgba(23, 61, 54, 0.04);
+}
+
+.conversaciones-hero__texto {
+    min-width: 0;
+}
+
+.conversaciones-hero h1 {
+    margin: 3px 0 5px;
+    color: var(--color-secundario);
+    font-size: 24px;
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+}
+
+.conversaciones-hero p {
+    max-width: 620px;
+    margin: 0;
+    color: var(--color-texto-suave);
+    font-size: 8.8px;
+    line-height: 1.6;
+}
+
+.conversaciones-hero__acciones {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    flex: 0 0 auto;
+}
+
+.conversaciones-cabecera__enlace {
+    min-height: 38px;
+    padding: 0 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 1px solid rgba(23, 61, 54, 0.10);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.84);
+    color: var(--color-secundario);
+    font-family: inherit;
+    font-size: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        color 0.18s ease;
+}
+
+.conversaciones-cabecera__enlace:hover {
+    transform: translateY(-1px);
+    border-color: rgba(232, 93, 50, 0.24);
+    background: #ffffff;
+    color: var(--color-principal);
+}
+
+.conversaciones-cabecera__enlace--activo {
+    border-color: rgba(48, 139, 90, 0.16);
+    background: #f2faf5;
+    color: #2d7f56;
+}
+
+.conversaciones-cabecera__enlace:disabled {
+    cursor: default;
+    transform: none;
+    opacity: 0.82;
+}
+
+
+/* =====================================================
+   PANEL
+===================================================== */
+
+.conversaciones-panel {
+    overflow: hidden;
+    border: 1px solid rgba(23, 61, 54, 0.085);
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(23, 61, 54, 0.045);
+}
+
+.conversaciones-panel__cabecera {
+    padding: 16px 18px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid rgba(23, 61, 54, 0.07);
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff,
+            #fbfcfb
+        );
+}
+
+.conversaciones-panel__kicker {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--color-principal);
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 0.075em;
+    text-transform: uppercase;
+}
+
+.conversaciones-panel__cabecera h2 {
+    margin: 0;
+    color: var(--color-secundario);
+    font-size: 15px;
+    letter-spacing: -0.02em;
+}
+
+.conversaciones-panel__cabecera p {
+    max-width: 600px;
+    margin: 3px 0 0;
+    color: var(--color-texto-suave);
+    font-size: 7.8px;
+    line-height: 1.5;
+}
+
+.conversaciones-panel__estado {
+    padding: 6px 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex: 0 0 auto;
+    border-radius: 999px;
+    background: rgba(23, 61, 54, 0.055);
+    color: #66756f;
+    font-size: 7px;
+    font-weight: 800;
+}
+
+.conversaciones-panel__contenido {
+    min-height: 350px;
+    padding: 13px;
+}
+
+
+/* =====================================================
+   BUSCADOR INYECTADO POR conversaciones.js
+===================================================== */
+
+.conversaciones-panel
+.conversaciones-buscador {
+    margin-bottom: 8px;
+}
+
+.conversaciones-panel
+.conversaciones-buscador__campo {
+    min-height: 42px;
+    padding: 0 10px;
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr) 30px;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(23, 61, 54, 0.10);
+    border-radius: 11px;
+    background: #f8faf8;
+    transition:
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.conversaciones-panel
+.conversaciones-buscador__campo:focus-within {
+    border-color: rgba(232, 93, 50, 0.30);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(232, 93, 50, 0.065);
+}
+
+.conversaciones-panel
+.conversaciones-buscador__campo > i {
+    color: #8a9691;
+    font-size: 9px;
+    text-align: center;
+}
+
+.conversaciones-panel
+.conversaciones-buscador input {
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--color-texto);
+    font-family: inherit;
+    font-size: 8.5px;
+}
+
+.conversaciones-panel
+.conversaciones-buscador input::placeholder {
+    color: #9ca6a2;
+}
+
+.conversaciones-panel
+.conversaciones-buscador__limpiar {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #7f8c87;
+    cursor: pointer;
+}
+
+.conversaciones-panel
+.conversaciones-buscador__limpiar:hover {
+    background: rgba(23, 61, 54, 0.055);
+    color: var(--color-secundario);
+}
+
+
+/* =====================================================
+   FILTROS
+===================================================== */
+
+.conversaciones-panel
+.conversaciones-filtros {
+    margin-bottom: 10px;
+    padding: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid rgba(23, 61, 54, 0.075);
+    border-radius: 10px;
+    background: #f7f9f7;
+    scrollbar-width: none;
+}
+
+.conversaciones-panel
+.conversaciones-filtros::-webkit-scrollbar {
+    display: none;
+}
+
+.conversaciones-panel
+.conversaciones-filtros__boton {
+    min-height: 31px;
+    padding: 0 10px;
+    flex: 0 0 auto;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: #6d7a75;
+    font-family: inherit;
+    font-size: 7.7px;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.conversaciones-panel
+.conversaciones-filtros__boton:hover {
+    color: var(--color-secundario);
+}
+
+.conversaciones-panel
+.conversaciones-filtros__boton.activo {
+    border-color: rgba(232, 93, 50, 0.13);
+    background: #ffffff;
+    color: var(--color-principal);
+    box-shadow: 0 3px 9px rgba(23, 61, 54, 0.04);
+}
+
+
+/* =====================================================
+   LISTA
+===================================================== */
+
+.conversaciones-lista--profesional {
+    display: grid;
+    gap: 7px;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta {
+    position: relative;
+    min-width: 0;
+    min-height: 76px;
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        auto;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(23, 61, 54, 0.07);
+    border-radius: 13px;
+    background: #ffffff;
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta:hover {
+    transform: translateY(-1px);
+    border-color: rgba(232, 93, 50, 0.18);
+    box-shadow: 0 7px 20px rgba(23, 61, 54, 0.045);
+}
+
+.conversaciones-panel
+.conversacion-tarjeta[data-pendientes]:not(
+    [data-pendientes="0"]
+) {
+    border-color: rgba(232, 93, 50, 0.13);
+    background:
+        linear-gradient(
+            90deg,
+            #fffaf7,
+            #ffffff 24%
+        );
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__enlace {
+    min-width: 0;
+    min-height: 74px;
+    padding: 10px 4px 10px 11px;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__avatar {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 15px;
+    background: #edf2ef;
+    color: #62716b;
+    font-size: 12px;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(23, 61, 54, 0.06);
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__avatar img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__contenido {
+    min-width: 0;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__superior {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__nombre-estado {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px 7px;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__nombre-estado > strong {
+    max-width: 230px;
+    overflow: hidden;
+    color: var(--color-secundario);
+    font-size: 9.4px;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__en-linea {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #347a57;
+    font-size: 6.6px;
+    font-weight: 800;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__en-linea > span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #37a46a;
+    box-shadow: 0 0 0 3px rgba(55, 164, 106, 0.10);
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__superior time {
+    flex: 0 0 auto;
+    color: #9aa39f;
+    font-size: 6.8px;
+    font-weight: 700;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__inferior {
+    min-width: 0;
+    margin-top: 4px;
+    display: block;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__mensaje {
+    display: block;
+    overflow: hidden;
+    color: #798681;
+    font-size: 7.7px;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__contador {
+    min-width: 23px;
+    height: 23px;
+    padding: 0 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--color-principal);
+    color: #ffffff;
+    font-size: 6.8px;
+    font-weight: 800;
+    box-shadow: 0 4px 10px rgba(232, 93, 50, 0.15);
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__contador-espacio {
+    width: 23px;
+}
+
+
+/* =====================================================
+   ACCIONES DE CONVERSACIÓN
+===================================================== */
+
+.conversaciones-panel
+.conversacion-tarjeta__acciones {
+    padding-right: 9px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    opacity: 0.55;
+    transition: opacity 0.18s ease;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta:hover
+.conversacion-tarjeta__acciones,
+.conversaciones-panel
+.conversacion-tarjeta:focus-within
+.conversacion-tarjeta__acciones {
+    opacity: 1;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__acciones button {
+    width: 31px;
+    height: 31px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: #7f8b86;
+    cursor: pointer;
+    transition:
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        color 0.18s ease;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__acciones button:hover {
+    border-color: rgba(23, 61, 54, 0.08);
+    background: #f5f8f6;
+    color: var(--color-secundario);
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__fijar[data-fijada="true"] {
+    background: rgba(232, 93, 50, 0.075);
+    color: var(--color-principal);
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__archivar[data-archivada="true"] {
+    background: rgba(23, 61, 54, 0.065);
+    color: var(--color-secundario);
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__eliminar:hover {
+    border-color: rgba(180, 69, 69, 0.09);
+    background: rgba(180, 69, 69, 0.055);
+    color: #a74f4f;
+}
+
+
+/* =====================================================
+   SIN RESULTADOS
+===================================================== */
+
+.conversaciones-panel
+.conversaciones-sin-resultados {
+    min-height: 150px;
+    padding: 28px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 7px;
+    border: 1px dashed rgba(23, 61, 54, 0.11);
+    border-radius: 13px;
+    background: #fbfcfb;
+    text-align: center;
+}
+
+.conversaciones-panel
+.conversaciones-sin-resultados > i {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: rgba(23, 61, 54, 0.055);
+    color: #70807a;
+    font-size: 12px;
+}
+
+.conversaciones-panel
+.conversaciones-sin-resultados p {
+    max-width: 440px;
+    margin: 0;
+    color: var(--color-texto-suave);
+    font-size: 8px;
+    line-height: 1.5;
+}
+
+
+/* =====================================================
+   ESTADOS: CARGA / ERROR / VACÍO
+===================================================== */
+
+.conversaciones-estado {
+    min-height: 230px;
+    padding: 28px 20px;
+    border: 1px dashed rgba(23, 61, 54, 0.10);
+    border-radius: 14px;
+    background: #fbfcfb;
+}
+
+.conversaciones-estado--carga {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    text-align: left;
+}
+
+.conversaciones-estado--error,
+.conversaciones-estado--vacio {
+    text-align: center;
+}
+
+.conversaciones-estado__icono {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 14px;
+    background: rgba(232, 93, 50, 0.08);
+    color: var(--color-principal);
+    font-size: 14px;
+    line-height: 1;
+}
+
+.conversaciones-estado__icono i {
+    position: static !important;
+    inset: auto !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+.conversaciones-estado--error
+.conversaciones-estado__icono,
+.conversaciones-estado--vacio
+.conversaciones-estado__icono {
+    margin: 0 auto 10px;
+}
+
+.conversaciones-estado strong {
+    display: block;
+    color: var(--color-secundario);
+    font-size: 10px;
+}
+
+.conversaciones-estado h3 {
+    margin: 3px 0 0;
+    color: var(--color-secundario);
+    font-size: 14px;
+}
+
+.conversaciones-estado p {
+    max-width: 500px;
+    margin: 4px auto 12px;
+    color: var(--color-texto-suave);
+    font-size: 8px;
+    line-height: 1.55;
+}
+
+.conversaciones-estado--carga p {
+    margin: 2px 0 0;
+}
+
+
+/* =====================================================
+   MODAL ELIMINAR
+===================================================== */
+
+.modal-conversacion {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    padding: 18px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10, 22, 19, 0.48);
+    backdrop-filter: blur(3px);
+}
+
+.modal-conversacion.visible {
+    display: flex;
+}
+
+.modal-conversacion__contenido {
+    position: relative;
+    width: min(100%, 390px);
+    padding: 24px;
+    border: 1px solid rgba(23, 61, 54, 0.08);
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 22px 60px rgba(10, 22, 19, 0.20);
+    text-align: center;
+}
+
+.modal-conversacion__cerrar {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 9px;
+    background: #f5f7f6;
+    color: #6f7d77;
+    cursor: pointer;
+}
+
+.modal-conversacion__icono {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 11px;
+    display: grid;
+    place-items: center;
+    border-radius: 15px;
+    background: rgba(180, 69, 69, 0.075);
+    color: #a64e4e;
+    font-size: 14px;
+}
+
+.modal-conversacion__contenido h2 {
+    margin: 0;
+    color: var(--color-secundario);
+    font-size: 16px;
+}
+
+.modal-conversacion__contenido p {
+    margin: 6px 0 17px;
+    color: var(--color-texto-suave);
+    font-size: 8.4px;
+    line-height: 1.55;
+}
+
+.modal-conversacion__acciones {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+    gap: 7px;
+}
+
+.modal-conversacion__boton {
+    min-height: 39px;
+    padding: 0 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 8px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.modal-conversacion__boton--secundario {
+    border: 1px solid rgba(23, 61, 54, 0.10);
+    background: #ffffff;
+    color: var(--color-secundario);
+}
+
+.modal-conversacion__boton--peligro {
+    border: 1px solid #a84f4f;
+    background: #a84f4f;
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   FOCUS
+===================================================== */
+
+.conversaciones-app
+button:focus-visible,
+.conversaciones-app
+a:focus-visible,
+.modal-conversacion
+button:focus-visible {
+    outline: 2px solid rgba(232, 93, 50, 0.68);
+    outline-offset: 2px;
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 900px) {
+
+    .conversaciones-app__layout {
+        grid-template-columns: 175px minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .conversaciones-hero {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 13px;
+    }
+
+    .conversaciones-hero__acciones {
+        width: 100%;
+    }
+
+    .conversaciones-panel
+    .conversacion-tarjeta__nombre-estado > strong {
+        max-width: 180px;
+    }
+
+}
+
+
+/* =====================================================
+   MÓVIL
+===================================================== */
+
+@media (max-width: 760px) {
+
+    .conversaciones-app {
+        padding-top: 10px;
+        padding-bottom: 22px;
+    }
+
+    .conversaciones-app__layout {
+        display: block;
+    }
+
+    .conversaciones-app
+    .mensajes-app-menu {
+        margin-bottom: 10px;
+    }
+
+    .conversaciones-hero {
+        padding: 15px;
+    }
+
+    .conversaciones-hero h1 {
+        font-size: 21px;
+    }
+
+    .conversaciones-hero__acciones {
+        display: grid;
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+    .conversaciones-cabecera__enlace {
+        width: 100%;
+    }
+
+    .conversaciones-panel__cabecera {
+        padding: 14px;
+    }
+
+    .conversaciones-panel__contenido {
+        padding: 9px;
+    }
+
+    .conversaciones-panel
+    .conversacion-tarjeta {
+        grid-template-columns:
+            minmax(0, 1fr)
+            auto;
+        gap: 4px;
+    }
+
+    .conversaciones-panel
+    .conversacion-tarjeta__enlace {
+        min-height: 70px;
+        grid-template-columns: 45px minmax(0, 1fr);
+        padding: 9px 4px 9px 8px;
+        gap: 8px;
+    }
+
+    .conversaciones-panel
+    .conversacion-tarjeta__avatar {
+        width: 45px;
+        height: 45px;
+        min-width: 45px;
+        border-radius: 14px;
+    }
+
+    .conversaciones-panel
+    .conversacion-tarjeta__contador,
+    .conversaciones-panel
+    .conversacion-tarjeta__contador-espacio {
+        margin-right: 7px;
+    }
+
+    .conversaciones-panel
+    .conversacion-tarjeta__acciones {
+        grid-column: 1 / -1;
+        width: 100%;
+        padding: 5px 8px 8px;
+        justify-content: flex-end;
+        border-top: 1px solid rgba(23, 61, 54, 0.05);
+        opacity: 1;
+    }
+
+    .conversaciones-panel
+    .conversacion-tarjeta__acciones button {
+        width: 34px;
+        height: 30px;
+    }
+
+}
+
+
+/* =====================================================
+   MÓVIL PEQUEÑO
+===================================================== */
+
+@media (max-width: 430px) {
+
+    .conversaciones-hero__acciones {
+        grid-template-columns: 1fr;
+    }
+
+    .conversaciones-panel__estado {
+        display: none;
+    }
+
+    .conversaciones-panel
+    .conversacion-tarjeta__nombre-estado > strong {
+        max-width: 150px;
+    }
+
+    .conversaciones-panel
+    .conversacion-tarjeta__superior time {
+        font-size: 6.2px;
+    }
+
+    .modal-conversacion__acciones {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* =====================================================
+   REDUCIR MOVIMIENTO
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .conversaciones-app *,
+    .modal-conversacion * {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+}
+/* ========================================================================
+   SURALIA · CONVERSACIONES V1.1
+   Corrección de espacio entre header y "Tus conversaciones"
+======================================================================== */
+
+.conversaciones-app {
+    padding-top: 44px;
+}
+
+@media (max-width: 760px) {
+
+    .conversaciones-app {
+        padding-top: 18px;
+    }
+
+}
+/* ========================================================================
+   SURALIA · CONVERSACIONES V1.2
+   Más aire entre el header y "Tus conversaciones"
+======================================================================== */
+
+.conversaciones-app {
+    padding-top: 56px;
+}
+
+@media (max-width: 760px) {
+
+    .conversaciones-app {
+        padding-top: 24px;
+    }
+
+}
+/* ========================================================================
+   SURALIA · MÓDULO MENSAJES · PULIDO FINAL V1.3
+   mensajes.html + conversaciones.html
+======================================================================== */
+
+
+/* =====================================================
+   RITMO GENERAL · MISMA ENTRADA EN AMBAS PÁGINAS
+===================================================== */
+
+.mensajes-app,
+.conversaciones-app {
+    padding-top: 56px;
+    padding-bottom: 52px;
+}
+
+.mensajes-app__layout,
+.conversaciones-app__layout {
+    grid-template-columns: 215px minmax(0, 1fr);
+    gap: 18px;
+}
+
+
+/* =====================================================
+   MENÚ MI SURALIA · MISMA ALTURA Y COMPORTAMIENTO
+===================================================== */
+
+.mensajes-app-menu {
+    top: 92px;
+    border-radius: 16px;
+    box-shadow: 0 8px 26px rgba(23, 61, 54, 0.04);
+}
+
+.mensajes-app-menu__enlace {
+    min-height: 51px;
+}
+
+.mensajes-app-menu__enlace.activo {
+    border-color: rgba(232, 93, 50, 0.14);
+    background:
+        linear-gradient(
+            90deg,
+            #fff7f2,
+            #ffffff
+        );
+}
+
+
+/* =====================================================
+   HEROES · MISMO LENGUAJE
+===================================================== */
+
+.mensajes-app__superior,
+.conversaciones-hero {
+    min-height: 118px;
+    margin-bottom: 12px;
+    padding: 20px;
+    border: 1px solid rgba(23, 61, 54, 0.08);
+    border-radius: 18px;
+    background:
+        radial-gradient(
+            circle at 91% 12%,
+            rgba(232, 93, 50, 0.09),
+            transparent 30%
+        ),
+        linear-gradient(
+            125deg,
+            #ffffff 0%,
+            #fffaf6 62%,
+            #f6f9f7 100%
+        );
+    box-shadow: 0 8px 26px rgba(23, 61, 54, 0.04);
+}
+
+.mensajes-app__titulo h1,
+.conversaciones-hero h1 {
+    margin: 3px 0 5px;
+    color: var(--color-secundario);
+    font-size: 24px;
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+}
+
+.mensajes-app__titulo p,
+.conversaciones-hero p {
+    max-width: 640px;
+    margin: 0;
+    color: var(--color-texto-suave);
+    font-size: 8.8px;
+    line-height: 1.6;
+}
+
+
+/* =====================================================
+   ACCIONES SECUNDARIAS · MISMO ESTILO
+===================================================== */
+
+.mensajes-volver--profesional,
+.chat-suralia--app .chat-suralia__ver-perfil,
+.conversaciones-cabecera__enlace {
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        background-color 0.18s ease,
+        color 0.18s ease;
+}
+
+.chat-suralia--app .chat-suralia__ver-perfil,
+.conversaciones-cabecera__enlace {
+    min-height: 36px;
+    border-radius: 10px;
+}
+
+.chat-suralia--app .chat-suralia__ver-perfil:hover,
+.conversaciones-cabecera__enlace:hover {
+    transform: translateY(-1px);
+}
+
+
+/* =====================================================
+   CHAT · PROPORCIÓN Y JERARQUÍA
+===================================================== */
+
+.chat-suralia--app {
+    height: min(670px, calc(100vh - 190px));
+    min-height: 540px;
+    border-radius: 18px;
+}
+
+.chat-suralia--app
+.chat-suralia__cabecera {
+    min-height: 74px;
+    padding: 11px 14px;
+}
+
+.chat-suralia--app
+.chat-suralia__mensajes {
+    gap: 0.62rem;
+    padding: 18px 18px 20px;
+}
+
+.chat-suralia--app
+.chat-mensaje__burbuja {
+    max-width: min(74%, 600px);
+    border-radius: 15px;
+    box-shadow: 0 3px 10px rgba(23, 61, 54, 0.035);
+}
+
+.chat-suralia--app
+.chat-mensaje--propio
+.chat-mensaje__burbuja {
+    border-bottom-right-radius: 5px;
+}
+
+.chat-suralia--app
+.chat-mensaje--recibido
+.chat-mensaje__burbuja {
+    border-bottom-left-radius: 5px;
+}
+
+.chat-suralia--app
+.chat-mensaje__respuesta-citada {
+    border-radius: 8px;
+}
+
+.chat-suralia--app
+.chat-reaccion-resumen {
+    min-height: 25px;
+    border-color: rgba(23, 61, 54, 0.10);
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 2px 6px rgba(23, 61, 54, 0.025);
+}
+
+
+/* =====================================================
+   CAJA DE ESCRITURA · ACABADO FINAL
+===================================================== */
+
+.chat-suralia--app
+.chat-suralia__formulario {
+    padding: 10px 12px 11px !important;
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff,
+            #fbfcfb
+        );
+}
+
+.chat-suralia--app
+.chat-suralia__formulario textarea {
+    border-color: rgba(23, 61, 54, 0.11);
+    background: #f7f9f7;
+}
+
+.chat-suralia--app
+.chat-suralia__formulario textarea::placeholder {
+    color: #98a29e;
+}
+
+.chat-suralia--app
+.chat-suralia__adjuntar-imagen {
+    background: #f5f8f6;
+}
+
+.chat-suralia--app
+.chat-suralia__adjuntar-imagen:not(:disabled):hover {
+    border-color: rgba(232, 93, 50, 0.20);
+    background: #fff8f4;
+    color: var(--color-principal);
+}
+
+
+/* =====================================================
+   BANDEJA · CABECERA / FILTROS
+===================================================== */
+
+.conversaciones-panel {
+    border-radius: 18px;
+}
+
+.conversaciones-panel__cabecera {
+    min-height: 76px;
+    padding: 16px 18px;
+}
+
+.conversaciones-panel__contenido {
+    padding: 14px;
+}
+
+.conversaciones-panel
+.conversaciones-buscador {
+    margin-bottom: 9px;
+}
+
+.conversaciones-panel
+.conversaciones-filtros {
+    margin-bottom: 11px;
+}
+
+
+/* =====================================================
+   TARJETAS DE CONVERSACIÓN · ACABADO FINAL
+===================================================== */
+
+.conversaciones-panel
+.conversacion-tarjeta {
+    min-height: 78px;
+    border-radius: 14px;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__enlace {
+    min-height: 76px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__avatar {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    border-radius: 15px;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__nombre-estado > strong {
+    font-size: 9.6px;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__mensaje {
+    font-size: 7.8px;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta[data-pendientes]:not(
+    [data-pendientes="0"]
+)::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    left: 0;
+    width: 3px;
+    border-radius: 0 999px 999px 0;
+    background: var(--color-principal);
+}
+
+.conversaciones-panel
+.conversacion-tarjeta__acciones {
+    opacity: 0.48;
+}
+
+.conversaciones-panel
+.conversacion-tarjeta:hover
+.conversacion-tarjeta__acciones,
+.conversaciones-panel
+.conversacion-tarjeta:focus-within
+.conversacion-tarjeta__acciones {
+    opacity: 1;
+}
+
+
+/* =====================================================
+   ESTADOS VACÍOS / CARGA · COHERENCIA ENTRE PÁGINAS
+===================================================== */
+
+.mensajes-carga--app,
+.mensajes-error--app,
+.conversaciones-estado {
+    border-color: rgba(23, 61, 54, 0.08);
+    border-radius: 16px;
+    background:
+        linear-gradient(
+            145deg,
+            #fbfcfb,
+            #fffaf7
+        );
+}
+
+.mensajes-carga__icono,
+.mensajes-error__icono,
+.conversaciones-estado__icono {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+}
+
+.mensajes-carga__icono i,
+.mensajes-error__icono i,
+.conversaciones-estado__icono i {
+    position: static !important;
+    inset: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+}
+
+
+/* =====================================================
+   FOCUS · MÓDULO COMPLETO
+===================================================== */
+
+.mensajes-app
+button:focus-visible,
+.mensajes-app
+a:focus-visible,
+.mensajes-app
+textarea:focus-visible,
+.conversaciones-app
+button:focus-visible,
+.conversaciones-app
+a:focus-visible,
+.conversaciones-app
+input:focus-visible {
+    outline: 2px solid rgba(232, 93, 50, 0.68);
+    outline-offset: 2px;
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 900px) {
+
+    .mensajes-app__layout,
+    .conversaciones-app__layout {
+        grid-template-columns: 175px minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .mensajes-app__superior,
+    .conversaciones-hero {
+        min-height: 0;
+    }
+
+    .chat-suralia--app {
+        height: min(650px, calc(100vh - 180px));
+    }
+
+}
+
+
+/* =====================================================
+   MÓVIL
+===================================================== */
+
+@media (max-width: 760px) {
+
+    .mensajes-app,
+    .conversaciones-app {
+        padding-top: 24px;
+        padding-bottom: 22px;
+    }
+
+    .mensajes-app-menu {
+        top: 68px;
+        margin-bottom: 12px;
+    }
+
+    .mensajes-app__superior,
+    .conversaciones-hero {
+        padding: 15px;
+        border-radius: 15px;
+    }
+
+    .mensajes-app__titulo h1,
+    .conversaciones-hero h1 {
+        font-size: 21px;
+    }
+
+    .chat-suralia--app {
+        height: calc(100dvh - 224px);
+        min-height: 500px;
+        border-radius: 15px;
+    }
+
+    .chat-suralia--app
+    .chat-suralia__mensajes {
+        padding: 13px 10px 15px;
+    }
+
+    .chat-suralia--app
+    .chat-mensaje__burbuja {
+        max-width: 86%;
+    }
+
+    .conversaciones-panel {
+        border-radius: 15px;
+    }
+
+    .conversaciones-panel__cabecera {
+        min-height: 0;
+        padding: 14px;
+    }
+
+    .conversaciones-panel__contenido {
+        padding: 10px;
+    }
+
+    .conversaciones-panel
+    .conversacion-tarjeta {
+        min-height: 72px;
+    }
+
+    .conversaciones-panel
+    .conversacion-tarjeta__enlace {
+        min-height: 70px;
+    }
+
+    .conversaciones-panel
+    .conversacion-tarjeta__avatar {
+        width: 46px;
+        height: 46px;
+        min-width: 46px;
+        border-radius: 14px;
+    }
+
+}
+
+
+/* =====================================================
+   MÓVIL PEQUEÑO
+===================================================== */
+
+@media (max-width: 430px) {
+
+    .mensajes-app,
+    .conversaciones-app {
+        padding-top: 20px;
+    }
+
+    .mensajes-app__superior {
+        display: none;
+    }
+
+    .chat-suralia--app {
+        height: calc(100dvh - 150px);
+        min-height: 470px;
+    }
+
+    .conversaciones-hero {
+        margin-bottom: 10px;
+    }
+
+    .conversaciones-panel
+    .conversacion-tarjeta__acciones {
+        opacity: 1;
+    }
+
+}
+/* ========================================================================
+   SURALIA · PLANES.HTML · RETOQUE SUAVE V1
+   Mantiene el diseño anterior. Solo mejora:
+   - "Voy solo"
+   - bloque social de las tarjetas
+   - espaciados
+   - móvil
+======================================================================== */
+
+
+/* =====================================================
+   1. PANEL DE FILTROS · SIN CAMBIAR SU ESTRUCTURA
+===================================================== */
+
+.seccion-explorar .panel-filtros {
+    border-color: rgba(23, 61, 54, 0.085);
+    box-shadow: 0 8px 24px rgba(23, 61, 54, 0.035);
+}
+
+.seccion-explorar .panel-filtros__descubrimiento {
+    border-radius: 15px;
+}
+
+.seccion-explorar .panel-filtros__descubrimiento-cabecera {
+    margin-bottom: 11px;
+}
+
+
+/* =====================================================
+   2. "VOY SOLO" · MÁS PROTAGONISMO, MISMO DISEÑO
+===================================================== */
+
+.seccion-explorar
+.filtro-experiencia[for="filtro-voy-solo"] {
+    position: relative;
+    border-color: rgba(232, 93, 50, 0.20);
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 248, 244, 0.96),
+            #ffffff
+        );
+    box-shadow: 0 5px 16px rgba(232, 93, 50, 0.045);
+}
+
+.seccion-explorar
+.filtro-experiencia[for="filtro-voy-solo"]::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 0;
+    width: 3px;
+    border-radius: 0 999px 999px 0;
+    background: var(--color-principal);
+    opacity: 0.78;
+}
+
+.seccion-explorar
+.filtro-experiencia[for="filtro-voy-solo"]
+.filtro-experiencia__icono {
+    background: rgba(232, 93, 50, 0.10);
+}
+
+.seccion-explorar
+.filtro-experiencia[for="filtro-voy-solo"]
+.filtro-experiencia__contenido strong {
+    color: var(--color-secundario);
+    font-weight: 800;
+}
+
+.seccion-explorar
+.filtro-experiencia[for="filtro-voy-solo"]:hover {
+    border-color: rgba(232, 93, 50, 0.30);
+    box-shadow: 0 8px 20px rgba(232, 93, 50, 0.07);
+}
+
+.seccion-explorar
+.filtro-experiencia[for="filtro-voy-solo"]:has(input:checked) {
+    border-color: rgba(232, 93, 50, 0.42);
+    background: #fff7f2;
+    box-shadow: 0 6px 18px rgba(232, 93, 50, 0.08);
+}
+
+
+/* =====================================================
+   3. TARJETAS · MISMO DISEÑO, ALGO MÁS LIMPIO
+===================================================== */
+
+.seccion-explorar .tarjeta-plan {
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.seccion-explorar .tarjeta-plan:hover {
+    transform: translateY(-2px);
+    border-color: rgba(232, 93, 50, 0.16);
+    box-shadow: 0 11px 28px rgba(23, 61, 54, 0.065);
+}
+
+.seccion-explorar .tarjeta-plan__contenido {
+    min-width: 0;
+}
+
+.seccion-explorar .tarjeta-plan__descripcion {
+    line-height: 1.5;
+}
+
+.seccion-explorar .tarjeta-plan__ubicacion {
+    line-height: 1.45;
+}
+
+
+/* =====================================================
+   4. BLOQUE SOCIAL DE CADA PLAN
+===================================================== */
+
+.seccion-explorar .tarjeta-plan__social {
+    margin-top: 10px;
+    padding: 7px 8px;
+    border: 1px solid rgba(23, 61, 54, 0.065);
+    border-radius: 11px;
+    background: #f8faf8;
+}
+
+.seccion-explorar .tarjeta-plan__social > span {
+    border-radius: 8px;
+}
+
+.seccion-explorar
+.tarjeta-plan__social-solas {
+    font-weight: 750;
+}
+
+.seccion-explorar
+.tarjeta-plan:not([data-personas-solas="0"])
+.tarjeta-plan__social {
+    border-color: rgba(232, 93, 50, 0.11);
+    background:
+        linear-gradient(
+            135deg,
+            #fffaf7,
+            #f8faf8 76%
+        );
+}
+
+.seccion-explorar
+.tarjeta-plan:not([data-personas-solas="0"])
+.tarjeta-plan__social-solas {
+    padding: 5px 7px;
+    border: 1px solid rgba(232, 93, 50, 0.15);
+    border-radius: 8px;
+    background: #fff5ef;
+    color: #b9502f;
+    font-weight: 800;
+}
+
+.seccion-explorar
+.tarjeta-plan[data-personas-solas="0"]
+.tarjeta-plan__social-solas {
+    color: #89948f;
+}
+
+
+/* =====================================================
+   5. FAVORITO · CENTRADO Y MÁS LIMPIO
+===================================================== */
+
+.seccion-explorar .tarjeta-plan__favorito {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+}
+
+.seccion-explorar .tarjeta-plan__favorito i {
+    position: static !important;
+    inset: auto !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+
+/* =====================================================
+   6. RESULTADOS · UN POCO MÁS DE AIRE
+===================================================== */
+
+.seccion-explorar .barra-resultados {
+    margin-top: 4px;
+    margin-bottom: 5px;
+}
+
+.seccion-explorar .planes__grid--explorar {
+    row-gap: 16px;
+}
+
+
+/* =====================================================
+   7. MÓVIL · SIN CAMBIAR EL DISEÑO ANTERIOR
+===================================================== */
+
+@media (max-width: 680px) {
+
+    .seccion-explorar .panel-filtros {
+        border-radius: 15px;
+    }
+
+    .seccion-explorar
+    .filtro-experiencia[for="filtro-voy-solo"] {
+        box-shadow: none;
+    }
+
+    .seccion-explorar
+    .filtro-experiencia[for="filtro-voy-solo"]::before {
+        top: 9px;
+        bottom: 9px;
+    }
+
+    .seccion-explorar .tarjeta-plan__social {
+        gap: 5px;
+    }
+
+    .seccion-explorar .tarjeta-plan__social > span {
+        min-height: 28px;
+    }
+
+    .seccion-explorar .planes__grid--explorar {
+        row-gap: 12px;
+    }
+
+}
+
+
+/* =====================================================
+   8. MÓVIL PEQUEÑO
+===================================================== */
+
+@media (max-width: 430px) {
+
+    .seccion-explorar .tarjeta-plan__social {
+        padding: 7px;
+    }
+
+    .seccion-explorar
+    .tarjeta-plan:not([data-personas-solas="0"])
+    .tarjeta-plan__social-solas {
+        width: 100%;
+        justify-content: center;
+    }
+
+}
+
+
+/* =====================================================
+   ACCESIBILIDAD
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .seccion-explorar .tarjeta-plan,
+    .seccion-explorar .filtro-experiencia {
+        transition: none !important;
+    }
+
+}
