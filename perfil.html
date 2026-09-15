@@ -264,7 +264,7 @@
 
                         <span class="perfil-menu__texto">
                             <strong>Mis planes</strong>
-                            <small>Reservas, guardados y publicados</small>
+                            <small>Próximos, guardados y creados</small>
                         </span>
                     </button>
 
@@ -773,7 +773,7 @@
                     </section>
 
                     <!-- =================================================
-                         RESERVAS
+                         MIS PLANES · ACTIVIDAD V2.8
                     ================================================== -->
 
                     <section
@@ -784,9 +784,8 @@
                         aria-hidden="true"
                     >
 
-                        
                         <nav
-                            class="perfil-submenu"
+                            class="perfil-submenu perfil-submenu--planes"
                             aria-label="Mis planes"
                         >
                             <button
@@ -794,7 +793,10 @@
                                 class="perfil-submenu__enlace"
                                 data-ir-seccion="reservas"
                             >
-                                <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+                                <i
+                                    class="fa-solid fa-calendar-check"
+                                    aria-hidden="true"
+                                ></i>
                                 Actividad
                             </button>
 
@@ -803,7 +805,10 @@
                                 class="perfil-submenu__enlace"
                                 data-ir-seccion="favoritos"
                             >
-                                <i class="fa-regular fa-heart" aria-hidden="true"></i>
+                                <i
+                                    class="fa-regular fa-heart"
+                                    aria-hidden="true"
+                                ></i>
                                 Guardados
                             </button>
 
@@ -812,66 +817,272 @@
                                 class="perfil-submenu__enlace"
                                 data-ir-seccion="publicados"
                             >
-                                <i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>
-                                Publicados
+                                <i
+                                    class="fa-regular fa-calendar-plus"
+                                    aria-hidden="true"
+                                ></i>
+                                Creados
                             </button>
                         </nav>
 
-<div class="perfil-seccion__cabecera">
 
-                            <div>
+                        <section class="mis-planes-hero">
+
+                            <div class="mis-planes-hero__texto">
 
                                 <span class="subtitulo">
                                     Mis planes
                                 </span>
 
                                 <h2>
-                                    Actividad
+                                    Tu agenda en Suralia
                                 </h2>
 
                                 <p>
-                                    Tus próximas reservas y los planes en los que participas.
+                                    Ten a mano lo que viene, recuerda lo que ya has
+                                    vivido y organiza tus próximos planes.
                                 </p>
 
                             </div>
 
-                        </div>
+                            <div class="mis-planes-hero__acciones">
 
-                        <div
-                            class="lista-reservas"
-                            id="lista-reservas-perfil" aria-live="polite" aria-atomic="false"
-                        ></div>
+                                <a
+                                    href="planes.html"
+                                    class="mis-planes-hero__boton"
+                                >
+                                    <i
+                                        class="fa-solid fa-compass"
+                                        aria-hidden="true"
+                                    ></i>
+                                    Explorar
+                                </a>
 
-                        <div
-                            class="estado-vacio"
-                            id="estado-vacio-reservas" role="status" aria-live="polite" aria-atomic="true"
+                                <a
+                                    href="publicar-plan.html"
+                                    class="mis-planes-hero__boton mis-planes-hero__boton--principal"
+                                >
+                                    <i
+                                        class="fa-solid fa-plus"
+                                        aria-hidden="true"
+                                    ></i>
+                                    Crear plan
+                                </a>
+
+                            </div>
+
+                        </section>
+
+
+                        <section
+                            class="mis-planes-resumen"
+                            aria-label="Resumen de mis planes"
                         >
 
-                            <span class="estado-vacio__icono">
-                                <i class="fa-regular fa-calendar-xmark" aria-hidden="true"></i>
-                            </span>
+                            <article class="mis-planes-resumen__item mis-planes-resumen__item--proximos">
 
-                            <h3>
-                                No tienes reservas ni asistencias
-                            </h3>
+                                <span class="mis-planes-resumen__icono">
+                                    <i
+                                        class="fa-solid fa-calendar-day"
+                                        aria-hidden="true"
+                                    ></i>
+                                </span>
 
-                            <p>
-                                Reserva un plan o indica que vas a un evento con entrada externa.
-                            </p>
+                                <div>
+                                    <strong
+                                        id="contador-proximos-mis-planes"
+                                        aria-live="polite"
+                                    >
+                                        0
+                                    </strong>
 
-                            <a
-                                href="planes.html"
-                                class="boton-auth"
+                                    <span>
+                                        Próximos
+                                    </span>
+                                </div>
+
+                            </article>
+
+                            <article class="mis-planes-resumen__item">
+
+                                <span class="mis-planes-resumen__icono">
+                                    <i
+                                        class="fa-solid fa-circle-check"
+                                        aria-hidden="true"
+                                    ></i>
+                                </span>
+
+                                <div>
+                                    <strong
+                                        id="contador-realizados-mis-planes"
+                                        aria-live="polite"
+                                    >
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        Realizados
+                                    </span>
+                                </div>
+
+                            </article>
+
+                            <article class="mis-planes-resumen__item">
+
+                                <span class="mis-planes-resumen__icono">
+                                    <i
+                                        class="fa-solid fa-heart"
+                                        aria-hidden="true"
+                                    ></i>
+                                </span>
+
+                                <div>
+                                    <strong
+                                        id="contador-guardados-mis-planes"
+                                        aria-live="polite"
+                                    >
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        Guardados
+                                    </span>
+                                </div>
+
+                            </article>
+
+                            <article class="mis-planes-resumen__item">
+
+                                <span class="mis-planes-resumen__icono">
+                                    <i
+                                        class="fa-solid fa-calendar-plus"
+                                        aria-hidden="true"
+                                    ></i>
+                                </span>
+
+                                <div>
+                                    <strong
+                                        id="contador-creados-mis-planes"
+                                        aria-live="polite"
+                                    >
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        Creados
+                                    </span>
+                                </div>
+
+                            </article>
+
+                        </section>
+
+
+                        <section class="mis-planes-bloque">
+
+                            <div class="mis-planes-bloque__cabecera">
+
+                                <div>
+
+                                    <span class="mis-planes-bloque__kicker">
+                                        Tu actividad
+                                    </span>
+
+                                    <h3>
+                                        Reservas y asistencias
+                                    </h3>
+
+                                    <p>
+                                        Separa lo que tienes por delante de las
+                                        experiencias que ya has realizado.
+                                    </p>
+
+                                </div>
+
+                                <div
+                                    class="mis-planes-filtros-actividad"
+                                    role="group"
+                                    aria-label="Filtrar actividad"
+                                >
+
+                                    <button
+                                        type="button"
+                                        class="mis-planes-filtro-actividad activo"
+                                        data-filtro-actividad-perfil="proximos"
+                                        aria-pressed="true"
+                                    >
+                                        Próximos
+
+                                        <span id="contador-filtro-proximos">
+                                            0
+                                        </span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="mis-planes-filtro-actividad"
+                                        data-filtro-actividad-perfil="realizados"
+                                        aria-pressed="false"
+                                    >
+                                        Realizados
+
+                                        <span id="contador-filtro-realizados">
+                                            0
+                                        </span>
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                class="lista-reservas lista-reservas--mis-planes"
+                                id="lista-reservas-perfil"
+                                aria-live="polite"
+                                aria-atomic="false"
+                            ></div>
+
+
+                            <div
+                                class="estado-vacio mis-planes-vacio"
+                                id="estado-vacio-reservas"
+                                role="status"
+                                aria-live="polite"
+                                aria-atomic="true"
                             >
-                                Explorar planes
-                            </a>
 
-                        </div>
+                                <span class="estado-vacio__icono">
+                                    <i
+                                        class="fa-regular fa-calendar-xmark"
+                                        aria-hidden="true"
+                                    ></i>
+                                </span>
+
+                                <h3>
+                                    No tienes reservas ni asistencias
+                                </h3>
+
+                                <p>
+                                    Reserva un plan o indica que vas a un evento
+                                    para empezar a construir tu agenda.
+                                </p>
+
+                                <a
+                                    href="planes.html"
+                                    class="boton-auth"
+                                >
+                                    Explorar planes
+                                </a>
+
+                            </div>
+
+                        </section>
 
                     </section>
 
                     <!-- =================================================
-                         FAVORITOS
+                         MIS PLANES · GUARDADOS V2.8
                     ================================================== -->
 
                     <section
@@ -882,9 +1093,8 @@
                         aria-hidden="true"
                     >
 
-                        
                         <nav
-                            class="perfil-submenu"
+                            class="perfil-submenu perfil-submenu--planes"
                             aria-label="Mis planes"
                         >
                             <button
@@ -892,7 +1102,10 @@
                                 class="perfil-submenu__enlace"
                                 data-ir-seccion="reservas"
                             >
-                                <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+                                <i
+                                    class="fa-solid fa-calendar-check"
+                                    aria-hidden="true"
+                                ></i>
                                 Actividad
                             </button>
 
@@ -901,7 +1114,10 @@
                                 class="perfil-submenu__enlace"
                                 data-ir-seccion="favoritos"
                             >
-                                <i class="fa-regular fa-heart" aria-hidden="true"></i>
+                                <i
+                                    class="fa-regular fa-heart"
+                                    aria-hidden="true"
+                                ></i>
                                 Guardados
                             </button>
 
@@ -910,12 +1126,16 @@
                                 class="perfil-submenu__enlace"
                                 data-ir-seccion="publicados"
                             >
-                                <i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>
-                                Publicados
+                                <i
+                                    class="fa-regular fa-calendar-plus"
+                                    aria-hidden="true"
+                                ></i>
+                                Creados
                             </button>
                         </nav>
 
-<div class="perfil-seccion__cabecera">
+
+                        <section class="mis-planes-cabecera-seccion">
 
                             <div>
 
@@ -928,34 +1148,60 @@
                                 </h2>
 
                                 <p>
-                                    Planes que quieres tener a mano para más adelante.
+                                    Actividades que te interesan y quieres tener
+                                    localizadas para decidir más adelante.
                                 </p>
 
                             </div>
 
-                        </div>
+                            <a
+                                href="planes.html"
+                                class="mis-planes-hero__boton mis-planes-hero__boton--principal"
+                            >
+                                <i
+                                    class="fa-solid fa-compass"
+                                    aria-hidden="true"
+                                ></i>
+                                Descubrir planes
+                            </a>
+
+                        </section>
+
 
                         <div
-                            class="planes__grid perfil-favoritos"
-                            id="lista-favoritos-perfil" aria-live="polite" aria-atomic="false"
+                            class="planes__grid perfil-favoritos perfil-favoritos--mis-planes"
+                            id="lista-favoritos-perfil"
+                            aria-live="polite"
+                            aria-atomic="false"
                         ></div>
 
+
                         <div
-                            class="estado-vacio"
-                            id="estado-vacio-favoritos" role="status" aria-live="polite" aria-atomic="true"
+                            class="estado-vacio mis-planes-vacio"
+                            id="estado-vacio-favoritos"
+                            role="status"
+                            aria-live="polite"
+                            aria-atomic="true"
                         >
 
                             <span class="estado-vacio__icono">
-                                <i class="fa-regular fa-heart" aria-hidden="true"></i>
+                                <i
+                                    class="fa-regular fa-heart"
+                                    aria-hidden="true"
+                                ></i>
+                            </span>
+
+                            <span class="subtitulo">
+                                Tu lista está vacía
                             </span>
 
                             <h3>
-                                No tienes planes favoritos
+                                Guarda lo que no quieras perder de vista
                             </h3>
 
                             <p>
-                                Guarda las actividades que más te interesen para
-                                encontrarlas fácilmente.
+                                Marca con el corazón los planes que te interesen
+                                y los tendrás siempre disponibles aquí.
                             </p>
 
                             <a
@@ -970,7 +1216,7 @@
                     </section>
 
                     <!-- =================================================
-                         AFINIDADES
+                         AFINIDADES · DESCUBRIR PERSONAS V2.6
                     ================================================== -->
 
                     <section
@@ -981,7 +1227,6 @@
                         aria-hidden="true"
                     >
 
-                        
                         <nav
                             class="perfil-submenu"
                             aria-label="Área social"
@@ -991,7 +1236,10 @@
                                 class="perfil-submenu__enlace"
                                 data-ir-seccion="conexiones"
                             >
-                                <i class="fa-solid fa-link" aria-hidden="true"></i>
+                                <i
+                                    class="fa-solid fa-link"
+                                    aria-hidden="true"
+                                ></i>
                                 Conexiones
                             </button>
 
@@ -1000,7 +1248,10 @@
                                 class="perfil-submenu__enlace"
                                 data-ir-seccion="afinidades"
                             >
-                                <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+                                <i
+                                    class="fa-solid fa-user-group"
+                                    aria-hidden="true"
+                                ></i>
                                 Afinidades
                             </button>
 
@@ -1008,40 +1259,131 @@
                                 class="perfil-submenu__enlace"
                                 href="conversaciones.html"
                             >
-                                <i class="fa-regular fa-comments" aria-hidden="true"></i>
+                                <i
+                                    class="fa-regular fa-comments"
+                                    aria-hidden="true"
+                                ></i>
                                 Mensajes
                             </a>
                         </nav>
 
-<div class="perfil-seccion__cabecera">
 
-                            <div>
+                        <section class="afinidades-descubre-hero">
+
+                            <div class="afinidades-descubre-hero__texto">
 
                                 <span class="subtitulo">
-                                    Social
+                                    Descubre personas
                                 </span>
 
                                 <h2>
-                                    Afinidades
+                                    Gente con la que ya tienes algo en común
                                 </h2>
 
                                 <p>
-                                    Personas y planes con intereses parecidos a los tuyos.
+                                    Aquí aparecen los planes en los que has activado
+                                    la afinidad. Entra en cada uno para descubrir
+                                    personas interesadas en la misma experiencia.
                                 </p>
 
                             </div>
 
-                        </div>
+                            <div class="afinidades-descubre-hero__acciones">
+
+                                <a
+                                    href="planes.html"
+                                    class="afinidades-descubre-hero__boton afinidades-descubre-hero__boton--principal"
+                                >
+                                    <i
+                                        class="fa-solid fa-compass"
+                                        aria-hidden="true"
+                                    ></i>
+                                    Explorar planes
+                                </a>
+
+                                <button
+                                    type="button"
+                                    class="afinidades-descubre-hero__boton"
+                                    data-ir-seccion="conexiones"
+                                >
+                                    <i
+                                        class="fa-solid fa-user-group"
+                                        aria-hidden="true"
+                                    ></i>
+                                    Mis conexiones
+                                </button>
+
+                            </div>
+
+                        </section>
+
+
+                        <section
+                            class="afinidades-descubre-resumen"
+                            aria-label="Resumen de afinidades"
+                        >
+
+                            <article class="afinidades-descubre-resumen__item">
+
+                                <span class="afinidades-descubre-resumen__icono">
+                                    <i
+                                        class="fa-solid fa-wand-magic-sparkles"
+                                        aria-hidden="true"
+                                    ></i>
+                                </span>
+
+                                <div>
+                                    <strong
+                                        id="contador-afinidades-perfil"
+                                        aria-live="polite"
+                                    >
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        Afinidades activas
+                                    </span>
+                                </div>
+
+                            </article>
+
+                            <article class="afinidades-descubre-resumen__item afinidades-descubre-resumen__item--personas">
+
+                                <span class="afinidades-descubre-resumen__icono">
+                                    <i
+                                        class="fa-solid fa-people-group"
+                                        aria-hidden="true"
+                                    ></i>
+                                </span>
+
+                                <div>
+                                    <strong
+                                        id="contador-personas-afinidades-perfil"
+                                        aria-live="polite"
+                                    >
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        Coincidencias en planes
+                                    </span>
+                                </div>
+
+                            </article>
+
+                        </section>
+
 
                         <div
-                            class="lista-afinidades"
+                            class="lista-afinidades lista-afinidades--descubre"
                             id="lista-afinidades-perfil"
                             aria-live="polite"
                             aria-atomic="false"
                         ></div>
 
+
                         <div
-                            class="estado-vacio"
+                            class="estado-vacio afinidades-descubre-vacio"
                             id="estado-vacio-afinidades"
                             role="status"
                             aria-live="polite"
@@ -1049,22 +1391,34 @@
                         >
 
                             <span class="estado-vacio__icono">
-                                <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+                                <i
+                                    class="fa-solid fa-people-arrows"
+                                    aria-hidden="true"
+                                ></i>
+                            </span>
+
+                            <span class="subtitulo">
+                                Todavía no has empezado
                             </span>
 
                             <h3>
-                                No tienes afinidades activas
+                                Activa una afinidad y descubre quién se apunta
                             </h3>
 
                             <p>
-                                Activa la opción “Quiero conocer gente” dentro
-                                de un plan para que aparezca aquí.
+                                Entra en un plan y activa “Quiero conocer gente”.
+                                Cuando haya otras personas compatibles podrás
+                                descubrir sus perfiles desde aquí.
                             </p>
 
                             <a
                                 href="planes.html"
                                 class="boton-auth"
                             >
+                                <i
+                                    class="fa-solid fa-compass"
+                                    aria-hidden="true"
+                                ></i>
                                 Explorar planes
                             </a>
 
@@ -1073,7 +1427,7 @@
                     </section>
 
                     <!-- =================================================
-                         CONEXIONES
+                         CONEXIONES · SOCIAL V2.5
                     ================================================== -->
 
                     <section
@@ -1084,7 +1438,6 @@
                         aria-hidden="true"
                     >
 
-                        
                         <nav
                             class="perfil-submenu"
                             aria-label="Área social"
@@ -1094,7 +1447,10 @@
                                 class="perfil-submenu__enlace"
                                 data-ir-seccion="conexiones"
                             >
-                                <i class="fa-solid fa-link" aria-hidden="true"></i>
+                                <i
+                                    class="fa-solid fa-link"
+                                    aria-hidden="true"
+                                ></i>
                                 Conexiones
                             </button>
 
@@ -1103,7 +1459,10 @@
                                 class="perfil-submenu__enlace"
                                 data-ir-seccion="afinidades"
                             >
-                                <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+                                <i
+                                    class="fa-solid fa-user-group"
+                                    aria-hidden="true"
+                                ></i>
                                 Afinidades
                             </button>
 
@@ -1111,59 +1470,135 @@
                                 class="perfil-submenu__enlace"
                                 href="conversaciones.html"
                             >
-                                <i class="fa-regular fa-comments" aria-hidden="true"></i>
+                                <i
+                                    class="fa-regular fa-comments"
+                                    aria-hidden="true"
+                                ></i>
                                 Mensajes
                             </a>
                         </nav>
 
-<div class="perfil-seccion__cabecera">
 
-                            <div>
+                        <div class="perfil-social-cabecera">
+
+                            <div class="perfil-social-cabecera__texto">
 
                                 <span class="subtitulo">
                                     Social
                                 </span>
 
                                 <h2>
-                                    Conexiones
+                                    Tu círculo
                                 </h2>
 
                                 <p>
-                                    Solicitudes y personas con las que ya has conectado.
+                                    Descubre quién quiere conocerte, mantén cerca
+                                    tus conexiones y continúa las conversaciones.
                                 </p>
+
+                            </div>
+
+                            <div class="perfil-social-cabecera__acciones">
+
+                                <button
+                                    type="button"
+                                    class="perfil-social-cabecera__boton"
+                                    data-ir-seccion="afinidades"
+                                >
+                                    <i
+                                        class="fa-solid fa-wand-magic-sparkles"
+                                        aria-hidden="true"
+                                    ></i>
+
+                                    Ver afinidades
+                                </button>
+
+                                <a
+                                    href="conversaciones.html"
+                                    class="perfil-social-cabecera__boton perfil-social-cabecera__boton--principal"
+                                >
+                                    <i
+                                        class="fa-regular fa-comments"
+                                        aria-hidden="true"
+                                    ></i>
+
+                                    Mensajes
+                                </a>
 
                             </div>
 
                         </div>
 
-                        <div class="perfil-estadisticas">
 
-                            <article>
+                        <!-- RESUMEN SOCIAL -->
 
-                                <span class="perfil-estadisticas__icono">
-                                    <i class="fa-solid fa-user-clock" aria-hidden="true"></i>
+                        <section
+                            class="perfil-social-resumen"
+                            aria-label="Resumen de conexiones"
+                        >
+
+                            <article class="perfil-social-resumen__item perfil-social-resumen__item--pendiente">
+
+                                <span class="perfil-social-resumen__icono">
+                                    <i
+                                        class="fa-solid fa-user-plus"
+                                        aria-hidden="true"
+                                    ></i>
                                 </span>
 
                                 <div>
-                                    <strong id="contador-solicitudes-recibidas" aria-live="polite">
+                                    <strong
+                                        id="contador-solicitudes-recibidas"
+                                        aria-live="polite"
+                                    >
                                         0
                                     </strong>
 
                                     <span>
-                                        Solicitudes pendientes
+                                        Quieren conectar
                                     </span>
                                 </div>
 
                             </article>
 
-                            <article>
+                            <article class="perfil-social-resumen__item">
 
-                                <span class="perfil-estadisticas__icono">
-                                    <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                                <span class="perfil-social-resumen__icono">
+                                    <i
+                                        class="fa-solid fa-user-group"
+                                        aria-hidden="true"
+                                    ></i>
                                 </span>
 
                                 <div>
-                                    <strong id="contador-solicitudes-enviadas" aria-live="polite">
+                                    <strong
+                                        id="contador-conexiones-aceptadas"
+                                        aria-live="polite"
+                                    >
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        En tu círculo
+                                    </span>
+                                </div>
+
+                            </article>
+
+                            <article class="perfil-social-resumen__item">
+
+                                <span class="perfil-social-resumen__icono">
+                                    <i
+                                        class="fa-regular fa-paper-plane"
+                                        aria-hidden="true"
+                                    ></i>
+                                </span>
+
+                                <div>
+                                    <strong
+                                        id="contador-solicitudes-enviadas"
+                                        aria-live="polite"
+                                    >
                                         0
                                     </strong>
 
@@ -1174,162 +1609,203 @@
 
                             </article>
 
-                            <article>
+                        </section>
 
-                                <span class="perfil-estadisticas__icono">
-                                    <i class="fa-solid fa-user-group" aria-hidden="true"></i>
-                                </span>
+
+                        <!-- SOLICITUDES RECIBIDAS -->
+
+                        <section class="perfil-social-bloque perfil-social-bloque--recibidas">
+
+                            <div class="perfil-social-bloque__cabecera">
 
                                 <div>
-                                    <strong id="contador-conexiones-aceptadas" aria-live="polite">
-                                        0
-                                    </strong>
 
-                                    <span>
-                                        Conexiones aceptadas
+                                    <span class="perfil-social-bloque__kicker">
+                                        Nuevas personas
                                     </span>
-                                </div>
 
-                            </article>
-
-                        </div>
-
-                        <div class="perfil-bloque">
-
-                            <div class="perfil-bloque__cabecera">
-
-                                <div>
                                     <h3>
-                                        Solicitudes recibidas
+                                        Quieren conocerte
                                     </h3>
 
                                     <p>
-                                        Personas que quieren conectar contigo.
+                                        Mira su perfil antes de decidir si quieres conectar.
                                     </p>
+
                                 </div>
+
+                                <span class="perfil-social-bloque__indicador">
+                                    <i
+                                        class="fa-regular fa-bell"
+                                        aria-hidden="true"
+                                    ></i>
+                                    Pendientes
+                                </span>
 
                             </div>
 
                             <div
+                                class="perfil-social-lista perfil-social-lista--recibidas"
                                 id="lista-solicitudes-recibidas"
                                 aria-live="polite"
                                 aria-atomic="false"
                             ></div>
 
                             <div
-                                class="estado-vacio estado-vacio--pequeno"
+                                class="estado-vacio estado-vacio--pequeno perfil-social-vacio"
                                 id="estado-vacio-solicitudes-recibidas"
                                 role="status"
                             >
 
                                 <span class="estado-vacio__icono">
-                                    <i class="fa-regular fa-envelope-open" aria-hidden="true"></i>
+                                    <i
+                                        class="fa-regular fa-envelope-open"
+                                        aria-hidden="true"
+                                    ></i>
                                 </span>
 
                                 <h3>
-                                    No tienes solicitudes pendientes
+                                    Todo tranquilo por aquí
                                 </h3>
 
                                 <p>
-                                    Cuando alguien quiera conectar contigo, su solicitud aparecerá aquí.
+                                    Cuando alguien quiera conectar contigo,
+                                    aparecerá en este espacio.
                                 </p>
 
                             </div>
 
-                        </div>
+                        </section>
 
-                        <div class="perfil-bloque">
 
-                            <div class="perfil-bloque__cabecera">
+                        <!-- CONEXIONES ACEPTADAS -->
 
-                                <div>
-                                    <h3>
-                                        Solicitudes enviadas
-                                    </h3>
+                        <section class="perfil-social-bloque perfil-social-bloque--circulo">
 
-                                    <p>
-                                        Consulta el estado de las solicitudes que has enviado.
-                                    </p>
-                                </div>
-
-                            </div>
-
-                            <div
-                                id="lista-solicitudes-enviadas"
-                                aria-live="polite"
-                                aria-atomic="false"
-                            ></div>
-
-                            <div
-                                class="estado-vacio estado-vacio--pequeno"
-                                id="estado-vacio-solicitudes-enviadas"
-                                role="status"
-                            >
-
-                                <span class="estado-vacio__icono">
-                                    <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
-                                </span>
-
-                                <h3>
-                                    No has enviado solicitudes
-                                </h3>
-
-                                <p>
-                                    Puedes enviar una solicitud desde el perfil público de otra persona.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                        <div class="perfil-bloque">
-
-                            <div class="perfil-bloque__cabecera">
+                            <div class="perfil-social-bloque__cabecera">
 
                                 <div>
+
+                                    <span class="perfil-social-bloque__kicker">
+                                        Tu gente
+                                    </span>
+
                                     <h3>
                                         Mis conexiones
                                     </h3>
 
                                     <p>
-                                        Personas con las que ya has conectado en Suralia.
+                                        Personas con las que ya puedes hablar y organizar planes.
                                     </p>
+
                                 </div>
 
                             </div>
 
                             <div
+                                class="perfil-social-lista perfil-social-lista--conexiones"
                                 id="lista-conexiones-aceptadas"
                                 aria-live="polite"
                                 aria-atomic="false"
                             ></div>
 
                             <div
-                                class="estado-vacio estado-vacio--pequeno"
+                                class="estado-vacio estado-vacio--pequeno perfil-social-vacio"
                                 id="estado-vacio-conexiones-aceptadas"
                                 role="status"
                             >
 
                                 <span class="estado-vacio__icono">
-                                    <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+                                    <i
+                                        class="fa-solid fa-user-group"
+                                        aria-hidden="true"
+                                    ></i>
                                 </span>
 
                                 <h3>
-                                    Todavía no tienes conexiones
+                                    Tu círculo empieza aquí
                                 </h3>
 
                                 <p>
-                                    Las solicitudes aceptadas aparecerán en esta sección.
+                                    Cuando aceptes una conexión, aparecerá aquí
+                                    para que podáis seguir hablando.
+                                </p>
+
+                                <button
+                                    type="button"
+                                    class="boton-auth"
+                                    data-ir-seccion="afinidades"
+                                >
+                                    Descubrir afinidades
+                                </button>
+
+                            </div>
+
+                        </section>
+
+
+                        <!-- SOLICITUDES ENVIADAS -->
+
+                        <section class="perfil-social-bloque perfil-social-bloque--enviadas">
+
+                            <div class="perfil-social-bloque__cabecera">
+
+                                <div>
+
+                                    <span class="perfil-social-bloque__kicker">
+                                        En espera
+                                    </span>
+
+                                    <h3>
+                                        Solicitudes enviadas
+                                    </h3>
+
+                                    <p>
+                                        Consulta a quién has enviado una solicitud
+                                        y su estado actual.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            <div
+                                class="perfil-social-lista perfil-social-lista--enviadas"
+                                id="lista-solicitudes-enviadas"
+                                aria-live="polite"
+                                aria-atomic="false"
+                            ></div>
+
+                            <div
+                                class="estado-vacio estado-vacio--pequeno perfil-social-vacio"
+                                id="estado-vacio-solicitudes-enviadas"
+                                role="status"
+                            >
+
+                                <span class="estado-vacio__icono">
+                                    <i
+                                        class="fa-regular fa-paper-plane"
+                                        aria-hidden="true"
+                                    ></i>
+                                </span>
+
+                                <h3>
+                                    No tienes solicitudes en espera
+                                </h3>
+
+                                <p>
+                                    Puedes enviar una solicitud desde el perfil
+                                    público de otra persona.
                                 </p>
 
                             </div>
 
-                        </div>
+                        </section>
 
                     </section>
 
                     <!-- =================================================
-                         PLANES PUBLICADOS
+                         MIS PLANES · CREADOS V2.8
                     ================================================== -->
 
                     <section
@@ -1340,9 +1816,8 @@
                         aria-hidden="true"
                     >
 
-                        
                         <nav
-                            class="perfil-submenu"
+                            class="perfil-submenu perfil-submenu--planes"
                             aria-label="Mis planes"
                         >
                             <button
@@ -1350,7 +1825,10 @@
                                 class="perfil-submenu__enlace"
                                 data-ir-seccion="reservas"
                             >
-                                <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+                                <i
+                                    class="fa-solid fa-calendar-check"
+                                    aria-hidden="true"
+                                ></i>
                                 Actividad
                             </button>
 
@@ -1359,7 +1837,10 @@
                                 class="perfil-submenu__enlace"
                                 data-ir-seccion="favoritos"
                             >
-                                <i class="fa-regular fa-heart" aria-hidden="true"></i>
+                                <i
+                                    class="fa-regular fa-heart"
+                                    aria-hidden="true"
+                                ></i>
                                 Guardados
                             </button>
 
@@ -1368,48 +1849,62 @@
                                 class="perfil-submenu__enlace"
                                 data-ir-seccion="publicados"
                             >
-                                <i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>
-                                Publicados
+                                <i
+                                    class="fa-regular fa-calendar-plus"
+                                    aria-hidden="true"
+                                ></i>
+                                Creados
                             </button>
                         </nav>
 
-<div class="perfil-seccion__cabecera">
+
+                        <section class="mis-planes-cabecera-seccion">
 
                             <div>
 
                                 <span class="subtitulo">
-                                    Mis planes
+                                    Organiza
                                 </span>
 
                                 <h2>
-                                    Publicados
+                                    Planes creados
                                 </h2>
 
                                 <p>
-                                    Tus planes publicados, pendientes y borradores.
+                                    Gestiona lo que has publicado, lo que está en
+                                    revisión y los borradores que aún quieres terminar.
                                 </p>
 
                             </div>
 
                             <a
                                 href="publicar-plan.html"
-                                class="boton-principal-pequeno"
+                                class="mis-planes-hero__boton mis-planes-hero__boton--principal"
                             >
-                                <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                                Publicar un plan
+                                <i
+                                    class="fa-solid fa-plus"
+                                    aria-hidden="true"
+                                ></i>
+                                Crear un plan
                             </a>
 
-                        </div>
+                        </section>
 
-                        <div class="filtros-publicaciones">
+
+                        <div class="filtros-publicaciones filtros-publicaciones--mis-planes">
 
                             <button
                                 type="button"
                                 class="filtro-publicacion activo"
-                                data-filtro-publicacion="todos" aria-pressed="true"
+                                data-filtro-publicacion="todos"
+                                aria-pressed="true"
                             >
                                 Todos
-                                <span id="contador-publicaciones" aria-live="polite">
+
+                                <span
+                                    id="contador-publicaciones"
+                                    aria-live="polite"
+                                >
                                     0
                                 </span>
                             </button>
@@ -1417,10 +1912,15 @@
                             <button
                                 type="button"
                                 class="filtro-publicacion"
-                                data-filtro-publicacion="pendiente" aria-pressed="false"
+                                data-filtro-publicacion="pendiente"
+                                aria-pressed="false"
                             >
-                                Pendientes
-                                <span id="contador-pendientes" aria-live="polite">
+                                En revisión
+
+                                <span
+                                    id="contador-pendientes"
+                                    aria-live="polite"
+                                >
                                     0
                                 </span>
                             </button>
@@ -1428,44 +1928,63 @@
                             <button
                                 type="button"
                                 class="filtro-publicacion"
-                                data-filtro-publicacion="borrador" aria-pressed="false"
+                                data-filtro-publicacion="borrador"
+                                aria-pressed="false"
                             >
                                 Borradores
-                                <span id="contador-borradores" aria-live="polite">
+
+                                <span
+                                    id="contador-borradores"
+                                    aria-live="polite"
+                                >
                                     0
                                 </span>
                             </button>
 
                         </div>
 
-                        <div
-                            class="lista-publicaciones"
-                            id="lista-publicaciones" aria-live="polite" aria-atomic="false"
-                        ></div>
 
                         <div
-                            class="estado-vacio"
-                            id="estado-vacio-publicaciones" role="status" aria-live="polite" aria-atomic="true"
+                            class="lista-publicaciones lista-publicaciones--mis-planes"
+                            id="lista-publicaciones"
+                            aria-live="polite"
+                            aria-atomic="false"
+                        ></div>
+
+
+                        <div
+                            class="estado-vacio mis-planes-vacio"
+                            id="estado-vacio-publicaciones"
+                            role="status"
+                            aria-live="polite"
+                            aria-atomic="true"
                         >
 
                             <span class="estado-vacio__icono">
-                                <i class="fa-regular fa-calendar-plus" aria-hidden="true"></i>
+                                <i
+                                    class="fa-regular fa-calendar-plus"
+                                    aria-hidden="true"
+                                ></i>
+                            </span>
+
+                            <span class="subtitulo">
+                                Empieza a organizar
                             </span>
 
                             <h3>
-                                Todavía no has publicado ningún plan
+                                Todavía no has creado ningún plan
                             </h3>
 
                             <p>
-                                Comparte una actividad y conecta con personas
-                                interesadas en nuevas experiencias.
+                                Comparte una actividad y reúne a personas que
+                                quieran vivir la misma experiencia.
                             </p>
 
                             <a
                                 href="publicar-plan.html"
                                 class="boton-auth"
                             >
-                                Publicar mi primer plan
+                                Crear mi primer plan
                             </a>
 
                         </div>

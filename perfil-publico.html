@@ -290,6 +290,24 @@
 
                             </div>
 
+                            <div
+                                class="perfil-publico-hero__intereses oculto"
+                                id="perfil-publico-hero-intereses"
+                                aria-label="Intereses principales"
+                            ></div>
+
+                            <p
+                                class="perfil-publico-hero__busca oculto"
+                                id="perfil-publico-hero-busca"
+                            >
+                                <i
+                                    class="fa-solid fa-compass"
+                                    aria-hidden="true"
+                                ></i>
+
+                                <span></span>
+                            </p>
+
                         </div>
 
                     </div>
@@ -299,6 +317,29 @@
             </section>
 
             <section class="perfil-publico-contenido">
+
+                <div class="contenedor">
+
+                    <div class="perfil-publico-resumen-superior">
+
+                        <div>
+                            <span class="subtitulo">
+                                Conoce un poco más
+                            </span>
+
+                            <h2>
+                                Perfil social
+                            </h2>
+                        </div>
+
+                        <p>
+                            Información compartida por esta persona para
+                            encontrar gente con intereses y planes en común.
+                        </p>
+
+                    </div>
+
+                </div>
 
                 <div class="contenedor perfil-publico-grid">
 
@@ -896,28 +937,91 @@
         id="modal-foto-publica"
         role="dialog"
         aria-modal="true"
-        aria-label="Fotografía ampliada"
+        aria-labelledby="titulo-modal-foto-publica"
         aria-hidden="true"
     >
+        <div
+            class="modal-foto-publica__fondo"
+            id="fondo-modal-foto-publica"
+        ></div>
 
-        <button
-            type="button"
-            class="modal-foto-publica__cerrar"
-            id="cerrar-modal-foto-publica"
-            aria-label="Cerrar fotografía"
-        >
-            <i
-                class="fa-solid fa-xmark"
-                aria-hidden="true"
-            ></i>
-        </button>
+        <section class="modal-foto-publica__panel">
 
-        <img
-            src=""
-            alt="Fotografía ampliada del perfil"
-            id="imagen-modal-foto-publica"
-        >
+            <div class="modal-foto-publica__barra">
+                <div>
+                    <h2 id="titulo-modal-foto-publica">
+                        Fotografía del perfil
+                    </h2>
 
+                    <span
+                        id="contador-modal-foto-publica"
+                        aria-live="polite"
+                    >
+                        1 / 1
+                    </span>
+                </div>
+
+                <button
+                    type="button"
+                    class="modal-foto-publica__cerrar"
+                    id="cerrar-modal-foto-publica"
+                    aria-label="Cerrar fotografía"
+                >
+                    <i
+                        class="fa-solid fa-xmark"
+                        aria-hidden="true"
+                    ></i>
+                </button>
+            </div>
+
+            <div
+                class="modal-foto-publica__imagen-wrap"
+                id="zona-modal-foto-publica"
+            >
+                <button
+                    type="button"
+                    class="modal-foto-publica__navegacion modal-foto-publica__navegacion--anterior"
+                    id="foto-publica-anterior"
+                    aria-label="Ver fotografía anterior"
+                >
+                    <i
+                        class="fa-solid fa-chevron-left"
+                        aria-hidden="true"
+                    ></i>
+                </button>
+
+                <img
+                    src=""
+                    alt="Fotografía ampliada del perfil"
+                    id="imagen-modal-foto-publica"
+                >
+
+                <button
+                    type="button"
+                    class="modal-foto-publica__navegacion modal-foto-publica__navegacion--siguiente"
+                    id="foto-publica-siguiente"
+                    aria-label="Ver fotografía siguiente"
+                >
+                    <i
+                        class="fa-solid fa-chevron-right"
+                        aria-hidden="true"
+                    ></i>
+                </button>
+            </div>
+
+            <p class="modal-foto-publica__ayuda">
+                <span>
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    Usa las flechas para cambiar de foto
+                </span>
+
+                <span>
+                    Esc para cerrar
+                </span>
+            </p>
+
+        </section>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

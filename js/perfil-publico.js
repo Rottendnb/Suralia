@@ -257,6 +257,31 @@ const cerrarModalFoto =
         "#cerrar-modal-foto-publica"
     );
 
+const fondoModalFotoPublica =
+    document.querySelector(
+        "#fondo-modal-foto-publica"
+    );
+
+const contadorModalFotoPublica =
+    document.querySelector(
+        "#contador-modal-foto-publica"
+    );
+
+const fotoPublicaAnterior =
+    document.querySelector(
+        "#foto-publica-anterior"
+    );
+
+const fotoPublicaSiguiente =
+    document.querySelector(
+        "#foto-publica-siguiente"
+    );
+
+const zonaModalFotoPublica =
+    document.querySelector(
+        "#zona-modal-foto-publica"
+    );
+
 
 const bloqueConexionPerfil =
     document.querySelector(
@@ -386,6 +411,18 @@ let usuarioEstaBloqueado =
     false;
 
 let elementoFocoAnterior =
+    null;
+
+let fotosPerfilPublicoActuales =
+    [];
+
+let indiceFotoPublicaActual =
+    0;
+
+let posicionTactilInicialFotoPublica =
+    null;
+
+let focoAnteriorFotoPublica =
     null;
 
 
@@ -856,18 +893,81 @@ function crearEtiquetas(
 }
 
 
-function abrirFotoPublica(
-    url
-) {
+function actualizarFotoPublicaVisor() {
     if (
-        !modalFoto ||
-        !imagenModalFoto
+        !imagenModalFoto ||
+        fotosPerfilPublicoActuales.length === 0
     ) {
         return;
     }
 
+    if (indiceFotoPublicaActual < 0) {
+        indiceFotoPublicaActual =
+            fotosPerfilPublicoActuales.length - 1;
+    }
+
+    if (
+        indiceFotoPublicaActual >=
+        fotosPerfilPublicoActuales.length
+    ) {
+        indiceFotoPublicaActual = 0;
+    }
+
+    const foto =
+        fotosPerfilPublicoActuales[
+            indiceFotoPublicaActual
+        ];
+
     imagenModalFoto.src =
-        url;
+        foto.url || "";
+
+    imagenModalFoto.alt =
+        foto.principal
+            ? `Fotografía principal de ${nombrePerfilPublico}`
+            : `Fotografía ${indiceFotoPublicaActual + 1} de ${nombrePerfilPublico}`;
+
+    if (contadorModalFotoPublica) {
+        contadorModalFotoPublica.textContent =
+            `${indiceFotoPublicaActual + 1} / ${fotosPerfilPublicoActuales.length}`;
+    }
+
+    const hayVarias =
+        fotosPerfilPublicoActuales.length > 1;
+
+    if (fotoPublicaAnterior) {
+        fotoPublicaAnterior.hidden =
+            !hayVarias;
+    }
+
+    if (fotoPublicaSiguiente) {
+        fotoPublicaSiguiente.hidden =
+            !hayVarias;
+    }
+}
+
+
+function abrirFotoPublica(
+    indice = 0
+) {
+    if (
+        !modalFoto ||
+        !imagenModalFoto ||
+        fotosPerfilPublicoActuales.length === 0
+    ) {
+        return;
+    }
+
+    focoAnteriorFotoPublica =
+        document.activeElement;
+
+    indiceFotoPublicaActual =
+        Number.isFinite(
+            Number(indice)
+        )
+            ? Number(indice)
+            : 0;
+
+    actualizarFotoPublicaVisor();
 
     modalFoto.classList.add(
         "visible"
@@ -878,8 +978,9 @@ function abrirFotoPublica(
         "false"
     );
 
-    document.body.style.overflow =
-        "hidden";
+    document.body.classList.add(
+        "modal-abierta"
+    );
 
     cerrarModalFoto?.focus();
 }
@@ -905,8 +1006,32 @@ function cerrarFotoPublica() {
     imagenModalFoto.src =
         "";
 
-    document.body.style.overflow =
-        "";
+    document.body.classList.remove(
+        "modal-abierta"
+    );
+
+    posicionTactilInicialFotoPublica =
+        null;
+
+    focoAnteriorFotoPublica?.focus?.();
+    focoAnteriorFotoPublica =
+        null;
+}
+
+
+function cambiarFotoPublica(
+    direccion
+) {
+    if (
+        fotosPerfilPublicoActuales.length <= 1
+    ) {
+        return;
+    }
+
+    indiceFotoPublicaActual +=
+        direccion;
+
+    actualizarFotoPublicaVisor();
 }
 
 
@@ -940,6 +1065,9 @@ function mostrarGaleria(
                     )
             )
             : [];
+
+    fotosPerfilPublicoActuales =
+        lista;
 
     if (
         !galeria ||
@@ -979,9 +1107,7 @@ function mostrarGaleria(
                                 ? "perfil-publico-galeria__foto--principal"
                                 : ""
                         }"
-                        data-foto-publica="${escaparHTML(
-                            foto.url
-                        )}"
+                        data-foto-publica-indice="${indice}"
                         aria-label="Ampliar fotografía ${indice + 1}"
                     >
                         <img
@@ -1009,29 +1135,91 @@ function mostrarGaleria(
 
     document
         .querySelectorAll(
-            "[data-foto-publica]"
+            "[data-foto-publica-indice]"
         )
         .forEach(
             (boton) => {
                 boton.addEventListener(
                     "click",
                     () => {
-                        const imagen =
-                            boton.querySelector(
-                                "img"
-                            );
-
                         abrirFotoPublica(
-                            imagen?.currentSrc ||
-                            imagen?.src ||
-                            boton.dataset
-                                .fotoPublica ||
-                            ""
+                            Number(
+                                boton.dataset
+                                    .fotoPublicaIndice
+                            )
                         );
                     }
                 );
             }
         );
+}
+
+
+function activarFotoPrincipalPublica() {
+    const fotoPrincipal =
+        document.querySelector(
+            "#perfil-publico-foto-principal"
+        );
+
+    if (
+        !fotoPrincipal ||
+        fotosPerfilPublicoActuales.length === 0
+    ) {
+        return;
+    }
+
+    const indicePrincipal =
+        fotosPerfilPublicoActuales.findIndex(
+            (foto) =>
+                Boolean(
+                    foto.principal
+                )
+        );
+
+    const indice =
+        indicePrincipal >= 0
+            ? indicePrincipal
+            : 0;
+
+    fotoPrincipal.classList.add(
+        "perfil-publico-identidad__foto--ampliable"
+    );
+
+    fotoPrincipal.setAttribute(
+        "role",
+        "button"
+    );
+
+    fotoPrincipal.setAttribute(
+        "tabindex",
+        "0"
+    );
+
+    fotoPrincipal.setAttribute(
+        "aria-label",
+        "Ampliar fotografía principal"
+    );
+
+    fotoPrincipal.onclick =
+        () => {
+            abrirFotoPublica(
+                indice
+            );
+        };
+
+    fotoPrincipal.onkeydown =
+        (evento) => {
+            if (
+                evento.key === "Enter" ||
+                evento.key === " "
+            ) {
+                evento.preventDefault();
+
+                abrirFotoPublica(
+                    indice
+                );
+            }
+        };
 }
 
 
@@ -1984,6 +2172,108 @@ async function prepararFotosPerfilPublico(
 }
 
 
+function actualizarResumenHeroPerfilPublico(
+    datos = {}
+) {
+    const interesesHero =
+        document.querySelector(
+            "#perfil-publico-hero-intereses"
+        );
+
+    const buscaHero =
+        document.querySelector(
+            "#perfil-publico-hero-busca"
+        );
+
+    if (interesesHero) {
+        const intereses =
+            Array.isArray(
+                datos?.intereses
+            )
+                ? datos.intereses
+                    .filter(Boolean)
+                    .slice(0, 4)
+                : [];
+
+        interesesHero.innerHTML =
+            "";
+
+        if (intereses.length > 0) {
+            intereses.forEach(
+                (interes) => {
+                    const etiqueta =
+                        document.createElement(
+                            "span"
+                        );
+
+                    etiqueta.textContent =
+                        textosIntereses[
+                            interes
+                        ] ||
+                        String(interes);
+
+                    interesesHero.appendChild(
+                        etiqueta
+                    );
+                }
+            );
+
+            interesesHero.classList.remove(
+                "oculto"
+            );
+        } else {
+            interesesHero.classList.add(
+                "oculto"
+            );
+        }
+    }
+
+    if (buscaHero) {
+        const listaBusca =
+            Array.isArray(
+                datos?.busca
+            )
+                ? datos.busca
+                    .filter(Boolean)
+                : [];
+
+        const textoBusca =
+            listaBusca.length > 0
+                ? listaBusca
+                    .slice(0, 2)
+                    .map(
+                        (valor) =>
+                            textosBusca[
+                                valor
+                            ] ||
+                            String(valor)
+                    )
+                    .join(" · ")
+                : "";
+
+        const span =
+            buscaHero.querySelector(
+                "span"
+            );
+
+        if (textoBusca) {
+            if (span) {
+                span.textContent =
+                    textoBusca;
+            }
+
+            buscaHero.classList.remove(
+                "oculto"
+            );
+        } else {
+            buscaHero.classList.add(
+                "oculto"
+            );
+        }
+    }
+}
+
+
 function mostrarPerfil(
     datos
 ) {
@@ -2067,6 +2357,10 @@ function mostrarPerfil(
         datos.ocupacion
     );
 
+    actualizarResumenHeroPerfilPublico(
+        datos
+    );
+
     crearEtiquetas(
         "#perfil-publico-busca",
         datos?.busca,
@@ -2091,6 +2385,8 @@ function mostrarPerfil(
     mostrarGaleria(
         datos?.fotos
     );
+
+    activarFotoPrincipalPublica();
 
     perfilCarga?.classList.add(
         "oculto"
@@ -2478,15 +2774,84 @@ cerrarModalFoto?.addEventListener(
 );
 
 
-modalFoto?.addEventListener(
+fondoModalFotoPublica?.addEventListener(
     "click",
+    cerrarFotoPublica
+);
+
+
+fotoPublicaAnterior?.addEventListener(
+    "click",
+    () => {
+        cambiarFotoPublica(
+            -1
+        );
+    }
+);
+
+
+fotoPublicaSiguiente?.addEventListener(
+    "click",
+    () => {
+        cambiarFotoPublica(
+            1
+        );
+    }
+);
+
+
+zonaModalFotoPublica?.addEventListener(
+    "touchstart",
     (evento) => {
         if (
-            evento.target ===
-            modalFoto
+            evento.touches.length !== 1
         ) {
-            cerrarFotoPublica();
+            return;
         }
+
+        posicionTactilInicialFotoPublica =
+            evento.touches[0].clientX;
+    },
+    {
+        passive: true
+    }
+);
+
+
+zonaModalFotoPublica?.addEventListener(
+    "touchend",
+    (evento) => {
+        if (
+            posicionTactilInicialFotoPublica === null ||
+            evento.changedTouches.length !== 1
+        ) {
+            return;
+        }
+
+        const posicionFinal =
+            evento.changedTouches[0].clientX;
+
+        const diferencia =
+            posicionFinal -
+            posicionTactilInicialFotoPublica;
+
+        posicionTactilInicialFotoPublica =
+            null;
+
+        if (
+            Math.abs(diferencia) < 45
+        ) {
+            return;
+        }
+
+        cambiarFotoPublica(
+            diferencia > 0
+                ? -1
+                : 1
+        );
+    },
+    {
+        passive: true
     }
 );
 
@@ -2525,14 +2890,43 @@ document.addEventListener(
         }
 
         if (
-            evento.key ===
-                "Escape" &&
             modalFoto?.classList.contains(
                 "visible"
             )
         ) {
-            cerrarFotoPublica();
-            return;
+            if (
+                evento.key ===
+                "Escape"
+            ) {
+                cerrarFotoPublica();
+                return;
+            }
+
+            if (
+                evento.key ===
+                "ArrowLeft"
+            ) {
+                evento.preventDefault();
+
+                cambiarFotoPublica(
+                    -1
+                );
+
+                return;
+            }
+
+            if (
+                evento.key ===
+                "ArrowRight"
+            ) {
+                evento.preventDefault();
+
+                cambiarFotoPublica(
+                    1
+                );
+
+                return;
+            }
         }
 
         limitarFocoModal(

@@ -523,6 +523,39 @@ function cambiarSeccion(
         );
     });
 
+    /*
+       Mantiene sincronizado el submenú interno de Social
+       para que Conexiones / Afinidades muestren claramente
+       cuál es la sección activa.
+    */
+    document
+        .querySelectorAll(
+            ".perfil-submenu [data-ir-seccion]"
+        )
+        .forEach(
+            (enlace) => {
+                const esActivo =
+                    enlace.dataset.irSeccion ===
+                    nombreSeccion;
+
+                enlace.classList.toggle(
+                    "activo",
+                    esActivo
+                );
+
+                if (esActivo) {
+                    enlace.setAttribute(
+                        "aria-current",
+                        "page"
+                    );
+                } else {
+                    enlace.removeAttribute(
+                        "aria-current"
+                    );
+                }
+            }
+        );
+
     if (
         window.location.hash !==
         `#${nombreSeccion}`
@@ -4347,6 +4380,39 @@ const contadorReservasPerfil = document.querySelector(
     "#contador-reservas-perfil"
 );
 
+const contadorProximosMisPlanes =
+    document.querySelector(
+        "#contador-proximos-mis-planes"
+    );
+
+const contadorRealizadosMisPlanes =
+    document.querySelector(
+        "#contador-realizados-mis-planes"
+    );
+
+const contadorGuardadosMisPlanes =
+    document.querySelector(
+        "#contador-guardados-mis-planes"
+    );
+
+const contadorCreadosMisPlanes =
+    document.querySelector(
+        "#contador-creados-mis-planes"
+    );
+
+const contadorFiltroProximos =
+    document.querySelector(
+        "#contador-filtro-proximos"
+    );
+
+const contadorFiltroRealizados =
+    document.querySelector(
+        "#contador-filtro-realizados"
+    );
+
+let filtroActividadPerfil =
+    "proximos";
+
 let reservasSupabasePerfil = [];
 let reservasSupabaseCargadas = false;
 
@@ -6883,6 +6949,34 @@ function crearReservaHTML(
     `;
 }
 
+function actualizarFiltrosActividadPerfil() {
+    document
+        .querySelectorAll(
+            "[data-filtro-actividad-perfil]"
+        )
+        .forEach(
+            (boton) => {
+                const esActivo =
+                    boton.dataset
+                        .filtroActividadPerfil ===
+                    filtroActividadPerfil;
+
+                boton.classList.toggle(
+                    "activo",
+                    esActivo
+                );
+
+                boton.setAttribute(
+                    "aria-pressed",
+                    String(
+                        esActivo
+                    )
+                );
+            }
+        );
+}
+
+
 function mostrarReservasPerfil() {
     const reservas =
         obtenerReservasUsuario();
@@ -6895,9 +6989,45 @@ function mostrarReservasPerfil() {
                 )
         );
 
+    const reservasRealizadas =
+        reservas.filter(
+            (reserva) =>
+                reservaYaRealizadaPerfil(
+                    reserva
+                )
+        );
+
     if (contadorReservasPerfil) {
         contadorReservasPerfil.textContent =
             reservas.length;
+    }
+
+    if (contadorProximosMisPlanes) {
+        contadorProximosMisPlanes.textContent =
+            String(
+                reservasProximas.length
+            );
+    }
+
+    if (contadorRealizadosMisPlanes) {
+        contadorRealizadosMisPlanes.textContent =
+            String(
+                reservasRealizadas.length
+            );
+    }
+
+    if (contadorFiltroProximos) {
+        contadorFiltroProximos.textContent =
+            String(
+                reservasProximas.length
+            );
+    }
+
+    if (contadorFiltroRealizados) {
+        contadorFiltroRealizados.textContent =
+            String(
+                reservasRealizadas.length
+            );
     }
 
     if (
@@ -6943,6 +7073,8 @@ function mostrarReservasPerfil() {
             );
         }
 
+        actualizarFiltrosActividadPerfil();
+
         return;
     }
 
@@ -6971,7 +7103,8 @@ function mostrarReservasPerfil() {
                 <h3>No tienes próximas actividades</h3>
 
                 <p>
-                    Tus experiencias anteriores siguen disponibles abajo para que puedas valorarlas y conectar con asistentes.
+                    Tus experiencias anteriores siguen disponibles para
+                    valorar y conectar con asistentes.
                 </p>
 
                 <a
@@ -6985,17 +7118,107 @@ function mostrarReservasPerfil() {
         `;
     }
 
-    listaReservasPerfil.innerHTML =
-        reservas
-            .map(
-                crearReservaHTML
-            )
-            .join("");
+    const reservasVisibles =
+        filtroActividadPerfil ===
+            "realizados"
+            ? reservasRealizadas
+            : reservasProximas;
+
+    if (
+        reservasVisibles.length ===
+        0
+    ) {
+        const realizados =
+            filtroActividadPerfil ===
+            "realizados";
+
+        listaReservasPerfil.innerHTML = `
+            <div class="estado-vacio estado-vacio--pequeno mis-planes-filtro-vacio">
+
+                <span class="estado-vacio__icono">
+                    <i class="${
+                        realizados
+                            ? "fa-regular fa-calendar-check"
+                            : "fa-regular fa-calendar"
+                    }"></i>
+                </span>
+
+                <h3>
+                    ${
+                        realizados
+                            ? "Todavía no tienes actividades realizadas"
+                            : "No tienes próximas actividades"
+                    }
+                </h3>
+
+                <p>
+                    ${
+                        realizados
+                            ? "Cuando pase la fecha de una actividad aparecerá aquí."
+                            : "Explora Suralia y encuentra algo que te apetezca hacer."
+                    }
+                </p>
+
+                ${
+                    realizados
+                        ? ""
+                        : `
+                            <a
+                                href="planes.html"
+                                class="boton-principal-pequeno"
+                            >
+                                Explorar planes
+                            </a>
+                        `
+                }
+
+            </div>
+        `;
+    } else {
+        listaReservasPerfil.innerHTML =
+            reservasVisibles
+                .map(
+                    crearReservaHTML
+                )
+                .join("");
+    }
+
+    actualizarFiltrosActividadPerfil();
 
     activarBotonesCancelarReserva();
     activarBotonesValorarReserva();
     activarBotonesConfirmarEntradaExternaPerfil();
 }
+
+document
+    .querySelectorAll(
+        "[data-filtro-actividad-perfil]"
+    )
+    .forEach(
+        (boton) => {
+            boton.addEventListener(
+                "click",
+                () => {
+                    const filtro =
+                        boton.dataset
+                            .filtroActividadPerfil;
+
+                    if (
+                        filtro !== "proximos" &&
+                        filtro !== "realizados"
+                    ) {
+                        return;
+                    }
+
+                    filtroActividadPerfil =
+                        filtro;
+
+                    mostrarReservasPerfil();
+                }
+            );
+        }
+    );
+
 
 function activarBotonesCancelarReserva() {
     document
@@ -8044,6 +8267,13 @@ function mostrarFavoritosPerfil() {
             favoritos.length;
     }
 
+    if (contadorGuardadosMisPlanes) {
+        contadorGuardadosMisPlanes.textContent =
+            String(
+                favoritos.length
+            );
+    }
+
     if (
         !listaFavoritosPerfil ||
         !estadoVacioFavoritos
@@ -8105,6 +8335,11 @@ const estadoVacioAfinidades =
 const contadorAfinidadesPerfil =
     document.querySelector(
         "#contador-afinidades-perfil"
+    );
+
+const contadorPersonasAfinidadesPerfil =
+    document.querySelector(
+        "#contador-personas-afinidades-perfil"
     );
 
 let afinidadesPerfil = [];
@@ -8205,9 +8440,23 @@ function crearAfinidadHTML(afinidad) {
             )
         );
 
+    const totalPersonas =
+        Math.max(
+            0,
+            Number(
+                afinidad.total_personas ||
+                0
+            )
+        );
+
+    const textoPersonas =
+        totalPersonas === 1
+            ? "1 persona disponible"
+            : `${totalPersonas} personas disponibles`;
+
     return `
         <article
-            class="afinidad-item"
+            class="afinidad-item afinidad-item--descubre"
             data-afinidad-plan-id="${planId}"
         >
 
@@ -8224,23 +8473,32 @@ function crearAfinidadHTML(afinidad) {
                 >
 
                 <span class="afinidad-item__estado">
-                    <i class="fa-solid fa-user-check"></i>
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
                     Afinidad activa
+                </span>
+
+                <span class="afinidad-item__personas-imagen">
+                    <i class="fa-solid fa-people-group"></i>
+                    ${textoPersonas}
                 </span>
 
             </div>
 
             <div class="afinidad-item__contenido">
 
-                <div>
+                <div class="afinidad-item__cabecera-social">
 
-                    <span class="subtitulo">
-                        Personas con intereses parecidos
-                    </span>
+                    <div>
 
-                    <h3>
-                        ${titulo}
-                    </h3>
+                        <span class="afinidad-item__kicker">
+                            Un plan que os conecta
+                        </span>
+
+                        <h3>
+                            ${titulo}
+                        </h3>
+
+                    </div>
 
                 </div>
 
@@ -8258,31 +8516,38 @@ function crearAfinidadHTML(afinidad) {
 
                 </div>
 
-                <p>
-                    Has indicado que te gustaría conocer gente
-                    para realizar este plan.
-                </p>
+                <div class="afinidad-item__motivo">
 
-                <div class="afinidad-item__coincidencias">
-
-                    <span class="afinidad-item__coincidencias-icono">
-                        <i class="fa-solid fa-people-group"></i>
+                    <span class="afinidad-item__motivo-icono">
+                        <i class="fa-solid fa-link"></i>
                     </span>
 
                     <div>
                         <strong>
-                            ${
-                                Number(afinidad.total_personas || 0)
-                            }
-                            ${
-                                Number(afinidad.total_personas || 0) === 1
-                                    ? "persona interesada"
-                                    : "personas interesadas"
-                            }
+                            Ya compartís una intención
+                        </strong>
+
+                        <p>
+                            Tú y estas personas habéis indicado que os gustaría
+                            conocer gente alrededor de esta actividad.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="afinidad-item__coincidencias">
+
+                    <span class="afinidad-item__coincidencias-icono">
+                        <i class="fa-solid fa-user-group"></i>
+                    </span>
+
+                    <div>
+                        <strong>
+                            ${textoPersonas}
                         </strong>
 
                         <span>
-                            Han activado la afinidad para este plan.
+                            Perfiles visibles que también han activado esta afinidad.
                         </span>
                     </div>
 
@@ -8290,32 +8555,32 @@ function crearAfinidadHTML(afinidad) {
 
                 <div class="afinidad-item__acciones">
 
-                    <a
-                        href="${enlace}"
-                        class="boton-principal-pequeno"
-                    >
-                        Ver actividad
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-
                     <button
                         type="button"
-                        class="boton-ver-personas-afinidad"
+                        class="boton-ver-personas-afinidad boton-ver-personas-afinidad--principal"
                         data-ver-personas-afinidad="${planId}"
                         aria-expanded="false"
                         aria-controls="personas-afinidad-${planId}"
                     >
                         <i class="fa-solid fa-people-group"></i>
-                        Ver personas interesadas
+                        Descubrir personas
                     </button>
+
+                    <a
+                        href="${enlace}"
+                        class="boton-principal-pequeno afinidad-item__ver-plan"
+                    >
+                        <i class="fa-regular fa-calendar"></i>
+                        Ver actividad
+                    </a>
 
                     <button
                         type="button"
-                        class="boton-desactivar-afinidad"
+                        class="boton-desactivar-afinidad afinidad-item__desactivar"
                         data-desactivar-afinidad="${planId}"
                     >
-                        <i class="fa-solid fa-user-minus"></i>
-                        Desactivar afinidad
+                        <i class="fa-solid fa-xmark"></i>
+                        Desactivar
                     </button>
 
                 </div>
@@ -8333,11 +8598,84 @@ function crearAfinidadHTML(afinidad) {
     `;
 }
 
+function mostrarCargandoAfinidadesPerfil() {
+    if (
+        !listaAfinidadesPerfil ||
+        !estadoVacioAfinidades
+    ) {
+        return;
+    }
+
+    estadoVacioAfinidades.classList.add(
+        "oculto"
+    );
+
+    listaAfinidadesPerfil.classList.remove(
+        "oculta"
+    );
+
+    listaAfinidadesPerfil.innerHTML = `
+        <article class="suralia-skeleton suralia-skeleton--afinidad">
+            <span class="suralia-skeleton__imagen"></span>
+
+            <div class="suralia-skeleton__contenido">
+                <span class="suralia-skeleton__linea suralia-skeleton__linea--corta"></span>
+                <span class="suralia-skeleton__linea suralia-skeleton__linea--titulo"></span>
+                <span class="suralia-skeleton__linea"></span>
+                <span class="suralia-skeleton__linea suralia-skeleton__linea--media"></span>
+
+                <div class="suralia-skeleton__caja"></div>
+
+                <div class="suralia-skeleton__acciones">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </article>
+
+        <article class="suralia-skeleton suralia-skeleton--afinidad suralia-skeleton--secundario">
+            <span class="suralia-skeleton__imagen"></span>
+
+            <div class="suralia-skeleton__contenido">
+                <span class="suralia-skeleton__linea suralia-skeleton__linea--corta"></span>
+                <span class="suralia-skeleton__linea suralia-skeleton__linea--titulo"></span>
+                <span class="suralia-skeleton__linea"></span>
+                <span class="suralia-skeleton__linea suralia-skeleton__linea--media"></span>
+            </div>
+        </article>
+    `;
+}
+
 
 function mostrarAfinidadesPerfil() {
     if (contadorAfinidadesPerfil) {
         contadorAfinidadesPerfil.textContent =
             afinidadesPerfil.length;
+    }
+
+    if (contadorPersonasAfinidadesPerfil) {
+        const totalPersonas =
+            afinidadesPerfil.reduce(
+                (
+                    total,
+                    afinidad
+                ) =>
+                    total +
+                    Math.max(
+                        0,
+                        Number(
+                            afinidad.total_personas ||
+                            0
+                        )
+                    ),
+                0
+            );
+
+        contadorPersonasAfinidadesPerfil.textContent =
+            String(
+                totalPersonas
+            );
     }
 
     if (
@@ -8598,6 +8936,8 @@ async function cargarAfinidadesPerfil() {
         return;
     }
 
+    mostrarCargandoAfinidadesPerfil();
+
     try {
         const usuario =
             await obtenerUsuarioAfinidades();
@@ -8786,6 +9126,55 @@ function textoInteresesComunes(
 }
 
 
+async function prepararFotosPersonasAfinidad(
+    personas = []
+) {
+    try {
+        const helper =
+            await asegurarHelperFotosPerfilSocial();
+
+        return await Promise.all(
+            personas.map(
+                async (
+                    persona
+                ) => {
+                    const fotoOriginal =
+                        String(
+                            persona?.foto_principal ||
+                            ""
+                        ).trim();
+
+                    if (!fotoOriginal) {
+                        return persona;
+                    }
+
+                    const fotoVisual =
+                        await helper.obtenerUrl({
+                            fotoUrl:
+                                fotoOriginal
+                        });
+
+                    return {
+                        ...persona,
+
+                        foto_principal:
+                            fotoVisual ||
+                            fotoOriginal
+                    };
+                }
+            )
+        );
+    } catch (error) {
+        console.warn(
+            "No se pudieron preparar las fotos temporales de afinidades:",
+            error
+        );
+
+        return personas;
+    }
+}
+
+
 function crearPersonaAfinidadHTML(
     persona
 ) {
@@ -8819,20 +9208,32 @@ function crearPersonaAfinidadHTML(
         );
 
     const edad =
-        Number(persona.edad || 0);
+        Number(
+            persona.edad ||
+            0
+        );
 
     const verificado =
         Boolean(
             persona.verificado
         );
 
+    const cantidadIntereses =
+        Math.max(
+            0,
+            Number(
+                persona.intereses_comunes ||
+                0
+            )
+        );
+
     const interesesComunes =
         textoInteresesComunes(
-            persona.intereses_comunes
+            cantidadIntereses
         );
 
     return `
-        <article class="persona-afinidad">
+        <article class="persona-afinidad persona-afinidad--descubre">
 
             <div class="persona-afinidad__foto">
 
@@ -8853,6 +9254,20 @@ function crearPersonaAfinidadHTML(
                         `
                 }
 
+                ${
+                    verificado
+                        ? `
+                            <span
+                                class="persona-afinidad__check"
+                                title="Perfil verificado"
+                                aria-label="Perfil verificado"
+                            >
+                                <i class="fa-solid fa-circle-check"></i>
+                            </span>
+                        `
+                        : ""
+                }
+
             </div>
 
             <div class="persona-afinidad__contenido">
@@ -8865,56 +9280,57 @@ function crearPersonaAfinidadHTML(
                             ${nombre}
                             ${
                                 edad > 0
-                                    ? `, ${edad}`
+                                    ? `<span>${edad}</span>`
                                     : ""
                             }
                         </h4>
 
-                        ${
-                            verificado
-                                ? `
-                                    <span class="persona-afinidad__verificado">
-                                        <i class="fa-solid fa-circle-check"></i>
-                                        Perfil verificado
-                                    </span>
-                                `
-                                : ""
-                        }
+                        <p class="persona-afinidad__localidad">
+                            <i class="fa-solid fa-location-dot"></i>
+                            ${localidad}
+                        </p>
 
                     </div>
 
                 </div>
 
-                <div class="persona-afinidad__datos">
+                ${
+                    ocupacion
+                        ? `
+                            <p class="persona-afinidad__ocupacion">
+                                <i class="fa-solid fa-briefcase"></i>
+                                ${ocupacion}
+                            </p>
+                        `
+                        : ""
+                }
+
+                <div class="persona-afinidad__porque">
 
                     <span>
-                        <i class="fa-solid fa-location-dot"></i>
-                        ${localidad}
+                        <i class="fa-solid fa-link"></i>
                     </span>
 
-                    ${
-                        ocupacion
-                            ? `
-                                <span>
-                                    <i class="fa-solid fa-briefcase"></i>
-                                    ${ocupacion}
-                                </span>
-                            `
-                            : ""
-                    }
+                    <div>
+                        <strong>
+                            Por qué podéis encajar
+                        </strong>
+
+                        <small>
+                            ${escaparHTML(
+                                interesesComunes
+                            )}
+                            y os interesa el mismo plan.
+                        </small>
+                    </div>
 
                 </div>
-
-                <span class="persona-afinidad__coincidencias">
-                    <i class="fa-solid fa-link"></i>
-                    ${escaparHTML(interesesComunes)}
-                </span>
 
                 <a
                     href="perfil-publico.html?id=${encodeURIComponent(
                         perfilId
                     )}"
-                    class="boton-principal-pequeno"
+                    class="persona-afinidad__perfil"
                 >
                     Ver perfil
                     <i class="fa-solid fa-arrow-right"></i>
@@ -8925,7 +9341,6 @@ function crearPersonaAfinidadHTML(
         </article>
     `;
 }
-
 
 async function cargarPersonasAfinidad(
     planId,
@@ -9002,27 +9417,37 @@ async function cargarPersonasAfinidad(
             return;
         }
 
+        const personasVisuales =
+            await prepararFotosPersonasAfinidad(
+                personas
+            );
+
         contenedor.innerHTML = `
             <div class="personas-afinidad__cabecera">
 
                 <div>
                     <span class="subtitulo">
-                        Personas interesadas
+                        Personas que también se apuntarían
                     </span>
 
                     <h4>
                         ${
-                            personas.length === 1
-                                ? "1 perfil disponible"
-                                : `${personas.length} perfiles disponibles`
+                            personasVisuales.length === 1
+                                ? "1 persona para descubrir"
+                                : `${personasVisuales.length} personas para descubrir`
                         }
                     </h4>
+
+                    <p>
+                        Entra en sus perfiles para conocer sus intereses antes
+                        de decidir si quieres conectar.
+                    </p>
                 </div>
 
             </div>
 
             <div class="personas-afinidad__grid">
-                ${personas
+                ${personasVisuales
                     .map(
                         crearPersonaAfinidadHTML
                     )
@@ -9086,6 +9511,11 @@ function activarBotonesVerPersonasAfinidad() {
                                 "false"
                             );
 
+                            boton.innerHTML = `
+                                <i class="fa-solid fa-people-group"></i>
+                                Descubrir personas
+                            `;
+
                             return;
                         }
 
@@ -9093,6 +9523,11 @@ function activarBotonesVerPersonasAfinidad() {
                             "aria-expanded",
                             "true"
                         );
+
+                        boton.innerHTML = `
+                            <i class="fa-solid fa-chevron-up"></i>
+                            Ocultar personas
+                        `;
 
                         await cargarPersonasAfinidad(
                             planId,
@@ -9899,6 +10334,59 @@ function obtenerInicialesConexion(nombre = "Usuario") {
         .toUpperCase() || "SU";
 }
 
+function crearInteresesConexionHTML(
+    perfil,
+    maximo = 3
+) {
+    const etiquetas = {
+        senderismo: "Senderismo",
+        musica: "Música",
+        gastronomia: "Gastronomía",
+        deporte: "Deporte",
+        viajes: "Viajes",
+        cultura: "Cultura",
+        cine: "Cine",
+        fotografia: "Fotografía",
+        naturaleza: "Naturaleza",
+        fiestas: "Fiestas"
+    };
+
+    const intereses =
+        Array.isArray(
+            perfil?.intereses
+        )
+            ? perfil.intereses
+                .filter(Boolean)
+                .slice(0, maximo)
+            : [];
+
+    if (intereses.length === 0) {
+        return "";
+    }
+
+    return `
+        <div class="conexion-item__intereses">
+            ${
+                intereses
+                    .map(
+                        (interes) => `
+                            <span>
+                                ${
+                                    escaparHTML(
+                                        etiquetas[interes] ||
+                                        interes
+                                    )
+                                }
+                            </span>
+                        `
+                    )
+                    .join("")
+            }
+        </div>
+    `;
+}
+
+
 function crearAvatarConexionHTML(perfil) {
     const nombre = escaparHTML(
         perfil?.nombre_visible || "Usuario de Suralia"
@@ -9933,53 +10421,81 @@ function crearAvatarConexionHTML(perfil) {
 
 function crearSolicitudRecibidaHTML(solicitud) {
     const perfil = solicitud.perfil || {};
+
     const nombre = escaparHTML(
-        perfil.nombre_visible || "Usuario de Suralia"
+        perfil.nombre_visible ||
+        "Usuario de Suralia"
     );
+
     const localidad = escaparHTML(
-        perfil.localidad || "Localidad no indicada"
+        perfil.localidad ||
+        "Localidad no indicada"
     );
+
     const perfilPublicoId = escaparHTML(
-        perfil.perfil_publico_id || ""
+        perfil.perfil_publico_id ||
+        ""
     );
+
     const fecha = escaparHTML(
-        formatearFechaConexion(solicitud.creado_en)
+        formatearFechaConexion(
+            solicitud.creado_en
+        )
     );
 
     return `
-        <article class="conexion-item" data-solicitud-id="${escaparHTML(solicitud.id)}">
-            ${crearAvatarConexionHTML(perfil)}
+        <article
+            class="conexion-item conexion-item--recibida"
+            data-solicitud-id="${escaparHTML(
+                solicitud.id
+            )}"
+        >
+            <div class="conexion-item__persona">
+                ${crearAvatarConexionHTML(perfil)}
 
-            <div class="conexion-item__contenido">
-                <div class="conexion-item__superior">
-                    <h4>${nombre}</h4>
-                    <span class="conexion-item__estado conexion-item__estado--pendiente">
-                        <i class="fa-regular fa-clock"></i>
-                        Pendiente
+                <div class="conexion-item__contenido">
+
+                    <div class="conexion-item__superior">
+
+                        <div>
+                            <h4>${nombre}</h4>
+
+                            <p>
+                                <i class="fa-solid fa-location-dot"></i>
+                                ${localidad}
+                            </p>
+                        </div>
+
+                        <span class="conexion-item__estado conexion-item__estado--pendiente">
+                            <i class="fa-regular fa-clock"></i>
+                            Quiere conectar
+                        </span>
+
+                    </div>
+
+                    ${crearInteresesConexionHTML(perfil)}
+
+                    <span class="conexion-item__fecha">
+                        Solicitud recibida el ${fecha}
                     </span>
+
                 </div>
-
-                <p>
-                    <i class="fa-solid fa-location-dot"></i>
-                    ${localidad}
-                </p>
-
-                <span class="conexion-item__fecha">
-                    Recibida el ${fecha}
-                </span>
             </div>
 
-            <div class="conexion-item__acciones">
+            <div class="conexion-item__acciones conexion-item__acciones--recibida">
+
                 ${
                     perfilPublicoId
                         ? `
                             <a
-                                href="perfil-publico.html?id=${encodeURIComponent(perfilPublicoId)}"
-                                class="boton-conexion boton-conexion--principal"
+                                href="perfil-publico.html?id=${encodeURIComponent(
+                                    perfilPublicoId
+                                )}"
+                                class="boton-conexion boton-conexion--secundario"
                                 data-ver-perfil-conexion
                             >
                                 <i class="fa-regular fa-user"></i>
-                                Ver perfil antes de decidir
+                                Ver perfil
                             </a>
                         `
                         : ""
@@ -9987,8 +10503,10 @@ function crearSolicitudRecibidaHTML(solicitud) {
 
                 <button
                     type="button"
-                    class="boton-conexion boton-conexion--secundario"
-                    data-aceptar-solicitud="${escaparHTML(solicitud.id)}"
+                    class="boton-conexion boton-conexion--aceptar"
+                    data-aceptar-solicitud="${escaparHTML(
+                        solicitud.id
+                    )}"
                 >
                     <i class="fa-solid fa-check"></i>
                     Aceptar
@@ -9996,12 +10514,16 @@ function crearSolicitudRecibidaHTML(solicitud) {
 
                 <button
                     type="button"
-                    class="boton-conexion boton-conexion--peligro"
-                    data-rechazar-solicitud="${escaparHTML(solicitud.id)}"
+                    class="boton-conexion boton-conexion--rechazar"
+                    data-rechazar-solicitud="${escaparHTML(
+                        solicitud.id
+                    )}"
+                    aria-label="Rechazar solicitud de ${nombre}"
                 >
                     <i class="fa-solid fa-xmark"></i>
                     Rechazar
                 </button>
+
             </div>
         </article>
     `;
@@ -10029,50 +10551,90 @@ function obtenerTextoEstadoSolicitud(estado) {
 
 function crearSolicitudEnviadaHTML(solicitud) {
     const perfil = solicitud.perfil || {};
+
     const nombre = escaparHTML(
-        perfil.nombre_visible || "Usuario de Suralia"
+        perfil.nombre_visible ||
+        "Usuario de Suralia"
     );
+
     const localidad = escaparHTML(
-        perfil.localidad || "Localidad no indicada"
+        perfil.localidad ||
+        "Localidad no indicada"
     );
+
     const perfilPublicoId = escaparHTML(
-        perfil.perfil_publico_id || ""
+        perfil.perfil_publico_id ||
+        ""
     );
-    const estado = String(solicitud.estado || "pendiente").toLowerCase();
-    const textoEstado = obtenerTextoEstadoSolicitud(estado);
-    const claseEstado = obtenerClaseEstadoSolicitud(estado);
+
+    const estado = String(
+        solicitud.estado ||
+        "pendiente"
+    ).toLowerCase();
+
+    const textoEstado =
+        obtenerTextoEstadoSolicitud(
+            estado
+        );
+
+    const claseEstado =
+        obtenerClaseEstadoSolicitud(
+            estado
+        );
+
     const fecha = escaparHTML(
-        formatearFechaConexion(solicitud.creado_en)
+        formatearFechaConexion(
+            solicitud.creado_en
+        )
     );
 
     return `
-        <article class="conexion-item" data-solicitud-id="${escaparHTML(solicitud.id)}">
-            ${crearAvatarConexionHTML(perfil)}
+        <article
+            class="conexion-item conexion-item--enviada"
+            data-solicitud-id="${escaparHTML(
+                solicitud.id
+            )}"
+        >
+            <div class="conexion-item__persona">
+                ${crearAvatarConexionHTML(perfil)}
 
-            <div class="conexion-item__contenido">
-                <div class="conexion-item__superior">
-                    <h4>${nombre}</h4>
-                    <span class="conexion-item__estado ${claseEstado}">
-                        ${textoEstado}
+                <div class="conexion-item__contenido">
+
+                    <div class="conexion-item__superior">
+
+                        <div>
+                            <h4>${nombre}</h4>
+
+                            <p>
+                                <i class="fa-solid fa-location-dot"></i>
+                                ${localidad}
+                            </p>
+                        </div>
+
+                        <span class="conexion-item__estado ${claseEstado}">
+                            ${textoEstado}
+                        </span>
+
+                    </div>
+
+                    ${crearInteresesConexionHTML(perfil, 2)}
+
+                    <span class="conexion-item__fecha">
+                        Enviada el ${fecha}
                     </span>
+
                 </div>
-
-                <p>
-                    <i class="fa-solid fa-location-dot"></i>
-                    ${localidad}
-                </p>
-
-                <span class="conexion-item__fecha">
-                    Enviada el ${fecha}
-                </span>
             </div>
 
             <div class="conexion-item__acciones">
+
                 ${
                     perfilPublicoId
                         ? `
                             <a
-                                href="perfil-publico.html?id=${encodeURIComponent(perfilPublicoId)}"
+                                href="perfil-publico.html?id=${encodeURIComponent(
+                                    perfilPublicoId
+                                )}"
                                 class="boton-conexion boton-conexion--secundario"
                             >
                                 <i class="fa-regular fa-user"></i>
@@ -10087,15 +10649,18 @@ function crearSolicitudEnviadaHTML(solicitud) {
                         ? `
                             <button
                                 type="button"
-                                class="boton-conexion boton-conexion--peligro"
-                                data-cancelar-solicitud="${escaparHTML(solicitud.id)}"
+                                class="boton-conexion boton-conexion--rechazar"
+                                data-cancelar-solicitud="${escaparHTML(
+                                    solicitud.id
+                                )}"
                             >
                                 <i class="fa-solid fa-ban"></i>
-                                Cancelar solicitud
+                                Cancelar
                             </button>
                         `
                         : ""
                 }
+
             </div>
         </article>
     `;
@@ -10103,55 +10668,97 @@ function crearSolicitudEnviadaHTML(solicitud) {
 
 function crearConexionAceptadaHTML(conexion) {
     const perfil = conexion.perfil || {};
+
     const nombre = escaparHTML(
-        perfil.nombre_visible || "Usuario de Suralia"
+        perfil.nombre_visible ||
+        "Usuario de Suralia"
     );
+
     const localidad = escaparHTML(
-        perfil.localidad || "Localidad no indicada"
+        perfil.localidad ||
+        "Localidad no indicada"
     );
+
     const perfilPublicoId = escaparHTML(
-        perfil.perfil_publico_id || ""
+        perfil.perfil_publico_id ||
+        ""
     );
+
     const fecha = escaparHTML(
         formatearFechaConexion(
-            conexion.actualizado_en || conexion.creado_en
+            conexion.actualizado_en ||
+            conexion.creado_en
         )
     );
 
     return `
-        <article class="conexion-item" data-conexion-id="${escaparHTML(conexion.id)}">
-            ${crearAvatarConexionHTML(perfil)}
+        <article
+            class="conexion-item conexion-item--aceptada"
+            data-conexion-id="${escaparHTML(
+                conexion.id
+            )}"
+        >
+            <div class="conexion-item__persona">
 
-            <div class="conexion-item__contenido">
-                <div class="conexion-item__superior">
-                    <h4>${nombre}</h4>
-                    <span class="conexion-item__estado conexion-item__estado--aceptada">
-                        <i class="fa-solid fa-user-check"></i>
-                        Conexión
+                ${crearAvatarConexionHTML(perfil)}
+
+                <div class="conexion-item__contenido">
+
+                    <div class="conexion-item__superior">
+
+                        <div>
+                            <h4>${nombre}</h4>
+
+                            <p>
+                                <i class="fa-solid fa-location-dot"></i>
+                                ${localidad}
+                            </p>
+                        </div>
+
+                        <span class="conexion-item__estado conexion-item__estado--aceptada">
+                            <i class="fa-solid fa-user-check"></i>
+                            Conectados
+                        </span>
+
+                    </div>
+
+                    ${crearInteresesConexionHTML(perfil)}
+
+                    <span class="conexion-item__fecha">
+                        En tu círculo desde el ${fecha}
                     </span>
+
                 </div>
 
-                <p>
-                    <i class="fa-solid fa-location-dot"></i>
-                    ${localidad}
-                </p>
-
-                <span class="conexion-item__fecha">
-                    Conectados desde el ${fecha}
-                </span>
             </div>
 
-            <div class="conexion-item__acciones">
+            <div class="conexion-item__acciones conexion-item__acciones--conexion">
+
+                <button
+                    type="button"
+                    class="boton-conexion boton-conexion--mensaje"
+                    data-iniciar-conversacion="${escaparHTML(
+                        conexion.otro_usuario_id ||
+                        ""
+                    )}"
+                    data-nombre-conversacion="${nombre}"
+                >
+                    <i class="fa-regular fa-comments"></i>
+                    Mensaje
+                </button>
+
                 ${
                     perfilPublicoId
                         ? `
                             <a
-                                href="perfil-publico.html?id=${encodeURIComponent(perfilPublicoId)}"
-                                class="boton-conexion boton-conexion--principal"
+                                href="perfil-publico.html?id=${encodeURIComponent(
+                                    perfilPublicoId
+                                )}"
+                                class="boton-conexion boton-conexion--secundario"
                                 data-ver-perfil-conexion
                             >
                                 <i class="fa-regular fa-user"></i>
-                                Ver perfil
+                                Perfil
                             </a>
                         `
                         : ""
@@ -10159,29 +10766,194 @@ function crearConexionAceptadaHTML(conexion) {
 
                 <button
                     type="button"
-                    class="boton-conexion boton-conexion--mensaje"
-                    data-iniciar-conversacion="${escaparHTML(
-                        conexion.otro_usuario_id || ""
+                    class="boton-conexion boton-conexion--eliminar"
+                    data-eliminar-conexion="${escaparHTML(
+                        conexion.id
                     )}"
-                    data-nombre-conversacion="${nombre}"
-                >
-                    <i class="fa-regular fa-comments"></i>
-                    Enviar mensaje
-                </button>
-
-                <button
-                    type="button"
-                    class="boton-conexion boton-conexion--peligro"
-                    data-eliminar-conexion="${escaparHTML(conexion.id)}"
                     data-nombre-conexion="${nombre}"
+                    aria-label="Eliminar conexión con ${nombre}"
                 >
                     <i class="fa-solid fa-user-minus"></i>
-                    Eliminar conexión
+                    Eliminar
                 </button>
+
             </div>
         </article>
     `;
 }
+
+async function asegurarHelperFotosPerfilSocial() {
+    if (window.SuraliaFotosPerfil) {
+        return window.SuraliaFotosPerfil;
+    }
+
+    if (
+        window.promesaHelperFotosPerfilSocial
+    ) {
+        return window.promesaHelperFotosPerfilSocial;
+    }
+
+    window.promesaHelperFotosPerfilSocial =
+        new Promise(
+            (
+                resolve,
+                reject
+            ) => {
+                const src =
+                    new URL(
+                        "js/fotos-perfil.js",
+                        document.baseURI
+                    ).href;
+
+                const existente =
+                    Array.from(
+                        document.scripts
+                    ).find(
+                        (script) =>
+                            script.src === src
+                    );
+
+                const comprobar =
+                    () => {
+                        if (
+                            window.SuraliaFotosPerfil
+                        ) {
+                            resolve(
+                                window.SuraliaFotosPerfil
+                            );
+                        } else {
+                            reject(
+                                new Error(
+                                    "No se ha podido iniciar el helper de fotografías."
+                                )
+                            );
+                        }
+                    };
+
+                if (existente) {
+                    if (
+                        window.SuraliaFotosPerfil
+                    ) {
+                        comprobar();
+                        return;
+                    }
+
+                    existente.addEventListener(
+                        "load",
+                        comprobar,
+                        {
+                            once: true
+                        }
+                    );
+
+                    existente.addEventListener(
+                        "error",
+                        () => {
+                            reject(
+                                new Error(
+                                    "No se pudo cargar js/fotos-perfil.js."
+                                )
+                            );
+                        },
+                        {
+                            once: true
+                        }
+                    );
+
+                    return;
+                }
+
+                const script =
+                    document.createElement(
+                        "script"
+                    );
+
+                script.src =
+                    src;
+
+                script.async =
+                    true;
+
+                script.addEventListener(
+                    "load",
+                    comprobar,
+                    {
+                        once: true
+                    }
+                );
+
+                script.addEventListener(
+                    "error",
+                    () => {
+                        reject(
+                            new Error(
+                                "No se pudo cargar js/fotos-perfil.js."
+                            )
+                        );
+                    },
+                    {
+                        once: true
+                    }
+                );
+
+                document.head.appendChild(
+                    script
+                );
+            }
+        );
+
+    return window.promesaHelperFotosPerfilSocial;
+}
+
+
+async function prepararFotosConexionesSocial(
+    perfiles = []
+) {
+    try {
+        const helper =
+            await asegurarHelperFotosPerfilSocial();
+
+        return await Promise.all(
+            perfiles.map(
+                async (
+                    perfil
+                ) => {
+                    const fotoOriginal =
+                        String(
+                            perfil?.foto_principal_url ||
+                            ""
+                        ).trim();
+
+                    if (!fotoOriginal) {
+                        return perfil;
+                    }
+
+                    const fotoVisual =
+                        await helper.obtenerUrl({
+                            fotoUrl:
+                                fotoOriginal
+                        });
+
+                    return {
+                        ...perfil,
+
+                        foto_principal_url:
+                            fotoVisual ||
+                            fotoOriginal
+                    };
+                }
+            )
+        );
+    } catch (error) {
+        console.warn(
+            "No se pudieron preparar las fotos temporales de las conexiones:",
+            error
+        );
+
+        return perfiles;
+    }
+}
+
 
 async function obtenerPerfilesConexion(usuarioIds = []) {
     const cliente = window.clienteSupabase;
@@ -10211,9 +10983,22 @@ async function obtenerPerfilesConexion(usuarioIds = []) {
         throw error;
     }
 
+    const perfiles =
+        Array.isArray(data)
+            ? data
+            : [];
+
+    const perfilesVisuales =
+        await prepararFotosConexionesSocial(
+            perfiles
+        );
+
     return new Map(
-        (Array.isArray(data) ? data : []).map(
-            (perfil) => [perfil.usuario_id, perfil]
+        perfilesVisuales.map(
+            (perfil) => [
+                perfil.usuario_id,
+                perfil
+            ]
         )
     );
 }
@@ -10730,6 +11515,74 @@ function activarAccionesSolicitudesConexion() {
         });
 }
 
+function mostrarCargandoConexionesPerfil() {
+    const listas = [
+        listaSolicitudesRecibidas,
+        listaConexionesAceptadas,
+        listaSolicitudesEnviadas
+    ];
+
+    const vacios = [
+        estadoVacioSolicitudesRecibidas,
+        estadoVacioConexionesAceptadas,
+        estadoVacioSolicitudesEnviadas
+    ];
+
+    vacios.forEach(
+        (estado) =>
+            estado?.classList.add(
+                "oculto"
+            )
+    );
+
+    listas.forEach(
+        (
+            lista,
+            indice
+        ) => {
+            if (!lista) {
+                return;
+            }
+
+            lista.classList.remove(
+                "oculta"
+            );
+
+            const cantidad =
+                indice === 1
+                    ? 2
+                    : 1;
+
+            lista.innerHTML =
+                Array.from(
+                    {
+                        length:
+                            cantidad
+                    }
+                )
+                    .map(
+                        () => `
+                            <article class="suralia-skeleton suralia-skeleton--persona">
+                                <span class="suralia-skeleton__avatar"></span>
+
+                                <div class="suralia-skeleton__contenido">
+                                    <span class="suralia-skeleton__linea suralia-skeleton__linea--titulo"></span>
+                                    <span class="suralia-skeleton__linea suralia-skeleton__linea--media"></span>
+
+                                    <div class="suralia-skeleton__chips">
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                </div>
+                            </article>
+                        `
+                    )
+                    .join("");
+        }
+    );
+}
+
+
 function mostrarErrorCargaConexiones() {
     const mensaje = `
         <div class="estado-vacio estado-vacio--pequeno">
@@ -10768,6 +11621,8 @@ async function cargarConexionesPerfil() {
         );
         return;
     }
+
+    mostrarCargandoConexionesPerfil();
 
     try {
         const usuario = await obtenerUsuarioPerfilSocial();
@@ -12489,6 +13344,13 @@ function actualizarContadoresPublicaciones(
     if (contadorPublicaciones) {
         contadorPublicaciones.textContent =
             planes.length;
+    }
+
+    if (contadorCreadosMisPlanes) {
+        contadorCreadosMisPlanes.textContent =
+            String(
+                planes.length
+            );
     }
 
     if (contadorPendientes) {
