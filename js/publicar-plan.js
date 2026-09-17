@@ -305,6 +305,7 @@ function crearFilaFechaAdicional(fechaValor = "", horaValor = "", plazasValor = 
     listaFechasPlan.appendChild(fila);
     actualizarLimitesFechasAdicionales();
     actualizarBotonAnadirFecha();
+    actualizarGestionPlazasPublicacion();
 
     return fila;
 }
@@ -403,6 +404,7 @@ function validarFechasAdicionales() {
     }
 
     const fechasSeleccionadas = obtenerFechasFormulario();
+    const reservaExterna = planUsaReservaExternaPublicacion();
 
     if (fechasSeleccionadas.length === 0) {
         return true;
@@ -411,16 +413,24 @@ function validarFechasAdicionales() {
     const claves = new Set();
 
     for (const item of fechasSeleccionadas) {
+        const plazasInvalidas =
+            !reservaExterna &&
+            (
+                !item.plazas ||
+                Number(item.plazas) < 1 ||
+                Number(item.plazas) > 500
+            );
+
         if (
             !item.fecha ||
             !item.hora ||
-            !item.plazas ||
-            Number(item.plazas) < 1 ||
-            Number(item.plazas) > 500
+            plazasInvalidas
         ) {
             if (errorFechasPlan) {
                 errorFechasPlan.textContent =
-                    "Completa fecha, hora y plazas de todos los días o pases añadidos (entre 1 y 500 plazas).";
+                    reservaExterna
+                        ? "Completa la fecha y la hora de todos los días o pases añadidos."
+                        : "Completa fecha, hora y plazas de todos los días o pases añadidos (entre 1 y 500 plazas).";
             }
             return false;
         }
@@ -512,6 +522,75 @@ function esFestivalMusical() {
             .trim()
             .toLowerCase() === "festival"
     );
+}
+
+function planUsaReservaExternaPublicacion() {
+    return Boolean(
+        String(
+            enlaceReserva?.value || ""
+        ).trim()
+    );
+}
+
+function actualizarGestionPlazasPublicacion() {
+    const reservaExterna =
+        planUsaReservaExternaPublicacion();
+
+    if (plazas) {
+        if (reservaExterna) {
+            plazas.value = "";
+            limpiarError(
+                plazas,
+                "error-plan-plazas"
+            );
+        }
+
+        plazas.disabled = reservaExterna;
+        plazas.setAttribute(
+            "aria-disabled",
+            String(reservaExterna)
+        );
+        plazas.placeholder = reservaExterna
+            ? "Gestionadas en la web externa"
+            : "Ejemplo: 20";
+    }
+
+    listaFechasPlan
+        ?.querySelectorAll(
+            "[data-plazas-adicional]"
+        )
+        .forEach((campoPlazas) => {
+            if (reservaExterna) {
+                campoPlazas.value = "";
+            }
+
+            campoPlazas.disabled = reservaExterna;
+            campoPlazas.setAttribute(
+                "aria-disabled",
+                String(reservaExterna)
+            );
+            campoPlazas.placeholder = reservaExterna
+                ? "Gestión externa"
+                : "Plazas";
+        });
+
+    if (etiquetaPlazasPlan) {
+        etiquetaPlazasPlan.textContent =
+            reservaExterna
+                ? "Plazas gestionadas fuera de Suralia"
+                : esPlanMusical()
+                    ? "Entradas disponibles"
+                    : "Plazas de la primera fecha";
+    }
+
+    if (ayudaPlazasPlan) {
+        ayudaPlazasPlan.textContent =
+            reservaExterna
+                ? "No necesitas indicar un aforo. La disponibilidad real se consultará en la web del organizador."
+                : esPlanMusical()
+                    ? "Indica las entradas que gestionará Suralia para esta fecha."
+                    : "Si añades más fechas, cada una podrá tener un número de plazas diferente.";
+    }
 }
 
 function obtenerDiasFestivalOrdenados() {
@@ -670,8 +749,8 @@ function actualizarModoPublicacion() {
         if (etiquetaFechaPlan) etiquetaFechaPlan.textContent = "Primera fecha / día";
         if (etiquetaHoraPlan) etiquetaHoraPlan.textContent = "Hora del concierto / inicio";
         if (etiquetaDuracionPlan) etiquetaDuracionPlan.textContent = "Duración aproximada del evento";
-        if (etiquetaPlazasPlan) etiquetaPlazasPlan.textContent = "Aforo o entradas disponibles";
-        if (ayudaPlazasPlan) ayudaPlazasPlan.textContent = "Indica las entradas disponibles para esta fecha. Si añades más días o pases, cada uno podrá tener su propio aforo.";
+        if (etiquetaPlazasPlan) etiquetaPlazasPlan.textContent = "Entradas disponibles";
+        if (ayudaPlazasPlan) ayudaPlazasPlan.textContent = "Indica las entradas que gestionará Suralia para esta fecha.";
         if (etiquetaUbicacionPlan) etiquetaUbicacionPlan.textContent = "Recinto o sala";
         if (ubicacion) ubicacion.placeholder = "Ejemplo: Cartuja Center CITE o Calle Leonardo da Vinci, 7";
         if (ayudaUbicacionPlan) ayudaUbicacionPlan.textContent = "Escribe el recinto o la calle con número. El mapa intentará localizarlo automáticamente; también puedes pulsar sobre el mapa para rellenar la dirección desde el marcador.";
@@ -695,6 +774,7 @@ function actualizarModoPublicacion() {
         limpiarErroresMusica();
     }
 
+    actualizarGestionPlazasPublicacion();
     actualizarBloqueAbonoFestival();
     actualizarVistaPrevia();
 }
@@ -726,6 +806,11 @@ function obtenerDetallesExtraFormulario() {
 }
 
 categoria?.addEventListener("change", actualizarModoPublicacion);
+
+enlaceReserva?.addEventListener(
+    "input",
+    actualizarGestionPlazasPublicacion
+);
 
 tipoEventoMusica?.addEventListener("change", () => {
     actualizarBloqueAbonoFestival();
@@ -2256,7 +2341,14 @@ formularioPublicar?.addEventListener("submit", async (evento) => {
         formularioValido = false;
     }
 
-    if (!plazas?.value || Number(plazas.value) < 1 || Number(plazas.value) > 500) {
+    if (
+        !planUsaReservaExternaPublicacion() &&
+        (
+            !plazas?.value ||
+            Number(plazas.value) < 1 ||
+            Number(plazas.value) > 500
+        )
+    ) {
         mostrarError(
             plazas,
             "error-plan-plazas",

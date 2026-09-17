@@ -44803,3 +44803,387 @@ input:focus-visible {
     }
 
 }
+
+
+/* ========================================================================
+   SURALIA · INDEX · PASADA PROFESIONAL V1
+   Hero más limpio y editorial. Conserva estructura, contenido y funciones.
+======================================================================== */
+
+.hero {
+    padding: 104px 0 120px;
+}
+
+.hero::before {
+    opacity: 0.1;
+}
+
+.hero__contenido {
+    grid-template-columns: 1.06fr 0.94fr;
+    gap: 64px;
+}
+
+.hero h1 {
+    max-width: 720px;
+    font-size: clamp(3.65rem, 6vw, 5.35rem);
+    line-height: 0.98;
+    letter-spacing: -0.058em;
+}
+
+.hero h1 span {
+    text-shadow: none;
+}
+
+.hero__texto > p {
+    max-width: 600px;
+    font-size: 18px;
+    line-height: 1.75;
+}
+
+.hero .etiqueta {
+    padding: 9px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 8px 22px rgba(23, 61, 54, 0.13);
+}
+
+.hero .buscador {
+    padding: 8px;
+    border: 1px solid rgba(23, 61, 54, 0.16);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(23, 61, 54, 0.13);
+}
+
+.hero .dato {
+    border-color: rgba(23, 61, 54, 0.1);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.76);
+    box-shadow: 0 8px 22px rgba(23, 61, 54, 0.055);
+}
+
+.hero .tarjeta-principal {
+    padding: 8px;
+    border: 1px solid rgba(23, 61, 54, 0.14);
+    border-radius: 27px;
+    box-shadow: 0 24px 60px rgba(23, 61, 54, 0.17);
+    transform: none;
+}
+
+.hero .tarjeta-principal__imagen {
+    border-radius: 20px;
+}
+
+.hero .tarjeta-flotante {
+    border: 1px solid rgba(23, 61, 54, 0.14);
+    border-radius: 15px;
+    box-shadow: 0 14px 34px rgba(23, 61, 54, 0.14);
+}
+
+@media (max-width: 1050px) {
+
+    .hero__contenido {
+        grid-template-columns: 1fr;
+        gap: 58px;
+    }
+
+}
+
+@media (max-width: 760px) {
+
+    .hero {
+        padding: 72px 0 92px;
+    }
+
+    .hero h1 {
+        font-size: clamp(2.9rem, 13vw, 3.8rem);
+        line-height: 1;
+    }
+
+    .hero .buscador {
+        box-shadow: 0 16px 38px rgba(23, 61, 54, 0.12);
+    }
+
+    .hero .tarjeta-principal {
+        box-shadow: 0 20px 46px rgba(23, 61, 54, 0.16);
+    }
+
+}
+
+@media (max-width: 480px) {
+
+    .hero h1 {
+        font-size: 2.7rem;
+    }
+
+    .hero .etiqueta {
+        box-shadow: 0 7px 18px rgba(23, 61, 54, 0.12);
+    }
+
+}
+
+
+/* ========================================================================
+   SURALIA · INDEX · PASADA PROFESIONAL V2
+   Categorías más ligeras, equilibradas y coherentes con el nuevo hero.
+======================================================================== */
+
+.categorias .encabezado-seccion {
+    margin-bottom: 40px;
+}
+
+.categorias__grid {
+    gap: 20px;
+}
+
+.categorias .categoria {
+    min-height: 190px;
+    padding: 26px;
+    border: 1px solid rgba(23, 61, 54, 0.11);
+    border-radius: 22px;
+    background: #ffffff;
+    box-shadow: 0 12px 30px rgba(23, 61, 54, 0.075);
+    transition:
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.25s ease;
+}
+
+.categorias .categoria:nth-child(2n) {
+    background: #fffaf1;
+}
+
+.categorias .categoria:nth-child(3n) {
+    background: #f5faf7;
+}
+
+.categorias .categoria::after {
+    right: -34px;
+    bottom: -42px;
+    width: 104px;
+    height: 104px;
+    background: rgba(232, 93, 50, 0.065);
+}
+
+.categorias .categoria:hover {
+    border-color: rgba(232, 93, 50, 0.24);
+    box-shadow: 0 20px 44px rgba(23, 61, 54, 0.12);
+    transform: translateY(-5px);
+}
+
+.categorias .categoria__icono {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 22px;
+    border-radius: 17px;
+    background: rgba(23, 61, 54, 0.095);
+    color: var(--color-secundario);
+    box-shadow: none;
+}
+
+.categorias .categoria h3 {
+    margin-top: auto;
+    font-size: 20px;
+    letter-spacing: -0.025em;
+}
+
+.categorias .categoria p {
+    margin-top: 4px;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.categorias .categoria__flecha {
+    margin-top: 18px;
+    transition: transform 0.25s ease;
+}
+
+.categorias .categoria:hover .categoria__flecha {
+    transform: translateX(4px);
+}
+
+@media (max-width: 760px) {
+
+    .categorias .categoria {
+        min-height: 175px;
+        padding: 23px;
+        box-shadow: 0 10px 25px rgba(23, 61, 54, 0.07);
+    }
+
+}
+
+@media (max-width: 480px) {
+
+    .categorias .categoria {
+        min-height: 0;
+        padding: 22px;
+    }
+
+}
+
+
+/* ========================================================================
+   SURALIA · INDEX · PASADA PROFESIONAL V3
+   Tarjetas de planes destacados con jerarquía y elevación más refinadas.
+======================================================================== */
+
+.planes {
+    background:
+        linear-gradient(
+            180deg,
+            #fffaf2 0%,
+            #f8f2e9 100%
+        );
+}
+
+.planes .encabezado-seccion {
+    margin-bottom: 40px;
+}
+
+.planes .planes__grid {
+    gap: 26px;
+}
+
+.planes .tarjeta-plan {
+    overflow: hidden;
+    border: 1px solid rgba(23, 61, 54, 0.11);
+    border-radius: 22px;
+    background: #ffffff;
+    box-shadow: 0 14px 34px rgba(23, 61, 54, 0.09);
+    transition:
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.25s ease;
+}
+
+.planes .tarjeta-plan:hover {
+    border-color: rgba(232, 93, 50, 0.22);
+    box-shadow: 0 22px 48px rgba(23, 61, 54, 0.14);
+    transform: translateY(-6px);
+}
+
+.planes .tarjeta-plan__imagen {
+    height: 255px;
+}
+
+.planes .tarjeta-plan__precio {
+    bottom: 16px;
+    left: 16px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--color-secundario);
+    box-shadow: 0 8px 20px rgba(23, 61, 54, 0.14);
+    backdrop-filter: blur(10px);
+}
+
+.planes .tarjeta-plan__favorito {
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(23, 61, 54, 0.1);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 8px 20px rgba(23, 61, 54, 0.12);
+}
+
+.planes .tarjeta-plan__contenido {
+    padding: 24px;
+}
+
+.planes .tarjeta-plan__meta {
+    gap: 13px;
+    color: var(--color-principal-oscuro);
+    font-size: 0.72rem;
+}
+
+.planes .tarjeta-plan h3 {
+    margin: 13px 0 9px;
+    font-size: 22px;
+    line-height: 1.32;
+    letter-spacing: -0.03em;
+}
+
+.planes .tarjeta-plan__ubicacion {
+    line-height: 1.5;
+}
+
+.planes .tarjeta-plan__social {
+    gap: 0.45rem 0.72rem;
+    margin-top: 15px;
+    padding: 10px 12px;
+    border: 1px solid rgba(23, 61, 54, 0.08);
+    border-radius: 12px;
+    background: #f5f8f6;
+    font-size: 0.78rem;
+}
+
+.planes .tarjeta-plan__pie {
+    margin-top: 17px;
+    padding-top: 15px;
+    border-top-color: rgba(23, 61, 54, 0.09);
+}
+
+.planes .tarjeta-plan__pie > span {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(232, 93, 50, 0.09);
+    color: var(--color-principal-oscuro);
+}
+
+@media (max-width: 760px) {
+
+    .planes .planes__grid {
+        gap: 22px;
+    }
+
+    .planes .tarjeta-plan {
+        box-shadow: 0 12px 28px rgba(23, 61, 54, 0.085);
+    }
+
+    .planes .tarjeta-plan__imagen {
+        height: 245px;
+    }
+
+}
+
+@media (max-width: 480px) {
+
+    .planes .tarjeta-plan__contenido {
+        padding: 21px;
+    }
+
+    .planes .tarjeta-plan__imagen {
+        height: 235px;
+    }
+
+}
+
+
+/* ========================================================================
+   SURALIA · INDEX · PASADA PROFESIONAL V4
+   Planes destacados más integrados en la página, sin efecto de flotación.
+======================================================================== */
+
+.planes {
+    border-top: 1px solid rgba(23, 61, 54, 0.055);
+    border-bottom: 1px solid rgba(23, 61, 54, 0.055);
+    background: #f8f6f1;
+}
+
+.planes .tarjeta-plan {
+    border-color: rgba(23, 61, 54, 0.1);
+    box-shadow: 0 6px 18px rgba(23, 61, 54, 0.065);
+}
+
+.planes .tarjeta-plan:hover {
+    border-color: rgba(232, 93, 50, 0.2);
+    box-shadow: 0 12px 28px rgba(23, 61, 54, 0.105);
+    transform: translateY(-3px);
+}
+
+@media (max-width: 760px) {
+
+    .planes .tarjeta-plan {
+        box-shadow: 0 5px 16px rgba(23, 61, 54, 0.06);
+    }
+
+}

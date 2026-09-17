@@ -2205,6 +2205,188 @@ gridPlanesPortada?.addEventListener(
 
 const MAXIMO_PLANES_PORTADA = 3;
 
+const INTERVALO_CAMBIO_PLANES_PORTADA =
+    8000;
+
+let planesPortadaDisponibles =
+    [];
+
+let indicePlanesPortada =
+    0;
+
+let intervaloPlanesPortada =
+    null;
+
+let rotacionPlanesPortadaPreparada =
+    false;
+
+
+function obtenerGrupoPlanesPortada() {
+    const total =
+        planesPortadaDisponibles.length;
+
+    if (
+        total ===
+        0
+    ) {
+        return [];
+    }
+
+    const cantidad =
+        Math.min(
+            MAXIMO_PLANES_PORTADA,
+            total
+        );
+
+    return Array.from(
+        {
+            length:
+                cantidad
+        },
+        (
+            _,
+            desplazamiento
+        ) =>
+            planesPortadaDisponibles[
+                (
+                    indicePlanesPortada +
+                    desplazamiento
+                ) %
+                total
+            ]
+    );
+}
+
+
+function mostrarGrupoPlanesPortada() {
+    if (!gridPlanesPortada) {
+        return;
+    }
+
+    gridPlanesPortada.innerHTML =
+        obtenerGrupoPlanesPortada()
+            .map(
+                crearTarjetaProximoPlanHTML
+            )
+            .join("");
+
+    cargarFavoritosPortada();
+}
+
+
+function cambiarGrupoPlanesPortada() {
+    const total =
+        planesPortadaDisponibles.length;
+
+    if (
+        total <=
+        MAXIMO_PLANES_PORTADA
+    ) {
+        return;
+    }
+
+    indicePlanesPortada =
+        (
+            indicePlanesPortada +
+            MAXIMO_PLANES_PORTADA
+        ) %
+        total;
+
+    mostrarGrupoPlanesPortada();
+}
+
+
+function detenerRotacionPlanesPortada() {
+    if (!intervaloPlanesPortada) {
+        return;
+    }
+
+    clearInterval(
+        intervaloPlanesPortada
+    );
+
+    intervaloPlanesPortada =
+        null;
+}
+
+
+function iniciarRotacionPlanesPortada() {
+    detenerRotacionPlanesPortada();
+
+    if (
+        planesPortadaDisponibles.length <=
+            MAXIMO_PLANES_PORTADA ||
+        window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches
+    ) {
+        return;
+    }
+
+    intervaloPlanesPortada =
+        setInterval(
+            cambiarGrupoPlanesPortada,
+            INTERVALO_CAMBIO_PLANES_PORTADA
+        );
+}
+
+
+function prepararRotacionPlanesPortada() {
+    if (
+        !gridPlanesPortada ||
+        rotacionPlanesPortadaPreparada
+    ) {
+        return;
+    }
+
+    rotacionPlanesPortadaPreparada =
+        true;
+
+    gridPlanesPortada.addEventListener(
+        "mouseenter",
+        detenerRotacionPlanesPortada
+    );
+
+    gridPlanesPortada.addEventListener(
+        "mouseleave",
+        iniciarRotacionPlanesPortada
+    );
+
+    gridPlanesPortada.addEventListener(
+        "focusin",
+        detenerRotacionPlanesPortada
+    );
+
+    gridPlanesPortada.addEventListener(
+        "focusout",
+        (
+            evento
+        ) => {
+            if (
+                !gridPlanesPortada.contains(
+                    evento.relatedTarget
+                )
+            ) {
+                iniciarRotacionPlanesPortada();
+            }
+        }
+    );
+
+    document.addEventListener(
+        "visibilitychange",
+        () => {
+            if (
+                document.visibilityState ===
+                "visible"
+            ) {
+                iniciarRotacionPlanesPortada();
+            } else {
+                detenerRotacionPlanesPortada();
+            }
+        }
+    );
+}
+
 
 
 function obtenerFechaLocalISO() {
@@ -3048,17 +3230,11 @@ async function cargarProximosPlanesPortada() {
             return true;
         });
 
-    const proximosPlanes =
-        planesUnicos.slice(
-            0,
-            MAXIMO_PLANES_PORTADA
-        );
-
     let resumenSocialPorPlan =
         new Map();
 
     const idsProximosPlanes =
-        proximosPlanes
+        planesUnicos
             .map(
                 (
                     plan
@@ -3125,8 +3301,8 @@ async function cargarProximosPlanesPortada() {
         }
     }
 
-    const proximosPlanesConSocial =
-        proximosPlanes.map(
+    const planesPortadaConSocial =
+        planesUnicos.map(
             (
                 plan
             ) => {
@@ -3156,12 +3332,14 @@ async function cargarProximosPlanesPortada() {
             }
         );
 
-    gridPlanesPortada.innerHTML =
-        proximosPlanesConSocial
-            .map(
-                crearTarjetaProximoPlanHTML
-            )
-            .join("");
+    planesPortadaDisponibles =
+        planesPortadaConSocial;
+
+    indicePlanesPortada =
+        0;
+
+    mostrarGrupoPlanesPortada();
+    iniciarRotacionPlanesPortada();
 
     planesHeroDisponibles =
         planesUnicos;
@@ -3182,7 +3360,6 @@ async function cargarProximosPlanesPortada() {
             : null
     );
 
-    cargarFavoritosPortada();
     actualizarFavoritoHero();
     actualizarContadorPersonasHero();
     iniciarRotacionHero();
@@ -3725,6 +3902,11 @@ window.addEventListener(
     detenerRotacionHero
 );
 
+window.addEventListener(
+    "beforeunload",
+    detenerRotacionPlanesPortada
+);
+
 
 /* =====================================================
    CAMBIOS DESDE OTRAS PESTAÑAS
@@ -3789,6 +3971,7 @@ async function iniciarPaginaPrincipal() {
     await comprobarAccesoAdministracion();
     await iniciarContadorMensajesHeader();
     prepararRotacionHero();
+    prepararRotacionPlanesPortada();
 
     await Promise.all([
         cargarEstadisticasPortada(),
