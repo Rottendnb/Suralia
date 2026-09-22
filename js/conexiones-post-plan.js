@@ -273,6 +273,48 @@
     }
 
 
+    function obtenerURLSeguraAvatarPostPlan(
+        valor = ""
+    ) {
+        const texto =
+            String(
+                valor ||
+                ""
+            ).trim();
+
+        if (!texto) {
+            return "";
+        }
+
+        try {
+            const url = new URL(
+                texto,
+                window.location.href
+            );
+
+            const protocoloPermitido =
+                [
+                    "https:",
+                    "http:"
+                ].includes(
+                    url.protocol
+                ) ||
+                (
+                    window.location.protocol ===
+                        "file:" &&
+                    url.protocol ===
+                        "file:"
+                );
+
+            return protocoloPermitido
+                ? url.href
+                : "";
+        } catch (_error) {
+            return "";
+        }
+    }
+
+
     function normalizarHoraPostPlan(
         hora = ""
     ) {
@@ -387,7 +429,15 @@
             .slice(0, 2)
             .map(
                 (parte) =>
-                    parte.charAt(0)
+                    Array.from(
+                        parte
+                    ).find(
+                        (caracter) =>
+                            /[\p{L}\p{N}]/u.test(
+                                caracter
+                            )
+                    ) ||
+                    ""
             )
             .join("")
             .toUpperCase() ||
@@ -856,16 +906,28 @@
     function crearAvatarAsistentePostPlan(
         asistente
     ) {
+        const nombreOriginal = String(
+            asistente.nombre_visible ||
+            "Usuario de Suralia"
+        ).trim();
+
         const nombre =
             escaparHTMLPostPlan(
-                asistente.nombre_visible ||
-                "Usuario de Suralia"
+                nombreOriginal
             );
 
         const foto =
             escaparHTMLPostPlan(
-                asistente.foto_principal_url_visual ||
-                ""
+                obtenerURLSeguraAvatarPostPlan(
+                    asistente.foto_principal_url_visual
+                )
+            );
+
+        const iniciales =
+            escaparHTMLPostPlan(
+                obtenerInicialesPostPlan(
+                    nombreOriginal
+                )
             );
 
         if (foto) {
@@ -875,12 +937,8 @@
                         src="${foto}"
                         alt="Foto de ${nombre}"
                         loading="lazy"
-                        onerror="
-                            this.onerror=null;
-                            this.parentElement.textContent='${obtenerInicialesPostPlan(
-                                asistente.nombre_visible
-                            )}';
-                        "
+                        data-avatar-post-plan
+                        data-iniciales-avatar="${iniciales}"
                     >
                 </span>
             `;
@@ -891,11 +949,54 @@
                 class="post-plan-persona__avatar"
                 aria-hidden="true"
             >
-                ${obtenerInicialesPostPlan(
-                    asistente.nombre_visible
-                )}
+                ${iniciales}
             </span>
         `;
+    }
+
+
+    function activarFallbackAvataresPostPlan(
+        contenedor
+    ) {
+        contenedor
+            ?.querySelectorAll(
+                "[data-avatar-post-plan]"
+            )
+            .forEach((imagen) => {
+                const mostrarIniciales = () => {
+                    const avatar =
+                        imagen.parentElement;
+
+                    if (!avatar) {
+                        return;
+                    }
+
+                    avatar.textContent =
+                        imagen.dataset
+                            .inicialesAvatar ||
+                        "SU";
+
+                    avatar.setAttribute(
+                        "aria-hidden",
+                        "true"
+                    );
+                };
+
+                imagen.addEventListener(
+                    "error",
+                    mostrarIniciales,
+                    {
+                        once: true
+                    }
+                );
+
+                if (
+                    imagen.complete &&
+                    imagen.naturalWidth === 0
+                ) {
+                    mostrarIniciales();
+                }
+            });
     }
 
 
@@ -1327,6 +1428,10 @@
                     .join("")}
             </div>
         `;
+
+        activarFallbackAvataresPostPlan(
+            contenido
+        );
     }
 
 

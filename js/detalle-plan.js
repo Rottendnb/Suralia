@@ -1718,29 +1718,51 @@ function cargarGaleria() {
 }
 
 
+function renderizarParrafosSegurosDetalle(
+    contenedor,
+    parrafos
+) {
+    if (!contenedor) {
+        return;
+    }
+
+    const fragmento =
+        document.createDocumentFragment();
+
+    (
+        Array.isArray(parrafos)
+            ? parrafos
+            : []
+    ).forEach(
+        (texto) => {
+            const parrafo =
+                document.createElement("p");
+
+            parrafo.textContent =
+                String(texto ?? "");
+
+            fragmento.appendChild(
+                parrafo
+            );
+        }
+    );
+
+    contenedor.replaceChildren(
+        fragmento
+    );
+}
+
+
 function cargarDescripcion() {
-    const contenedor =
-        seleccionar("#detalle-descripcion");
+    renderizarParrafosSegurosDetalle(
+        seleccionar("#detalle-descripcion"),
+        planActual.descripcion
+    );
 
-    if (contenedor) {
-        contenedor.innerHTML =
-            planActual.descripcion
-                .map(
-                    (parrafo) =>
-                        `<p>${parrafo}</p>`
-                )
-                .join("");
-    }
-
-    if (descripcionAmpliada) {
-        descripcionAmpliada.innerHTML =
-            planActual.descripcionAmpliada
-                .map(
-                    (parrafo) =>
-                        `<p>${parrafo}</p>`
-                )
-                .join("");
-    }
+    renderizarParrafosSegurosDetalle(
+        descripcionAmpliada,
+        planActual.descripcionAmpliada
+    );
 }
 
 
@@ -2109,34 +2131,63 @@ function cargarIncluye() {
         return;
     }
 
-    contenedor.innerHTML =
-        planActual.incluye
-            .map(([tipo, texto]) => {
-                const noIncluido =
-                    tipo === "no";
+    const fragmento =
+        document.createDocumentFragment();
 
-                return `
-                    <div
-                        ${
-                            noIncluido
-                                ? 'class="no-incluido"'
-                                : ""
-                        }
-                        role="listitem"
-                    >
-                        <i
-                            class="fa-solid ${
-                                noIncluido
-                                    ? "fa-xmark"
-                                    : "fa-check"
-                            }"
-                            aria-hidden="true"
-                        ></i>
-                        ${texto}
-                    </div>
-                `;
-            })
-            .join("");
+    (
+        Array.isArray(planActual.incluye)
+            ? planActual.incluye
+            : []
+    ).forEach(
+        ([tipo, texto]) => {
+            const noIncluido =
+                tipo === "no";
+
+            const elemento =
+                document.createElement("div");
+
+            elemento.setAttribute(
+                "role",
+                "listitem"
+            );
+
+            if (noIncluido) {
+                elemento.classList.add(
+                    "no-incluido"
+                );
+            }
+
+            const icono =
+                document.createElement("i");
+
+            icono.className =
+                `fa-solid ${
+                    noIncluido
+                        ? "fa-xmark"
+                        : "fa-check"
+                }`;
+
+            icono.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            elemento.append(
+                icono,
+                document.createTextNode(
+                    ` ${String(texto ?? "")}`
+                )
+            );
+
+            fragmento.appendChild(
+                elemento
+            );
+        }
+    );
+
+    contenedor.replaceChildren(
+        fragmento
+    );
 }
 
 
@@ -3414,8 +3465,10 @@ function cargarFechasDisponiblesDetalle() {
                                     opcion.precio
                                 )}`
                                 : (
-                                    opcion.hora ||
-                                    "Hora por confirmar"
+                                    escaparTextoHTML(
+                                        opcion.hora ||
+                                        "Hora por confirmar"
+                                    )
                                 )
                         }
                     </span>
@@ -3912,7 +3965,9 @@ function cerrarModal() {
         "true"
     );
 
-    imagenModal.src = "";
+    imagenModal.removeAttribute(
+        "src"
+    );
     imagenModal.alt =
         "Imagen ampliada del plan";
 

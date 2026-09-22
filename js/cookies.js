@@ -257,9 +257,6 @@ function activarAnaliticaSuralia() {
      * el script deberá cargarse aquí.
      */
 
-    console.log(
-        "Cookies de analítica aceptadas."
-    );
 }
 
 
@@ -270,23 +267,22 @@ function desactivarAnaliticaSuralia() {
      * exista una herramienta real.
      */
 
-    console.log(
-        "Cookies de analítica desactivadas."
-    );
 }
 
 
 function activarMarketingSuralia() {
-    console.log(
-        "Cookies de marketing aceptadas."
-    );
+    /*
+     * Cuando exista una herramienta de
+     * marketing, se activará aquí.
+     */
 }
 
 
 function desactivarMarketingSuralia() {
-    console.log(
-        "Cookies de marketing desactivadas."
-    );
+    /*
+     * Cuando exista una herramienta de
+     * marketing, se desactivará aquí.
+     */
 }
 
 

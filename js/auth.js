@@ -693,6 +693,64 @@ async function sincronizarPerfilSocial(
    REDIRECCIÓN DESPUÉS DEL LOGIN
 ===================================================== */
 
+function obtenerDestinoSeguroAuth(
+    valor = "",
+    destinoAlternativo = "perfil.html"
+) {
+    const texto =
+        String(
+            valor ||
+            ""
+        ).trim();
+
+    if (!texto) {
+        return destinoAlternativo;
+    }
+
+    const tieneProtocoloExplicito =
+        /^[a-zA-Z][a-zA-Z\d+.-]*:/.test(
+            texto
+        ) ||
+        texto.startsWith(
+            "//"
+        );
+
+    try {
+        const url = new URL(
+            texto,
+            window.location.href
+        );
+
+        if (
+            [
+                "https:",
+                "http:"
+            ].includes(
+                url.protocol
+            ) &&
+            url.origin ===
+                window.location.origin
+        ) {
+            return url.href;
+        }
+
+        if (
+            window.location.protocol ===
+                "file:" &&
+            url.protocol ===
+                "file:" &&
+            !tieneProtocoloExplicito
+        ) {
+            return url.href;
+        }
+    } catch (_error) {
+        return destinoAlternativo;
+    }
+
+    return destinoAlternativo;
+}
+
+
 function obtenerPaginaDestino() {
     const parametros =
         new URLSearchParams(
@@ -718,15 +776,9 @@ function obtenerPaginaDestino() {
         "destinoDespuesLoginSuralia"
     );
 
-    if (
-        destino.startsWith("http://") ||
-        destino.startsWith("https://") ||
-        destino.startsWith("//")
-    ) {
-        return "perfil.html";
-    }
-
-    return destino;
+    return obtenerDestinoSeguroAuth(
+        destino
+    );
 }
 
 
@@ -1622,22 +1674,11 @@ function guardarDestinoAntesDeGoogle() {
         destinoGuardado ||
         "perfil.html";
 
-    if (
-        destino.startsWith("http://") ||
-        destino.startsWith("https://") ||
-        destino.startsWith("//")
-    ) {
-        sessionStorage.setItem(
-            "destinoDespuesLoginSuralia",
-            "perfil.html"
-        );
-
-        return;
-    }
-
     sessionStorage.setItem(
         "destinoDespuesLoginSuralia",
-        destino
+        obtenerDestinoSeguroAuth(
+            destino
+        )
     );
 }
 

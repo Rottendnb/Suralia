@@ -499,7 +499,12 @@ async function cargarUsuarioHeaderPerfilPublico() {
     function mostrarImagen(
         url
     ) {
-        if (!url) {
+        const urlSegura =
+            obtenerURLSeguraFotoPerfilPublico(
+                url
+            );
+
+        if (!urlSegura) {
             mostrarIniciales();
             return;
         }
@@ -508,7 +513,7 @@ async function cargarUsuarioHeaderPerfilPublico() {
             "";
 
         avatarHeader.style.backgroundImage =
-            `url("${url}")`;
+            `url("${urlSegura}")`;
 
         avatarHeader.style.backgroundPosition =
             "center";
@@ -758,6 +763,43 @@ function escaparHTML(
 }
 
 
+function obtenerURLSeguraFotoPerfilPublico(
+    valor = ""
+) {
+    const texto =
+        String(
+            valor ||
+            ""
+        ).trim();
+
+    if (!texto) {
+        return "";
+    }
+
+    try {
+        const url = new URL(
+            texto,
+            window.location.href
+        );
+
+        if (
+            ![
+                "https:",
+                "http:"
+            ].includes(
+                url.protocol
+            )
+        ) {
+            return "";
+        }
+
+        return url.href;
+    } catch (_error) {
+        return "";
+    }
+}
+
+
 function obtenerPerfilIdURL() {
     const parametros =
         new URLSearchParams(
@@ -918,8 +960,19 @@ function actualizarFotoPublicaVisor() {
             indiceFotoPublicaActual
         ];
 
-    imagenModalFoto.src =
-        foto.url || "";
+    const urlFotoSegura =
+        obtenerURLSeguraFotoPerfilPublico(
+            foto?.url
+        );
+
+    if (urlFotoSegura) {
+        imagenModalFoto.src =
+            urlFotoSegura;
+    } else {
+        imagenModalFoto.removeAttribute(
+            "src"
+        );
+    }
 
     imagenModalFoto.alt =
         foto.principal
@@ -1003,8 +1056,9 @@ function cerrarFotoPublica() {
         "true"
     );
 
-    imagenModalFoto.src =
-        "";
+    imagenModalFoto.removeAttribute(
+        "src"
+    );
 
     document.body.classList.remove(
         "modal-abierta"
@@ -1054,8 +1108,27 @@ function mostrarGaleria(
         );
 
     const lista =
-        Array.isArray(fotos)
-            ? [...fotos].sort(
+        (
+            Array.isArray(fotos)
+                ? [...fotos]
+                : []
+        )
+            .map(
+                (foto) => ({
+                    ...foto,
+                    url:
+                        obtenerURLSeguraFotoPerfilPublico(
+                            foto?.url
+                        )
+                })
+            )
+            .filter(
+                (foto) =>
+                    Boolean(
+                        foto.url
+                    )
+            )
+            .sort(
                 (fotoA, fotoB) =>
                     Number(
                         fotoA.posicion
@@ -1063,8 +1136,7 @@ function mostrarGaleria(
                     Number(
                         fotoB.posicion
                     )
-            )
-            : [];
+            );
 
     fotosPerfilPublicoActuales =
         lista;
@@ -2302,6 +2374,11 @@ function mostrarPerfil(
             "#perfil-publico-foto-principal"
         );
 
+    const fotoPrincipalSegura =
+        obtenerURLSeguraFotoPerfilPublico(
+            datos?.foto_principal
+        );
+
     const verificado =
         document.querySelector(
             "#perfil-publico-verificado"
@@ -2320,12 +2397,12 @@ function mostrarPerfil(
 
     if (
         fotoPrincipal &&
-        datos?.foto_principal
+        fotoPrincipalSegura
     ) {
         fotoPrincipal.innerHTML = `
             <img
                 src="${escaparHTML(
-                    datos.foto_principal
+                    fotoPrincipalSegura
                 )}"
                 alt="Fotografía principal de ${escaparHTML(
                     nombre

@@ -2685,12 +2685,17 @@ function renderizarRecomendacionesModoSuralia(
                                     "Puede encajar contigo"
                                 ];
 
+                        const urlImagenSegura =
+                            obtenerURLSeguraImagenPlanes(
+                                item.datos.imagen
+                            );
+
                         const imagen =
-                            item.datos.imagen
+                            urlImagenSegura
                                 ? `
                                     <img
                                         src="${escaparHTMLPlanes(
-                                            item.datos.imagen
+                                            urlImagenSegura
                                         )}"
                                         alt=""
                                         loading="lazy"
@@ -4464,6 +4469,48 @@ function escaparHTMLPlanes(
 }
 
 
+function obtenerURLSeguraImagenPlanes(
+    valor = ""
+) {
+    const texto =
+        String(
+            valor ||
+            ""
+        ).trim();
+
+    if (!texto) {
+        return "";
+    }
+
+    try {
+        const url = new URL(
+            texto,
+            window.location.href
+        );
+
+        const protocoloPermitido =
+            [
+                "https:",
+                "http:"
+            ].includes(
+                url.protocol
+            ) ||
+            (
+                window.location.protocol ===
+                    "file:" &&
+                url.protocol ===
+                    "file:"
+            );
+
+        return protocoloPermitido
+            ? url.href
+            : "";
+    } catch (_error) {
+        return "";
+    }
+}
+
+
 function formatearFechaPublicada(
     fechaIso
 ) {
@@ -4786,10 +4833,17 @@ function crearTarjetaPlanSupabase(
             0
         );
 
+    const imagenSegura =
+        obtenerURLSeguraImagenPlanes(
+            plan.imagen_url
+        ) ||
+        obtenerURLSeguraImagenPlanes(
+            "img/placeholder-plan.jpg"
+        );
+
     const imagen =
         escaparHTMLPlanes(
-            plan.imagen_url ||
-            "img/placeholder-plan.jpg"
+            imagenSegura
         );
 
     const precioNumero =

@@ -416,6 +416,48 @@ function escaparHTML(
 }
 
 
+function obtenerURLSeguraImagenAdmin(
+    valor = ""
+) {
+    const texto =
+        String(
+            valor ||
+            ""
+        ).trim();
+
+    if (!texto) {
+        return "";
+    }
+
+    try {
+        const url = new URL(
+            texto,
+            window.location.href
+        );
+
+        const protocoloPermitido =
+            [
+                "https:",
+                "http:"
+            ].includes(
+                url.protocol
+            ) ||
+            (
+                window.location.protocol ===
+                    "file:" &&
+                url.protocol ===
+                    "file:"
+            );
+
+        return protocoloPermitido
+            ? url.href
+            : "";
+    } catch (_error) {
+        return "";
+    }
+}
+
+
 function formatearFechaAdmin(
     fechaIso
 ) {
@@ -726,8 +768,9 @@ function crearPlanPendienteHTML(
 
     const fotoAutor =
         escaparHTML(
-            plan.foto_principal_url_visual ||
-            ""
+            obtenerURLSeguraImagenAdmin(
+                plan.foto_principal_url_visual
+            )
         );
 
     const descripcion =
@@ -745,8 +788,12 @@ function crearPlanPendienteHTML(
 
     const imagen =
         escaparHTML(
-            plan.imagen_url ||
-            "img/placeholder-plan.jpg"
+            obtenerURLSeguraImagenAdmin(
+                plan.imagen_url
+            ) ||
+            obtenerURLSeguraImagenAdmin(
+                "img/placeholder-plan.jpg"
+            )
         );
 
     const ubicacion =
@@ -1455,8 +1502,12 @@ function crearPlanPublicadoHTML(
 
     const imagen =
         escaparHTML(
-            plan.imagen_url ||
-            "img/placeholder-plan.jpg"
+            obtenerURLSeguraImagenAdmin(
+                plan.imagen_url
+            ) ||
+            obtenerURLSeguraImagenAdmin(
+                "img/placeholder-plan.jpg"
+            )
         );
 
     const ubicacion =
@@ -2024,8 +2075,9 @@ function crearUsuarioAdminHTML(
 
     const foto =
         escaparHTML(
-            usuario.foto_principal_url_visual ||
-            ""
+            obtenerURLSeguraImagenAdmin(
+                usuario.foto_principal_url_visual
+            )
         );
 
     const rol =
@@ -2544,14 +2596,16 @@ function crearVerificacionHTML(
 
     const fotoPerfil =
         escaparHTML(
-            verificacion.foto_principal_url_visual ||
-            ""
+            obtenerURLSeguraImagenAdmin(
+                verificacion.foto_principal_url_visual
+            )
         );
 
     const selfie =
         escaparHTML(
-            verificacion.selfie_url_temporal ||
-            ""
+            obtenerURLSeguraImagenAdmin(
+                verificacion.selfie_url_temporal
+            )
         );
 
     const codigo =
@@ -2678,6 +2732,7 @@ function crearVerificacionHTML(
                                     <img
                                         src="${selfie}"
                                         alt="Selfie de verificación de ${nombre}"
+                                        loading="lazy"
                                     >
 
                                     <span>

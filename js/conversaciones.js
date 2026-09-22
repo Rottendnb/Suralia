@@ -489,6 +489,44 @@ function escaparHTML(valor = "") {
         .replace(/'/g, "&#039;");
 }
 
+
+function obtenerURLSeguraAvatarConversaciones(
+    valor = ""
+) {
+    const texto =
+        String(
+            valor ||
+            ""
+        ).trim();
+
+    if (!texto) {
+        return "";
+    }
+
+    try {
+        const url = new URL(
+            texto,
+            window.location.href
+        );
+
+        if (
+            ![
+                "https:",
+                "http:"
+            ].includes(
+                url.protocol
+            )
+        ) {
+            return "";
+        }
+
+        return url.href;
+    } catch (_error) {
+        return "";
+    }
+}
+
+
 function formatearFecha(fecha) {
     if (!fecha) return "";
 
@@ -559,7 +597,12 @@ async function cargarHeader() {
     function mostrarImagen(
         url
     ) {
-        if (!url) {
+        const urlSegura =
+            obtenerURLSeguraAvatarConversaciones(
+                url
+            );
+
+        if (!urlSegura) {
             mostrarIniciales();
             return;
         }
@@ -568,7 +611,7 @@ async function cargarHeader() {
             "";
 
         avatar.style.backgroundImage =
-            `url("${url}")`;
+            `url("${urlSegura}")`;
 
         avatar.style.backgroundPosition =
             "center";
@@ -718,8 +761,8 @@ function actualizarTituloNoLeidos(
 
     document.title =
         total > 0
-            ? `(${total > 99 ? "99+" : total}) Mensajes | Suralia`
-            : "Mensajes | Suralia";
+            ? `(${total > 99 ? "99+" : total}) Conversaciones | Suralia`
+            : "Conversaciones | Suralia";
 }
 
 
@@ -735,8 +778,10 @@ function avatarPerfil(
     perfil
 ) {
     const fotoVisual =
-        perfil?.foto_principal_url_visual ||
-        "";
+        obtenerURLSeguraAvatarConversaciones(
+            perfil?.foto_principal_url_visual ||
+            ""
+        );
 
     if (fotoVisual) {
         return `
@@ -745,6 +790,7 @@ function avatarPerfil(
                     fotoVisual
                 )}"
                 alt=""
+                loading="lazy"
             >
         `;
     }

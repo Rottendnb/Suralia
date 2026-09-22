@@ -12,8 +12,3 @@ const clienteSupabase =
 
 window.clienteSupabase =
     clienteSupabase;
-
-console.log(
-    "Supabase conectado",
-    clienteSupabase
-);

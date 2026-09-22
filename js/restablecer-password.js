@@ -242,6 +242,31 @@ function mostrarFormulario() {
 }
 
 
+function coincideConEnlaceRecuperacion(
+    sesion
+) {
+    if (!sesion?.access_token) {
+        return false;
+    }
+
+    const parametrosHash =
+        new URLSearchParams(
+            window.location.hash.replace(
+                /^#/,
+                ""
+            )
+        );
+
+    return (
+        parametrosHash.get("type") ===
+            "recovery" &&
+        parametrosHash.get(
+            "access_token"
+        ) === sesion.access_token
+    );
+}
+
+
 /* =====================================================
    COMPROBAR LA SESIÓN DE RECUPERACIÓN
 ===================================================== */
@@ -266,17 +291,11 @@ async function comprobarRecuperacion() {
                 (evento, sesion) => {
                     if (
                         evento ===
-                        "PASSWORD_RECOVERY"
-                    ) {
-                        mostrarFormulario();
-                    }
-
-                    if (
-                        evento ===
-                            "SIGNED_IN" &&
+                            "PASSWORD_RECOVERY" &&
                         sesion
                     ) {
                         mostrarFormulario();
+                        return;
                     }
                 }
             );
@@ -300,7 +319,11 @@ async function comprobarRecuperacion() {
             return;
         }
 
-        if (data.session) {
+        if (
+            coincideConEnlaceRecuperacion(
+                data.session
+            )
+        ) {
             mostrarFormulario();
             return;
         }

@@ -765,13 +765,16 @@
                         </span>
 
                         <h2>
-                            Relación provisional de tecnologías
+                            Tecnologías utilizadas actualmente
                         </h2>
 
                         <p>
-                            Actualmente, durante el desarrollo del proyecto,
-                            se utilizan principalmente datos almacenados en el
-                            navegador.
+                            Suralia utiliza almacenamiento local y de sesión
+                            del navegador para recordar determinadas
+                            preferencias, mantener la continuidad de la
+                            navegación y apoyar algunas funciones de la cuenta.
+                            La autenticación y los datos principales de planes,
+                            perfiles y reservas se gestionan mediante Supabase.
                         </p>
 
                         <div class="legal__tabla-contenedor">
@@ -824,21 +827,44 @@
 
                                     <tr>
                                         <td>
-                                            sesionSuralia
+                                            sb-…-auth-token
                                         </td>
 
                                         <td>
-                                            Almacenamiento local provisional
+                                            Almacenamiento local de Supabase
                                         </td>
 
                                         <td>
-                                            Mantener la sesión durante la fase
-                                            de desarrollo.
+                                            Mantener la sesión autenticada y
+                                            renovar de forma segura sus
+                                            credenciales temporales.
+                                        </td>
+
+                                        <td>
+                                            Hasta cerrar sesión, alcanzar su
+                                            caducidad o eliminar los datos del
+                                            navegador.
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            usuarioSuralia / sesionSuralia
+                                        </td>
+
+                                        <td>
+                                            Almacenamiento local
+                                        </td>
+
+                                        <td>
+                                            Recordar información básica de la
+                                            cuenta para mostrar el perfil y la
+                                            sesión correctamente en la interfaz.
                                         </td>
 
                                         <td>
                                             Hasta cerrar sesión o eliminar los
-                                            datos.
+                                            datos del navegador.
                                         </td>
                                     </tr>
 
@@ -848,15 +874,18 @@
                                         </td>
 
                                         <td>
-                                            Almacenamiento local provisional
+                                            Almacenamiento local
                                         </td>
 
                                         <td>
-                                            Guardar los planes favoritos.
+                                            Mantener una copia local de los
+                                            planes marcados como favoritos para
+                                            sincronizar su estado entre páginas.
                                         </td>
 
                                         <td>
-                                            Hasta que el usuario los elimine.
+                                            Hasta retirar los favoritos o
+                                            eliminar los datos del navegador.
                                         </td>
                                     </tr>
 
@@ -866,16 +895,62 @@
                                         </td>
 
                                         <td>
-                                            Almacenamiento local provisional
+                                            Almacenamiento local
                                         </td>
 
                                         <td>
-                                            Guardar reservas simuladas durante
-                                            el desarrollo.
+                                            Mantener una copia auxiliar de las
+                                            reservas. Las reservas confirmadas y
+                                            la disponibilidad real se gestionan
+                                            en Supabase.
                                         </td>
 
                                         <td>
-                                            Hasta que el usuario las elimine.
+                                            Hasta cancelar la reserva o eliminar
+                                            los datos del navegador.
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            borradoresSuralia
+                                        </td>
+
+                                        <td>
+                                            Almacenamiento local
+                                        </td>
+
+                                        <td>
+                                            Conservar borradores de planes para
+                                            poder continuar su edición más
+                                            adelante.
+                                        </td>
+
+                                        <td>
+                                            Hasta publicar o eliminar el
+                                            borrador, o borrar los datos del
+                                            navegador.
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            destinoDespuesLoginSuralia
+                                        </td>
+
+                                        <td>
+                                            Almacenamiento de sesión
+                                        </td>
+
+                                        <td>
+                                            Recordar la página a la que debe
+                                            regresar el usuario después de
+                                            iniciar sesión.
+                                        </td>
+
+                                        <td>
+                                            Durante la sesión de la pestaña del
+                                            navegador.
                                         </td>
                                     </tr>
 
@@ -886,9 +961,9 @@
                         </div>
 
                         <p>
-                            Esta tabla deberá sustituirse cuando la plataforma
-                            utilice autenticación, base de datos, analítica y
-                            pagos reales.
+                            Esta relación deberá revisarse antes del lanzamiento
+                            y cada vez que se incorporen nuevas herramientas de
+                            analítica, publicidad, pagos o servicios de terceros.
                         </p>
 
                     </section>

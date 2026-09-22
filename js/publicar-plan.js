@@ -918,10 +918,22 @@ function actualizarVistaPrevia() {
         : direccionTexto || "Ubicación pendiente";
 
     if (vistaUbicacion) {
-        vistaUbicacion.innerHTML = `
-            <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-            ${ubicacionVista}
-        `;
+        const iconoUbicacion = document.createElement("i");
+
+        iconoUbicacion.className =
+            "fa-solid fa-location-dot";
+
+        iconoUbicacion.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+        vistaUbicacion.replaceChildren(
+            iconoUbicacion,
+            document.createTextNode(
+                ` ${ubicacionVista}`
+            )
+        );
     }
 
     const valorPrecio = Number(precio?.value || 0);
@@ -1089,7 +1101,11 @@ function eliminarImagenSeleccionada(indice = 1) {
     if (configuracion.input) configuracion.input.value = "";
     configuracion.guardarBase64("");
 
-    if (configuracion.vista) configuracion.vista.src = "";
+    if (configuracion.vista) {
+        configuracion.vista.removeAttribute(
+            "src"
+        );
+    }
     if (configuracion.nombre) configuracion.nombre.textContent = "";
 
     configuracion.resultado?.classList.remove("visible");

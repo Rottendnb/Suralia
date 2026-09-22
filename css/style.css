@@ -7398,8 +7398,13 @@ img {
         right: 12px;
         bottom: 12px;
         left: 12px;
+        max-height: calc(100dvh - 24px);
         padding: 18px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
         border-radius: 18px;
+        scrollbar-width: thin;
+        -webkit-overflow-scrolling: touch;
     }
 
     .banner-cookies__acciones {

@@ -334,8 +334,10 @@ function aplicarAvatar(elemento) {
             : "";
 
     const avatarVisual =
-        avatarPerfilTemporal ||
-        avatarExternoPersistido;
+        obtenerURLSeguraFotoPerfil(
+            avatarPerfilTemporal ||
+            avatarExternoPersistido
+        );
 
     if (avatarVisual) {
         elemento.classList.add(
@@ -959,6 +961,43 @@ function escaparAtributoHTML(
 }
 
 
+function obtenerURLSeguraFotoPerfil(
+    valor = ""
+) {
+    const texto =
+        String(
+            valor ||
+            ""
+        ).trim();
+
+    if (!texto) {
+        return "";
+    }
+
+    try {
+        const url = new URL(
+            texto,
+            window.location.href
+        );
+
+        if (
+            ![
+                "https:",
+                "http:"
+            ].includes(
+                url.protocol
+            )
+        ) {
+            return "";
+        }
+
+        return url.href;
+    } catch (_error) {
+        return "";
+    }
+}
+
+
 /*
    Sustituye tu función reducirFotoPerfil() completa por esta versión.
 
@@ -1421,15 +1460,33 @@ let posicionTactilInicialVisor =
 function obtenerFotosOrdenadasVisor() {
     return [
         ...fotosPerfil
-    ].sort(
-        (fotoA, fotoB) =>
-            Number(
-                fotoA.posicion
-            ) -
-            Number(
-                fotoB.posicion
-            )
-    );
+    ]
+        .map(
+            (foto) => ({
+                ...foto,
+                url_segura:
+                    obtenerURLSeguraFotoPerfil(
+                        foto.url_visual ||
+                        foto.foto_url ||
+                        ""
+                    )
+            })
+        )
+        .filter(
+            (foto) =>
+                Boolean(
+                    foto.url_segura
+                )
+        )
+        .sort(
+            (fotoA, fotoB) =>
+                Number(
+                    fotoA.posicion
+                ) -
+                Number(
+                    fotoB.posicion
+                )
+        );
 }
 
 
@@ -1523,11 +1580,7 @@ function actualizarVisorFotoPerfil() {
         ];
 
     const url =
-        String(
-            foto.url_visual ||
-            foto.foto_url ||
-            ""
-        ).trim();
+        foto.url_segura;
 
     const textoAlt =
         foto.es_principal
@@ -1642,8 +1695,9 @@ function cerrarVisorFotoPerfil() {
     );
 
     if (imagen) {
-        imagen.src =
-            "";
+        imagen.removeAttribute(
+            "src"
+        );
 
         imagen.alt =
             "Fotografía del perfil";
@@ -1849,9 +1903,11 @@ function crearFotoGaleriaHTML(
 
     const url =
         escaparAtributoHTML(
-            foto.url_visual ||
-            foto.foto_url ||
-            ""
+            obtenerURLSeguraFotoPerfil(
+                foto.url_visual ||
+                foto.foto_url ||
+                ""
+            )
         );
 
     const esPrincipal =
@@ -1957,6 +2013,18 @@ function mostrarGaleriaPerfil() {
     const total =
         fotosPerfil.length;
 
+    const fotosVisibles =
+        fotosPerfil.filter(
+            (foto) =>
+                Boolean(
+                    obtenerURLSeguraFotoPerfil(
+                        foto.url_visual ||
+                        foto.foto_url ||
+                        ""
+                    )
+                )
+        );
+
     if (contadorFotosPerfil) {
         contadorFotosPerfil.textContent =
             String(total);
@@ -1985,7 +2053,7 @@ function mostrarGaleriaPerfil() {
         return;
     }
 
-    if (total === 0) {
+    if (fotosVisibles.length === 0) {
         galeriaFotosPerfil.innerHTML =
             "";
 
@@ -2009,7 +2077,7 @@ function mostrarGaleriaPerfil() {
     );
 
     galeriaFotosPerfil.innerHTML =
-        fotosPerfil
+        fotosVisibles
             .sort(
                 (fotoA, fotoB) =>
                     Number(fotoA.posicion) -
@@ -6636,6 +6704,7 @@ function crearProximaReservaHTML(
                 <img
                     src="${imagen}"
                     alt="${titulo}"
+                    loading="lazy"
                     onerror="
                         this.onerror=null;
                         this.src='img/placeholder-plan.jpg';
@@ -6949,6 +7018,7 @@ function crearReservaHTML(
                 <img
                     src="${imagen}"
                     alt="${titulo}"
+                    loading="lazy"
                     onerror="
                         this.onerror=null;
                         this.src='img/placeholder-plan.jpg';
@@ -10585,12 +10655,23 @@ function crearInteresesConexionHTML(
 
 
 function crearAvatarConexionHTML(perfil) {
+    const nombreOriginal = String(
+        perfil?.nombre_visible ||
+        "Usuario de Suralia"
+    ).trim();
+
     const nombre = escaparHTML(
-        perfil?.nombre_visible || "Usuario de Suralia"
+        nombreOriginal
     );
 
     const foto = escaparHTML(
         perfil?.foto_principal_url || ""
+    );
+
+    const iniciales = escaparHTML(
+        obtenerInicialesConexion(
+            nombreOriginal
+        )
     );
 
     if (foto) {
@@ -10600,10 +10681,8 @@ function crearAvatarConexionHTML(perfil) {
                     src="${foto}"
                     alt="Foto de ${nombre}"
                     loading="lazy"
-                    onerror="
-                        this.onerror=null;
-                        this.parentElement.textContent='${obtenerInicialesConexion(nombre)}';
-                    "
+                    data-avatar-conexion
+                    data-iniciales-avatar="${iniciales}"
                 >
             </span>
         `;
@@ -10611,9 +10690,54 @@ function crearAvatarConexionHTML(perfil) {
 
     return `
         <span class="conexion-item__avatar" aria-hidden="true">
-            ${obtenerInicialesConexion(nombre)}
+            ${iniciales}
         </span>
     `;
+}
+
+
+function activarFallbackAvataresConexion(
+    contenedor
+) {
+    contenedor
+        ?.querySelectorAll(
+            "[data-avatar-conexion]"
+        )
+        .forEach((imagen) => {
+            const mostrarIniciales = () => {
+                const avatar =
+                    imagen.parentElement;
+
+                if (!avatar) {
+                    return;
+                }
+
+                avatar.textContent =
+                    imagen.dataset
+                        .inicialesAvatar ||
+                    "SU";
+
+                avatar.setAttribute(
+                    "aria-hidden",
+                    "true"
+                );
+            };
+
+            imagen.addEventListener(
+                "error",
+                mostrarIniciales,
+                {
+                    once: true
+                }
+            );
+
+            if (
+                imagen.complete &&
+                imagen.naturalWidth === 0
+            ) {
+                mostrarIniciales();
+            }
+        });
 }
 
 function crearSolicitudRecibidaHTML(solicitud) {
@@ -11220,6 +11344,10 @@ function actualizarBloqueConexiones(
     lista.classList.remove("oculta");
     estadoVacio.classList.add("oculto");
     lista.innerHTML = elementos.map(creadorHTML).join("");
+
+    activarFallbackAvataresConexion(
+        lista
+    );
 }
 
 

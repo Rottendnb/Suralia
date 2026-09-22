@@ -77,6 +77,63 @@
     }
 
 
+    function obtenerEnlaceSeguroNotificacion(
+        valor = ""
+    ) {
+        const texto =
+            String(
+                valor ||
+                ""
+            ).trim();
+
+        if (!texto) {
+            return "";
+        }
+
+        const tieneProtocoloExplicito =
+            /^[a-zA-Z][a-zA-Z\d+.-]*:/.test(
+                texto
+            ) ||
+            texto.startsWith(
+                "//"
+            );
+
+        try {
+            const url = new URL(
+                texto,
+                window.location.href
+            );
+
+            if (
+                [
+                    "https:",
+                    "http:"
+                ].includes(
+                    url.protocol
+                ) &&
+                url.origin ===
+                    window.location.origin
+            ) {
+                return url.href;
+            }
+
+            if (
+                window.location.protocol ===
+                    "file:" &&
+                url.protocol ===
+                    "file:" &&
+                !tieneProtocoloExplicito
+            ) {
+                return url.href;
+            }
+
+            return "";
+        } catch (_error) {
+            return "";
+        }
+    }
+
+
     function esperar(
         milisegundos
     ) {
@@ -497,8 +554,9 @@
 
         const enlace =
             escaparHTML(
-                notificacion.enlace ||
-                ""
+                obtenerEnlaceSeguroNotificacion(
+                    notificacion.enlace
+                )
             );
 
         const fecha =
@@ -913,9 +971,11 @@
                                 );
 
                             const enlace =
-                                item?.dataset
-                                    ?.notificacionEnlace ||
-                                "";
+                                obtenerEnlaceSeguroNotificacion(
+                                    item?.dataset
+                                        ?.notificacionEnlace ||
+                                    ""
+                                );
 
                             await marcarNotificacionLeida(
                                 id

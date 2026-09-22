@@ -910,6 +910,44 @@ function escaparHTML(
 }
 
 
+function obtenerURLSeguraImagenChat(
+    valor = ""
+) {
+    const texto =
+        String(
+            valor ||
+            ""
+        ).trim();
+
+    if (!texto) {
+        return "";
+    }
+
+    try {
+        const url = new URL(
+            texto,
+            window.location.href
+        );
+
+        if (
+            ![
+                "https:",
+                "http:",
+                "blob:"
+            ].includes(
+                url.protocol
+            )
+        ) {
+            return "";
+        }
+
+        return url.href;
+    } catch (_error) {
+        return "";
+    }
+}
+
+
 function mostrarErrorMensajes(
     mensaje
 ) {
@@ -1545,8 +1583,9 @@ function liberarVistaPreviaImagen() {
     ocultarMenuImagenChat();
 
     if (imagenPrevia) {
-        imagenPrevia.src =
-            "";
+        imagenPrevia.removeAttribute(
+            "src"
+        );
     }
 
     vistaPreviaImagen?.classList.add(
@@ -2491,6 +2530,11 @@ function crearElementoMensaje(
         mensaje.eliminado ===
         true;
 
+    const urlImagenSegura =
+        obtenerURLSeguraImagenChat(
+            mensaje.imagen_url_temporal
+        );
+
     const articulo =
         document.createElement(
             "article"
@@ -2693,22 +2737,22 @@ function crearElementoMensaje(
                             <a
                                 class="chat-mensaje__imagen-enlace"
                                 href="${escaparHTML(
-                                    mensaje.imagen_url_temporal ||
+                                    urlImagenSegura ||
                                     "#"
                                 )}"
                                 data-abrir-imagen-chat="${escaparHTML(
-                                    mensaje.imagen_url_temporal ||
+                                    urlImagenSegura ||
                                     ""
                                 )}"
                                 aria-label="Abrir imagen"
                             >
                                 ${
-                                    mensaje.imagen_url_temporal
+                                    urlImagenSegura
                                         ? `
                                             <img
                                                 class="chat-mensaje__imagen"
                                                 src="${escaparHTML(
-                                                    mensaje.imagen_url_temporal
+                                                    urlImagenSegura
                                                 )}"
                                                 alt="${escaparHTML(
                                                     mensaje.imagen_nombre ||
@@ -2927,8 +2971,13 @@ function abrirModalImagenChat(
     url,
     textoAlternativo = "Imagen ampliada del chat"
 ) {
+    const urlSegura =
+        obtenerURLSeguraImagenChat(
+            url
+        );
+
     if (
-        !url ||
+        !urlSegura ||
         !modalImagenChat ||
         !modalImagenChatImg
     ) {
@@ -2936,7 +2985,7 @@ function abrirModalImagenChat(
     }
 
     modalImagenChatImg.src =
-        url;
+        urlSegura;
 
     modalImagenChatImg.alt =
         textoAlternativo;
@@ -2965,8 +3014,9 @@ function cerrarImagenChat() {
         "oculto"
     );
 
-    modalImagenChatImg.src =
-        "";
+    modalImagenChatImg.removeAttribute(
+        "src"
+    );
 
     document.body.classList.remove(
         "modal-abierto"

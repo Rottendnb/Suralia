@@ -84,6 +84,28 @@
     }
 
 
+    function obtenerOrigenSupabaseFotosPerfil() {
+        const cliente =
+            obtenerClienteSupabaseFotosPerfil();
+
+        const urlSupabase =
+            cliente?.supabaseUrl ||
+            "";
+
+        if (!urlSupabase) {
+            return "";
+        }
+
+        try {
+            return new URL(
+                urlSupabase
+            ).origin;
+        } catch (error) {
+            return "";
+        }
+    }
+
+
     function esUrlInternaFotosPerfil(
         valor = ""
     ) {
@@ -104,16 +126,28 @@
                     window.location.href
                 );
 
-            return (
-                url.pathname.includes(
-                    `/storage/v1/object/public/${BUCKET_FOTOS_PERFIL}/`
-                ) ||
-                url.pathname.includes(
-                    `/storage/v1/object/sign/${BUCKET_FOTOS_PERFIL}/`
-                ) ||
-                url.pathname.includes(
-                    `/storage/v1/object/authenticated/${BUCKET_FOTOS_PERFIL}/`
-                )
+            const origenSupabase =
+                obtenerOrigenSupabaseFotosPerfil();
+
+            if (
+                !origenSupabase ||
+                url.origin !==
+                    origenSupabase
+            ) {
+                return false;
+            }
+
+            const prefijos = [
+                `/storage/v1/object/public/${BUCKET_FOTOS_PERFIL}/`,
+                `/storage/v1/object/sign/${BUCKET_FOTOS_PERFIL}/`,
+                `/storage/v1/object/authenticated/${BUCKET_FOTOS_PERFIL}/`
+            ];
+
+            return prefijos.some(
+                (prefijo) =>
+                    url.pathname.startsWith(
+                        prefijo
+                    )
             );
         } catch (error) {
             return false;
@@ -178,6 +212,14 @@
                     window.location.href
                 );
 
+            if (
+                !esUrlInternaFotosPerfil(
+                    texto
+                )
+            ) {
+                return "";
+            }
+
             const prefijos = [
                 `/storage/v1/object/public/${BUCKET_FOTOS_PERFIL}/`,
                 `/storage/v1/object/sign/${BUCKET_FOTOS_PERFIL}/`,
@@ -187,7 +229,7 @@
             const prefijo =
                 prefijos.find(
                     (item) =>
-                        url.pathname.includes(
+                        url.pathname.startsWith(
                             item
                         )
                 );

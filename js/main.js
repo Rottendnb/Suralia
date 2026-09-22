@@ -1144,6 +1144,48 @@ function escaparTextoHTML(valor = "") {
 }
 
 
+function obtenerURLSeguraImagenPortada(
+    valor = ""
+) {
+    const texto =
+        String(
+            valor ||
+            ""
+        ).trim();
+
+    if (!texto) {
+        return "";
+    }
+
+    try {
+        const url = new URL(
+            texto,
+            window.location.href
+        );
+
+        const protocoloPermitido =
+            [
+                "https:",
+                "http:"
+            ].includes(
+                url.protocol
+            ) ||
+            (
+                window.location.protocol ===
+                    "file:" &&
+                url.protocol ===
+                    "file:"
+            );
+
+        return protocoloPermitido
+            ? url.href
+            : "";
+    } catch (_error) {
+        return "";
+    }
+}
+
+
 
 async function sincronizarAvatarCabeceraDesdeSupabase() {
     const cliente =
@@ -1315,8 +1357,10 @@ function obtenerAvatarCabeceraHTML() {
         usuarioActual?.avatarTipo;
 
     const avatarValor =
-        avatarCabeceraTemporal ||
-        usuarioActual?.avatarValor;
+        obtenerURLSeguraImagenPortada(
+            avatarCabeceraTemporal ||
+            usuarioActual?.avatarValor
+        );
 
     if (
         avatarTipo === "imagen" &&
@@ -2651,9 +2695,18 @@ function crearTarjetaProximoPlanHTML(plan) {
     const ubicacion = escaparTextoHTML(
         plan.ubicacion || "Ubicación por confirmar"
     );
-    const imagen = escaparAtributoHTML(
-        plan.imagen || "img/placeholder-plan.jpg"
-    );
+    const imagenSegura =
+        obtenerURLSeguraImagenPortada(
+            plan.imagen
+        ) ||
+        obtenerURLSeguraImagenPortada(
+            "img/placeholder-plan.jpg"
+        );
+
+    const imagen =
+        escaparAtributoHTML(
+            imagenSegura
+        );
     const enlace = escaparAtributoHTML(plan.enlace || "planes.html");
     const precio = Number(plan.precio || 0);
     const valoracion = Number(plan.valoracion || 0);
@@ -2877,7 +2930,12 @@ function actualizarHeroConProximoPlan(
         plan.categoriaTexto || "";
 
     tarjetaHero.dataset.imagen =
-        plan.imagen || "";
+        obtenerURLSeguraImagenPortada(
+            plan.imagen
+        ) ||
+        obtenerURLSeguraImagenPortada(
+            "img/placeholder-plan.jpg"
+        );
 
     tarjetaHero.dataset.fecha =
         plan.fechaTexto || "";
@@ -2923,11 +2981,16 @@ function actualizarHeroConProximoPlan(
     }
 
     if (imagenHero) {
-        imagenHero.style.backgroundImage =
-            `url('${escaparAtributoHTML(
-                plan.imagen ||
+        const imagenHeroSegura =
+            obtenerURLSeguraImagenPortada(
+                plan.imagen
+            ) ||
+            obtenerURLSeguraImagenPortada(
                 "img/placeholder-plan.jpg"
-            )}')`;
+            );
+
+        imagenHero.style.backgroundImage =
+            `url("${imagenHeroSegura}")`;
     }
 
     if (categoriaHero) {

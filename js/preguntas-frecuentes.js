@@ -336,18 +336,33 @@ if (botonLimpiarBusquedaFaq) {
 ===================================================== */
 
 function abrirPreguntaDesdeUrlFaq() {
-    const identificador =
+    const fragmento =
         window.location.hash
-            .replace("#", "")
+            .slice(1)
             .trim();
+
+    let identificador = "";
+
+    try {
+        identificador =
+            decodeURIComponent(
+                fragmento
+            ).trim();
+    } catch (error) {
+        return;
+    }
 
     if (!identificador) {
         return;
     }
 
     const pregunta =
-        document.querySelector(
-            `[data-pregunta="${identificador}"]`
+        Array.from(
+            preguntasFaq
+        ).find(
+            (elemento) =>
+                elemento.dataset.pregunta ===
+                identificador
         );
 
     if (!pregunta) {
