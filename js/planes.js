@@ -4092,21 +4092,53 @@ function obtenerBotonesFavoritosPlanes() {
 }
 
 
-function obtenerSesionPlanes() {
-    try {
-        return JSON.parse(
-            localStorage.getItem(
-                "sesionSuralia"
-            )
-        );
-    } catch (error) {
-        console.error(
-            "No se pudo leer la sesión:",
-            error
-        );
+let usuarioFavoritosPlanes = null;
+let promesaUsuarioFavoritosPlanes = null;
 
-        return null;
+
+async function obtenerUsuarioFavoritosPlanes() {
+    if (promesaUsuarioFavoritosPlanes) {
+        return promesaUsuarioFavoritosPlanes;
     }
+
+    promesaUsuarioFavoritosPlanes =
+        (async () => {
+            const cliente =
+                window.clienteSupabase;
+
+            if (!cliente?.auth) {
+                usuarioFavoritosPlanes = null;
+                return null;
+            }
+
+            try {
+                const {
+                    data,
+                    error
+                } =
+                    await cliente.auth.getUser();
+
+                if (error) {
+                    usuarioFavoritosPlanes = null;
+                    return null;
+                }
+
+                usuarioFavoritosPlanes =
+                    data?.user || null;
+
+                return usuarioFavoritosPlanes;
+            } catch (error) {
+                console.warn(
+                    "No se pudo comprobar la sesión para favoritos:",
+                    error
+                );
+
+                usuarioFavoritosPlanes = null;
+                return null;
+            }
+        })();
+
+    return promesaUsuarioFavoritosPlanes;
 }
 
 
@@ -4240,9 +4272,9 @@ function actualizarBotonFavoritoTarjeta(
 }
 
 
-function cargarEstadoFavoritosTarjetas() {
-    const sesion =
-        obtenerSesionPlanes();
+async function cargarEstadoFavoritosTarjetas() {
+    const usuario =
+        await obtenerUsuarioFavoritosPlanes();
 
     obtenerBotonesFavoritosPlanes().forEach(
         (boton) => {
@@ -4258,11 +4290,11 @@ function cargarEstadoFavoritosTarjetas() {
                 tarjeta.dataset.planId;
 
             const esFavorito = Boolean(
-                sesion?.conectado &&
+                usuario?.email &&
                 planId &&
                 tarjetaEstaEnFavoritos(
                     planId,
-                    sesion.email
+                    usuario.email
                 )
             );
 
@@ -4275,13 +4307,13 @@ function cargarEstadoFavoritosTarjetas() {
 }
 
 
-function alternarFavoritoTarjeta(
+async function alternarFavoritoTarjeta(
     boton
 ) {
-    const sesion =
-        obtenerSesionPlanes();
+    const usuario =
+        await obtenerUsuarioFavoritosPlanes();
 
-    if (!sesion?.conectado) {
+    if (!usuario) {
         sessionStorage.setItem(
             "destinoDespuesLoginSuralia",
             window.location.href
@@ -4332,7 +4364,7 @@ function alternarFavoritoTarjeta(
                     favorito.planId ===
                         datosPlan.planId &&
                     favorito.usuarioEmail ===
-                        sesion.email
+                        usuario.email
                 );
             }
         );
@@ -4358,7 +4390,7 @@ function alternarFavoritoTarjeta(
                 Date.now(),
 
             usuarioEmail:
-                sesion.email,
+                usuario.email,
 
             fechaGuardado:
                 new Date().toISOString()
@@ -4398,7 +4430,7 @@ function alternarFavoritoTarjeta(
 
 listaPlanes?.addEventListener(
     "click",
-    (evento) => {
+    async (evento) => {
         const boton =
             evento.target.closest(
                 ".tarjeta-plan__favorito"
@@ -4411,7 +4443,7 @@ listaPlanes?.addEventListener(
         evento.preventDefault();
         evento.stopPropagation();
 
-        alternarFavoritoTarjeta(
+        await alternarFavoritoTarjeta(
             boton
         );
     }
@@ -5370,14 +5402,22 @@ async function cargarPlanesPublicadosSupabase() {
 
 window.addEventListener(
     "storage",
-    (evento) => {
+    async (evento) => {
         if (
             evento.key ===
                 "favoritosSuralia" ||
             evento.key ===
                 "sesionSuralia"
         ) {
-            cargarEstadoFavoritosTarjetas();
+            if (
+                evento.key ===
+                    "sesionSuralia"
+            ) {
+                usuarioFavoritosPlanes = null;
+                promesaUsuarioFavoritosPlanes = null;
+            }
+
+            await cargarEstadoFavoritosTarjetas();
         }
     }
 );

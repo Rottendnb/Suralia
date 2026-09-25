@@ -488,6 +488,37 @@
 
                     </a>
 
+                    <a
+                        href="#mensajes-contacto"
+                        class="admin-tarjeta admin-tarjeta--activa"
+                    >
+
+                        <span class="admin-tarjeta__icono">
+                            <i
+                                class="fa-regular fa-envelope-open"
+                                aria-hidden="true"
+                            ></i>
+                        </span>
+
+                        <div>
+
+                            <span class="admin-tarjeta__estado admin-tarjeta__estado--activo">
+                                Disponible
+                            </span>
+
+                            <h3>
+                                Mensajes de contacto
+                            </h3>
+
+                            <p>
+                                Lee las consultas recibidas, responde por
+                                correo y actualiza su estado de seguimiento.
+                            </p>
+
+                        </div>
+
+                    </a>
+
                 </div>
 
                 <section
@@ -712,6 +743,100 @@
                     <div
                         class="admin-verificaciones__lista"
                         id="lista-verificaciones"
+                    ></div>
+
+                </section>
+
+                <section
+                    class="admin-contacto"
+                    id="mensajes-contacto"
+                    aria-labelledby="titulo-mensajes-contacto"
+                >
+
+                    <div class="admin-contacto__cabecera">
+
+                        <div>
+
+                            <span class="subtitulo">
+                                Atención y soporte
+                            </span>
+
+                            <h2 id="titulo-mensajes-contacto">
+                                Mensajes de contacto
+                            </h2>
+
+                            <p>
+                                Consulta los mensajes enviados desde la web
+                                y organiza su seguimiento sin eliminarlos.
+                            </p>
+
+                        </div>
+
+                        <span
+                            class="admin-contador"
+                            id="contador-mensajes-contacto"
+                            aria-live="polite"
+                        >
+                            0 pendientes
+                        </span>
+
+                    </div>
+
+                    <div class="admin-contacto__herramientas">
+
+                        <label for="filtro-mensajes-contacto">
+                            Mostrar
+                        </label>
+
+                        <select id="filtro-mensajes-contacto">
+                            <option value="todos">
+                                Todos los mensajes
+                            </option>
+                            <option value="pendiente">
+                                Pendientes
+                            </option>
+                            <option value="en_revision">
+                                En revisión
+                            </option>
+                            <option value="respondido">
+                                Respondidos
+                            </option>
+                            <option value="archivado">
+                                Archivados
+                            </option>
+                        </select>
+
+                        <button
+                            type="button"
+                            class="admin-boton admin-boton--secundario"
+                            id="recargar-mensajes-contacto"
+                        >
+                            <i
+                                class="fa-solid fa-rotate"
+                                aria-hidden="true"
+                            ></i>
+                            Actualizar
+                        </button>
+
+                    </div>
+
+                    <div
+                        class="admin-contacto__estado"
+                        id="estado-mensajes-contacto"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        <i
+                            class="fa-solid fa-spinner fa-spin"
+                            aria-hidden="true"
+                        ></i>
+
+                        Cargando mensajes...
+                    </div>
+
+                    <div
+                        class="admin-contacto__lista"
+                        id="lista-mensajes-contacto"
                     ></div>
 
                 </section>

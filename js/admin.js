@@ -19,6 +19,39 @@ const footerAdmin =
 
 
 /* =====================================================
+   ELEMENTOS DE MENSAJES DE CONTACTO
+===================================================== */
+
+const listaMensajesContacto =
+    document.querySelector(
+        "#lista-mensajes-contacto"
+    );
+
+const estadoMensajesContacto =
+    document.querySelector(
+        "#estado-mensajes-contacto"
+    );
+
+const contadorMensajesContacto =
+    document.querySelector(
+        "#contador-mensajes-contacto"
+    );
+
+const filtroMensajesContacto =
+    document.querySelector(
+        "#filtro-mensajes-contacto"
+    );
+
+const recargarMensajesContacto =
+    document.querySelector(
+        "#recargar-mensajes-contacto"
+    );
+
+let mensajesContactoAdmin =
+    [];
+
+
+/* =====================================================
    ELEMENTOS DE VERIFICACIONES
 ===================================================== */
 
@@ -3157,6 +3190,495 @@ confirmarRechazoVerificacion?.addEventListener(
 
 
 /* =====================================================
+   MENSAJES DE CONTACTO
+===================================================== */
+
+const estadosMensajeContacto = [
+    "pendiente",
+    "en_revision",
+    "respondido",
+    "archivado"
+];
+
+const etiquetasEstadoMensaje = {
+    pendiente:
+        "Pendiente",
+    en_revision:
+        "En revisión",
+    respondido:
+        "Respondido",
+    archivado:
+        "Archivado"
+};
+
+const etiquetasMotivoContacto = {
+    reserva:
+        "Duda sobre una reserva",
+    actividad:
+        "Información sobre una actividad",
+    publicacion:
+        "Publicar o gestionar un plan",
+    cuenta:
+        "Cuenta y perfil",
+    colaboracion:
+        "Colaboraciones",
+    otro:
+        "Otra consulta"
+};
+
+
+function actualizarContadorMensajesContacto() {
+    if (!contadorMensajesContacto) {
+        return;
+    }
+
+    const pendientes =
+        mensajesContactoAdmin.filter(
+            (mensaje) =>
+                mensaje.estado ===
+                "pendiente"
+        ).length;
+
+    contadorMensajesContacto.textContent =
+        `${pendientes} ${
+            pendientes === 1
+                ? "pendiente"
+                : "pendientes"
+        }`;
+}
+
+
+function crearTarjetaMensajeContacto(
+    mensaje
+) {
+    const id =
+        escaparHTML(
+            mensaje.id
+        );
+
+    const nombreCompleto =
+        `${mensaje.nombre || ""} ${
+            mensaje.apellidos || ""
+        }`.trim() ||
+        "Persona sin nombre";
+
+    const email =
+        String(
+            mensaje.email ||
+            ""
+        ).trim();
+
+    const asunto =
+        mensaje.asunto ||
+        "Consulta sin asunto";
+
+    const textoMensaje =
+        escaparHTML(
+            mensaje.mensaje ||
+            ""
+        ).replace(/\n/g, "<br>");
+
+    const estado =
+        estadosMensajeContacto.includes(
+            mensaje.estado
+        )
+            ? mensaje.estado
+            : "pendiente";
+
+    const motivo =
+        etiquetasMotivoContacto[
+            mensaje.motivo
+        ] ||
+        "Otra consulta";
+
+    const enlaceCorreo =
+        `mailto:${email}` +
+        `?subject=${encodeURIComponent(
+            `Suralia: ${asunto}`
+        )}`;
+
+    const opcionesEstado =
+        estadosMensajeContacto
+            .map(
+                (valor) => `
+                    <option
+                        value="${valor}"
+                        ${
+                            valor === estado
+                                ? "selected"
+                                : ""
+                        }
+                    >
+                        ${etiquetasEstadoMensaje[valor]}
+                    </option>
+                `
+            )
+            .join("");
+
+    return `
+        <article
+            class="admin-mensaje admin-mensaje--${estado}"
+            data-mensaje-contacto-id="${id}"
+        >
+            <div class="admin-mensaje__superior">
+                <div>
+                    <span class="admin-mensaje__motivo">
+                        ${escaparHTML(motivo)}
+                    </span>
+
+                    <h3>
+                        ${escaparHTML(asunto)}
+                    </h3>
+                </div>
+
+                <span class="admin-mensaje__estado admin-mensaje__estado--${estado}">
+                    ${escaparHTML(
+                        etiquetasEstadoMensaje[estado]
+                    )}
+                </span>
+            </div>
+
+            <div class="admin-mensaje__remitente">
+                <span>
+                    <i
+                        class="fa-regular fa-user"
+                        aria-hidden="true"
+                    ></i>
+                    ${escaparHTML(nombreCompleto)}
+                </span>
+
+                <a href="mailto:${escaparHTML(email)}">
+                    <i
+                        class="fa-regular fa-envelope"
+                        aria-hidden="true"
+                    ></i>
+                    ${escaparHTML(email)}
+                </a>
+
+                <time datetime="${escaparHTML(
+                    mensaje.creado_en ||
+                    ""
+                )}">
+                    <i
+                        class="fa-regular fa-clock"
+                        aria-hidden="true"
+                    ></i>
+                    ${escaparHTML(
+                        formatearFechaAdmin(
+                            mensaje.creado_en
+                        )
+                    )}
+                </time>
+            </div>
+
+            <div class="admin-mensaje__texto">
+                ${textoMensaje}
+            </div>
+
+            <div class="admin-mensaje__acciones">
+                <a
+                    class="admin-boton admin-boton--responder"
+                    href="${escaparHTML(enlaceCorreo)}"
+                >
+                    <i
+                        class="fa-regular fa-paper-plane"
+                        aria-hidden="true"
+                    ></i>
+                    Responder por correo
+                </a>
+
+                <label>
+                    Estado
+                    <select
+                        data-estado-mensaje-contacto="${id}"
+                        data-estado-anterior="${estado}"
+                        aria-label="Estado del mensaje de ${escaparHTML(
+                            nombreCompleto
+                        )}"
+                    >
+                        ${opcionesEstado}
+                    </select>
+                </label>
+            </div>
+        </article>
+    `;
+}
+
+
+function renderizarMensajesContacto() {
+    if (
+        !listaMensajesContacto ||
+        !estadoMensajesContacto
+    ) {
+        return;
+    }
+
+    actualizarContadorMensajesContacto();
+
+    const filtro =
+        filtroMensajesContacto?.value ||
+        "todos";
+
+    const mensajesVisibles =
+        filtro === "todos"
+            ? mensajesContactoAdmin
+            : mensajesContactoAdmin.filter(
+                (mensaje) =>
+                    mensaje.estado ===
+                    filtro
+            );
+
+    if (mensajesVisibles.length === 0) {
+        listaMensajesContacto.innerHTML =
+            "";
+
+        estadoMensajesContacto.className =
+            "admin-contacto__estado admin-contacto__estado--vacio";
+
+        estadoMensajesContacto.innerHTML = `
+            <i
+                class="fa-regular fa-circle-check"
+                aria-hidden="true"
+            ></i>
+
+            <div>
+                <strong>
+                    No hay mensajes en esta vista
+                </strong>
+
+                <p>
+                    Los nuevos mensajes aparecerán aquí.
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+    estadoMensajesContacto.className =
+        "admin-contacto__estado oculto";
+
+    listaMensajesContacto.innerHTML =
+        mensajesVisibles
+            .map(
+                crearTarjetaMensajeContacto
+            )
+            .join("");
+}
+
+
+async function cargarMensajesContacto() {
+    if (
+        !listaMensajesContacto ||
+        !estadoMensajesContacto
+    ) {
+        return;
+    }
+
+    const cliente =
+        window.clienteSupabase;
+
+    estadoMensajesContacto.className =
+        "admin-contacto__estado";
+
+    estadoMensajesContacto.innerHTML = `
+        <i
+            class="fa-solid fa-spinner fa-spin"
+            aria-hidden="true"
+        ></i>
+
+        Cargando mensajes...
+    `;
+
+    listaMensajesContacto.innerHTML =
+        "";
+
+    if (recargarMensajesContacto) {
+        recargarMensajesContacto.disabled =
+            true;
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente
+            .from("mensajes_contacto")
+            .select(
+                "id, nombre, apellidos, email, motivo, asunto, mensaje, estado, creado_en, actualizado_en"
+            )
+            .order(
+                "creado_en",
+                {
+                    ascending:
+                        false
+                }
+            )
+            .limit(200);
+
+        if (error) {
+            throw error;
+        }
+
+        mensajesContactoAdmin =
+            Array.isArray(data)
+                ? data
+                : [];
+
+        renderizarMensajesContacto();
+    } catch (error) {
+        console.error(
+            "No se pudieron cargar los mensajes de contacto:",
+            error
+        );
+
+        mensajesContactoAdmin =
+            [];
+
+        actualizarContadorMensajesContacto();
+
+        estadoMensajesContacto.className =
+            "admin-contacto__estado admin-contacto__estado--error";
+
+        estadoMensajesContacto.innerHTML = `
+            <i
+                class="fa-solid fa-triangle-exclamation"
+                aria-hidden="true"
+            ></i>
+
+            <div>
+                <strong>
+                    No se pudieron cargar los mensajes
+                </strong>
+
+                <p>
+                    Comprueba la conexión y vuelve a intentarlo.
+                </p>
+            </div>
+        `;
+    } finally {
+        if (recargarMensajesContacto) {
+            recargarMensajesContacto.disabled =
+                false;
+        }
+    }
+}
+
+
+async function actualizarEstadoMensajeContacto(
+    selector
+) {
+    const mensajeId =
+        selector?.dataset
+            .estadoMensajeContacto;
+
+    const estadoNuevo =
+        selector?.value;
+
+    const estadoAnterior =
+        selector?.dataset
+            .estadoAnterior ||
+        "pendiente";
+
+    if (
+        !mensajeId ||
+        !estadosMensajeContacto.includes(
+            estadoNuevo
+        )
+    ) {
+        return;
+    }
+
+    selector.disabled =
+        true;
+
+    try {
+        const {
+            error
+        } = await window
+            .clienteSupabase
+            .from("mensajes_contacto")
+            .update({
+                estado:
+                    estadoNuevo
+            })
+            .eq(
+                "id",
+                mensajeId
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        mensajesContactoAdmin =
+            mensajesContactoAdmin.map(
+                (mensaje) =>
+                    String(mensaje.id) ===
+                    String(mensajeId)
+                        ? {
+                            ...mensaje,
+                            estado:
+                                estadoNuevo,
+                            actualizado_en:
+                                new Date()
+                                    .toISOString()
+                        }
+                        : mensaje
+            );
+
+        renderizarMensajesContacto();
+    } catch (error) {
+        console.error(
+            "No se pudo actualizar el estado del mensaje:",
+            error
+        );
+
+        selector.value =
+            estadoAnterior;
+
+        selector.disabled =
+            false;
+
+        alert(
+            "No se pudo actualizar el mensaje. Inténtalo de nuevo."
+        );
+    }
+}
+
+
+filtroMensajesContacto?.addEventListener(
+    "change",
+    renderizarMensajesContacto
+);
+
+
+recargarMensajesContacto?.addEventListener(
+    "click",
+    cargarMensajesContacto
+);
+
+
+listaMensajesContacto?.addEventListener(
+    "change",
+    async (evento) => {
+        const selector =
+            evento.target.closest(
+                "[data-estado-mensaje-contacto]"
+            );
+
+        if (!selector) {
+            return;
+        }
+
+        await actualizarEstadoMensajeContacto(
+            selector
+        );
+    }
+);
+
+
+/* =====================================================
    PROTEGER Y MOSTRAR EL PANEL
 ===================================================== */
 
@@ -3254,7 +3776,8 @@ async function protegerPanelAdministracion() {
             cargarPlanesPendientesAdmin(),
             cargarPlanesPublicadosAdmin(),
             cargarUsuariosAdmin(),
-            cargarVerificacionesPendientes()
+            cargarVerificacionesPendientes(),
+            cargarMensajesContacto()
         ]);
     } catch (error) {
         console.error(

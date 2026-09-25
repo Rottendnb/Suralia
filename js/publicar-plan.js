@@ -1,14 +1,19 @@
-const sesionPublicar = JSON.parse(
-    localStorage.getItem("sesionSuralia")
-);
-
-if (!sesionPublicar?.conectado) {
-    window.location.href = "login.html";
-}
-
 const formularioPublicar = document.querySelector("#formulario-publicar");
 const botonPublicarActividad = formularioPublicar?.querySelector('button[type="submit"]');
 const BUCKET_IMAGENES_PLANES = "imagenes-planes";
+
+let usuarioPublicarActivo =
+    null;
+
+if (formularioPublicar) {
+    formularioPublicar.hidden =
+        true;
+
+    formularioPublicar.setAttribute(
+        "aria-busy",
+        "true"
+    );
+}
 
 /* =====================================================
    CAMPOS DEL FORMULARIO
@@ -2130,7 +2135,9 @@ function obtenerDatosFormulario() {
         imagen2: imagen2Base64,
         imagen3: imagen3Base64,
         estado: "pendiente",
-        creadoPor: sesionPublicar.email,
+        creadoPor:
+            usuarioPublicarActivo?.email ||
+            "",
         fechaCreacion: new Date().toISOString()
     };
 }
@@ -2665,51 +2672,92 @@ function cargarBorradorParaEditar() {
 }
 
 /* =====================================================
-   INICIO
+   INICIO PROTEGIDO POR LA SESIÓN REAL DE SUPABASE
 ===================================================== */
 
-[
-    titulo,
-    categoria,
-    descripcion,
-    fecha,
-    hora,
-    duracion,
-    plazas,
-    municipio,
-    ubicacion,
-    precio,
-    enlaceReserva,
-    tipoEventoMusica,
-    artistaCartelMusica,
-    aperturaPuertasMusica,
-    horaFinMusica,
-    edadMinimaMusica,
-    tipoEntradaMusica,
-    ofreceAbonoGeneral,
-    precioAbonoGeneral,
-    idealPrimeraVez,
-    imagen,
-    imagen2,
-    imagen3,
-    confirmarPlan
-].forEach((campo) => {
-    campo?.setAttribute("aria-invalid", "false");
-});
+async function iniciarPaginaPublicar() {
+    try {
+        usuarioPublicarActivo =
+            await obtenerUsuarioSupabase();
+    } catch (error) {
+        console.warn(
+            "No existe una sesión válida para publicar:",
+            error
+        );
 
-cargarBorradorParaEditar();
-inicializarMapaPublicar();
-actualizarModoPublicacion();
-actualizarBloqueAbonoFestival();
-actualizarResumenAbonoFestival();
+        sessionStorage.setItem(
+            "destinoDespuesLoginSuralia",
+            "publicar-plan.html"
+        );
 
-if (
-    !latitudPlan?.value &&
-    !longitudPlan?.value &&
-    obtenerConsultaDireccionMapa()
-) {
-    programarGeocodificacionDireccion(250);
+        window.location.replace(
+            "login.html?redirect=publicar-plan.html"
+        );
+
+        return;
+    }
+
+    if (formularioPublicar) {
+        formularioPublicar.hidden =
+            false;
+
+        formularioPublicar.setAttribute(
+            "aria-busy",
+            "false"
+        );
+    }
+
+    [
+        titulo,
+        categoria,
+        descripcion,
+        fecha,
+        hora,
+        duracion,
+        plazas,
+        municipio,
+        ubicacion,
+        precio,
+        enlaceReserva,
+        tipoEventoMusica,
+        artistaCartelMusica,
+        aperturaPuertasMusica,
+        horaFinMusica,
+        edadMinimaMusica,
+        tipoEntradaMusica,
+        ofreceAbonoGeneral,
+        precioAbonoGeneral,
+        idealPrimeraVez,
+        imagen,
+        imagen2,
+        imagen3,
+        confirmarPlan
+    ].forEach((campo) => {
+        campo?.setAttribute(
+            "aria-invalid",
+            "false"
+        );
+    });
+
+    cargarBorradorParaEditar();
+    inicializarMapaPublicar();
+    actualizarModoPublicacion();
+    actualizarBloqueAbonoFestival();
+    actualizarResumenAbonoFestival();
+
+    if (
+        !latitudPlan?.value &&
+        !longitudPlan?.value &&
+        obtenerConsultaDireccionMapa()
+    ) {
+        programarGeocodificacionDireccion(
+            250
+        );
+    }
+
+    actualizarContadores();
+    actualizarVistaPrevia();
 }
 
-actualizarContadores();
-actualizarVistaPrevia();
+
+iniciarPaginaPublicar();

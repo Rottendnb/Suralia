@@ -4077,16 +4077,53 @@ document.addEventListener(
    FAVORITOS
 ===================================================== */
 
-function obtenerSesion() {
-    try {
-        return JSON.parse(
-            localStorage.getItem(
-                "sesionSuralia"
-            )
-        );
-    } catch (error) {
-        return null;
+let usuarioSupabaseDetalle = null;
+let promesaUsuarioSupabaseDetalle = null;
+
+
+async function obtenerUsuarioSupabaseDetalle() {
+    if (promesaUsuarioSupabaseDetalle) {
+        return promesaUsuarioSupabaseDetalle;
     }
+
+    promesaUsuarioSupabaseDetalle =
+        (async () => {
+            const cliente =
+                window.clienteSupabase;
+
+            if (!cliente?.auth) {
+                usuarioSupabaseDetalle = null;
+                return null;
+            }
+
+            try {
+                const {
+                    data,
+                    error
+                } =
+                    await cliente.auth.getUser();
+
+                if (error) {
+                    usuarioSupabaseDetalle = null;
+                    return null;
+                }
+
+                usuarioSupabaseDetalle =
+                    data?.user || null;
+
+                return usuarioSupabaseDetalle;
+            } catch (error) {
+                console.warn(
+                    "No se pudo comprobar la sesión en el detalle del plan:",
+                    error
+                );
+
+                usuarioSupabaseDetalle = null;
+                return null;
+            }
+        })();
+
+    return promesaUsuarioSupabaseDetalle;
 }
 
 
@@ -4097,25 +4134,25 @@ function obtenerFavoritosGuardados() {
 }
 
 
-function planEstaEnFavoritos() {
-    const sesion =
-        obtenerSesion();
+async function planEstaEnFavoritos() {
+    const usuario =
+        await obtenerUsuarioSupabaseDetalle();
 
-    if (!sesion?.conectado) {
+    if (!usuario?.email) {
         return false;
     }
 
     return obtenerFavoritosGuardados().some(
         (favorito) =>
             favorito.usuarioEmail ===
-                sesion.email &&
+                usuario.email &&
             favorito.planId ===
                 planActual.planId
     );
 }
 
 
-function actualizarBotonFavoritoDetalle() {
+async function actualizarBotonFavoritoDetalle() {
     if (!botonFavoritoPlan) {
         return;
     }
@@ -4131,7 +4168,7 @@ function actualizarBotonFavoritoDetalle() {
         );
 
     const esFavorito =
-        planEstaEnFavoritos();
+        await planEstaEnFavoritos();
 
     botonFavoritoPlan.classList.toggle(
         "favorito-activo",
@@ -4173,11 +4210,11 @@ function actualizarBotonFavoritoDetalle() {
 }
 
 
-function alternarFavoritoDetalle() {
-    const sesion =
-        obtenerSesion();
+async function alternarFavoritoDetalle() {
+    const usuario =
+        await obtenerUsuarioSupabaseDetalle();
 
-    if (!sesion?.conectado) {
+    if (!usuario) {
         sessionStorage.setItem(
             "destinoDespuesLoginSuralia",
             window.location.href
@@ -4202,7 +4239,7 @@ function alternarFavoritoDetalle() {
         favoritos.findIndex(
             (favorito) =>
                 favorito.usuarioEmail ===
-                    sesion.email &&
+                    usuario.email &&
                 favorito.planId ===
                     planActual.planId
         );
@@ -4246,7 +4283,7 @@ function alternarFavoritoDetalle() {
                 planActual.enlace,
 
             usuarioEmail:
-                sesion.email,
+                usuario.email,
 
             fechaGuardado:
                 new Date().toISOString()
@@ -4271,7 +4308,7 @@ function alternarFavoritoDetalle() {
         return;
     }
 
-    actualizarBotonFavoritoDetalle();
+    await actualizarBotonFavoritoDetalle();
 }
 
 
@@ -4937,18 +4974,14 @@ async function cargarEstadoReservaExternaSeleccionada() {
     pintarEstadoReservaExterna(null);
 
     try {
-        const { data: datosSesion, error: errorSesion } =
-            await cliente.auth.getSession();
+        const usuario =
+            await obtenerUsuarioSupabaseDetalle();
 
         if (token !== tokenConsultaReservaExterna) {
             return;
         }
 
-        if (errorSesion) {
-            throw errorSesion;
-        }
-
-        const usuarioId = datosSesion?.session?.user?.id;
+        const usuarioId = usuario?.id;
 
         if (!usuarioId) {
             pintarEstadoReservaExterna(null, "sin-sesion");
@@ -5047,14 +5080,10 @@ async function registrarAsistenciaExternaDetalle({
         throw new Error("No se ha podido conectar con Supabase.");
     }
 
-    const { data: datosSesion, error: errorSesion } =
-        await cliente.auth.getSession();
+    const usuario =
+        await obtenerUsuarioSupabaseDetalle();
 
-    if (errorSesion) {
-        throw errorSesion;
-    }
-
-    if (!datosSesion?.session) {
+    if (!usuario) {
         throw new Error("Tu sesión ha caducado. Inicia sesión de nuevo.");
     }
 
@@ -5097,11 +5126,11 @@ async function registrarAsistenciaExternaDetalle({
 }
 
 
-function validarSeleccionReservaExterna() {
-    const sesionActual =
-        obtenerSesion();
+async function validarSeleccionReservaExterna() {
+    const usuarioActual =
+        await obtenerUsuarioSupabaseDetalle();
 
-    if (!sesionActual?.conectado) {
+    if (!usuarioActual) {
         sessionStorage.setItem(
             "destinoDespuesLoginSuralia",
             window.location.href
@@ -5223,14 +5252,14 @@ function validarSeleccionReservaExterna() {
         ...pase,
         numeroPersonas,
         voySolo,
-        sesionActual
+        usuarioActual
     };
 }
 
 
 async function procesarCompraReservaExterna() {
     const seleccion =
-        validarSeleccionReservaExterna();
+        await validarSeleccionReservaExterna();
 
     if (!seleccion) {
         return;
@@ -5794,7 +5823,7 @@ async function crearReservaSupabaseDetalle({
     textoFecha,
     numeroPersonas,
     voySolo,
-    sesionActual
+    usuarioActual
 }) {
     const cliente =
         window.clienteSupabase;
@@ -5805,16 +5834,7 @@ async function crearReservaSupabaseDetalle({
         );
     }
 
-    const {
-        data: datosSesion,
-        error: errorSesion
-    } = await cliente.auth.getSession();
-
-    if (errorSesion) {
-        throw errorSesion;
-    }
-
-    if (!datosSesion?.session) {
+    if (!usuarioActual) {
         throw new Error(
             "Tu sesión ha caducado. Inicia sesión de nuevo."
         );
@@ -5972,8 +5992,7 @@ async function crearReservaSupabaseDetalle({
                 "confirmada",
 
             usuarioEmail:
-                sesionActual?.email ||
-                datosSesion.session.user?.email ||
+                usuarioActual.email ||
                 "",
 
             fechaReserva:
@@ -6332,10 +6351,10 @@ if (formularioReserva) {
                 return;
             }
 
-            const sesionActual =
-                obtenerSesion();
+            const usuarioActual =
+                await obtenerUsuarioSupabaseDetalle();
 
-            if (!sesionActual?.conectado) {
+            if (!usuarioActual) {
                 sessionStorage.setItem(
                     "destinoDespuesLoginSuralia",
                     window.location.href
@@ -6536,7 +6555,7 @@ if (formularioReserva) {
                         textoFecha,
                         numeroPersonas,
                         voySolo,
-                        sesionActual
+                        usuarioActual
                     });
 
                     await cargarDisponibilidadGlobalPlan();
@@ -6593,7 +6612,7 @@ if (formularioReserva) {
                 reservasGuardadas.some(
                     (reserva) =>
                         reserva.usuarioEmail ===
-                            sesionActual.email &&
+                            usuarioActual.email &&
                         reserva.planId ===
                             planActual.planId &&
                         (
@@ -6687,7 +6706,7 @@ if (formularioReserva) {
                     "confirmada",
 
                 usuarioEmail:
-                    sesionActual.email,
+                    usuarioActual.email,
 
                 fechaReserva:
                     new Date().toISOString()
@@ -7323,14 +7342,22 @@ async function cargarPlanesRelacionadosDinamicos() {
 
 window.addEventListener(
     "storage",
-    (evento) => {
+    async (evento) => {
         if (
             evento.key ===
                 "favoritosSuralia" ||
             evento.key ===
                 "sesionSuralia"
         ) {
-            actualizarBotonFavoritoDetalle();
+            if (
+                evento.key ===
+                    "sesionSuralia"
+            ) {
+                usuarioSupabaseDetalle = null;
+                promesaUsuarioSupabaseDetalle = null;
+            }
+
+            await actualizarBotonFavoritoDetalle();
         }
     }
 );
@@ -7401,7 +7428,7 @@ async function iniciarDetallePlan() {
         configurarNavegacionDetalle();
         actualizarDesgloseReserva();
         actualizarBarraReservaMovil();
-        actualizarBotonFavoritoDetalle();
+        await actualizarBotonFavoritoDetalle();
         await cargarPlanesRelacionadosDinamicos();
 
         descripcionAmpliada?.setAttribute(

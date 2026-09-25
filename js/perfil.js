@@ -151,14 +151,22 @@ if (
     );
 }
 
-const sesionGuardada =
+/*
+   Copia local usada únicamente para mantener datos visuales
+   compatibles mientras Supabase carga el perfil real.
+*/
+const sesionLocalInterfaz =
     leerDatoLocal("sesionSuralia", null);
 
-if (
-    !sesionGuardada ||
-    !sesionGuardada.conectado
-) {
-    window.location.replace("login.html");
+let usuarioPerfilAutenticado =
+    null;
+
+const contenidoPerfilProtegido =
+    document.querySelector("main");
+
+if (contenidoPerfilProtegido) {
+    contenidoPerfilProtegido.hidden =
+        true;
 }
 
 /* =========================================
@@ -4445,9 +4453,10 @@ if (formularioPerfil) {
         guardarDatoLocal(
             "sesionSuralia",
             {
-                ...sesionGuardada,
+                ...sesionLocalInterfaz,
                 id:
-                    sesionGuardada?.id ||
+                    usuarioPerfilAutenticado?.id ||
+                    sesionLocalInterfaz?.id ||
                     usuarioGuardado.id,
                 nombre,
                 apellidos,
@@ -14272,7 +14281,64 @@ document.addEventListener(
    CARGA INICIAL
 ========================================= */
 
-function iniciarPerfil() {
+async function iniciarPerfil() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente?.auth) {
+        sessionStorage.setItem(
+            "destinoDespuesLoginSuralia",
+            window.location.href
+        );
+
+        window.location.replace(
+            "login.html?redirect=perfil.html"
+        );
+
+        return;
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente.auth.getUser();
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data?.user) {
+            throw new Error(
+                "No existe una sesión válida."
+            );
+        }
+
+        usuarioPerfilAutenticado =
+            data.user;
+    } catch (error) {
+        console.warn(
+            "No existe una sesión válida para abrir el perfil:",
+            error
+        );
+
+        sessionStorage.setItem(
+            "destinoDespuesLoginSuralia",
+            window.location.href
+        );
+
+        window.location.replace(
+            "login.html?redirect=perfil.html"
+        );
+
+        return;
+    }
+
+    if (contenidoPerfilProtegido) {
+        contenidoPerfilProtegido.hidden =
+            false;
+    }
+
     if (
         typeof window.obtenerTodosPlanesSuralia !==
         "function"

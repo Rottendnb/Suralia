@@ -6120,16 +6120,16 @@ async function cargarConversacion() {
 
     try {
         const {
-            data: datosSesion,
-            error: errorSesion
-        } = await cliente.auth.getSession();
+            data: datosUsuario,
+            error: errorUsuario
+        } = await cliente.auth.getUser();
 
-        if (errorSesion) {
-            throw errorSesion;
+        if (errorUsuario) {
+            throw errorUsuario;
         }
 
         usuarioSesionActual =
-            datosSesion.session?.user;
+            datosUsuario.user;
 
         if (!usuarioSesionActual) {
             sessionStorage.setItem(

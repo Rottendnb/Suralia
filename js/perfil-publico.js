@@ -24,25 +24,15 @@ function leerDatoLocal(
 }
 
 
-const sesionGuardada =
+/*
+   Estos datos locales se usan solo como apoyo visual del encabezado.
+   Nunca se emplean para autorizar el acceso a la página.
+*/
+const sesionLocalInterfaz =
     leerDatoLocal(
         "sesionSuralia",
         null
     );
-
-if (
-    !sesionGuardada ||
-    !sesionGuardada.conectado
-) {
-    sessionStorage.setItem(
-        "destinoDespuesLoginSuralia",
-        window.location.href
-    );
-
-    window.location.replace(
-        "login.html"
-    );
-}
 
 
 /* =====================================================
@@ -457,12 +447,12 @@ async function cargarUsuarioHeaderPerfilPublico() {
 
     const nombreLocal =
         usuarioLocal.nombre ||
-        sesionGuardada?.nombre ||
+        sesionLocalInterfaz?.nombre ||
         "Mi perfil";
 
     const apellidosLocal =
         usuarioLocal.apellidos ||
-        sesionGuardada?.apellidos ||
+        sesionLocalInterfaz?.apellidos ||
         "";
 
     nombreHeader.textContent =
@@ -2504,17 +2494,17 @@ async function cargarPerfilPublico() {
 
     try {
         const {
-            data: datosSesion,
-            error: errorSesion
+            data: datosUsuario,
+            error: errorUsuario
         } = await cliente
             .auth
-            .getSession();
+            .getUser();
 
-        if (errorSesion) {
-            throw errorSesion;
+        if (errorUsuario) {
+            throw errorUsuario;
         }
 
-        if (!datosSesion.session) {
+        if (!datosUsuario.user) {
             sessionStorage.setItem(
                 "destinoDespuesLoginSuralia",
                 window.location.href
@@ -2528,7 +2518,7 @@ async function cargarPerfilPublico() {
         }
 
         usuarioSesionActual =
-            datosSesion.session.user;
+            datosUsuario.user;
 
         const {
             data,

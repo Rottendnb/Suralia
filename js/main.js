@@ -1052,7 +1052,7 @@ if (
    SESIÓN DEL USUARIO
 ===================================================== */
 
-const sesionActual =
+let sesionActual =
     leerLocalStorage(
         "sesionSuralia",
         null
@@ -1063,6 +1063,127 @@ let usuarioActual =
         "usuarioSuralia",
         null
     );
+
+
+async function sincronizarSesionRealCabecera() {
+    const cliente =
+        window.clienteSupabase;
+
+    if (!cliente?.auth) {
+        sesionActual =
+            null;
+
+        return false;
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await cliente.auth.getUser();
+
+        if (error) {
+            throw error;
+        }
+
+        const usuarioSupabase =
+            data?.user;
+
+        if (!usuarioSupabase) {
+            sesionActual =
+                null;
+
+            localStorage.removeItem(
+                "sesionSuralia"
+            );
+
+            return false;
+        }
+
+        if (
+            usuarioActual?.id &&
+            usuarioActual.id !==
+                usuarioSupabase.id
+        ) {
+            usuarioActual =
+                null;
+        }
+
+        const metadatos =
+            usuarioSupabase.user_metadata ||
+            {};
+
+        const nombreCompleto =
+            String(
+                metadatos.full_name ||
+                metadatos.name ||
+                ""
+            ).trim();
+
+        const partesNombre =
+            nombreCompleto
+                .split(/\s+/)
+                .filter(Boolean);
+
+        const nombreLocalValido =
+            sesionActual?.id ===
+                usuarioSupabase.id
+                ? sesionActual.nombre
+                : "";
+
+        const nombre =
+            usuarioActual?.nombre ||
+            nombreLocalValido ||
+            metadatos.nombre ||
+            metadatos.given_name ||
+            partesNombre.shift() ||
+            usuarioSupabase.email
+                ?.split("@")[0] ||
+            "Mi perfil";
+
+        const apellidos =
+            usuarioActual?.apellidos ||
+            (
+                sesionActual?.id ===
+                    usuarioSupabase.id
+                    ? sesionActual.apellidos
+                    : ""
+            ) ||
+            metadatos.apellidos ||
+            metadatos.family_name ||
+            partesNombre.join(" ") ||
+            "";
+
+        sesionActual = {
+            id:
+                usuarioSupabase.id,
+            nombre,
+            apellidos,
+            email:
+                usuarioSupabase.email ||
+                "",
+            conectado:
+                true
+        };
+
+        guardarLocalStorage(
+            "sesionSuralia",
+            sesionActual
+        );
+
+        return true;
+    } catch (error) {
+        console.warn(
+            "No se pudo confirmar la sesión real de la cabecera:",
+            error
+        );
+
+        sesionActual =
+            null;
+
+        return false;
+    }
+}
 
 
 /*
@@ -1682,14 +1803,21 @@ async function cerrarSesionSuralia() {
     }
 }
 
-if (
-    sesionActual?.conectado &&
-    navegacion
-) {
-    navegacion.classList.add(
-        "usuario-conectado"
+function actualizarNavegacionSegunSesionReal() {
+    const usuarioConectado =
+        Boolean(
+            sesionActual?.conectado
+        );
+
+    navegacion?.classList.toggle(
+        "usuario-conectado",
+        usuarioConectado
     );
-} else {
+
+    if (usuarioConectado) {
+        return;
+    }
+
     opcionesUsuarioMovil.forEach(
         (opcion) => {
             opcion.remove();
@@ -4010,6 +4138,9 @@ window.addEventListener(
 ===================================================== */
 
 async function iniciarPaginaPrincipal() {
+    await sincronizarSesionRealCabecera();
+    actualizarNavegacionSegunSesionReal();
+
     try {
         await asegurarHelperFotosPerfilSuralia();
     } catch (error) {

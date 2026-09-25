@@ -1,5 +1,6 @@
 /* =====================================================
    FORMULARIO DE CONTACTO
+   Versión Supabase V2 · Antispam básico
 ===================================================== */
 
 const formularioContacto =
@@ -26,13 +27,43 @@ const campoMensaje =
 const campoPrivacidad =
     document.querySelector("#contacto-privacidad");
 
+const campoContactoTrampa =
+    document.querySelector("#contacto-website");
+
 const contadorMensaje =
     document.querySelector("#contador-contacto-mensaje");
 
 const notificacion =
     document.querySelector("#notificacion");
 
+const motivosContactoPermitidos = [
+    "reserva",
+    "actividad",
+    "publicacion",
+    "cuenta",
+    "colaboracion",
+    "otro"
+];
+
 let temporizadorNotificacion;
+let envioContactoEnCurso = false;
+let momentoInicioFormulario = Date.now();
+
+const TIEMPO_MINIMO_FORMULARIO_MS =
+    2500;
+
+
+/* =====================================================
+   OBTENER CLIENTE DE SUPABASE
+===================================================== */
+
+function obtenerClienteSupabaseContacto() {
+    if (window.clienteSupabase) {
+        return window.clienteSupabase;
+    }
+
+    return null;
+}
 
 
 /* =====================================================
@@ -57,7 +88,7 @@ function mostrarNotificacionContacto(mensaje) {
 
     temporizadorNotificacion = setTimeout(() => {
         notificacion.classList.remove("visible");
-    }, 3500);
+    }, 4500);
 }
 
 
@@ -258,29 +289,35 @@ function validarFormularioContacto() {
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 
-    if (nombre.length < 2) {
+    if (nombre.length < 2 || nombre.length > 80) {
         mostrarError(
             campoNombre,
             "#error-contacto-nombre",
-            "Introduce un nombre válido."
+            "El nombre debe tener entre 2 y 80 caracteres."
         );
 
         formularioValido = false;
     }
 
 
-    if (apellidos.length < 2) {
+    if (
+        apellidos.length < 2 ||
+        apellidos.length > 120
+    ) {
         mostrarError(
             campoApellidos,
             "#error-contacto-apellidos",
-            "Introduce tus apellidos."
+            "Los apellidos deben tener entre 2 y 120 caracteres."
         );
 
         formularioValido = false;
     }
 
 
-    if (!expresionEmail.test(email)) {
+    if (
+        !expresionEmail.test(email) ||
+        email.length > 254
+    ) {
         mostrarError(
             campoEmail,
             "#error-contacto-email",
@@ -291,7 +328,7 @@ function validarFormularioContacto() {
     }
 
 
-    if (!motivo) {
+    if (!motivosContactoPermitidos.includes(motivo)) {
         mostrarError(
             campoMotivo,
             "#error-contacto-motivo",
@@ -302,22 +339,22 @@ function validarFormularioContacto() {
     }
 
 
-    if (asunto.length < 5) {
+    if (asunto.length < 5 || asunto.length > 160) {
         mostrarError(
             campoAsunto,
             "#error-contacto-asunto",
-            "El asunto debe tener al menos 5 caracteres."
+            "El asunto debe tener entre 5 y 160 caracteres."
         );
 
         formularioValido = false;
     }
 
 
-    if (mensaje.length < 20) {
+    if (mensaje.length < 20 || mensaje.length > 1000) {
         mostrarError(
             campoMensaje,
             "#error-contacto-mensaje",
-            "El mensaje debe tener al menos 20 caracteres."
+            "El mensaje debe tener entre 20 y 1000 caracteres."
         );
 
         formularioValido = false;
@@ -344,20 +381,20 @@ function validarFormularioContacto() {
 
 
 /* =====================================================
-   GUARDAR MENSAJE
+   ENVIAR MENSAJE A SUPABASE
 ===================================================== */
 
-function guardarMensajeContacto() {
-    const mensajesGuardados =
-        JSON.parse(
-            localStorage.getItem(
-                "mensajesContactoSuralia"
-            ) || "[]"
+async function enviarMensajeContacto() {
+    const cliente =
+        obtenerClienteSupabaseContacto();
+
+    if (!cliente) {
+        throw new Error(
+            "No se ha podido iniciar la conexión con Supabase."
         );
+    }
 
     const nuevoMensaje = {
-        id: Date.now(),
-
         nombre:
             campoNombre.value.trim(),
 
@@ -376,21 +413,54 @@ function guardarMensajeContacto() {
             campoAsunto.value.trim(),
 
         mensaje:
-            campoMensaje.value.trim(),
-
-        fecha:
-            new Date().toISOString(),
-
-        estado:
-            "pendiente"
+            campoMensaje.value.trim()
     };
 
-    mensajesGuardados.push(nuevoMensaje);
+    /*
+       No añadimos .select(). La tabla permite enviar mensajes,
+       pero no leerlos desde el formulario público.
+    */
+    const { error } = await cliente
+        .from("mensajes_contacto")
+        .insert(nuevoMensaje);
 
-    localStorage.setItem(
-        "mensajesContactoSuralia",
-        JSON.stringify(mensajesGuardados)
+    if (error) {
+        throw error;
+    }
+}
+
+
+/* =====================================================
+   ESTADO DEL BOTÓN
+===================================================== */
+
+function cambiarEstadoBotonContacto(
+    boton,
+    enviando
+) {
+    if (!boton) {
+        return;
+    }
+
+    boton.disabled = enviando;
+    boton.setAttribute(
+        "aria-busy",
+        enviando ? "true" : "false"
     );
+
+    if (enviando) {
+        boton.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Enviando...
+        `;
+
+        return;
+    }
+
+    boton.innerHTML = `
+        <span>Enviar mensaje</span>
+        <i class="fa-solid fa-arrow-right"></i>
+    `;
 }
 
 
@@ -401,8 +471,45 @@ function guardarMensajeContacto() {
 if (formularioContacto) {
     formularioContacto.addEventListener(
         "submit",
-        (evento) => {
+        async (evento) => {
             evento.preventDefault();
+
+            if (envioContactoEnCurso) {
+                return;
+            }
+
+            /*
+               Campo trampa: una persona no puede verlo ni rellenarlo.
+               Si contiene texto, simulamos un envío correcto sin guardar
+               información para no revelar la protección al bot.
+            */
+            if (
+                campoContactoTrampa?.value
+                    .trim()
+            ) {
+                formularioContacto.reset();
+                actualizarContadorMensaje();
+                momentoInicioFormulario =
+                    Date.now();
+
+                mostrarNotificacionContacto(
+                    "Tu mensaje se ha enviado correctamente."
+                );
+
+                return;
+            }
+
+            if (
+                Date.now() -
+                momentoInicioFormulario <
+                TIEMPO_MINIMO_FORMULARIO_MS
+            ) {
+                mostrarNotificacionContacto(
+                    "Espera un momento antes de enviar el mensaje."
+                );
+
+                return;
+            }
 
             const esValido =
                 validarFormularioContacto();
@@ -429,35 +536,41 @@ if (formularioContacto) {
                     ".boton-enviar-contacto"
                 );
 
-            if (botonEnviar) {
-                botonEnviar.disabled = true;
+            envioContactoEnCurso = true;
+            cambiarEstadoBotonContacto(
+                botonEnviar,
+                true
+            );
 
-                botonEnviar.innerHTML = `
-                    <i class="fa-solid fa-spinner fa-spin"></i>
-                    Enviando...
-                `;
-            }
-
-            setTimeout(() => {
-                guardarMensajeContacto();
+            try {
+                await enviarMensajeContacto();
 
                 formularioContacto.reset();
-
+                limpiarTodosLosErrores();
                 actualizarContadorMensaje();
+                momentoInicioFormulario =
+                    Date.now();
 
                 mostrarNotificacionContacto(
                     "Tu mensaje se ha enviado correctamente."
                 );
+            } catch (error) {
+                console.error(
+                    "Error al enviar el mensaje de contacto:",
+                    error
+                );
 
-                if (botonEnviar) {
-                    botonEnviar.disabled = false;
+                mostrarNotificacionContacto(
+                    "No hemos podido enviar tu mensaje. Inténtalo de nuevo."
+                );
+            } finally {
+                envioContactoEnCurso = false;
 
-                    botonEnviar.innerHTML = `
-                        <span>Enviar mensaje</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    `;
-                }
-            }, 800);
+                cambiarEstadoBotonContacto(
+                    botonEnviar,
+                    false
+                );
+            }
         }
     );
 }

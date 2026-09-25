@@ -1609,10 +1609,17 @@ async function cargarConversaciones() {
     }
 
     try {
-        const { data: sesion, error: errorSesion } = await cliente.auth.getSession();
-        if (errorSesion) throw errorSesion;
+        const {
+            data: datosUsuario,
+            error: errorUsuario
+        } = await cliente.auth.getUser();
 
-        usuarioActual = sesion.session?.user;
+        if (errorUsuario) {
+            throw errorUsuario;
+        }
+
+        usuarioActual =
+            datosUsuario.user;
 
         if (!usuarioActual) {
             sessionStorage.setItem("destinoDespuesLoginSuralia", window.location.href);

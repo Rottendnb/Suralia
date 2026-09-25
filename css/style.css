@@ -45192,3 +45192,341 @@ input:focus-visible {
     }
 
 }
+
+
+/* ========================================================================
+   SURALIA · ADMIN · MENSAJES DE CONTACTO V1
+======================================================================== */
+
+.admin-contacto {
+    margin-top: 34px;
+    padding: 32px;
+    border: 1px solid rgba(23, 61, 54, 0.1);
+    border-radius: 24px;
+    background: #ffffff;
+    box-shadow: 0 14px 34px rgba(23, 61, 54, 0.07);
+}
+
+.admin-contacto__cabecera {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.admin-contacto__cabecera h2 {
+    margin: 5px 0 7px;
+    color: var(--color-secundario);
+    font-size: clamp(1.55rem, 2.4vw, 2rem);
+    letter-spacing: -0.035em;
+}
+
+.admin-contacto__cabecera p {
+    max-width: 680px;
+    margin: 0;
+    color: var(--color-texto-suave);
+    line-height: 1.65;
+}
+
+.admin-contacto__herramientas {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+    padding: 14px;
+    border: 1px solid rgba(23, 61, 54, 0.09);
+    border-radius: 16px;
+    background: #f7f9f8;
+}
+
+.admin-contacto__herramientas label {
+    color: var(--color-secundario);
+    font-size: 0.84rem;
+    font-weight: 800;
+}
+
+.admin-contacto__herramientas select,
+.admin-mensaje__acciones select {
+    min-height: 42px;
+    padding: 0 38px 0 13px;
+    border: 1px solid rgba(23, 61, 54, 0.16);
+    border-radius: 11px;
+    outline: none;
+    background: #ffffff;
+    color: var(--color-secundario);
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.admin-contacto__herramientas select:focus,
+.admin-mensaje__acciones select:focus {
+    border-color: var(--color-principal);
+    box-shadow: 0 0 0 3px rgba(232, 93, 50, 0.12);
+}
+
+.admin-contacto__herramientas .admin-boton {
+    margin-left: auto;
+}
+
+.admin-contacto__estado {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 116px;
+    padding: 24px;
+    border: 1px dashed rgba(23, 61, 54, 0.18);
+    border-radius: 17px;
+    background: #f8faf9;
+    color: var(--color-texto-suave);
+    text-align: center;
+}
+
+.admin-contacto__estado strong,
+.admin-contacto__estado p {
+    display: block;
+    margin: 0;
+}
+
+.admin-contacto__estado p {
+    margin-top: 4px;
+    font-size: 0.9rem;
+}
+
+.admin-contacto__estado--vacio i {
+    color: #2f8b67;
+    font-size: 1.45rem;
+}
+
+.admin-contacto__estado--error {
+    border-color: rgba(185, 50, 50, 0.2);
+    background: #fff7f7;
+    color: #973838;
+}
+
+.admin-contacto__lista {
+    display: grid;
+    gap: 18px;
+}
+
+.admin-mensaje {
+    position: relative;
+    overflow: hidden;
+    padding: 24px;
+    border: 1px solid rgba(23, 61, 54, 0.11);
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 8px 22px rgba(23, 61, 54, 0.055);
+}
+
+.admin-mensaje::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 4px;
+    background: #d1d9d5;
+    content: "";
+}
+
+.admin-mensaje--pendiente::before {
+    background: var(--color-principal);
+}
+
+.admin-mensaje--en_revision::before {
+    background: #d39725;
+}
+
+.admin-mensaje--respondido::before {
+    background: #2f8b67;
+}
+
+.admin-mensaje--archivado::before {
+    background: #7b8580;
+}
+
+.admin-mensaje__superior {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.admin-mensaje__motivo {
+    color: var(--color-principal);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.admin-mensaje__superior h3 {
+    margin: 6px 0 0;
+    color: var(--color-secundario);
+    font-size: 1.15rem;
+    line-height: 1.35;
+}
+
+.admin-mensaje__estado {
+    flex: 0 0 auto;
+    padding: 7px 11px;
+    border-radius: 999px;
+    background: #eef2f0;
+    color: #59645f;
+    font-size: 0.72rem;
+    font-weight: 900;
+}
+
+.admin-mensaje__estado--pendiente {
+    background: rgba(232, 93, 50, 0.11);
+    color: #ae3d1d;
+}
+
+.admin-mensaje__estado--en_revision {
+    background: rgba(211, 151, 37, 0.14);
+    color: #8b6218;
+}
+
+.admin-mensaje__estado--respondido {
+    background: rgba(47, 139, 103, 0.12);
+    color: #226d50;
+}
+
+.admin-mensaje__remitente {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin-top: 15px;
+    color: var(--color-texto-suave);
+    font-size: 0.84rem;
+}
+
+.admin-mensaje__remitente span,
+.admin-mensaje__remitente a,
+.admin-mensaje__remitente time {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+}
+
+.admin-mensaje__remitente a {
+    overflow-wrap: anywhere;
+    color: var(--color-secundario);
+    font-weight: 750;
+}
+
+.admin-mensaje__texto {
+    margin-top: 19px;
+    padding: 17px 18px;
+    border: 1px solid rgba(23, 61, 54, 0.075);
+    border-radius: 14px;
+    background: #f8faf9;
+    color: var(--color-texto);
+    font-size: 0.94rem;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.admin-mensaje__acciones {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.admin-mensaje__acciones label {
+    display: grid;
+    gap: 6px;
+    color: var(--color-secundario);
+    font-size: 0.76rem;
+    font-weight: 850;
+}
+
+.admin-boton--responder {
+    background: var(--color-secundario);
+    color: #ffffff;
+}
+
+.admin-boton--responder:hover {
+    background: var(--color-secundario-oscuro, #102e29);
+    color: #ffffff;
+}
+
+@media (max-width: 760px) {
+
+    .admin-contacto {
+        padding: 24px;
+        border-radius: 20px;
+    }
+
+    .admin-contacto__cabecera,
+    .admin-mensaje__superior {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-contacto__herramientas {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-contacto__herramientas .admin-boton {
+        justify-content: center;
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .admin-contacto__herramientas select {
+        width: 100%;
+    }
+
+    .admin-mensaje__acciones {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-mensaje__acciones .admin-boton,
+    .admin-mensaje__acciones label,
+    .admin-mensaje__acciones select {
+        justify-content: center;
+        width: 100%;
+    }
+
+}
+
+@media (max-width: 480px) {
+
+    .admin-contacto {
+        padding: 20px;
+    }
+
+    .admin-mensaje {
+        padding: 20px;
+    }
+
+    .admin-mensaje__remitente {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}
+
+
+/* ========================================================================
+   SURALIA · CONTACTO · CAMPO ANTISPAM INVISIBLE V2
+======================================================================== */
+
+.campo-contacto-trampa {
+    position: absolute !important;
+    left: -10000px !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
